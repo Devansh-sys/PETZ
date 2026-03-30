@@ -16,17 +16,18 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
- * Central Spring Security configuration for the entire PETZ platform.
+ * MERGED Security Configuration — combines:
+ *   1. Auth filter chain (Epic 1.1 — JWT + Rate Limiting)
+ *   2. Teammate's basic permitAll config (NGO branch)
  *
  * ┌──────────────────────────────────────────────────────────────────────┐
- * │  TEAMMATES: Do NOT create a second SecurityFilterChain bean.        │
+ * │  TEAMMATES: This is the ONLY SecurityConfig in the project.         │
+ * │  Delete any other SecurityConfig files in other packages.           │
  * │  To add new public endpoints → add to permitAll() list below.      │
  * │  To add role restrictions → use @PreAuthorize on your controllers.  │
- * │  EnableMethodSecurity is already ON.                                │
  * └──────────────────────────────────────────────────────────────────────┘
  *
- * Filter chain order (US-1.1.5 requirement):
- *   RateLimitFilter → JwtAuthFilter → Controllers
+ * Filter chain order: RateLimitFilter → JwtAuthFilter → Controllers
  */
 @Configuration
 @EnableWebSecurity
@@ -45,30 +46,32 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+
                 .authorizeHttpRequests(auth -> auth
-                        // Public — no authentication needed
+                        // ── Public endpoints (no auth needed) ──
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/webhook/**").permitAll()
                         .requestMatchers("/health", "/actuator/health").permitAll()
 
-                        // SOS creation — any authenticated user (even temporary)
+                        // ── NGO endpoints (from teammate's branch) ──
+                        .requestMatchers("/api/v1/ngo/**").permitAll()       // permitAll for now, tighten later
+                        .requestMatchers("/api/v1/hospitals/**").permitAll() // permitAll for now, tighten later
+
+                        // ── SOS creation — any authenticated user (even temporary) ──
                         .requestMatchers(HttpMethod.POST, "/api/v1/sos/reports").authenticated()
 
-                        // Admin endpoints
+                        // ── Admin endpoints ──
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
-                        // NGO endpoints (teammates Epic 1.3)
-                        .requestMatchers("/api/v1/ngo/**").hasAnyRole("NGO_REP", "ADMIN")
-
-                        // Hospital management (teammates Sprint 3)
-                        .requestMatchers("/api/v1/hospitals/manage/**").hasAnyRole("VET", "ADMIN")
-
-                        // Everything else requires authentication
-                        .anyRequest().authenticated()
+                        // ── Everything else — permitAll during development ──
+                        // Change to .authenticated() before production
+                        .anyRequest().permitAll()
                 )
+
                 // Filter ordering: RateLimitFilter → JwtAuthFilter → Controllers
                 .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(jwtAuthFilter, RateLimitFilter.class);
@@ -77,9 +80,10 @@ public class SecurityConfig {
     }
 
     /**
-     * BCrypt encoder — used for:
+     * BCrypt encoder — used by:
      * - OTP hashing (US-1.1.2)
-     * - Password hashing (US-4.1.1, US-4.1.2 — teammate scope)
+     * - Password hashing (US-4.1.1, US-4.1.2)
+     * - SessionConversionService (teammate's NGO branch)
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
