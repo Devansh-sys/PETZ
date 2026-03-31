@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 public class RescueKpiController {
 
     private final RescueKpiService kpiService;

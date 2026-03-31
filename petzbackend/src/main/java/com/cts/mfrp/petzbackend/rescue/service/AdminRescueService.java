@@ -10,7 +10,9 @@ import com.cts.mfrp.petzbackend.rescue.model.NgoAssignment.AssignmentStatus;
 import com.cts.mfrp.petzbackend.rescue.repository.NgoAssignmentRepository;
 import com.cts.mfrp.petzbackend.rescue.repository.SosReportRescueRepository;
 import com.cts.mfrp.petzbackend.sosreport.model.SosReport;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminRescueService {
@@ -32,6 +35,7 @@ public class AdminRescueService {
      * Returns all non-completed SOS reports enriched with assignment info,
      * with optional in-memory filtering by status, severity, and NGO.
      */
+    @Transactional(readOnly = true)
     public List<AdminRescueMapResponse> getAllActiveRescues(
             ReportStatus statusFilter,
             UrgencyLevel severityFilter,
@@ -60,13 +64,24 @@ public class AdminRescueService {
             if (active == null || !ngoFilter.equals(active.getNgoId())) return null;
         }
 
+        // Safely resolve reporter phone — proxy may exist but point to a deleted user
+        String reporterPhone = null;
+        try {
+            if (r.getReporter() != null) {
+                reporterPhone = r.getReporter().getPhone();
+            }
+        } catch (EntityNotFoundException e) {
+            log.warn("Reporter not found for SOS report {} — user may have been deleted", r.getId());
+            reporterPhone = null;
+        }
+
         return AdminRescueMapResponse.builder()
                 .sosId(r.getId())
                 .latitude(r.getLatitude())
                 .longitude(r.getLongitude())
                 .status(r.getCurrentStatus())
                 .urgencyLevel(r.getUrgencyLevel())
-                .reporterPhone(r.getReporter().getPhone())
+                .reporterPhone(reporterPhone)
                 .reportedAt(r.getReportedAt())
                 .assignedNgoId(active != null ? active.getNgoId().toString() : "Unassigned")
                 .assignedVolunteerId(active != null && active.getVolunteerId() != null

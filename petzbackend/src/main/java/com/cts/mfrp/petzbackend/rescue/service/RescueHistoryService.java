@@ -1,9 +1,11 @@
-package com.cts.mfrp.petzbackend.rescue.service;
+//FILE: rescue/service/RescueHistoryService.java
+        package com.cts.mfrp.petzbackend.rescue.service;
 
 import com.cts.mfrp.petzbackend.enums.ReportStatus;
 import com.cts.mfrp.petzbackend.rescue.dto.RescueHistoryResponse;
 import com.cts.mfrp.petzbackend.rescue.repository.SosReportRescueRepository;
 import com.cts.mfrp.petzbackend.sosreport.model.SosReport;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ public class RescueHistoryService {
 
     private final SosReportRescueRepository sosReportRepo;
 
+    @Transactional(readOnly = true)
     public List<RescueHistoryResponse> getHistoryForUser(UUID userId) {
         List<SosReport> reports =
                 sosReportRepo.findByReporter_IdOrderByReportedAtDesc(userId);
