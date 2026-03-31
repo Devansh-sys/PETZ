@@ -43,7 +43,8 @@ public class NgoAssignment {
 
     @Column(name = "accepted_at")
     private LocalDateTime acceptedAt;
-
+    @Column(name = "arrival_at")
+    private LocalDateTime arrivalAt;
     @Enumerated(EnumType.STRING)
     @Column(name = "assignment_status", nullable = false, length = 20)
     private AssignmentStatus assignmentStatus;
