@@ -3,16 +3,21 @@ package com.cts.mfrp.petzbackend.sosmedia.model;
 import com.cts.mfrp.petzbackend.enums.SosMediaType;
 import com.cts.mfrp.petzbackend.sosreport.model.SosReport;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.UUID;
 
 @Entity
 @Table(name = "sos_media")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SosMedia {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(updatable = false, nullable = false)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -23,19 +28,6 @@ public class SosMedia {
     private String fileUrl;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "media_type", nullable = false, length = 10)
+    @Column(name = "media_type", nullable = false)
     private SosMediaType mediaType;
-
-    // ── Getters & Setters ─────────────────────────────────────────────────────
-
-    public UUID getId() { return id; }
-
-    public SosReport getSosReport() { return sosReport; }
-    public void setSosReport(SosReport sosReport) { this.sosReport = sosReport; }
-
-    public String getFileUrl() { return fileUrl; }
-    public void setFileUrl(String fileUrl) { this.fileUrl = fileUrl; }
-
-    public SosMediaType getMediaType() { return mediaType; }
-    public void setMediaType(SosMediaType mediaType) { this.mediaType = mediaType; }
 }

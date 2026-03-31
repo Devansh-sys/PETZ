@@ -29,7 +29,7 @@ public class SessionConversionController {
 
     @PostMapping("/convert-session")
     public ResponseEntity<ConvertSessionResponse> convertSession(
-            @AuthenticationPrincipal UUID userId,
+            @RequestParam UUID userId,
             @Valid @RequestBody ConvertSessionRequest req) {
 
         return ResponseEntity.ok(conversionService.convertSession(userId, req));

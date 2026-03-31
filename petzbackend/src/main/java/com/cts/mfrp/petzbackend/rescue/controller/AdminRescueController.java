@@ -23,7 +23,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/admin/rescues")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
+
 public class AdminRescueController {
 
     private final AdminRescueService adminRescueService;
