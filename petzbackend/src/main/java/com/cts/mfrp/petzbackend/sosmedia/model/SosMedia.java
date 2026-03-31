@@ -3,15 +3,24 @@ package com.cts.mfrp.petzbackend.sosmedia.model;
 import com.cts.mfrp.petzbackend.enums.SosMediaType;
 import com.cts.mfrp.petzbackend.sosreport.model.SosReport;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.UUID;
 
 @Entity
 @Table(name = "sos_media")
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+
 public class SosMedia {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+
     @Column(updatable = false, nullable = false)
     private UUID id;
 
