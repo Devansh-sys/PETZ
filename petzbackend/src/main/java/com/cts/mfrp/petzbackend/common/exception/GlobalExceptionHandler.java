@@ -93,4 +93,19 @@ public class GlobalExceptionHandler {
                         "Something went wrong. Please try again.", request.getRequestURI())
         );
     }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleResourceNotFound(
+            ResourceNotFoundException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiErrorResponse.of(404, "Not Found", ex.getMessage(), request.getRequestURI())
+        );
+    }
+    @ExceptionHandler(FileValidationException.class)
+    public ResponseEntity<ApiErrorResponse> handleFileValidation(
+            FileValidationException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ApiErrorResponse.of(400, "File Validation Failed", ex.getMessage(), request.getRequestURI())
+        );
+    }
 }

@@ -6,6 +6,7 @@ import com.cts.mfrp.petzbackend.sosmedia.model.SosMedia;
 import com.cts.mfrp.petzbackend.statuslog.model.StatusLog;
 import com.cts.mfrp.petzbackend.user.model.User;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,6 +16,11 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "sos_reports")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SosReport {
 
     @Id
@@ -30,9 +36,11 @@ public class SosReport {
     private UUID assignedAnimalId;
 
     @OneToMany(mappedBy = "sosReport", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<SosMedia> mediaFiles = new ArrayList<>();
 
     @OneToMany(mappedBy = "sosReport", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<StatusLog> statusLogs = new ArrayList<>();
 
     @Column(precision = 10, scale = 7)
@@ -46,7 +54,7 @@ public class SosReport {
     private UrgencyLevel urgencyLevel;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "current_status", nullable = false, length = 15)
+    @Column(name = "current_status", nullable = false, length = 20)
     private ReportStatus currentStatus;
 
     @Column(length = 500)
@@ -72,37 +80,4 @@ public class SosReport {
         statusLogs.add(log);
         log.setSosReport(this);
     }
-
-    // ── Getters & Setters ─────────────────────────────────────────────────────
-
-    public UUID getId() { return id; }
-
-    public User getReporter() { return reporter; }
-    public void setReporter(User reporter) { this.reporter = reporter; }
-
-    public UUID getAssignedAnimalId() { return assignedAnimalId; }
-    public void setAssignedAnimalId(UUID assignedAnimalId) { this.assignedAnimalId = assignedAnimalId; }
-
-    public List<SosMedia> getMediaFiles() { return mediaFiles; }
-    public void setMediaFiles(List<SosMedia> mediaFiles) { this.mediaFiles = mediaFiles; }
-
-    public List<StatusLog> getStatusLogs() { return statusLogs; }
-    public void setStatusLogs(List<StatusLog> statusLogs) { this.statusLogs = statusLogs; }
-
-    public BigDecimal getLatitude() { return latitude; }
-    public void setLatitude(BigDecimal latitude) { this.latitude = latitude; }
-
-    public BigDecimal getLongitude() { return longitude; }
-    public void setLongitude(BigDecimal longitude) { this.longitude = longitude; }
-
-    public UrgencyLevel getUrgencyLevel() { return urgencyLevel; }
-    public void setUrgencyLevel(UrgencyLevel urgencyLevel) { this.urgencyLevel = urgencyLevel; }
-
-    public ReportStatus getCurrentStatus() { return currentStatus; }
-    public void setCurrentStatus(ReportStatus currentStatus) { this.currentStatus = currentStatus; }
-
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-
-    public LocalDateTime getReportedAt() { return reportedAt; }
 }

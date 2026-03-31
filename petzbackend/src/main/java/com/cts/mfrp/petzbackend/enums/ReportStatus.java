@@ -5,5 +5,8 @@ public enum ReportStatus {
     DISPATCHED,
     ON_SITE,
     TRANSPORTING,
-    COMPLETE
+    COMPLETE,
+    MISSION_COMPLETE,
+    FLAGGED,
+    CLOSED
 }
