@@ -4,16 +4,19 @@ import com.cts.mfrp.petzbackend.ngo.dto.NavigationDTO;
 import com.cts.mfrp.petzbackend.ngo.dto.NgoResponseDTO;
 import com.cts.mfrp.petzbackend.ngo.model.Mission;
 import com.cts.mfrp.petzbackend.ngo.model.Ngo;
-import com.cts.mfrp.petzbackend.ngo.model.StatusLog;
 import com.cts.mfrp.petzbackend.ngo.repository.MissionRepository;
 import com.cts.mfrp.petzbackend.ngo.repository.NgoRepository;
-import com.cts.mfrp.petzbackend.ngo.repository.StatusLogRepository;
+import com.cts.mfrp.petzbackend.sosreport.model.SosReport;
+import com.cts.mfrp.petzbackend.sosreport.repository.SosReportRepository;
+import com.cts.mfrp.petzbackend.statuslog.model.StatusLog;
+import com.cts.mfrp.petzbackend.statuslog.repository.StatusLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class NgoService {
@@ -25,6 +28,8 @@ public class NgoService {
     @Autowired
     private StatusLogRepository statusLogRepository;
     @Autowired
+    private SosReportRepository sosReportRepository;
+    @Autowired
     private NotificationService notificationService;
 
     // US-1.3.1 Automatic NGO Assignment
@@ -35,7 +40,7 @@ public class NgoService {
             default -> 5;
         };
 
-        List<Ngo> nearest = ngoRepository.findActiveNgos(); // TODO: filter by distance
+        List<Ngo> nearest = ngoRepository.findActiveNgos();
         return nearest.stream()
                 .limit(5)
                 .map(ngo -> new NgoResponseDTO(
@@ -61,7 +66,7 @@ public class NgoService {
         missionRepository.save(mission);
 
         notificationService.notifyOthersMissionClaimed(missionId, ngoId);
-        logStatus(missionId, "ACCEPTED");
+        logStatus(mission.getSosReportId(), "ACCEPTED");
     }
 
     // US-1.3.3 Decline Rescue Mission
@@ -70,7 +75,7 @@ public class NgoService {
         mission.getDeclinedNgoIds().add(ngoId);
         missionRepository.save(mission);
 
-        logStatus(missionId, "DECLINED");
+        logStatus(mission.getSosReportId(), "DECLINED");
 
         if (mission.getDeclinedNgoIds().size() >= 5) {
             reDispatch(mission);
@@ -93,7 +98,7 @@ public class NgoService {
                 mission.setStatus("REDISPATCH");
                 missionRepository.save(mission);
                 reDispatch(mission);
-                logStatus(mission.getId(), "REDISPATCH");
+                logStatus(mission.getSosReportId(), "REDISPATCH");
             }
         }
     }
@@ -107,11 +112,14 @@ public class NgoService {
     }
 
     // US-1.3.6 Status Log Audit Trail
-    public void logStatus(Long missionId, String status) {
-        StatusLog log = new StatusLog();
-        log.setMissionId(missionId);
-        log.setStatus(status);
-        log.setUpdatedAt(LocalDateTime.now());
+    public void logStatus(UUID sosReportId, String status) {
+        SosReport sosReport = sosReportRepository.findById(sosReportId)
+                .orElseThrow(() -> new RuntimeException("SOS Report not found: " + sosReportId));
+
+        StatusLog log = StatusLog.builder()
+                .sosReport(sosReport)
+                .status(status)
+                .build();
         statusLogRepository.save(log);
     }
 

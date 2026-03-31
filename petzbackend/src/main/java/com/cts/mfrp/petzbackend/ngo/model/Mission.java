@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 public class Mission {
@@ -11,6 +12,13 @@ public class Mission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    /**
+     * Links this mission to the SOS Report that triggered it.
+     * Required for status logging against the correct SOS case.
+     */
+    @Column(name = "sos_report_id")
+    private UUID sosReportId;
 
     private double sosLat;
     private double sosLon;
@@ -32,6 +40,9 @@ public class Mission {
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    public UUID getSosReportId() { return sosReportId; }
+    public void setSosReportId(UUID sosReportId) { this.sosReportId = sosReportId; }
 
     public double getSosLat() { return sosLat; }
     public void setSosLat(double sosLat) { this.sosLat = sosLat; }
