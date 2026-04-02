@@ -37,6 +37,7 @@ petzbackend/.sts4-cache/
 # ==========================================
 # Frontend (Future petz-frontend)
 # ==========================================
+# Pre-emptively ignoring standard React/Node artifacts
 **/node_modules/
 **/build/
 **/dist/
@@ -53,9 +54,11 @@ petzbackend/.sts4-cache/
 # OS / Log files
 # ==========================================
 log/
+<<<<<<< HEAD
 *.log
 
-# ==========================================
 # Local config with secrets
-# ==========================================
 petzbackend/src/main/resources/application.properties
+=======
+*.log
+>>>>>>> origin/ngobranch

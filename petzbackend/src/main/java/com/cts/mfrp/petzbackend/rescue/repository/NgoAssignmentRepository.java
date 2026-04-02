@@ -13,6 +13,7 @@ import java.util.UUID;
 
 public interface NgoAssignmentRepository extends JpaRepository<NgoAssignment, UUID> {
 
+    // Used by other services — keep as-is
     Optional<NgoAssignment> findBySosReportIdAndAssignmentStatus(
             UUID sosReportId, AssignmentStatus status);
 
@@ -21,6 +22,11 @@ public interface NgoAssignmentRepository extends JpaRepository<NgoAssignment, UU
 
     List<NgoAssignment> findBySosReport_Id(UUID sosReportId);
 
+    // ✅ Added for US-1.4.1 — navigate sosReport.id via underscore notation
+    Optional<NgoAssignment> findBySosReport_IdAndVolunteerId(
+            UUID sosReportId, UUID volunteerId);
+
+    // ✅ Added for US-1.5.4 — already existed but confirming signature
     Optional<NgoAssignment> findBySosReport_IdAndAssignmentStatus(
             UUID sosReportId, AssignmentStatus status);
 
