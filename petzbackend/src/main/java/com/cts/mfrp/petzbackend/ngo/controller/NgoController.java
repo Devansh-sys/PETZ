@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/ngo")
@@ -24,19 +25,19 @@ public class NgoController {
     }
 
     @PostMapping("/missions/{missionId}/accept")
-    public ResponseEntity<String> acceptMission(@PathVariable Long missionId, @RequestParam Long ngoId) {
-        ngoService.acceptMission(missionId, ngoId);
+    public ResponseEntity<String> acceptMission(@PathVariable UUID missionId, @RequestParam UUID ngoUserId) {
+        ngoService.acceptMission(missionId, ngoUserId);
         return ResponseEntity.ok("Mission accepted");
     }
 
     @PostMapping("/missions/{missionId}/decline")
-    public ResponseEntity<String> declineMission(@PathVariable Long missionId, @RequestParam Long ngoId) {
-        ngoService.declineMission(missionId, ngoId);
+    public ResponseEntity<String> declineMission(@PathVariable UUID missionId, @RequestParam UUID ngoUserId) {
+        ngoService.declineMission(missionId, ngoUserId);
         return ResponseEntity.ok("Mission declined");
     }
 
     @GetMapping("/missions/{missionId}/navigation")
-    public ResponseEntity<NavigationDTO> getNavigation(@PathVariable Long missionId) {
+    public ResponseEntity<NavigationDTO> getNavigation(@PathVariable UUID missionId) {
         return ResponseEntity.ok(ngoService.getNavigationDetails(missionId));
     }
 }

@@ -1,22 +1,28 @@
 package com.cts.mfrp.petzbackend.ngo.service;
 
 import com.cts.mfrp.petzbackend.common.service.NotificationService;
+import com.cts.mfrp.petzbackend.enums.ReportStatus;
 import com.cts.mfrp.petzbackend.ngo.dto.NavigationDTO;
 import com.cts.mfrp.petzbackend.ngo.dto.NgoResponseDTO;
-import com.cts.mfrp.petzbackend.ngo.model.Mission;
 import com.cts.mfrp.petzbackend.ngo.model.Ngo;
-import com.cts.mfrp.petzbackend.ngo.repository.MissionRepository;
 import com.cts.mfrp.petzbackend.ngo.repository.NgoRepository;
+import com.cts.mfrp.petzbackend.rescue.model.RescueMission;
+import com.cts.mfrp.petzbackend.rescue.repository.RescueMissionRepository;
 import com.cts.mfrp.petzbackend.sosreport.model.SosReport;
 import com.cts.mfrp.petzbackend.sosreport.repository.SosReportRepository;
 import com.cts.mfrp.petzbackend.statuslog.model.StatusLog;
 import com.cts.mfrp.petzbackend.statuslog.repository.StatusLogRepository;
+import com.cts.mfrp.petzbackend.user.model.User;
+import com.cts.mfrp.petzbackend.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -25,22 +31,18 @@ public class NgoService {
     @Autowired
     private NgoRepository ngoRepository;
     @Autowired
-    private MissionRepository missionRepository;
+    private RescueMissionRepository rescueMissionRepository;
     @Autowired
     private StatusLogRepository statusLogRepository;
     @Autowired
     private SosReportRepository sosReportRepository;
     @Autowired
+    private UserRepository userRepository;
+    @Autowired
     private NotificationService notificationService;
 
     // US-1.3.1 Automatic NGO Assignment
     public List<NgoResponseDTO> assignNearestNgo(double sosLat, double sosLon, int severityLevel) {
-        int radius = switch (severityLevel) {
-            case 1 -> 10;
-            case 2 -> 7;
-            default -> 5;
-        };
-
         List<Ngo> nearest = ngoRepository.findActiveNgos();
         return nearest.stream()
                 .limit(5)
@@ -57,51 +59,76 @@ public class NgoService {
     }
 
     // US-1.3.2 Accept Rescue Mission
-    public void acceptMission(Long missionId, Long ngoId) {
-        Mission mission = missionRepository.findById(missionId).orElseThrow();
-        if ("ASSIGNED".equals(mission.getStatus())) throw new IllegalStateException("Already claimed");
+    @Transactional
+    public void acceptMission(UUID missionId, UUID ngoUserId) {
+        RescueMission mission = rescueMissionRepository.findById(missionId)
+                .orElseThrow(() -> new NoSuchElementException("Mission not found: " + missionId));
 
-        mission.setStatus("ASSIGNED");
-        mission.setAssignedNgoId(ngoId);
-        mission.setAcceptedAt(LocalDateTime.now());
-        missionRepository.save(mission);
+        if (mission.getRescueStatus() == ReportStatus.DISPATCHED) {
+            throw new IllegalStateException("Mission already assigned");
+        }
 
-        notificationService.notifyOthersMissionClaimed(missionId, ngoId);
-        logStatus(mission.getSosReportId(), "ACCEPTED");
+        User ngoUser = userRepository.findById(ngoUserId)
+                .orElseThrow(() -> new NoSuchElementException("NGO user not found: " + ngoUserId));
+
+        mission.setRescueStatus(ReportStatus.DISPATCHED);
+        mission.setAssignedNgoUser(ngoUser);
+        mission.setDispatchedAt(LocalDateTime.now());
+        rescueMissionRepository.save(mission);
+
+        // Sync status to SOS report
+        mission.getSosReport().setCurrentStatus(ReportStatus.DISPATCHED);
+        sosReportRepository.save(mission.getSosReport());
+
+        notificationService.notifyOthersMissionClaimed(0L, 0L);
+        logStatus(mission.getSosReport().getId(), "ACCEPTED");
     }
 
     // US-1.3.3 Decline Rescue Mission
-    public void declineMission(Long missionId, Long ngoId) {
-        Mission mission = missionRepository.findById(missionId).orElseThrow();
-        mission.getDeclinedNgoIds().add(ngoId);
-        missionRepository.save(mission);
+    @Transactional
+    public void declineMission(UUID missionId, UUID ngoUserId) {
+        RescueMission mission = rescueMissionRepository.findById(missionId)
+                .orElseThrow(() -> new NoSuchElementException("Mission not found: " + missionId));
 
-        logStatus(mission.getSosReportId(), "DECLINED");
-
-        if (mission.getDeclinedNgoIds().size() >= 5) {
-            reDispatch(mission);
-        }
+        logStatus(mission.getSosReport().getId(), "DECLINED");
     }
 
     // US-1.3.4 GPS Navigation
-    public NavigationDTO getNavigationDetails(Long missionId) {
-        Mission mission = missionRepository.findById(missionId).orElseThrow();
-        return new NavigationDTO(mission.getSosLat(), mission.getSosLon(), "ETA: 10 mins");
+    public NavigationDTO getNavigationDetails(UUID missionId) {
+        RescueMission mission = rescueMissionRepository.findById(missionId)
+                .orElseThrow(() -> new NoSuchElementException("Mission not found: " + missionId));
+
+        SosReport report = mission.getSosReport();
+        return new NavigationDTO(
+                report.getLatitude().doubleValue(),
+                report.getLongitude().doubleValue(),
+                mission.getEtaMinutes() != null
+                        ? "ETA: " + mission.getEtaMinutes() + " mins"
+                        : "ETA: calculating...");
     }
 
     // US-1.3.5 Auto-Reassign on Timeout
     @Scheduled(fixedRate = 60000)
+    @Transactional
     public void checkTimeouts() {
-        List<Mission> pending = missionRepository.findByStatus("PENDING");
-        for (Mission mission : pending) {
+        List<RescueMission> pending = rescueMissionRepository.findByRescueStatus(ReportStatus.REPORTED);
+        for (RescueMission mission : pending) {
+            SosReport report = mission.getSosReport();
+            int severity = urgencyToSeverity(report.getUrgencyLevel());
             if (mission.getCreatedAt().isBefore(LocalDateTime.now()
-                    .minusMinutes(timeoutForSeverity(mission.getSeverityLevel())))) {
-                mission.setStatus("REDISPATCH");
-                missionRepository.save(mission);
-                reDispatch(mission);
-                logStatus(mission.getSosReportId(), "REDISPATCH");
+                    .minusMinutes(timeoutForSeverity(severity)))) {
+                logStatus(report.getId(), "REDISPATCH");
+                reDispatch(report);
             }
         }
+    }
+
+    private int urgencyToSeverity(com.cts.mfrp.petzbackend.enums.UrgencyLevel level) {
+        return switch (level) {
+            case CRITICAL -> 1;
+            case MODERATE -> 2;
+            case LOW -> 3;
+        };
     }
 
     private int timeoutForSeverity(int severity) {
@@ -124,7 +151,10 @@ public class NgoService {
         statusLogRepository.save(log);
     }
 
-    private void reDispatch(Mission mission) {
-        assignNearestNgo(mission.getSosLat(), mission.getSosLon(), mission.getSeverityLevel());
+    private void reDispatch(SosReport report) {
+        assignNearestNgo(
+                report.getLatitude().doubleValue(),
+                report.getLongitude().doubleValue(),
+                urgencyToSeverity(report.getUrgencyLevel()));
     }
 }
