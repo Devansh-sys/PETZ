@@ -129,14 +129,14 @@ public class SosReportService {
 
         return mapToResponse(report);
     }
-
+    @Transactional(readOnly = true)
     public SosReportResponse getReportById(UUID reportId) {
         SosReport report = sosReportRepository.findById(reportId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "SOS Report not found with id: " + reportId));
         return mapToResponse(report);
     }
-
+    @Transactional(readOnly = true)
     public List<SosReportResponse> getAllReports() {
         return sosReportRepository.findAll().stream()
                 .map(this::mapToResponse)
@@ -166,5 +166,13 @@ public class SosReportService {
                 .reportedAt(report.getReportedAt())
                 .media(mediaResponses)
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<SosReportResponse> getReportsByReporter(UUID reporterId) {
+        return sosReportRepository.findByReporter_IdOrderByReportedAtDesc(reporterId)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 }

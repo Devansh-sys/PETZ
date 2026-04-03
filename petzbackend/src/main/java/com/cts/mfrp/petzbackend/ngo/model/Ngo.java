@@ -1,13 +1,14 @@
 package com.cts.mfrp.petzbackend.ngo.model;
 
 import jakarta.persistence.*;
+import java.util.UUID;
 
 @Entity
 public class Ngo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     private String name;
     private double latitude;
@@ -25,8 +26,8 @@ public class Ngo {
     }
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

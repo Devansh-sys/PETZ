@@ -62,4 +62,13 @@ public class SosReportController {
         List<SosReportResponse> reports = sosReportService.getAllReports();
         return ResponseEntity.ok(ApiResponse.ok("Reports fetched", reports));
     }
+
+    // GET /api/v1/sos-reports/my-reports?reporterId=<uuid>
+    @GetMapping("/my-reports")
+    public ResponseEntity<ApiResponse<List<SosReportResponse>>> getMyReports(
+            @RequestParam UUID reporterId) {
+
+        List<SosReportResponse> reports = sosReportService.getReportsByReporter(reporterId);
+        return ResponseEntity.ok(ApiResponse.ok("Reporter's reports fetched", reports));
+    }
 }

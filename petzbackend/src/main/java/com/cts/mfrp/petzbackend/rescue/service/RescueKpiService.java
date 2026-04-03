@@ -4,8 +4,10 @@ import com.cts.mfrp.petzbackend.rescue.dto.KpiRequest;
 import com.cts.mfrp.petzbackend.rescue.dto.KpiResponse;
 import com.cts.mfrp.petzbackend.rescue.repository.NgoAssignmentRepository;
 import com.cts.mfrp.petzbackend.sosreport.repository.SosReportRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * US-1.8.3 – Computes rescue KPIs for the admin dashboard.
@@ -17,6 +19,7 @@ public class RescueKpiService {
     private final SosReportRepository sosReportRepo;
     private final NgoAssignmentRepository   ngoAssignmentRepo;
 
+    @Transactional(readOnly = true)
     public KpiResponse computeKpis(KpiRequest req) {
         var from = req.getFrom();
         var to   = req.getTo();

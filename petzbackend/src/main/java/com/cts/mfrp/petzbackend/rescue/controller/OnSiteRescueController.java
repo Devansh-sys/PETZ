@@ -23,7 +23,19 @@ public class OnSiteRescueController {
 
     private final OnSiteRescueService service;
 
-    // US-1.4.1 — Mark Arrival
+//     US-1.4.1 — Mark Arrival
+//    Two layers of security in your app:
+//    Layer	Where	What it does	Your config
+//    URL-level	SecurityConfig filter chain	Controls HTTP access to URLs	permitAll() ✅ passes
+//    Method-level	@PreAuthorize on controller methods	Checks user roles after URL passes	❌ blocks you here
+//    The OnSiteRescueController has this on every method:
+//
+//    @PreAuthorize("hasRole('VOLUNTEER') or hasRole('NGO_REP')")
+//
+//    Since you're not sending a JWT token, Spring sees you as anonymous (no role), so hasRole('VOLUNTEER') = false, hasRole('NGO_REP') = false → Access Denied.
+//
+//    The fix — disable method-level security for dev testing:
+//    Comment out @EnableMethodSecurity in SecurityConfig:
     @PatchMapping("/arrival")
     @PreAuthorize("hasRole('VOLUNTEER') or hasRole('NGO_REP')")
     public ResponseEntity<ApiResponse<Void>> markArrival(
@@ -33,7 +45,7 @@ public class OnSiteRescueController {
         return ResponseEntity.ok(ApiResponse.ok("Arrival marked. Status: ON_SITE.", null));
     }
 
-    // US-1.4.2 + US-1.4.3 — On-Site Assessment + Decision
+    // US-1.4.2 + US-1.4.3 — On-Site Assessment + Decision //it is to record the assessment
     @PostMapping("/assessment")
     @PreAuthorize("hasRole('VOLUNTEER') or hasRole('NGO_REP')")
     public ResponseEntity<ApiResponse<OnSiteAssessmentResponse>> submitAssessment(
@@ -54,7 +66,7 @@ public class OnSiteRescueController {
                         service.getNearbyEmergencyHospitals(sosReportId)));
     }
 
-    // US-1.5.2 — Send Incoming Rescue Alert
+    // US-1.5.2 — Send Incoming Rescue Alert //alerting hospital that animal is coming
     @PostMapping("/hospitals/{hospitalId}/alert")
     @PreAuthorize("hasRole('VOLUNTEER') or hasRole('NGO_REP')")
     public ResponseEntity<ApiResponse<Void>> sendAlert(

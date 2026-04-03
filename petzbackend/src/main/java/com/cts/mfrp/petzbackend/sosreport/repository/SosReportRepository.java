@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,4 +58,6 @@ public interface SosReportRepository extends JpaRepository<SosReport, UUID> {
     """)
     Double avgMinutesToAcceptance(@Param("from") LocalDateTime from,
                                   @Param("to")   LocalDateTime to);
+
+
 }

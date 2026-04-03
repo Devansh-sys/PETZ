@@ -6,7 +6,9 @@ import com.cts.mfrp.petzbackend.ngo.dto.NavigationDTO;
 import com.cts.mfrp.petzbackend.ngo.dto.NgoResponseDTO;
 import com.cts.mfrp.petzbackend.ngo.model.Ngo;
 import com.cts.mfrp.petzbackend.ngo.repository.NgoRepository;
+import com.cts.mfrp.petzbackend.rescue.model.NgoAssignment;
 import com.cts.mfrp.petzbackend.rescue.model.RescueMission;
+import com.cts.mfrp.petzbackend.rescue.repository.NgoAssignmentRepository;
 import com.cts.mfrp.petzbackend.rescue.repository.RescueMissionRepository;
 import com.cts.mfrp.petzbackend.sosreport.model.SosReport;
 import com.cts.mfrp.petzbackend.sosreport.repository.SosReportRepository;
@@ -38,6 +40,8 @@ public class NgoService {
     private SosReportRepository sosReportRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private NgoAssignmentRepository ngoAssignmentRepository;
     @Autowired
     private NotificationService notificationService;
 
@@ -80,7 +84,17 @@ public class NgoService {
         mission.getSosReport().setCurrentStatus(ReportStatus.DISPATCHED);
         sosReportRepository.save(mission.getSosReport());
 
-        notificationService.notifyOthersMissionClaimed(0L, 0L);
+        // Create NgoAssignment record (required by OnSiteRescueService for arrival/assessment)
+        NgoAssignment assignment = NgoAssignment.builder()
+                .sosReport(mission.getSosReport())
+                .ngoId(ngoUserId)             // NGO user ID as ngoId
+                .volunteerId(ngoUserId)       // same user acts as volunteer
+                .acceptedAt(LocalDateTime.now())
+                .assignmentStatus(NgoAssignment.AssignmentStatus.ACCEPTED)
+                .build();
+        ngoAssignmentRepository.save(assignment);
+
+        notificationService.notifyOthersMissionClaimed(missionId, ngoUser.getId());
         logStatus(mission.getSosReport().getId(), "ACCEPTED");
     }
 
@@ -94,6 +108,7 @@ public class NgoService {
     }
 
     // US-1.3.4 GPS Navigation
+    @Transactional(readOnly = true)
     public NavigationDTO getNavigationDetails(UUID missionId) {
         RescueMission mission = rescueMissionRepository.findById(missionId)
                 .orElseThrow(() -> new NoSuchElementException("Mission not found: " + missionId));

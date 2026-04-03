@@ -21,7 +21,7 @@ public class RescueTrackingController {
 
     private final RescueTrackingService rescueTrackingService;
 
-    // POST /api/v1/rescue-missions?sosReportId={id}
+    // POST /api/v1/rescue-missions?sosReportId={id} creating mission
     @PostMapping
     public ResponseEntity<ApiResponse<RescueMissionResponse>> createMission(
             @RequestParam UUID sosReportId) {
@@ -60,7 +60,7 @@ public class RescueTrackingController {
         return ResponseEntity.ok(ApiResponse.ok("Mission fetched", response));
     }
 
-    // GET /api/v1/rescue-missions?status={status}
+    // GET /api/v1/rescue-missions?status={status} listing mission by their status
     @GetMapping
     public ResponseEntity<ApiResponse<List<RescueMissionResponse>>> getMissionsByStatus(
             @RequestParam(required = false) ReportStatus status) {

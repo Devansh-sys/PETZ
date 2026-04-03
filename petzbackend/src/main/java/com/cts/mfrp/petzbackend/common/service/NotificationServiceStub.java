@@ -25,7 +25,7 @@ public class NotificationServiceStub implements NotificationService {
     }
 
     @Override
-    public void notifyOthersMissionClaimed(Long missionId, Long ngoId) {
+    public void notifyOthersMissionClaimed(UUID missionId, UUID ngoId) {
         log.info("[STUB] Mission {} claimed by NGO {}. Other NGOs notified.", missionId, ngoId);
     }
 

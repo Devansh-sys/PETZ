@@ -185,6 +185,7 @@ public class AuthService {
         // Generate a verification token (random UUID) — stored hashed
         String verificationToken = UUID.randomUUID().toString();
         String hashedToken = passwordEncoder.encode(verificationToken);
+        log.info("[DEV ONLY] Missed call verification token for {}: {}", phone, verificationToken);
 
         OtpVerification record = new OtpVerification();
         record.setPhone(phone);

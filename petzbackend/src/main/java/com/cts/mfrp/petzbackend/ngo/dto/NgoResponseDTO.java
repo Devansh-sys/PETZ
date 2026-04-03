@@ -1,14 +1,16 @@
 package com.cts.mfrp.petzbackend.ngo.dto;
 
+import java.util.UUID;
+
 public class NgoResponseDTO {
-    private Long ngoId;
+    private UUID ngoId;
     private String name;
     private double distance;   // distance from SOS location
     private String status;     // e.g., NOTIFIED, ACCEPTED, DECLINED
 
     public NgoResponseDTO() {}
 
-    public NgoResponseDTO(Long ngoId, String name, double distance, String status) {
+    public NgoResponseDTO(UUID ngoId, String name, double distance, String status) {
         this.ngoId = ngoId;
         this.name = name;
         this.distance = distance;
@@ -16,8 +18,8 @@ public class NgoResponseDTO {
     }
 
     // Getters and Setters
-    public Long getNgoId() { return ngoId; }
-    public void setNgoId(Long ngoId) { this.ngoId = ngoId; }
+    public UUID getNgoId() { return ngoId; }
+    public void setNgoId(UUID ngoId) { this.ngoId = ngoId; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

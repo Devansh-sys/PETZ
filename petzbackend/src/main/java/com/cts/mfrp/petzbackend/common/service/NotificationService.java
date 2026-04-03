@@ -16,7 +16,7 @@ public interface NotificationService {
     // ── NGO notifications ────────────────────────────────────────
     void sendSirenAlert(Ngo ngo, double sosLat, double sosLon);
 
-    void notifyOthersMissionClaimed(Long missionId, Long ngoId);
+    void notifyOthersMissionClaimed(UUID missionId, UUID ngoId);
 
     // ── Rescue workflow notifications ────────────────────────────
     void notifyReporter(UUID reporterId, String message);
