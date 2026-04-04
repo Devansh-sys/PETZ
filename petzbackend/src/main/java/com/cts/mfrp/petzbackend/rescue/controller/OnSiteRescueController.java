@@ -24,18 +24,6 @@ public class OnSiteRescueController {
     private final OnSiteRescueService service;
 
 //     US-1.4.1 — Mark Arrival
-//    Two layers of security in your app:
-//    Layer	Where	What it does	Your config
-//    URL-level	SecurityConfig filter chain	Controls HTTP access to URLs	permitAll() ✅ passes
-//    Method-level	@PreAuthorize on controller methods	Checks user roles after URL passes	❌ blocks you here
-//    The OnSiteRescueController has this on every method:
-//
-//    @PreAuthorize("hasRole('VOLUNTEER') or hasRole('NGO_REP')")
-//
-//    Since you're not sending a JWT token, Spring sees you as anonymous (no role), so hasRole('VOLUNTEER') = false, hasRole('NGO_REP') = false → Access Denied.
-//
-//    The fix — disable method-level security for dev testing:
-//    Comment out @EnableMethodSecurity in SecurityConfig:
     @PatchMapping("/arrival")
     @PreAuthorize("hasRole('VOLUNTEER') or hasRole('NGO_REP')")
     public ResponseEntity<ApiResponse<Void>> markArrival(
