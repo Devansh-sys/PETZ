@@ -31,4 +31,9 @@ public interface HospitalRepository extends JpaRepository<Hospital, UUID> {
     @Query("SELECT DISTINCT h FROM Hospital h JOIN h.services s " +
             "WHERE h.isVerified = true AND s.serviceType = :serviceType")
     List<Hospital> findVerifiedByServiceType(@Param("serviceType") ServiceType serviceType);
+    // Sreeja — pending registrations (US-3.7.1)
+    List<Hospital> findByIsVerifiedFalse();
+
+    // Sreeja — metrics by city (US-3.7.2)
+    List<Hospital> findByCityIgnoreCase(String city);
 }

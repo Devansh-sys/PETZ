@@ -5,6 +5,9 @@ import com.cts.mfrp.petzbackend.hospital.model.Appointment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import java.time.LocalTime;
+import org.springframework.data.repository.query.Param;
+
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,4 +41,19 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
     // Sreeja — metrics (US-3.7.2)
     long countByHospitalIdAndAppointmentDateBetween(UUID hospitalId, LocalDate from, LocalDate to);
     long countByHospitalIdAndStatus(UUID hospitalId, AppointmentStatus status);
+
+    // Slot management queries (migrated from AppointmentSlotRepository)
+    @Query("SELECT a FROM Appointment a " +
+            "WHERE a.hospitalId = :hospitalId AND a.doctorId = :doctorId " +
+            "AND a.appointmentDate = :date " +
+            "AND a.appointmentTime < :endTime AND a.endTime > :startTime")
+    List<Appointment> findOverlappingAppointments(
+            @Param("hospitalId") UUID hospitalId,
+            @Param("doctorId")   UUID doctorId,
+            @Param("date")       LocalDate date,
+            @Param("startTime")  LocalTime startTime,
+            @Param("endTime")    LocalTime endTime);
+
+    List<Appointment> findByHospitalIdAndAppointmentDateAndSlotStatus(
+            UUID hospitalId, LocalDate date, Appointment.SlotStatus slotStatus);
 }

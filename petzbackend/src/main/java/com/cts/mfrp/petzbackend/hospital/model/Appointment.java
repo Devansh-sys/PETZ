@@ -40,9 +40,26 @@ public class Appointment {
     @Column(name = "appointment_time")
     private LocalTime appointmentTime;
 
+    @Column(name = "end_time")
+    private LocalTime endTime;
+
+    @Column(name = "duration_minutes")
+    private int durationMinutes;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private AppointmentStatus status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "slot_status")
+    private SlotStatus slotStatus;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "booking_type")
+    private BookingType bookingType;
+
+    @Column(name = "is_locked")
+    private boolean isLocked;
 
     @Column(name = "clinical_notes")
     private String clinicalNotes;
@@ -74,6 +91,18 @@ public class Appointment {
     @Column(name = "cancellation_reason")
     private String cancellationReason;
 
+    @PrePersist
+    protected void onCreate() {
+        if (this.createdAt == null)  this.createdAt  = LocalDateTime.now();
+        if (this.slotStatus == null) this.slotStatus  = SlotStatus.AVAILABLE;
+        if (this.bookingType == null) this.bookingType = BookingType.ROUTINE;
+    }
+
+    public enum SlotStatus  { AVAILABLE, BOOKED, BLOCKED, LOCKED }
+    public enum BookingType { ROUTINE, EMERGENCY }
+
+    // ── Getters & Setters ──────────────────────────────────────────────
+
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 
@@ -101,8 +130,23 @@ public class Appointment {
     public LocalTime getAppointmentTime() { return appointmentTime; }
     public void setAppointmentTime(LocalTime appointmentTime) { this.appointmentTime = appointmentTime; }
 
+    public LocalTime getEndTime() { return endTime; }
+    public void setEndTime(LocalTime endTime) { this.endTime = endTime; }
+
+    public int getDurationMinutes() { return durationMinutes; }
+    public void setDurationMinutes(int durationMinutes) { this.durationMinutes = durationMinutes; }
+
     public AppointmentStatus getStatus() { return status; }
     public void setStatus(AppointmentStatus status) { this.status = status; }
+
+    public SlotStatus getSlotStatus() { return slotStatus; }
+    public void setSlotStatus(SlotStatus slotStatus) { this.slotStatus = slotStatus; }
+
+    public BookingType getBookingType() { return bookingType; }
+    public void setBookingType(BookingType bookingType) { this.bookingType = bookingType; }
+
+    public boolean isLocked() { return isLocked; }
+    public void setLocked(boolean isLocked) { this.isLocked = isLocked; }
 
     public String getClinicalNotes() { return clinicalNotes; }
     public void setClinicalNotes(String clinicalNotes) { this.clinicalNotes = clinicalNotes; }

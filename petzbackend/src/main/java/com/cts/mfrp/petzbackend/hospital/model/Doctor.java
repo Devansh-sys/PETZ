@@ -33,4 +33,9 @@ public class Doctor {
 
     @Column(name = "contact_phone")
     private String contactPhone;
+    @Column
+    private String availability;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
 }
