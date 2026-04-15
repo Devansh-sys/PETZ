@@ -1,7 +1,3 @@
-
-// ─────────────────────────────────────────────
-// FILE 3: hospital/model/Doctor.java
-// ─────────────────────────────────────────────
 package com.cts.mfrp.petzbackend.hospital.model;
 
 import jakarta.persistence.*;
@@ -11,27 +7,30 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "doctors")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Doctor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(updatable = false, nullable = false)
     private UUID id;
 
+    @Column(name = "hospital_id")
+    private UUID hospitalId;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hospital_id", nullable = false)
+    @JoinColumn(name = "hospital_id", insertable = false, updatable = false)
     private Hospital hospital;
 
-    @Column(nullable = false)
+    @Column(name = "name")
     private String name;
 
-    @Column
+    @Column(name = "specialization")
     private String specialization;
 
-    @Column
-    private String availability;
-
-    @Column(name = "is_active", nullable = false)
-    private boolean isActive;
+    @Column(name = "contact_phone")
+    private String contactPhone;
 }
