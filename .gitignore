@@ -18,7 +18,7 @@ petzbackend/*.jar
 petzbackend/*.war
 petzbackend/*.zip
 petzbackend/*.tar.gz
-.claude/
+test/.claude/
 
 # Maven Wrapper
 petzbackend/.mvn/wrapper/maven-wrapper.jar
