@@ -61,6 +61,26 @@ public class Appointment {
     @Column(name = "is_locked")
     private boolean isLocked;
 
+    /**
+     * US-3.4.2 — slot-lock expiry timestamp. While slotStatus=LOCKED and
+     * lockedUntil is in the future, the slot is held for a pending booking.
+     * A scheduled sweeper flips expired locks back to AVAILABLE.
+     */
+    @Column(name = "locked_until")
+    private LocalDateTime lockedUntil;
+
+    /** Optimistic-locking guard for concurrent booking attempts (US-3.4.2). */
+    @Version
+    @Column(name = "version")
+    private Long version;
+
+    /**
+     * US-3.4.5 — link to the originating SOS report when the appointment was
+     * booked via the rescue flow. Null for regular user-driven bookings.
+     */
+    @Column(name = "sos_report_id")
+    private UUID sosReportId;
+
     @Column(name = "clinical_notes")
     private String clinicalNotes;
 
@@ -147,6 +167,15 @@ public class Appointment {
 
     public boolean isLocked() { return isLocked; }
     public void setLocked(boolean isLocked) { this.isLocked = isLocked; }
+
+    public LocalDateTime getLockedUntil() { return lockedUntil; }
+    public void setLockedUntil(LocalDateTime lockedUntil) { this.lockedUntil = lockedUntil; }
+
+    public Long getVersion() { return version; }
+    public void setVersion(Long version) { this.version = version; }
+
+    public UUID getSosReportId() { return sosReportId; }
+    public void setSosReportId(UUID sosReportId) { this.sosReportId = sosReportId; }
 
     public String getClinicalNotes() { return clinicalNotes; }
     public void setClinicalNotes(String clinicalNotes) { this.clinicalNotes = clinicalNotes; }

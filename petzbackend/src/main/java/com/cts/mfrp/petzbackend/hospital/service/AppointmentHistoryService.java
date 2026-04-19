@@ -95,6 +95,9 @@ public class AppointmentHistoryService {
                 .appointmentDate(a.getAppointmentDate())
                 .appointmentTime(a.getAppointmentTime())
                 .status(a.getStatus())
+                // US-3.4.5 AC#4 — expose booking type so hospital UI can show
+                // an emergency indicator alongside each appointment row.
+                .bookingType(a.getBookingType() != null ? a.getBookingType().name() : null)
                 .build();
     }
 }

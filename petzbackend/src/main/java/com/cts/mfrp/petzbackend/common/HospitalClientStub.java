@@ -1,19 +1,20 @@
 package com.cts.mfrp.petzbackend.common; // ✅ must match HospitalClient.java package exactly
 
 import com.cts.mfrp.petzbackend.rescue.dto.NearbyHospitalResponse;
-import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
 /**
- * TEMPORARY STUB — delete this once the Hospital module collaborator
- * provides the real @Service implementation of HospitalClient.
+ * TEMPORARY STUB — superseded by
+ * {@code com.cts.mfrp.petzbackend.hospital.service.HospitalClientImpl}
+ * (which is marked {@code @Primary}).
  *
- * This only exists so the app can start without the hospital module.
+ * The @Service annotation has been removed so Spring no longer registers
+ * this bean. File kept for reference; safe to delete once the real impl
+ * is battle-tested.
  */
-@Service
 public class HospitalClientStub implements HospitalClient {
 
     // Fixed UUIDs so they can be reused across test calls (alert, booking, handover)

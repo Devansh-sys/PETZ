@@ -2,7 +2,9 @@ package com.cts.mfrp.petzbackend.hospital.repository;
 
 import com.cts.mfrp.petzbackend.hospital.enums.AppointmentStatus;
 import com.cts.mfrp.petzbackend.hospital.model.Appointment;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import java.time.LocalTime;
@@ -12,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -56,4 +59,43 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
 
     List<Appointment> findByHospitalIdAndAppointmentDateAndSlotStatus(
             UUID hospitalId, LocalDate date, Appointment.SlotStatus slotStatus);
+
+    // ── US-3.4.2: Slot locking support ──────────────────────────────────
+    /**
+     * Pessimistic write lock for atomic slot booking.
+     * The SELECT ... FOR UPDATE serializes concurrent booking attempts at
+     * the row level so only one caller can transition a slot from AVAILABLE
+     * to LOCKED or LOCKED to BOOKED at a time.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT a FROM Appointment a WHERE a.id = :id")
+    Optional<Appointment> findByIdForUpdate(@Param("id") UUID id);
+
+    /** Slots whose 2-minute lock has elapsed — candidates for sweep back to AVAILABLE. */
+    @Query("SELECT a FROM Appointment a " +
+            "WHERE a.slotStatus = com.cts.mfrp.petzbackend.hospital.model.Appointment.SlotStatus.LOCKED " +
+            "AND a.lockedUntil IS NOT NULL AND a.lockedUntil < :now")
+    List<Appointment> findExpiredLocks(@Param("now") LocalDateTime now);
+
+    // ── US-3.4.5: find an available EMERGENCY slot at a hospital for a given time ──
+    @Query("SELECT a FROM Appointment a " +
+            "WHERE a.hospitalId = :hospitalId " +
+            "AND a.bookingType = com.cts.mfrp.petzbackend.hospital.model.Appointment.BookingType.EMERGENCY " +
+            "AND a.slotStatus  = com.cts.mfrp.petzbackend.hospital.model.Appointment.SlotStatus.AVAILABLE " +
+            "AND a.appointmentDate = :date AND a.appointmentTime = :time")
+    Optional<Appointment> findEmergencySlot(
+            @Param("hospitalId") UUID hospitalId,
+            @Param("date") LocalDate date,
+            @Param("time") LocalTime time);
+
+    /** Fallback: any available EMERGENCY slot for the hospital on the given date. */
+    @Query("SELECT a FROM Appointment a " +
+            "WHERE a.hospitalId = :hospitalId " +
+            "AND a.bookingType = com.cts.mfrp.petzbackend.hospital.model.Appointment.BookingType.EMERGENCY " +
+            "AND a.slotStatus  = com.cts.mfrp.petzbackend.hospital.model.Appointment.SlotStatus.AVAILABLE " +
+            "AND a.appointmentDate = :date " +
+            "ORDER BY a.appointmentTime ASC")
+    List<Appointment> findAvailableEmergencySlots(
+            @Param("hospitalId") UUID hospitalId,
+            @Param("date") LocalDate date);
 }

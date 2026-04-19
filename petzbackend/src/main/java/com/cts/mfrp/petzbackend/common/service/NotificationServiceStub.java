@@ -46,4 +46,21 @@ public class NotificationServiceStub implements NotificationService {
         log.info("[STUB] Rescue alert to hospital owner {} for SOS {}: {}",
                 hospitalOwnerId, sosReportId, animalCondition);
     }
+
+    // ── Appointment notifications (Epic 3.4) ─────────────────────────
+
+    @Override
+    public void notifyAppointmentConfirmed(UUID userId, UUID appointmentId, String details) {
+        log.info("═══════════════════════════════════════════");
+        log.info("  [STUB] APPOINTMENT CONFIRMED → user {}", userId);
+        log.info("  appointmentId: {}", appointmentId);
+        log.info("  {}", details);
+        log.info("═══════════════════════════════════════════");
+    }
+
+    @Override
+    public void notifyHospitalEmergencyBooking(UUID hospitalOwnerId, UUID appointmentId, String details) {
+        log.info("[STUB] 🚨 EMERGENCY BOOKING → hospital owner {} | appt {} | {}",
+                hospitalOwnerId, appointmentId, details);
+    }
 }
