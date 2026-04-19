@@ -82,6 +82,31 @@ public class GlobalExceptionHandler {
         );
     }
 
+    // ─── Booking conflicts / validation (Epic 3.4) ───────────────────────
+
+    /**
+     * {@link IllegalStateException} is used by the booking service for
+     * "Slot Unavailable" / "Slot lock expired" / "pet not emergency slot"
+     * and similar state-machine errors. Surface as 409 Conflict so
+     * clients can distinguish from a true server failure.
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalState(
+            IllegalStateException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ApiErrorResponse.of(409, "Conflict", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    /** Bad user input (enum parse, wrong booking type, etc.) → 400. */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalArgument(
+            IllegalArgumentException ex, HttpServletRequest request) {
+        return ResponseEntity.badRequest().body(
+                ApiErrorResponse.of(400, "Bad Request", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
     // ─── Catch-all ───────────────────────────────────────────────────────
 
     @ExceptionHandler(Exception.class)

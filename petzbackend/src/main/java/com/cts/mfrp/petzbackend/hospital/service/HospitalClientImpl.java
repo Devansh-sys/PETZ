@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -47,7 +48,10 @@ public class HospitalClientImpl implements HospitalClient {
     private final NotificationService        notificationService;
 
     @Override
+    @Transactional(readOnly = true)
     public List<NearbyHospitalResponse> findNearbyEmergencyHospitals(BigDecimal lat, BigDecimal lon) {
+        // @Transactional keeps the Hibernate session open so the lazy
+        // hospital.services collection can be resolved inside the stream.
         // Simple filter: verified + emergency-ready. Distance computed
         // via haversine when coords are present on the hospital row.
         return hospitalRepo.findAll().stream()
