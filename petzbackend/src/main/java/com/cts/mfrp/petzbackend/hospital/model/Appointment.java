@@ -8,6 +8,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 
+/**
+ * Represents a veterinary appointment booked by a pet owner.
+ * Lifecycle transitions are managed by Epic 3.5 (US-3.5.1 – US-3.5.5).
+ * Primary structure based on advanced slot management with legacy constraints integrated.
+ */
 @Entity
 @Table(name = "appointments")
 public class Appointment {
@@ -16,28 +21,28 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "pet_id")
+    @Column(name = "pet_id", nullable = false)
     private UUID petId;
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     private UUID userId;
 
-    @Column(name = "hospital_id")
+    @Column(name = "hospital_id", nullable = false)
     private UUID hospitalId;
 
-    @Column(name = "doctor_id")
+    @Column(name = "doctor_id", nullable = false)
     private UUID doctorId;
 
-    @Column(name = "slot_id")
+    @Column(name = "slot_id", nullable = false)
     private UUID slotId;
 
     @Column(name = "service_type")
     private String serviceType;
 
-    @Column(name = "appointment_date")
+    @Column(name = "appointment_date", nullable = false)
     private LocalDate appointmentDate;
 
-    @Column(name = "appointment_time")
+    @Column(name = "appointment_time", nullable = false)
     private LocalTime appointmentTime;
 
     @Column(name = "end_time")
@@ -47,7 +52,7 @@ public class Appointment {
     private int durationMinutes;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
+    @Column(name = "status", nullable = false)
     private AppointmentStatus status;
 
     @Enumerated(EnumType.STRING)
@@ -62,44 +67,56 @@ public class Appointment {
     private boolean isLocked;
 
     @Column(name = "clinical_notes")
-    private String clinicalNotes;
+    private String clinicalNotes;           // Populated on US-3.5.4
 
     @Column(name = "no_show_count")
-    private int noShowCount;
+    private int noShowCount;                // Incremented on US-3.5.5
 
     @Column(name = "cancellation_policy_hours")
-    private int cancellationPolicyHours;
+    private int cancellationPolicyHours;    // Hospital-defined window for US-3.5.1 / US-3.5.2
 
     @Column(name = "attended_at")
-    private LocalDateTime attendedAt;
+    private LocalDateTime attendedAt;       // US-3.5.3
 
     @Column(name = "completed_at")
-    private LocalDateTime completedAt;
+    private LocalDateTime completedAt;      // US-3.5.4
 
     @Column(name = "cancelled_at")
-    private LocalDateTime cancelledAt;
+    private LocalDateTime cancelledAt;      // US-3.5.1
 
     @Column(name = "rescheduled_at")
-    private LocalDateTime rescheduledAt;
+    private LocalDateTime rescheduledAt;    // US-3.5.2
 
-    @Column(name = "created_at")
+    @Column(name = "cancellation_reason")
+    private String cancellationReason;      // US-3.5.1
+
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "cancellation_reason")
-    private String cancellationReason;
+    // Internal Enums from Snippet 2
+    public enum SlotStatus  { AVAILABLE, BOOKED, BLOCKED, LOCKED }
+    public enum BookingType { ROUTINE, EMERGENCY }
 
     @PrePersist
     protected void onCreate() {
-        if (this.createdAt == null)  this.createdAt  = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+
+        // Default statuses from Snippet 2
         if (this.slotStatus == null) this.slotStatus  = SlotStatus.AVAILABLE;
         if (this.bookingType == null) this.bookingType = BookingType.ROUTINE;
     }
 
-    public enum SlotStatus  { AVAILABLE, BOOKED, BLOCKED, LOCKED }
-    public enum BookingType { ROUTINE, EMERGENCY }
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public Appointment() {}
 
     // ── Getters & Setters ──────────────────────────────────────────────
 
@@ -146,7 +163,7 @@ public class Appointment {
     public void setBookingType(BookingType bookingType) { this.bookingType = bookingType; }
 
     public boolean isLocked() { return isLocked; }
-    public void setLocked(boolean isLocked) { this.isLocked = isLocked; }
+    public void setLocked(boolean locked) { isLocked = locked; }
 
     public String getClinicalNotes() { return clinicalNotes; }
     public void setClinicalNotes(String clinicalNotes) { this.clinicalNotes = clinicalNotes; }
@@ -169,12 +186,12 @@ public class Appointment {
     public LocalDateTime getRescheduledAt() { return rescheduledAt; }
     public void setRescheduledAt(LocalDateTime rescheduledAt) { this.rescheduledAt = rescheduledAt; }
 
+    public String getCancellationReason() { return cancellationReason; }
+    public void setCancellationReason(String cancellationReason) { this.cancellationReason = cancellationReason; }
+
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
-
-    public String getCancellationReason() { return cancellationReason; }
-    public void setCancellationReason(String cancellationReason) { this.cancellationReason = cancellationReason; }
 }
