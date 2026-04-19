@@ -2,63 +2,50 @@ package com.cts.mfrp.petzbackend.hospital.repository;
 
 import com.cts.mfrp.petzbackend.hospital.enums.AppointmentStatus;
 import com.cts.mfrp.petzbackend.hospital.model.Appointment;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import java.time.LocalTime;
+import org.springframework.data.repository.query.Param;
+
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, UUID> {
 
-    // ── US-3.5.1 / US-3.5.2 — User Management ─────────────────────────
+    // Gobika's original methods
     List<Appointment> findByUserIdAndStatus(UUID userId, AppointmentStatus status);
-
-    // ── US-3.5.5 — Overdue Logic (Merged Versions) ────────────────────
-
-    /**
-     * Legacy Version: Uses separate Date and Time (Snippet 1 logic)
-     */
-    @Query("SELECT a FROM Appointment a WHERE a.status = 'CONFIRMED' " +
-            "AND a.appointmentDate = :date AND a.appointmentTime < :time")
-    List<Appointment> findOverdueConfirmed(@Param("date") LocalDate date,
-                                           @Param("time") LocalTime time);
-
-    /**
-     * Primary Version: Uses LocalDateTime cutoff (Snippet 2 logic)
-     */
-    @Query("SELECT a FROM Appointment a WHERE a.status = 'CONFIRMED' AND a.appointmentDate < :cutoff")
-    List<Appointment> findOverdueConfirmed(@Param("cutoff") LocalDateTime cutoff);
-
-    // ── Hospital View (US-3.5.3 / 3.5.4 / 3.5.5) ───────────────────────
     List<Appointment> findByHospitalIdAndStatus(UUID hospitalId, AppointmentStatus status);
-
-    // Check slot is not double-booked (for reschedule — US-3.5.2)
     boolean existsBySlotIdAndStatusNot(UUID slotId, AppointmentStatus status);
 
-    // ── Sreeja — User Appointment History (US-3.6.1) ───────────────────
+    @Query("SELECT a FROM Appointment a WHERE a.status = 'CONFIRMED' AND a.appointmentDate < :cutoff")
+    List<Appointment> findOverdueConfirmed(LocalDateTime cutoff);
+
+    // Sreeja — user appointment history (US-3.6.1)
     List<Appointment> findByUserIdOrderByAppointmentDateDesc(UUID userId);
     List<Appointment> findByUserIdAndPetIdOrderByAppointmentDateDesc(UUID userId, UUID petId);
     List<Appointment> findByUserIdAndHospitalIdOrderByAppointmentDateDesc(UUID userId, UUID hospitalId);
     List<Appointment> findByUserIdAndAppointmentDateBetweenOrderByAppointmentDateDesc(UUID userId, LocalDate from, LocalDate to);
     List<Appointment> findByUserIdAndPetIdAndAppointmentDateBetweenOrderByAppointmentDateDesc(UUID userId, UUID petId, LocalDate from, LocalDate to);
 
-    // ── Sreeja — Hospital Dashboard (US-3.6.2) ─────────────────────────
+    // Sreeja — hospital dashboard (US-3.6.2)
     List<Appointment> findByHospitalIdAndAppointmentDateOrderByAppointmentTimeAsc(UUID hospitalId, LocalDate date);
     List<Appointment> findByHospitalIdAndDoctorIdAndAppointmentDateOrderByAppointmentTimeAsc(UUID hospitalId, UUID doctorId, LocalDate date);
     List<Appointment> findByHospitalIdAndAppointmentDateBetweenOrderByAppointmentDateAscAppointmentTimeAsc(UUID hospitalId, LocalDate from, LocalDate to);
     List<Appointment> findByHospitalIdAndDoctorIdAndAppointmentDateBetweenOrderByAppointmentDateAscAppointmentTimeAsc(UUID hospitalId, UUID doctorId, LocalDate from, LocalDate to);
 
-    // ── Sreeja — Metrics (US-3.7.2) ────────────────────────────────────
+    // Sreeja — metrics (US-3.7.2)
     long countByHospitalIdAndAppointmentDateBetween(UUID hospitalId, LocalDate from, LocalDate to);
     long countByHospitalIdAndStatus(UUID hospitalId, AppointmentStatus status);
 
-    // ── Slot Management (Snippet 2 Specific) ───────────────────────────
+    // Slot management queries (migrated from AppointmentSlotRepository)
     @Query("SELECT a FROM Appointment a " +
             "WHERE a.hospitalId = :hospitalId AND a.doctorId = :doctorId " +
             "AND a.appointmentDate = :date " +
@@ -72,4 +59,43 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
 
     List<Appointment> findByHospitalIdAndAppointmentDateAndSlotStatus(
             UUID hospitalId, LocalDate date, Appointment.SlotStatus slotStatus);
+
+    // ── US-3.4.2: Slot locking support ──────────────────────────────────
+    /**
+     * Pessimistic write lock for atomic slot booking.
+     * The SELECT ... FOR UPDATE serializes concurrent booking attempts at
+     * the row level so only one caller can transition a slot from AVAILABLE
+     * to LOCKED or LOCKED to BOOKED at a time.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT a FROM Appointment a WHERE a.id = :id")
+    Optional<Appointment> findByIdForUpdate(@Param("id") UUID id);
+
+    /** Slots whose 2-minute lock has elapsed — candidates for sweep back to AVAILABLE. */
+    @Query("SELECT a FROM Appointment a " +
+            "WHERE a.slotStatus = com.cts.mfrp.petzbackend.hospital.model.Appointment.SlotStatus.LOCKED " +
+            "AND a.lockedUntil IS NOT NULL AND a.lockedUntil < :now")
+    List<Appointment> findExpiredLocks(@Param("now") LocalDateTime now);
+
+    // ── US-3.4.5: find an available EMERGENCY slot at a hospital for a given time ──
+    @Query("SELECT a FROM Appointment a " +
+            "WHERE a.hospitalId = :hospitalId " +
+            "AND a.bookingType = com.cts.mfrp.petzbackend.hospital.model.Appointment.BookingType.EMERGENCY " +
+            "AND a.slotStatus  = com.cts.mfrp.petzbackend.hospital.model.Appointment.SlotStatus.AVAILABLE " +
+            "AND a.appointmentDate = :date AND a.appointmentTime = :time")
+    Optional<Appointment> findEmergencySlot(
+            @Param("hospitalId") UUID hospitalId,
+            @Param("date") LocalDate date,
+            @Param("time") LocalTime time);
+
+    /** Fallback: any available EMERGENCY slot for the hospital on the given date. */
+    @Query("SELECT a FROM Appointment a " +
+            "WHERE a.hospitalId = :hospitalId " +
+            "AND a.bookingType = com.cts.mfrp.petzbackend.hospital.model.Appointment.BookingType.EMERGENCY " +
+            "AND a.slotStatus  = com.cts.mfrp.petzbackend.hospital.model.Appointment.SlotStatus.AVAILABLE " +
+            "AND a.appointmentDate = :date " +
+            "ORDER BY a.appointmentTime ASC")
+    List<Appointment> findAvailableEmergencySlots(
+            @Param("hospitalId") UUID hospitalId,
+            @Param("date") LocalDate date);
 }

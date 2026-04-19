@@ -29,5 +29,7 @@ public class HospitalDashboardResponse {
         private LocalDate appointmentDate;
         private LocalTime appointmentTime;
         private AppointmentStatus status;
+        /** US-3.4.5 AC#4 — "Hospital sees emergency indicator". */
+        private String bookingType;
     }
 }

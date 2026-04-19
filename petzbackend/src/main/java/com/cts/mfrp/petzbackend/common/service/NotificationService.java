@@ -24,4 +24,17 @@ public interface NotificationService {
     void notifyVolunteer(UUID volunteerId, String message);
 
     void sendIncomingRescueAlert(UUID hospitalOwnerId, UUID sosReportId, String animalCondition);
+
+    // ── Appointment notifications (Epic 3.4) ─────────────────────────
+    /**
+     * US-3.4.4 — push + in-app confirmation to the pet owner.
+     * `details` is a human-readable summary (hospital, doctor, service, date, time, pet).
+     */
+    void notifyAppointmentConfirmed(UUID userId, UUID appointmentId, String details);
+
+    /**
+     * US-3.4.5 AC#4 — hospital staff get an "emergency" banner/push when an
+     * emergency appointment is booked (either directly or via rescue flow).
+     */
+    void notifyHospitalEmergencyBooking(UUID hospitalOwnerId, UUID appointmentId, String details);
 }
