@@ -24,4 +24,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByPhone(String phone);
 
     boolean existsByEmail(String email);
+
+    // ── Epic 2 (Pet Adoption): helpers used by adoption module ──────────
+    /** Fetch a user only when their role matches (e.g. adopter vs ngo rep). */
+    Optional<User> findByIdAndRole(UUID id, User.Role role);
 }

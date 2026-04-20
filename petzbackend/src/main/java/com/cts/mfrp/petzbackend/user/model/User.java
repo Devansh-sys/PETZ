@@ -66,6 +66,16 @@ public class User {
     @Column(name = "is_temporary", nullable = false)
     private boolean isTemporary = false;
 
+    /**
+     * Epic 2 (Pet Adoption) — nullable FK to the NGO this user represents.
+     * Populated only for role=NGO_REP users so the adoption module can read
+     * the caller's ngo from their authenticated principal instead of trusting
+     * a client-supplied value. Remains null for REPORTER / ADOPTER / VET /
+     * ADMIN users. Additive change — existing rows keep working unchanged.
+     */
+    @Column(name = "ngo_id")
+    private UUID ngoId;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -123,4 +133,7 @@ public class User {
 
     public boolean isTemporary() { return isTemporary; }
     public void setTemporary(boolean temporary) { isTemporary = temporary; }
+
+    public UUID getNgoId() { return ngoId; }
+    public void setNgoId(UUID ngoId) { this.ngoId = ngoId; }
 }
