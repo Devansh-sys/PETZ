@@ -3,6 +3,8 @@ package com.cts.mfrp.petzbackend.hospital.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -38,4 +40,19 @@ public class Doctor {
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
+
+    /**
+     * US-3.2.3 AC#3 — "Linked to services".
+     * A doctor can offer multiple services and a service can be offered
+     * by multiple doctors. Backed by a join table {@code doctor_services}
+     * with (doctor_id, service_id) pairs.
+     */
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(
+            name = "doctor_services",
+            joinColumns = @JoinColumn(name = "doctor_id"),
+            inverseJoinColumns = @JoinColumn(name = "service_id")
+    )
+    @Builder.Default
+    private Set<HospitalService> services = new HashSet<>();
 }

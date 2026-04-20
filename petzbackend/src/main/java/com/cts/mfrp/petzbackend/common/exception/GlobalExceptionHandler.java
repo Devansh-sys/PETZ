@@ -2,13 +2,18 @@ package com.cts.mfrp.petzbackend.common.exception;
 
 import com.cts.mfrp.petzbackend.common.dto.ApiErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.stream.Collectors;
 
@@ -107,12 +112,74 @@ public class GlobalExceptionHandler {
         );
     }
 
+    // ─── Spring MVC + JPA / Jackson exceptions → clean 4xx ───────────────
+
+    /** Malformed JSON / wrong types in the body → 400, not 500. */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiErrorResponse> handleUnreadable(
+            HttpMessageNotReadableException ex, HttpServletRequest request) {
+        String root = ex.getMostSpecificCause() != null
+                ? ex.getMostSpecificCause().getMessage() : ex.getMessage();
+        return ResponseEntity.badRequest().body(
+                ApiErrorResponse.of(400, "Bad Request",
+                        "Malformed request body: " + root, request.getRequestURI())
+        );
+    }
+
+    /** Missing @RequestParam → 400. */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiErrorResponse> handleMissingParam(
+            MissingServletRequestParameterException ex, HttpServletRequest request) {
+        return ResponseEntity.badRequest().body(
+                ApiErrorResponse.of(400, "Bad Request", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    /** Wrong type in path/query (e.g. non-UUID where UUID expected) → 400. */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiErrorResponse> handleTypeMismatch(
+            MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+        String msg = "Invalid value '" + ex.getValue() + "' for parameter '" + ex.getName() + "'";
+        return ResponseEntity.badRequest().body(
+                ApiErrorResponse.of(400, "Bad Request", msg, request.getRequestURI())
+        );
+    }
+
+    /** Validation on method/path parameters (service-layer @Validated) → 400. */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiErrorResponse> handleConstraintViolation(
+            ConstraintViolationException ex, HttpServletRequest request) {
+        String errors = ex.getConstraintViolations().stream()
+                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                .collect(Collectors.joining("; "));
+        return ResponseEntity.badRequest().body(
+                ApiErrorResponse.of(400, "Validation Failed", errors, request.getRequestURI())
+        );
+    }
+
+    /**
+     * DB constraint violations (NOT NULL, UNIQUE, FK). These happen when
+     * bean validation was bypassed or the caller sent a technically-valid
+     * payload that the schema still rejects. 409 Conflict beats 500.
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiErrorResponse> handleDataIntegrity(
+            DataIntegrityViolationException ex, HttpServletRequest request) {
+        String root = ex.getMostSpecificCause() != null
+                ? ex.getMostSpecificCause().getMessage() : ex.getMessage();
+        log.warn("DataIntegrityViolation at {}: {}", request.getRequestURI(), root);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ApiErrorResponse.of(409, "Data Conflict", root, request.getRequestURI())
+        );
+    }
+
     // ─── Catch-all ───────────────────────────────────────────────────────
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGenericException(
             Exception ex, HttpServletRequest request) {
-        log.error("Unhandled exception at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
+        log.error("Unhandled exception at {}: {} ({})",
+                request.getRequestURI(), ex.getMessage(), ex.getClass().getName(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 ApiErrorResponse.of(500, "Internal Server Error",
                         "Something went wrong. Please try again.", request.getRequestURI())
