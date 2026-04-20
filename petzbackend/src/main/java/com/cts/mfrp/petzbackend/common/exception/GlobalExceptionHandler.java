@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 /**
@@ -191,6 +192,22 @@ public class GlobalExceptionHandler {
             ResourceNotFoundException ex, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 ApiErrorResponse.of(404, "Not Found", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    /**
+     * Several services throw {@link NoSuchElementException} on lookup
+     * misses (e.g. OnSiteRescueService when no NgoAssignment matches).
+     * Map it to 404 so callers know the referenced resource isn't there,
+     * instead of falling through to the generic 500.
+     */
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<ApiErrorResponse> handleNoSuchElement(
+            NoSuchElementException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiErrorResponse.of(404, "Not Found",
+                        ex.getMessage() != null ? ex.getMessage() : "Resource not found",
+                        request.getRequestURI())
         );
     }
     @ExceptionHandler(FileValidationException.class)
