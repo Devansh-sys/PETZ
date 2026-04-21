@@ -8,10 +8,13 @@ import com.cts.mfrp.petzbackend.adoption.dto.AdoptablePetDtos.UpdateRequest;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionMediaDtos.MediaResponse;
 import com.cts.mfrp.petzbackend.adoption.dto.PageResponse;
 import com.cts.mfrp.petzbackend.adoption.enums.AdoptablePetStatus;
+import com.cts.mfrp.petzbackend.adoption.enums.AdoptionApplicationStatus;
 import com.cts.mfrp.petzbackend.adoption.enums.AuditTargetType;
 import com.cts.mfrp.petzbackend.adoption.model.AdoptablePet;
+import com.cts.mfrp.petzbackend.adoption.model.AdoptionApplication;
 import com.cts.mfrp.petzbackend.adoption.model.AdoptionMedia;
 import com.cts.mfrp.petzbackend.adoption.repository.AdoptablePetRepository;
+import com.cts.mfrp.petzbackend.adoption.repository.AdoptionApplicationRepository;
 import com.cts.mfrp.petzbackend.adoption.repository.AdoptionMediaRepository;
 import com.cts.mfrp.petzbackend.common.exception.ResourceNotFoundException;
 import com.cts.mfrp.petzbackend.ngo.model.Ngo;
@@ -58,10 +61,11 @@ public class AdoptablePetService {
     public static final int DEFAULT_PAGE_SIZE = 20;
     public static final int MAX_PAGE_SIZE     = 100;
 
-    private final AdoptablePetRepository  petRepo;
-    private final AdoptionMediaRepository mediaRepo;
-    private final NgoRepository           ngoRepo;
-    private final AdoptionAuditService    auditService;
+    private final AdoptablePetRepository          petRepo;
+    private final AdoptionMediaRepository         mediaRepo;
+    private final NgoRepository                   ngoRepo;
+    private final AdoptionAuditService            auditService;
+    private final AdoptionApplicationRepository  applicationRepo;
 
     // ═════════════════════════════════════════════════════════════════
     //  US-2.1.1 + US-2.1.2 + US-2.1.3  — Public browse / filter / sort
@@ -232,10 +236,24 @@ public class AdoptablePetService {
         auditService.log(AuditTargetType.PET_LISTING, saved.getId(), actingUserId,
                 "LISTING_ARCHIVED", reason, null);
 
-        // Wave 2 hook — applications pointing at this pet will be flagged in
-        // AdoptionApplicationService when they next load. Nothing to do here
-        // yet; comment kept so the tie-back is obvious.
-        log.info("AdoptablePet {} archived by user {}", saved.getId(), actingUserId);
+        // US-2.2.4 AC#3 — "Pending applications flagged".
+        // Write one FLAGGED_BY_ARCHIVE row to the audit log per active app
+        // for this pet so the NGO review queue shows them with a badge.
+        // We DON'T auto-withdraw — the reviewer should make that call.
+        List<AdoptionApplicationStatus> activeStatuses = List.of(
+                AdoptionApplicationStatus.DRAFT,
+                AdoptionApplicationStatus.SUBMITTED,
+                AdoptionApplicationStatus.UNDER_REVIEW,
+                AdoptionApplicationStatus.CLARIFICATION_REQUESTED);
+        List<AdoptionApplication> affected =
+                applicationRepo.findByAdoptablePetIdAndStatusIn(saved.getId(), activeStatuses);
+        for (AdoptionApplication app : affected) {
+            auditService.log(AuditTargetType.APPLICATION, app.getId(), actingUserId,
+                    "FLAGGED_BY_PET_ARCHIVE", reason,
+                    "{\"petId\":\"" + saved.getId() + "\"}");
+        }
+        log.info("AdoptablePet {} archived by user {} — flagged {} active application(s)",
+                saved.getId(), actingUserId, affected.size());
 
         return toDetail(saved, ngoRepo.findById(saved.getNgoId()).orElse(null),
                 mediaRepo.findByAdoptablePetIdOrderByDisplayOrderAsc(saved.getId()));

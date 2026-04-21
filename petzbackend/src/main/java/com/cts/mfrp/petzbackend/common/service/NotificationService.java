@@ -37,4 +37,31 @@ public interface NotificationService {
      * emergency appointment is booked (either directly or via rescue flow).
      */
     void notifyHospitalEmergencyBooking(UUID hospitalOwnerId, UUID appointmentId, String details);
+
+    // ── Adoption application notifications (Epic 2.3 + 2.4) ──────────
+    /**
+     * US-2.3.3 AC#5 + US-2.3.6 — NGO reviewers see the new / withdrawn
+     * application in their queue.
+     */
+    void notifyNgoNewApplication(UUID ngoId, UUID applicationId, String details);
+
+    /**
+     * US-2.4.3 / US-2.4.4 — push + in-app notification to the adopter
+     * with the final decision (APPROVED / REJECTED / WITHDRAWN).
+     */
+    void notifyAdopterDecision(UUID adopterId, UUID applicationId,
+                               String decision, String reason);
+
+    /**
+     * US-2.4.5 — NGO reviewer asked for extra info; adopter sees the
+     * clarification questions and can reply by PATCHing form sections.
+     */
+    void notifyAdopterClarification(UUID adopterId, UUID applicationId, String questions);
+
+    /**
+     * US-2.4.6 — adopter informed when a KYC document is verified or
+     * rejected (with reason).
+     */
+    void notifyAdopterKycDecision(UUID adopterId, UUID applicationId, UUID documentId,
+                                  String status, String reason);
 }

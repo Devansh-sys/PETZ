@@ -63,4 +63,35 @@ public class NotificationServiceStub implements NotificationService {
         log.info("[STUB] 🚨 EMERGENCY BOOKING → hospital owner {} | appt {} | {}",
                 hospitalOwnerId, appointmentId, details);
     }
+
+    // ── Adoption application notifications (Epic 2.3 + 2.4) ──────────
+
+    @Override
+    public void notifyNgoNewApplication(UUID ngoId, UUID applicationId, String details) {
+        log.info("[STUB] 📬 NGO {} has new adoption application {} | {}",
+                ngoId, applicationId, details);
+    }
+
+    @Override
+    public void notifyAdopterDecision(UUID adopterId, UUID applicationId,
+                                      String decision, String reason) {
+        log.info("═══════════════════════════════════════════");
+        log.info("  [STUB] ADOPTION DECISION → adopter {}", adopterId);
+        log.info("  applicationId: {}  decision: {}", applicationId, decision);
+        if (reason != null) log.info("  reason: {}", reason);
+        log.info("═══════════════════════════════════════════");
+    }
+
+    @Override
+    public void notifyAdopterClarification(UUID adopterId, UUID applicationId, String questions) {
+        log.info("[STUB] ❓ CLARIFICATION REQUESTED → adopter {} | app {} | questions: {}",
+                adopterId, applicationId, questions);
+    }
+
+    @Override
+    public void notifyAdopterKycDecision(UUID adopterId, UUID applicationId, UUID documentId,
+                                         String status, String reason) {
+        log.info("[STUB] KYC doc {} on app {} -> {} (adopter {})  reason={}",
+                documentId, applicationId, status, adopterId, reason);
+    }
 }
