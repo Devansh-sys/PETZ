@@ -1,0 +1,60 @@
+.page-wrap {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  h1 { font-size: 1.8rem; font-weight: 800; color: var(--deep); margin: 0; }
+}
+
+.appt-list { display: flex; flex-direction: column; gap: 16px; }
+
+.appt-card {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.appt-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.appt-pet { font-weight: 700; font-size: 1rem; color: var(--deep); }
+.appt-hospital { font-size: 14px; color: var(--muted); margin-top: 2px; }
+.appt-body { display: flex; flex-direction: column; gap: 6px; }
+.appt-row { font-size: 13px; color: var(--dusk); }
+
+.appt-emergency {
+  margin-top: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #dc2626;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.empty-icon { font-size: 56px; }
+h3 { font-size: 1.4rem; font-weight: 700; color: var(--deep); margin: 0; }
+
+.tag.danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+.state-msg { text-align: center; padding: 60px 0; color: var(--muted); font-size: 15px; }
+.alert.error { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; border-radius: 10px; padding: 14px 18px; font-size: 14px; }

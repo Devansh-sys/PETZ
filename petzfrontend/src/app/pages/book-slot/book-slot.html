@@ -1,0 +1,40 @@
+<petz-navbar></petz-navbar>
+
+<div class="report-card">
+  <div class="step-dots">
+    <span class="dot done"></span>
+    <span class="dot done"></span>
+    <span class="dot done"></span>
+    <span class="dot active"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="block-head">
+    <div class="block-title">Step 4 of 5 — Pick a Slot</div>
+    <div *ngIf="state" class="block-sub">Dr. {{ state.doctorName }} · {{ state.serviceName }}</div>
+  </div>
+
+  <div class="block">
+    <div class="field">
+      <label>Appointment date</label>
+      <input type="date" [(ngModel)]="selectedDate" [min]="minDate" (change)="loadSlots()" />
+    </div>
+
+    <div *ngIf="loading" class="state-msg">Loading available slots...</div>
+
+    <div *ngIf="!loading && error" class="alert error">{{ error }}</div>
+
+    <div *ngIf="!loading && !error && slots.length === 0" class="state-msg">
+      No available slots on this date. Try another day.
+    </div>
+
+    <div *ngIf="!loading && !error && slots.length > 0" class="slot-grid">
+      <button *ngFor="let slot of slots" class="slot-chip" (click)="select(slot)">
+        {{ formatTime(slot.startTime) }} – {{ formatTime(slot.endTime) }}
+        <span *ngIf="slot.slotType === 'EMERGENCY'" class="slot-type">Emergency</span>
+      </button>
+    </div>
+  </div>
+
+  <button class="btn-link" (click)="back()">‹ Back</button>
+</div>

@@ -1,0 +1,40 @@
+<petz-navbar></petz-navbar>
+
+<div class="report-card">
+  <div class="step-dots">
+    <span class="dot done"></span>
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="block-head">
+    <div class="block-title">Step 2 of 5 — Choose a Service</div>
+    <div *ngIf="state" class="block-sub">{{ state.hospitalName }}</div>
+  </div>
+
+  <div class="block">
+    <div *ngIf="loading" class="state-msg">Loading services...</div>
+
+    <div *ngIf="!loading && error" class="alert error">{{ error }}</div>
+
+    <div *ngIf="!loading && !error && services.length === 0" class="state-msg">
+      No services available at this hospital.
+    </div>
+
+    <div *ngIf="!loading && !error && services.length > 0" class="pick-list">
+      <button *ngFor="let svc of services" class="pick-item" (click)="select(svc)">
+        <div class="pick-info">
+          <div class="pick-name">{{ svc.serviceName }}</div>
+          <div *ngIf="svc.description" class="pick-meta">{{ svc.description }}</div>
+          <div class="pick-meta">{{ svc.serviceType }}</div>
+          <span *ngIf="svc.emergencyDedicated" class="tag warn">Emergency only</span>
+        </div>
+        <span class="pick-arrow">›</span>
+      </button>
+    </div>
+  </div>
+
+  <button class="btn-link" (click)="back()">‹ Back</button>
+</div>

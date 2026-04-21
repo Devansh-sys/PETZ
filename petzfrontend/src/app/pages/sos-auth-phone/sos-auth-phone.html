@@ -1,0 +1,71 @@
+<petz-navbar />
+
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="step-dots">
+      <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
+    </div>
+
+    <div class="title-row">
+      <a routerLink="/" class="back" aria-label="Back to home">←</a>
+      <h1>Verify your number</h1>
+    </div>
+    <p class="lead">
+      Enter your mobile number so we can verify you and dispatch the nearest rescue partner.
+      <strong>This takes under 5 seconds.</strong>
+    </p>
+
+    <div class="field">
+      <label for="phone">Mobile number</label>
+      <div class="phone-input">
+        <span class="cc">🇮🇳 +91</span>
+        <input
+          id="phone"
+          type="tel"
+          inputmode="numeric"
+          autocomplete="tel"
+          placeholder="98765 43210"
+          maxlength="15"
+          [ngModel]="phone()"
+          (ngModelChange)="phone.set($event)"
+          (keyup.enter)="requestOtp()">
+      </div>
+      <small class="hint">We'll send a 6-digit code. No account, no profile creation.</small>
+    </div>
+
+    @if (notice()) {
+      <div class="alert info">
+        <span>ℹ️</span>
+        <span>{{ notice() }}</span>
+      </div>
+    }
+
+    @if (error()) {
+      <div class="alert error">
+        <span>⚠️</span>
+        <span>{{ error() }}</span>
+      </div>
+    }
+
+    <button
+      type="button"
+      class="btn btn-primary btn-big"
+      [disabled]="!canSubmit || loading()"
+      (click)="requestOtp()">
+      @if (loading()) { Sending OTP… } @else { Send OTP → }
+    </button>
+
+    <div class="divider"><span>or</span></div>
+
+    <button
+      type="button"
+      class="btn btn-ghost btn-big"
+      [disabled]="!canSubmit"
+      (click)="useMissedCall()">
+      📞 Use missed-call verification
+    </button>
+    <small class="fallback-hint">Best for weak-network areas.</small>
+
+    <div id="recaptcha-container"></div>
+  </div>
+</section>

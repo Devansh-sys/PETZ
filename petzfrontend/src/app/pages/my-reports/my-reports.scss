@@ -1,0 +1,128 @@
+.page-wrap {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  h1 { font-size: 1.8rem; font-weight: 800; color: var(--deep); margin: 0 0 4px; }
+}
+
+.report-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.report-card-item {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.urgency-badge {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--deep);
+}
+
+.report-date {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.description {
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.5;
+  padding: 10px 12px;
+  background: var(--cream);
+  border-left: 3px solid var(--peach);
+  border-radius: 4px;
+  &.muted { color: var(--muted); font-style: italic; }
+}
+
+.details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-row {
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+  align-items: baseline;
+}
+
+.detail-label {
+  color: var(--muted);
+  min-width: 90px;
+  flex-shrink: 0;
+}
+
+.card-footer {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.empty-icon { font-size: 56px; }
+h3 { font-size: 1.4rem; font-weight: 700; color: var(--deep); margin: 0; }
+
+.state-msg {
+  text-align: center;
+  padding: 60px 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.alert.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 14px;
+}

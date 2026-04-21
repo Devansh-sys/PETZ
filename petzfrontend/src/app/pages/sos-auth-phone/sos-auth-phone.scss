@@ -1,0 +1,119 @@
+:host { display: block; }
+
+.auth-page {
+  min-height: calc(100vh - 150px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: linear-gradient(180deg, var(--cream) 0%, var(--bg) 60%);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow: 0 30px 80px -30px rgba(154, 52, 18, .2);
+}
+
+.step-dots {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 24px;
+  .dot {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--line);
+    transition: background .2s;
+    &.active { background: var(--peach); }
+  }
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  .back {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--cream);
+    color: var(--deep);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 700;
+    transition: .15s;
+    &:hover { background: var(--sunset); }
+  }
+  h1 { font-size: 26px; font-weight: 800; letter-spacing: -.6px; }
+}
+.lead {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 24px;
+  strong { color: var(--ink); font-weight: 600; }
+}
+
+.phone-input {
+  display: flex;
+  align-items: stretch;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  transition: border-color .15s;
+  overflow: hidden;
+  &:focus-within { border-color: var(--peach); box-shadow: 0 0 0 4px rgba(249,115,22,.12); }
+  .cc {
+    display: flex; align-items: center;
+    padding: 0 14px;
+    background: var(--cream);
+    color: var(--deep);
+    font-weight: 600;
+    font-size: 14px;
+    border-right: 1.5px solid var(--line);
+  }
+  input {
+    flex: 1;
+    border: 0;
+    padding: 14px 16px;
+    font-size: 16px;
+    background: transparent;
+    outline: none;
+    letter-spacing: 1px;
+  }
+}
+
+.btn-big {
+  width: 100%;
+  padding: 16px;
+  font-size: 15px;
+  margin-top: 20px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 4px;
+  color: var(--muted);
+  font-size: 12px;
+  &::before, &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+}
+
+.fallback-hint {
+  display: block;
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.alert { margin-top: 16px; }

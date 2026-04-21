@@ -1,0 +1,32 @@
+<petz-navbar />
+
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="step-dots">
+      <span class="dot done"></span>
+      <span class="dot done"></span>
+      <span class="dot active"></span>
+    </div>
+
+    <div class="check-circle">
+      <svg viewBox="0 0 52 52" aria-hidden="true">
+        <circle class="check-bg" cx="26" cy="26" r="25" />
+        <path class="check-mark" d="M14 27 l8 8 l16 -18" />
+      </svg>
+    </div>
+
+    <h1>You're verified.</h1>
+    <p class="lead">
+      @if (phone()) { Emergency session active for <strong>{{ phone() }}</strong>. }
+      @if (temp()) { This is a temporary session — valid until your rescue case is closed. }
+    </p>
+
+    <div class="next">
+      <h3>Next step</h3>
+      <p>Tell us where the animal is and what's happening. We'll dispatch the nearest rescuer.</p>
+    </div>
+
+    <a routerLink="/sos/report" class="btn btn-primary btn-big">📍 Continue to SOS Report</a>
+    <a routerLink="/" class="btn btn-ghost btn-big">Back to Home</a>
+  </div>
+</section>

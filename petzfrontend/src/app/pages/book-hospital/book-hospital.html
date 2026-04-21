@@ -1,0 +1,44 @@
+<petz-navbar></petz-navbar>
+
+<div class="report-card">
+  <div class="step-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="block-head">
+    <div class="block-title">Step 1 of 5 — Choose a Hospital</div>
+  </div>
+
+  <div class="block">
+    <div class="filter-row">
+      <input class="filter-input" type="text" placeholder="Filter by city..." [(ngModel)]="filterCity" (input)="load()" />
+      <label class="check-label">
+        <input type="checkbox" [(ngModel)]="filterEmergency" (change)="load()" />
+        Emergency only
+      </label>
+    </div>
+
+    <div *ngIf="loading" class="state-msg">Loading hospitals...</div>
+
+    <div *ngIf="!loading && error" class="alert error">{{ error }}</div>
+
+    <div *ngIf="!loading && !error && hospitals.length === 0" class="state-msg">
+      No hospitals found.
+    </div>
+
+    <div *ngIf="!loading && !error && hospitals.length > 0" class="pick-list">
+      <button *ngFor="let h of hospitals" class="pick-item" (click)="select(h)">
+        <div class="pick-info">
+          <div class="pick-name">{{ h.name }}</div>
+          <div class="pick-meta">{{ h.city }} · {{ h.address }}</div>
+          <span *ngIf="h.emergencyReady" class="tag ok">Emergency ready</span>
+        </div>
+        <span class="pick-arrow">›</span>
+      </button>
+    </div>
+  </div>
+</div>

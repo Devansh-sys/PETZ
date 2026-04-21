@@ -1,0 +1,124 @@
+<petz-navbar />
+
+<section class="report-page">
+  <div class="report-card">
+    <div class="step-dots">
+      <span class="dot done"></span>
+      <span class="dot active"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+
+    <div class="title-row">
+      <a routerLink="/" class="back" aria-label="Back to home">←</a>
+      <h1>Tell us about the animal</h1>
+    </div>
+    <p class="lead">
+      We'll dispatch the nearest rescuer. The more detail, the faster they can help.
+    </p>
+
+    <!-- LOCATION -->
+    <div class="block">
+      <div class="block-head">
+        <h2>📍 Location</h2>
+        @if (locating()) { <span class="tag pending">Locating…</span> }
+        @else if (latitude() !== null && !manualLocation()) { <span class="tag ok">GPS locked</span> }
+        @else if (manualLocation()) { <span class="tag warn">Manual</span> }
+      </div>
+
+      @if (!manualLocation() && latitude() !== null) {
+        <div class="gps-box">
+          <div class="coords">
+            <span>{{ latitude() }}, {{ longitude() }}</span>
+            @if (accuracy()) { <small>± {{ accuracy() }} m</small> }
+          </div>
+          <div class="gps-actions">
+            <button type="button" class="btn-link" (click)="captureLocation()" [disabled]="locating()">Refresh</button>
+            <button type="button" class="btn-link" (click)="manualLocation.set(true)">Enter manually</button>
+          </div>
+        </div>
+      }
+
+      @if (locationError()) {
+        <div class="alert error">
+          <span>⚠️</span>
+          <span>{{ locationError() }}</span>
+        </div>
+      }
+
+      @if (manualLocation()) {
+        <div class="manual-grid">
+          <div class="field">
+            <label for="lat">Latitude</label>
+            <input id="lat" type="number" step="0.000001" placeholder="12.971598"
+                   [ngModel]="latitude()" (ngModelChange)="setLat($event)">
+          </div>
+          <div class="field">
+            <label for="lng">Longitude</label>
+            <input id="lng" type="number" step="0.000001" placeholder="77.594566"
+                   [ngModel]="longitude()" (ngModelChange)="setLng($event)">
+          </div>
+        </div>
+        <button type="button" class="btn-link try-gps" (click)="captureLocation()" [disabled]="locating()">
+          📡 Try GPS again
+        </button>
+      }
+    </div>
+
+    <!-- URGENCY -->
+    <div class="block">
+      <div class="block-head">
+        <h2>🚦 Urgency</h2>
+        @if (urgency()) { <span class="tag ok">Selected</span> }
+      </div>
+      <div class="urgency-grid">
+        @for (opt of urgencyOptions; track opt.value) {
+          <button type="button"
+                  class="urgency-chip"
+                  [class.selected]="urgency() === opt.value"
+                  [class]="'u-' + opt.value.toLowerCase()"
+                  (click)="urgency.set(opt.value)">
+            <span class="emoji">{{ opt.emoji }}</span>
+            <span class="label">{{ opt.label }}</span>
+            <small>{{ opt.hint }}</small>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- DESCRIPTION -->
+    <div class="block">
+      <div class="block-head">
+        <h2>📝 Notes <small class="optional">(optional)</small></h2>
+        <span class="char-count" [class.warn]="descriptionLength > maxDescription - 50">
+          {{ descriptionLength }}/{{ maxDescription }}
+        </span>
+      </div>
+      <div class="field">
+        <textarea rows="4"
+                  placeholder="e.g. Black puppy, hit by bike near Lalbagh east gate. Bleeding from hind leg."
+                  [ngModel]="description()"
+                  (ngModelChange)="onDescription($event)"></textarea>
+        <small class="hint">Species, colour, injury, nearby landmark — anything helps.</small>
+      </div>
+    </div>
+
+    @if (error()) {
+      <div class="alert error">
+        <span>⚠️</span>
+        <span>{{ error() }}</span>
+      </div>
+    }
+
+    <button type="button"
+            class="btn btn-primary btn-big"
+            [disabled]="!canSubmit"
+            (click)="submit()">
+      @if (submitting()) { Submitting… } @else { Dispatch nearest rescuer → }
+    </button>
+
+    <p class="reassure">
+      🔒 Location and details are shared only with verified rescue partners.
+    </p>
+  </div>
+</section>

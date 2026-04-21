@@ -1,0 +1,91 @@
+<petz-navbar />
+
+<section class="queue-page">
+  <div class="queue-wrap">
+    <header class="queue-head">
+      <div>
+        <span class="eyebrow">Rescuer dashboard</span>
+        <h1>Pending rescues</h1>
+        <p class="sub">Unassigned SOS reports waiting for a verified rescuer.</p>
+      </div>
+      <div class="refresh-meta">
+        @if (lastRefreshed()) { <small>Updated {{ formatPolled() }}</small> }
+        <button type="button" class="btn-link" (click)="refresh(false)" [disabled]="loading()">
+          🔄 Refresh
+        </button>
+      </div>
+    </header>
+
+    <div class="filters">
+      <button type="button" class="chip" [class.on]="filter() === 'ALL'" (click)="filter.set('ALL')">
+        All <span class="count">{{ counts().all }}</span>
+      </button>
+      <button type="button" class="chip critical" [class.on]="filter() === 'CRITICAL'" (click)="filter.set('CRITICAL')">
+        🚨 Critical <span class="count">{{ counts().CRITICAL }}</span>
+      </button>
+      <button type="button" class="chip moderate" [class.on]="filter() === 'MODERATE'" (click)="filter.set('MODERATE')">
+        ⚠️ Moderate <span class="count">{{ counts().MODERATE }}</span>
+      </button>
+      <button type="button" class="chip low" [class.on]="filter() === 'LOW'" (click)="filter.set('LOW')">
+        🐾 Low <span class="count">{{ counts().LOW }}</span>
+      </button>
+    </div>
+
+    @if (loading()) {
+      <p class="state">Loading pending cases…</p>
+    }
+
+    @if (error()) {
+      <div class="alert error">
+        <span>⚠️</span>
+        <span>{{ error() }}</span>
+      </div>
+    }
+
+    @if (!loading() && visible().length === 0) {
+      <div class="empty">
+        <div class="emoji">🐾</div>
+        <h3>All clear!</h3>
+        <p>No pending cases in this filter. We'll keep watching.</p>
+      </div>
+    }
+
+    <div class="cards">
+      @for (item of visible(); track item.mission.id) {
+        <button type="button" class="case" (click)="open(item)">
+          <div class="tag-row">
+            @if (item.report?.urgencyLevel === 'CRITICAL') {
+              <span class="tag crit">🚨 Critical</span>
+            } @else if (item.report?.urgencyLevel === 'MODERATE') {
+              <span class="tag mod">⚠️ Moderate</span>
+            } @else if (item.report?.urgencyLevel === 'LOW') {
+              <span class="tag low">🐾 Low</span>
+            }
+            <span class="time">{{ timeAgo(item.report?.reportedAt) }}</span>
+          </div>
+
+          <h3 class="case-title">
+            Case #{{ item.mission.sosReportId.slice(0, 8).toUpperCase() }}
+          </h3>
+
+          @if (item.report?.description) {
+            <p class="desc">{{ item.report?.description }}</p>
+          } @else {
+            <p class="desc muted">No notes provided.</p>
+          }
+
+          <div class="meta">
+            <span>📍 {{ distanceHint(item) }}</span>
+            @if (item.report?.media?.length) {
+              <span>📷 {{ item.report?.media?.length }} photo(s)</span>
+            }
+          </div>
+
+          <div class="cta-row">
+            <span class="cta">Review & accept →</span>
+          </div>
+        </button>
+      }
+    </div>
+  </div>
+</section>

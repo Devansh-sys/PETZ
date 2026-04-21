@@ -1,0 +1,36 @@
+.block-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+.slot-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.slot-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 20px;
+  background: white;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--deep);
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  &:hover { border-color: var(--peach); background: var(--cream); }
+}
+
+.slot-type {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--peach);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.state-msg { text-align: center; padding: 40px 0; color: var(--muted); font-size: 15px; }
+.alert.error { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; border-radius: 10px; padding: 14px 18px; font-size: 14px; }

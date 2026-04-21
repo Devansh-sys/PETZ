@@ -1,0 +1,81 @@
+<petz-navbar />
+
+<section class="media-page">
+  <div class="media-card">
+    <div class="step-dots">
+      <span class="dot done"></span>
+      <span class="dot done"></span>
+      <span class="dot active"></span>
+      <span class="dot"></span>
+    </div>
+
+    <h1>Add photos or a video</h1>
+    <p class="lead">
+      A clear photo helps rescuers prepare the right equipment.
+      <strong>Up to 3 photos or 1 short video.</strong>
+    </p>
+
+    @if (previews().length === 0) {
+      <label class="dropzone" [class.disabled]="uploading()">
+        <input type="file"
+               accept="image/*,video/*"
+               multiple
+               (change)="onFileInput($event)"
+               [disabled]="uploading()"
+               hidden>
+        <div class="dz-inner">
+          <div class="icon">📷</div>
+          <strong>Tap to add photos or video</strong>
+          <small>JPG, PNG, HEIC up to 10 MB each · MP4 up to 50 MB</small>
+        </div>
+      </label>
+    }
+
+    @if (previews().length > 0) {
+      <div class="previews" [class.single-video]="hasVideo">
+        @for (p of previews(); track p.url; let i = $index) {
+          <div class="prev" [class.video]="p.kind === 'video'">
+            @if (p.kind === 'photo') {
+              <img [src]="p.url" alt="Preview {{ i + 1 }}">
+            } @else {
+              <video [src]="p.url" controls muted></video>
+            }
+            <button type="button" class="remove" (click)="remove(i)" [disabled]="uploading()" aria-label="Remove">✕</button>
+            <small class="size">{{ p.sizeMb }} MB</small>
+          </div>
+        }
+
+        @if (canAddMore) {
+          <label class="add-tile" [class.disabled]="uploading()">
+            <input type="file"
+                   accept="image/*"
+                   multiple
+                   (change)="onFileInput($event)"
+                   [disabled]="uploading()"
+                   hidden>
+            <span>＋</span>
+            <small>Add photo</small>
+          </label>
+        }
+      </div>
+    }
+
+    @if (error()) {
+      <div class="alert error">
+        <span>⚠️</span>
+        <span>{{ error() }}</span>
+      </div>
+    }
+
+    <button type="button"
+            class="btn btn-primary btn-big"
+            [disabled]="!previews().length || uploading()"
+            (click)="upload()">
+      @if (uploading()) { Uploading… } @else { Attach and continue → }
+    </button>
+
+    <button type="button" class="btn btn-ghost btn-big" (click)="skip()" [disabled]="uploading()">
+      Skip — dispatch without media
+    </button>
+  </div>
+</section>

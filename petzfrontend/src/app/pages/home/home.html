@@ -1,0 +1,147 @@
+<petz-navbar />
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <div class="badge">Trusted by 340+ hospitals across India</div>
+      <h1>Professional pet care, <em>one tap away</em>.</h1>
+      <p>
+        See an animal in distress? Help is closer than you think.
+        Tap the button — we'll verify you in seconds and dispatch
+        the nearest rescue partner.
+      </p>
+
+      <!-- Epic 1.1 Story 1 — One-Touch SOS Emergency Button -->
+      <button
+        type="button"
+        class="sos-button"
+        aria-label="Report an emergency. One tap initiates rescue."
+        (click)="onSosTap()">
+        <span class="sos-ring"></span>
+        <span class="sos-inner">
+          <span class="sos-icon" aria-hidden="true">🚨</span>
+          <span class="sos-label">
+            <span class="sos-title">EMERGENCY</span>
+            <span class="sos-sub">Tap to report now</span>
+          </span>
+        </span>
+      </button>
+
+      <div class="sos-meta">
+        <span>● No account needed</span>
+        <span>● Works in under 30 seconds</span>
+        <span>● 100% free for reporters</span>
+      </div>
+    </div>
+
+    <aside class="hero-visual">
+      <div class="hv-header">
+        <h4>Live Activity</h4>
+        <span class="hv-live">LIVE NOW</span>
+      </div>
+      <div class="vc">
+        <div class="vc-icon">🚑</div>
+        <div class="vc-main">
+          <div class="vc-title">Rescue dispatched — Sector 12</div>
+          <div class="vc-meta">Paws Rescue NGO · 4 min ETA</div>
+        </div>
+        <span class="chip chip-live">Live</span>
+      </div>
+      <div class="vc">
+        <div class="vc-icon">🏥</div>
+        <div class="vc-main">
+          <div class="vc-title">Slot locked — Dr. Mehta</div>
+          <div class="vc-meta">Paws Clinic · 2.4 km away</div>
+        </div>
+        <span class="chip chip-ok">Confirmed</span>
+      </div>
+      <div class="vc">
+        <div class="vc-icon">✅</div>
+        <div class="vc-main">
+          <div class="vc-title">Case closed — Bruno</div>
+          <div class="vc-meta">Handed over to Animal Hospital</div>
+        </div>
+        <span class="chip chip-ok">Done</span>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section class="how">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">— How it works</div>
+      <h2>Three steps. No friction.</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-icon">📍</div>
+        <h3>Tap Emergency</h3>
+        <p>One prominent button on the home screen. No navigation, no registration — just tap.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-icon">⚡</div>
+        <h3>Verify in seconds</h3>
+        <p>We send an OTP to your number, or use a missed-call fallback if the network is weak.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-icon">🚑</div>
+        <h3>Nearest rescuer on the way</h3>
+        <p>The closest verified NGO is dispatched within 5 seconds. Track the rescue live.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="actions">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">— What we do</div>
+      <h2>Everything animal welfare, in one platform.</h2>
+    </div>
+    <div class="action-grid">
+      <a routerLink="/sos/auth" class="action">
+        <div class="action-icon">🚨</div>
+        <h3>Emergency SOS</h3>
+        <p>Report injured animals with photos. Nearest NGO dispatched in minutes.</p>
+      </a>
+      <a routerLink="/book" class="action">
+        <div class="action-icon">📅</div>
+        <h3>Slot Booking</h3>
+        <p>Hospital → service → doctor. 2-minute lock prevents double-booking.</p>
+      </a>
+      <a routerLink="/hospitals" class="action">
+        <div class="action-icon">🏥</div>
+        <h3>Hospital Directory</h3>
+        <p>340+ verified hospitals with hours, services, emergency readiness.</p>
+      </a>
+      <div class="action">
+        <div class="action-icon">🏠</div>
+        <h3>Adoption Network</h3>
+        <p>Meet rescued pets who are healthy, vaccinated, and ready for a home.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stats-section">
+  <div class="container">
+    <div class="stats-card">
+      <div class="stats-head">
+        <h2>Real outcomes, every day.</h2>
+        <p>Numbers audited quarterly. No vanity metrics.</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat"><h3>12,400+</h3><p>Rescues</p></div>
+        <div class="stat"><h3>340</h3><p>Hospitals</p></div>
+        <div class="stat"><h3>8,200</h3><p>Adoptions</p></div>
+        <div class="stat"><h3>&lt; 6m</h3><p>Response</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<petz-footer />

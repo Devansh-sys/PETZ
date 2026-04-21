@@ -1,0 +1,63 @@
+<petz-navbar />
+
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="step-dots">
+      <span class="dot done"></span>
+      <span class="dot active"></span>
+      <span class="dot"></span>
+    </div>
+
+    <div class="title-row">
+      <a routerLink="/sos/auth" class="back" aria-label="Change number">←</a>
+      <h1>Enter the 6-digit code</h1>
+    </div>
+    <p class="lead">
+      We sent a code to <strong>{{ maskedPhone }}</strong>.
+      @if (expiresIn() > 0) {
+        It expires in <strong class="timer">{{ formatExpiry() }}</strong>.
+      } @else {
+        <strong class="expired">Code expired — request a new one.</strong>
+      }
+    </p>
+
+    <div class="field otp-field">
+      <label for="otp">One-time password</label>
+      <input
+        id="otp"
+        type="tel"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        maxlength="6"
+        placeholder="••••••"
+        [ngModel]="otp()"
+        (ngModelChange)="onOtpInput($event)"
+        [disabled]="loading()">
+      <small class="hint">We'll verify automatically.</small>
+    </div>
+
+    @if (error()) {
+      <div class="alert error">
+        <span>⚠️</span>
+        <span>{{ error() }}</span>
+      </div>
+    }
+
+    <button
+      type="button"
+      class="btn btn-primary btn-big"
+      [disabled]="!canSubmit || loading()"
+      (click)="verify()">
+      @if (loading()) { Verifying… } @else { Verify & Continue → }
+    </button>
+
+    <div class="resend-row">
+      @if (canResend) {
+        <button type="button" class="link-btn" (click)="resend()">Resend code</button>
+      } @else {
+        <span class="muted">Resend in {{ resendCooldown() }}s</span>
+      }
+      <button type="button" class="link-btn" (click)="useMissedCall()">Use missed-call instead</button>
+    </div>
+  </div>
+</section>
