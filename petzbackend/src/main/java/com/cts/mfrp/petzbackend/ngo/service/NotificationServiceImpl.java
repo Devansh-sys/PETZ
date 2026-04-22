@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 /**
  * Stub implementation of NotificationService.
  * Logs instead of sending real notifications.
@@ -22,7 +24,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public void notifyOthersMissionClaimed(Long missionId, Long ngoId) {
+    public void notifyOthersMissionClaimed(UUID missionId, UUID ngoId) {
         log.info("NOTIFICATION → Mission {} claimed by NGO {}. Other NGOs notified.",
                 missionId, ngoId);
     }

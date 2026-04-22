@@ -77,13 +77,6 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
-        <!-- ═══ Firebase (Push Notifications) ════════════════════════ -->
-        <dependency>
-            <groupId>com.google.firebase</groupId>
-            <artifactId>firebase-admin</artifactId>
-            <version>9.2.0</version>
-        </dependency>
-
         <!-- ═══ Lombok ═══════════════════════════════════════════════ -->
         <dependency>
             <groupId>org.projectlombok</groupId>

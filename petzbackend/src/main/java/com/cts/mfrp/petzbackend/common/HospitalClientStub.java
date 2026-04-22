@@ -8,12 +8,10 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * TEMPORARY STUB — delete this once the Hospital module collaborator
- * provides the real @Service implementation of HospitalClient.
- *
- * This only exists so the app can start without the hospital module.
+ * TEMPORARY STUB — superseded by HospitalClientImpl (hospital module).
+ * @Primary is on HospitalClientImpl; this stub is kept only so it compiles
+ * in case the hospital module is absent in a test context.
  */
-@Service
 public class HospitalClientStub implements HospitalClient {
 
     @Override

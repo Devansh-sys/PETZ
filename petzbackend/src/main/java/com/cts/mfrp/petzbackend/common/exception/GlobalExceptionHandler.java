@@ -4,11 +4,13 @@ import com.cts.mfrp.petzbackend.common.dto.ApiErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.stream.Collectors;
 
@@ -79,6 +81,55 @@ public class GlobalExceptionHandler {
             AuthExceptions.MissedCallVerificationFailedException ex, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                 ApiErrorResponse.of(401, "Verification Failed", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    // ─── Epic 3.4: Booking / Slot Locking Errors ────────────────────────
+
+    /**
+     * Handles slot-unavailable, lock-expired, and ownership violations thrown
+     * as IllegalStateException or IllegalArgumentException from AppointmentService
+     * and SlotLockService (US-3.4.1, US-3.4.2, US-3.4.3).
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalState(
+            IllegalStateException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ApiErrorResponse.of(409, "Conflict", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalArgument(
+            IllegalArgumentException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ApiErrorResponse.of(400, "Bad Request", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    /**
+     * Safety net for any DataIntegrityViolationException that escapes a service method
+     * (e.g. if saveAndFlush is not used and the constraint fires at commit time).
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiErrorResponse> handleDataIntegrity(
+            DataIntegrityViolationException ex, HttpServletRequest request) {
+        log.warn("DataIntegrityViolation at {}: {}", request.getRequestURI(), ex.getMostSpecificCause().getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ApiErrorResponse.of(409, "Conflict", "Slot Unavailable: concurrent booking detected", request.getRequestURI())
+        );
+    }
+
+    // ─── Invalid path/query parameter types (e.g. non-UUID passed as UUID) ─
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiErrorResponse> handleTypeMismatch(
+            MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+        String message = String.format("Invalid value '%s' for parameter '%s' — expected %s",
+                ex.getValue(), ex.getName(),
+                ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "correct type");
+        return ResponseEntity.badRequest().body(
+                ApiErrorResponse.of(400, "Bad Request", message, request.getRequestURI())
         );
     }
 

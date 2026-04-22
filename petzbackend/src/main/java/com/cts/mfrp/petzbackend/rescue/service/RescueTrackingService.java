@@ -33,6 +33,13 @@ public class RescueTrackingService {
 
     @Transactional
     public RescueMissionResponse createMission(UUID sosReportId) {
+        // If a mission already exists for this SOS report (e.g., created by /ngo/assign), return it
+        var existing = rescueMissionRepository.findBySosReportId(sosReportId);
+        if (existing.isPresent()) {
+            log.info("Rescue mission already exists for sosReportId={}, returning existing", sosReportId);
+            return mapToResponse(existing.get());
+        }
+
         SosReport sosReport = sosReportRepository.findById(sosReportId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "SOS Report not found with id: " + sosReportId));

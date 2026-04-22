@@ -1,11 +1,13 @@
 package com.cts.mfrp.petzbackend.ngo.service;
 
+import com.cts.mfrp.petzbackend.enums.ReportStatus;
+import com.cts.mfrp.petzbackend.ngo.dto.AssignResponseDTO;
 import com.cts.mfrp.petzbackend.ngo.dto.NavigationDTO;
 import com.cts.mfrp.petzbackend.ngo.dto.NgoResponseDTO;
-import com.cts.mfrp.petzbackend.ngo.model.Mission;
 import com.cts.mfrp.petzbackend.ngo.model.Ngo;
-import com.cts.mfrp.petzbackend.ngo.repository.MissionRepository;
 import com.cts.mfrp.petzbackend.ngo.repository.NgoRepository;
+import com.cts.mfrp.petzbackend.rescue.model.RescueMission;
+import com.cts.mfrp.petzbackend.rescue.repository.RescueMissionRepository;
 import com.cts.mfrp.petzbackend.sosreport.model.SosReport;
 import com.cts.mfrp.petzbackend.sosreport.repository.SosReportRepository;
 import com.cts.mfrp.petzbackend.statuslog.model.StatusLog;
@@ -24,7 +26,7 @@ public class NgoService {
     @Autowired
     private NgoRepository ngoRepository;
     @Autowired
-    private MissionRepository missionRepository;
+    private RescueMissionRepository rescueMissionRepository;
     @Autowired
     private StatusLogRepository statusLogRepository;
     @Autowired
@@ -33,13 +35,43 @@ public class NgoService {
     private NotificationService notificationService;
 
     // US-1.3.1 Automatic NGO Assignment
-    public List<NgoResponseDTO> assignNearestNgo(double sosLat, double sosLon, int severityLevel) {
-        int radius = switch (severityLevel) {
-            case 1 -> 10;
-            case 2 -> 7;
-            default -> 5;
-        };
+    public AssignResponseDTO assignNearestNgo(UUID sosReportId, double sosLat, double sosLon, int severityLevel) {
+        List<NgoResponseDTO> ngoList = findNearestNgos(sosLat, sosLon, severityLevel);
 
+        // Check if a rescue mission already exists for this SOS report
+        var existing = rescueMissionRepository.findBySosReportId(sosReportId);
+        RescueMission mission;
+
+        if (existing.isPresent()) {
+            // Reuse existing mission — just update NGO fields
+            mission = existing.get();
+            mission.setSosLat(sosLat);
+            mission.setSosLon(sosLon);
+            mission.setSeverityLevel(severityLevel);
+            mission.setNgoStatus("PENDING");
+            mission = rescueMissionRepository.save(mission);
+        } else {
+            // Create new mission only if none exists
+            SosReport sosReport = sosReportRepository.findById(sosReportId)
+                    .orElseThrow(() -> new RuntimeException("SOS Report not found: " + sosReportId));
+
+            mission = RescueMission.builder()
+                    .sosReport(sosReport)
+                    .rescueStatus(ReportStatus.REPORTED)
+                    .sosLat(sosLat)
+                    .sosLon(sosLon)
+                    .severityLevel(severityLevel)
+                    .ngoStatus("PENDING")
+                    .build();
+            mission = rescueMissionRepository.save(mission);
+        }
+
+        logStatus(sosReportId, "PENDING");
+
+        return new AssignResponseDTO(mission.getId(), mission.getNgoStatus(), ngoList);
+    }
+
+    private List<NgoResponseDTO> findNearestNgos(double sosLat, double sosLon, int severityLevel) {
         List<Ngo> nearest = ngoRepository.findActiveNgos();
         return nearest.stream()
                 .limit(5)
@@ -56,26 +88,26 @@ public class NgoService {
     }
 
     // US-1.3.2 Accept Rescue Mission
-    public void acceptMission(Long missionId, Long ngoId) {
-        Mission mission = missionRepository.findById(missionId).orElseThrow();
-        if ("ASSIGNED".equals(mission.getStatus())) throw new IllegalStateException("Already claimed");
+    public void acceptMission(UUID missionId, UUID ngoId) {
+        RescueMission mission = rescueMissionRepository.findById(missionId).orElseThrow();
+        if ("ASSIGNED".equals(mission.getNgoStatus())) throw new IllegalStateException("Already claimed");
 
-        mission.setStatus("ASSIGNED");
+        mission.setNgoStatus("ASSIGNED");
         mission.setAssignedNgoId(ngoId);
         mission.setAcceptedAt(LocalDateTime.now());
-        missionRepository.save(mission);
+        rescueMissionRepository.save(mission);
 
         notificationService.notifyOthersMissionClaimed(missionId, ngoId);
-        logStatus(mission.getSosReportId(), "ACCEPTED");
+        logStatus(mission.getSosReport().getId(), "ACCEPTED");
     }
 
     // US-1.3.3 Decline Rescue Mission
-    public void declineMission(Long missionId, Long ngoId) {
-        Mission mission = missionRepository.findById(missionId).orElseThrow();
+    public void declineMission(UUID missionId, UUID ngoId) {
+        RescueMission mission = rescueMissionRepository.findById(missionId).orElseThrow();
         mission.getDeclinedNgoIds().add(ngoId);
-        missionRepository.save(mission);
+        rescueMissionRepository.save(mission);
 
-        logStatus(mission.getSosReportId(), "DECLINED");
+        logStatus(mission.getSosReport().getId(), "DECLINED");
 
         if (mission.getDeclinedNgoIds().size() >= 5) {
             reDispatch(mission);
@@ -83,22 +115,22 @@ public class NgoService {
     }
 
     // US-1.3.4 GPS Navigation
-    public NavigationDTO getNavigationDetails(Long missionId) {
-        Mission mission = missionRepository.findById(missionId).orElseThrow();
+    public NavigationDTO getNavigationDetails(UUID missionId) {
+        RescueMission mission = rescueMissionRepository.findById(missionId).orElseThrow();
         return new NavigationDTO(mission.getSosLat(), mission.getSosLon(), "ETA: 10 mins");
     }
 
     // US-1.3.5 Auto-Reassign on Timeout
     @Scheduled(fixedRate = 60000)
     public void checkTimeouts() {
-        List<Mission> pending = missionRepository.findByStatus("PENDING");
-        for (Mission mission : pending) {
+        List<RescueMission> pending = rescueMissionRepository.findByNgoStatus("PENDING");
+        for (RescueMission mission : pending) {
             if (mission.getCreatedAt().isBefore(LocalDateTime.now()
                     .minusMinutes(timeoutForSeverity(mission.getSeverityLevel())))) {
-                mission.setStatus("REDISPATCH");
-                missionRepository.save(mission);
+                mission.setNgoStatus("REDISPATCH");
+                rescueMissionRepository.save(mission);
                 reDispatch(mission);
-                logStatus(mission.getSosReportId(), "REDISPATCH");
+                logStatus(mission.getSosReport().getId(), "REDISPATCH");
             }
         }
     }
@@ -123,7 +155,11 @@ public class NgoService {
         statusLogRepository.save(log);
     }
 
-    private void reDispatch(Mission mission) {
-        assignNearestNgo(mission.getSosLat(), mission.getSosLon(), mission.getSeverityLevel());
+    private void reDispatch(RescueMission mission) {
+        mission.setNgoStatus("PENDING");
+        mission.setAssignedNgoId(null);
+        mission.setCreatedAt(LocalDateTime.now());
+        mission.getDeclinedNgoIds().clear();
+        rescueMissionRepository.save(mission);
     }
 }

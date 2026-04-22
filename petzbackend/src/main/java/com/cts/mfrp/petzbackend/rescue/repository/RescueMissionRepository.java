@@ -17,4 +17,7 @@ public interface RescueMissionRepository extends JpaRepository<RescueMission, UU
     List<RescueMission> findByRescueStatus(ReportStatus status);
 
     List<RescueMission> findByAssignedNgoUserId(UUID ngoUserId);
+
+    // Queries merged from MissionRepository
+    List<RescueMission> findByNgoStatus(String ngoStatus);
 }
