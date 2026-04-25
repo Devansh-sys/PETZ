@@ -22,9 +22,9 @@ import java.util.UUID;
  *     POST  /api/v1/adoptions/disputes                 raise a dispute
  *
  *   Admin-facing:
- *     GET   /admin/adoptions/disputes[?status=OPEN]    queue
- *     GET   /admin/adoptions/disputes/{id}             full detail
- *     POST  /admin/adoptions/disputes/{id}/resolve     OVERRIDE/WARN/SUSPEND
+ *     GET   /api/v1/admin/adoptions/disputes[?status=OPEN]    queue
+ *     GET   /api/v1/admin/adoptions/disputes/{id}             full detail
+ *     POST  /api/v1/admin/adoptions/disputes/{id}/resolve     OVERRIDE/WARN/SUSPEND
  */
 @RestController
 @RequiredArgsConstructor
@@ -44,7 +44,7 @@ public class AdoptionDisputeController {
     }
 
     // Admin queue (US-4.1.3 — ADMIN only when JWT present; dev fallback allowed).
-    @GetMapping("/admin/adoptions/disputes")
+    @GetMapping("/api/v1/admin/adoptions/disputes")
     @PreAuthorize("hasRole('ADMIN') or !isAuthenticated()")
     public ResponseEntity<ApiResponse<PageResponse<DisputeResponse>>> list(
             @RequestParam(required = false) String status,
@@ -54,14 +54,14 @@ public class AdoptionDisputeController {
                 "Disputes fetched.", disputeService.list(status, page, size)));
     }
 
-    @GetMapping("/admin/adoptions/disputes/{id}")
+    @GetMapping("/api/v1/admin/adoptions/disputes/{id}")
     @PreAuthorize("hasRole('ADMIN') or !isAuthenticated()")
     public ResponseEntity<ApiResponse<DisputeResponse>> detail(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.ok(
                 "Dispute detail fetched.", disputeService.getById(id)));
     }
 
-    @PostMapping("/admin/adoptions/disputes/{id}/resolve")
+    @PostMapping("/api/v1/admin/adoptions/disputes/{id}/resolve")
     @PreAuthorize("hasRole('ADMIN') or !isAuthenticated()")
     public ResponseEntity<ApiResponse<DisputeResponse>> resolve(
             @AuthenticationPrincipal UUID principalUserId,

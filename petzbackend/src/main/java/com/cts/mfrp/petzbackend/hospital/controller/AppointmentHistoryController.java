@@ -19,8 +19,8 @@ public class AppointmentHistoryController {
 
     private final AppointmentHistoryService historyService;
 
-    // US-3.6.1 — GET /users/{userId}/appointments
-    @GetMapping("/users/{userId}/appointments")
+    // US-3.6.1 — GET /api/v1/users/{userId}/appointments
+    @GetMapping("/api/v1/users/{userId}/appointments")
     public ResponseEntity<ApiResponse<List<AppointmentHistoryResponse>>> getUserAppointmentHistory(
             @PathVariable UUID userId,
             @RequestParam(required = false) UUID petId,
@@ -32,8 +32,8 @@ public class AppointmentHistoryController {
         return ResponseEntity.ok(ApiResponse.ok("Appointment history fetched", history));
     }
 
-    // US-3.6.2 — GET /hospitals/{hospitalId}/dashboard
-    @GetMapping("/hospitals/{hospitalId}/dashboard")
+    // US-3.6.2 — GET /api/v1/hospitals/{hospitalId}/dashboard
+    @GetMapping("/api/v1/hospitals/{hospitalId}/dashboard")
     public ResponseEntity<ApiResponse<HospitalDashboardResponse>> getHospitalDashboard(
             @PathVariable UUID hospitalId,
             @RequestParam(required = false) UUID doctorId) {

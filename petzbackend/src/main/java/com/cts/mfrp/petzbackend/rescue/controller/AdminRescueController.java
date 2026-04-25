@@ -21,7 +21,7 @@ import java.util.UUID;
  * All routes require ADMIN role (enforced via @PreAuthorize).
  */
 @RestController
-@RequestMapping("/admin/rescues")
+@RequestMapping("/api/v1/admin/rescues")
 @RequiredArgsConstructor
 
 public class AdminRescueController {

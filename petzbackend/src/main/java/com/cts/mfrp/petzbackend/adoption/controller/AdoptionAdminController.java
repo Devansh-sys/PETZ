@@ -38,7 +38,7 @@ import java.util.UUID;
  * existing tests and internal tooling keep working.
  */
 @RestController
-@RequestMapping("/admin/adoptions")
+@RequestMapping("/api/v1/admin/adoptions")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN') or !isAuthenticated()")
 public class AdoptionAdminController {

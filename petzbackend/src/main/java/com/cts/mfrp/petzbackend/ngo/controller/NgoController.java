@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/ngo")
+@RequestMapping("/api/v1/ngo")
 public class NgoController {
 
     @Autowired

@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
  *     totalSos, completedSos, totalDispatched, acceptedDispatched
  */
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
 public class RescueKpiController {
 
