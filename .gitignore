@@ -59,7 +59,7 @@ log/
 *.log
 
 # Local config with secrets
-#petzbackend/src/main/resources/application.properties
+petzbackend/src/main/resources/application.properties
 =======
 *.log
 >>>>>>> origin/ngobranch
