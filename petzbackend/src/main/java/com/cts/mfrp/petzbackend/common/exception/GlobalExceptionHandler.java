@@ -14,6 +14,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -85,6 +86,35 @@ public class GlobalExceptionHandler {
             AuthExceptions.MissedCallVerificationFailedException ex, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                 ApiErrorResponse.of(401, "Verification Failed", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    // ─── Epic 4.1 Password Login Errors (US-4.1.2) ───────────────────────
+
+    @ExceptionHandler(AuthExceptions.InvalidCredentialsException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidCredentials(
+            AuthExceptions.InvalidCredentialsException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                ApiErrorResponse.of(401, "Invalid Credentials",
+                        ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    @ExceptionHandler(AuthExceptions.AccountLockedException.class)
+    public ResponseEntity<ApiErrorResponse> handleAccountLocked(
+            AuthExceptions.AccountLockedException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.LOCKED).body(
+                ApiErrorResponse.of(423, "Account Locked",
+                        ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    @ExceptionHandler(AuthExceptions.AccountDisabledException.class)
+    public ResponseEntity<ApiErrorResponse> handleAccountDisabled(
+            AuthExceptions.AccountDisabledException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                ApiErrorResponse.of(403, "Account Disabled",
+                        ex.getMessage(), request.getRequestURI())
         );
     }
 
@@ -171,6 +201,24 @@ public class GlobalExceptionHandler {
         log.warn("DataIntegrityViolation at {}: {}", request.getRequestURI(), root);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
                 ApiErrorResponse.of(409, "Data Conflict", root, request.getRequestURI())
+        );
+    }
+
+    // ─── Spring MVC — path not mapped → 404 (not 500) ───────────────────
+
+    /**
+     * Spring 6 throws NoResourceFoundException when no handler/static resource
+     * matches the request path (e.g. /health when actuator is not on classpath).
+     * Without this handler it falls through to the generic Exception catch-all
+     * and comes back as 500 — confusing callers who expect 404.
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleNoResourceFound(
+            NoResourceFoundException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiErrorResponse.of(404, "Not Found",
+                        "No endpoint mapped to " + request.getRequestURI(),
+                        request.getRequestURI())
         );
     }
 

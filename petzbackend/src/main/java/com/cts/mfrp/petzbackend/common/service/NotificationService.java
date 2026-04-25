@@ -64,4 +64,28 @@ public interface NotificationService {
      */
     void notifyAdopterKycDecision(UUID adopterId, UUID applicationId, UUID documentId,
                                   String status, String reason);
+
+    // ── Adoption completion + admin notifications (Epic 2.5 + 2.6) ───
+    /**
+     * US-2.5.1 AC#2 — both parties receive handover date/location as
+     * soon as the NGO schedules.
+     */
+    void notifyAdopterHandoverScheduled(UUID adopterId, UUID adoptionId, String details);
+    void notifyNgoHandoverScheduled(UUID ngoId, UUID adoptionId, String details);
+
+    /**
+     * US-2.5.5 — after finalization, the adopter is told their new pet
+     * is now reachable through the hospital module (so they can book
+     * appointments immediately).
+     */
+    void notifyHospitalModuleLinked(UUID adopterId, UUID adoptionId, UUID hospitalPetId);
+
+    /** US-2.5.3 AC#2 — daily reminder to adopter when a follow-up comes due. */
+    void notifyAdopterFollowUpDue(UUID adopterId, UUID followUpId, String details);
+
+    /** US-2.5.3 AC#2 — daily reminder to NGO reviewer when a follow-up comes due. */
+    void notifyNgoFollowUpDue(UUID ngoId, UUID followUpId, String details);
+
+    /** US-2.6.3 — parties informed of dispute resolution (adopter / NGO owner). */
+    void notifyDisputeResolved(UUID userId, UUID disputeId, String action, String resolution);
 }

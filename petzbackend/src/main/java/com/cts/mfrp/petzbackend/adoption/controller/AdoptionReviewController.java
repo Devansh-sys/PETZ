@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +41,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/ngo/adoption-applications")
 @RequiredArgsConstructor
+// US-4.1.3 — NGO review queue is restricted to NGO_REP / ADMIN when a JWT
+// is present. Dev-mode (no JWT) remains open for existing X-User-Id flows.
+@PreAuthorize("hasAnyRole('NGO_REP','ADMIN') or !isAuthenticated()")
 public class AdoptionReviewController {
 
     private final AdoptionReviewService reviewService;

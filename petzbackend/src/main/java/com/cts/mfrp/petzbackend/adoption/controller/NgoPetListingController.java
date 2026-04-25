@@ -17,6 +17,7 @@ import com.cts.mfrp.petzbackend.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,6 +50,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/ngo/adoptable-pets")
 @RequiredArgsConstructor
+// US-4.1.3 — NGO_REP or ADMIN only when JWT is present. Dev-mode fallback
+// (no JWT) stays open so existing X-User-Id test flows keep working.
+@PreAuthorize("hasAnyRole('NGO_REP','ADMIN') or !isAuthenticated()")
 public class NgoPetListingController {
 
     private final AdoptablePetService  petService;

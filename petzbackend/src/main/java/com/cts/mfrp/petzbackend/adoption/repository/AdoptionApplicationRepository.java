@@ -46,6 +46,12 @@ public interface AdoptionApplicationRepository
     List<AdoptionApplication> findByAdoptablePetIdAndStatusIn(
             UUID adoptablePetId, List<AdoptionApplicationStatus> statuses);
 
+    /** US-4.3 dashboard — application count per status for an NGO. */
+    long countByNgoIdAndStatus(UUID ngoId, AdoptionApplicationStatus status);
+
+    /** US-4.3 dashboard — total applications across multiple statuses for an NGO. */
+    long countByNgoIdAndStatusIn(UUID ngoId, List<AdoptionApplicationStatus> statuses);
+
     // ── Future cleanup job placeholder (US-2.3.2 AC#3) ──────────────
     /**
      * Drafts untouched for > 30 days are candidates for auto-expire.

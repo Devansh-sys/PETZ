@@ -109,6 +109,32 @@ public class FileStorageService {
         }
     }
 
+    /**
+     * US-4.1.4 — profile photo upload. Accepts JPEG/PNG only; 5 MB cap
+     * enforced by caller (or by spring.servlet.multipart.max-file-size).
+     * Stored under {@code /uploads/profile-photos/} for easy ACL / purge.
+     */
+    public String storeProfilePhoto(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new FileValidationException("Uploaded file is empty");
+        }
+        if (!ALLOWED_IMAGE_TYPES.contains(file.getContentType())) {
+            throw new FileValidationException(
+                    "Invalid profile photo type: " + file.getContentType() +
+                            ". Allowed: JPEG, PNG");
+        }
+        String ext = getExtension(file.getOriginalFilename());
+        String storedName = UUID.randomUUID() + ext;
+        try {
+            Path target = rootLocation.resolve(storedName);
+            Files.copy(file.getInputStream(), target,
+                    StandardCopyOption.REPLACE_EXISTING);
+            return "/uploads/profile-photos/" + storedName;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store profile photo", e);
+        }
+    }
+
     private boolean isAllowedType(String contentType) {
         return ALLOWED_IMAGE_TYPES.contains(contentType)
                 || ALLOWED_VIDEO_TYPES.contains(contentType);
