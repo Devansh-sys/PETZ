@@ -21,7 +21,7 @@ import java.util.UUID;
  * Response:     ConvertSessionResponse (userId, phone, fullName, email, message)
  */
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class SessionConversionController {
 

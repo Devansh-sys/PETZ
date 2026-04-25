@@ -209,7 +209,7 @@ Verifies the OTP and returns a JWT token. If the phone number is new, a temporar
 - `400` — Wrong OTP or OTP expired
 - `400` — OTP format invalid (must be 6 digits)
 
-> ⚠️ **Caution:** `isTemporarySession: true` means the account is temporary. The user should later call `/auth/convert-session` to create a full account.
+> ⚠️ **Caution:** `isTemporarySession: true` means the account is temporary. The user should later call `/api/v1/auth/convert-session` to create a full account.
 
 ---
 
@@ -355,11 +355,9 @@ Password-based login. The identifier can be either email or phone number.
 ---
 
 ### 1.8 Convert Temporary Session
-**POST** `/auth/convert-session`
+**POST** `/api/v1/auth/convert-session`
 
 Converts a temporary SOS reporter session into a full account with password + email. Call this after getting a JWT from the OTP flow.
-
-> ⚠️ **Note:** This endpoint is at `/auth/` (no `/api/v1/` prefix).
 
 **Query Params:**
 | Param | Type | Required |
@@ -751,14 +749,13 @@ GET {{base_url}}/api/v1/sos-reports/my-reports?reporterId=3fa85f64-5717-4562-b3f
 
 # Module 5 — NGO (SOS Flow)
 
-> **Base path:** `/ngo`  
-> **Auth required:** ❌ (legacy endpoints from early Epic 1)  
-> ⚠️ Note: These endpoints are at `/ngo` (no `/api/v1/` prefix). They handle the older NGO mission assignment flow for SOS rescues.
+> **Base path:** `/api/v1/ngo`  
+> **Auth required:** ❌ (legacy endpoints from early Epic 1)
 
 ---
 
 ### 5.1 Assign Nearest NGO
-**POST** `/ngo/assign`
+**POST** `/api/v1/ngo/assign`
 
 Auto-assigns the nearest available NGO to a rescue based on coordinates and severity.
 
@@ -771,7 +768,7 @@ Auto-assigns the nearest available NGO to a rescue based on coordinates and seve
 
 **Sample Request:**
 ```
-POST {{base_url}}/ngo/assign?sosLat=13.0827&sosLon=80.2707&severity=3
+POST {{base_url}}/api/v1/ngo/assign?sosLat=13.0827&sosLon=80.2707&severity=3
 ```
 
 **Success Response (200):** Returns list of assigned `NgoResponseDTO`.
@@ -779,7 +776,7 @@ POST {{base_url}}/ngo/assign?sosLat=13.0827&sosLon=80.2707&severity=3
 ---
 
 ### 5.2 Accept Mission
-**POST** `/ngo/missions/{missionId}/accept`
+**POST** `/api/v1/ngo/missions/{missionId}/accept`
 
 NGO rep accepts a rescue mission assignment.
 
@@ -787,7 +784,7 @@ NGO rep accepts a rescue mission assignment.
 **Query Param:** `ngoUserId` — UUID of the NGO user
 
 ```
-POST {{base_url}}/ngo/missions/{missionId}/accept?ngoUserId={uuid}
+POST {{base_url}}/api/v1/ngo/missions/{missionId}/accept?ngoUserId={uuid}
 ```
 
 **Success Response (200):** `"Mission accepted"`
@@ -795,7 +792,7 @@ POST {{base_url}}/ngo/missions/{missionId}/accept?ngoUserId={uuid}
 ---
 
 ### 5.3 Decline Mission
-**POST** `/ngo/missions/{missionId}/decline`
+**POST** `/api/v1/ngo/missions/{missionId}/decline`
 
 NGO rep declines a mission (another NGO will be tried).
 
@@ -806,7 +803,7 @@ NGO rep declines a mission (another NGO will be tried).
 ---
 
 ### 5.4 Get Navigation Details
-**GET** `/ngo/missions/{missionId}/navigation`
+**GET** `/api/v1/ngo/missions/{missionId}/navigation`
 
 Returns navigation/GPS directions from the NGO to the rescue location.
 
@@ -1264,7 +1261,7 @@ Volunteer confirms the animal has been released/treated and provides a confirmat
 ---
 
 ### 9.1 Get User's Rescue History
-**GET** `/users/{userId}/rescue-history`
+**GET** `/api/v1/users/{userId}/rescue-history`
 
 Returns all SOS reports submitted by a specific user.
 
@@ -1289,7 +1286,7 @@ Returns all SOS reports submitted by a specific user.
 ---
 
 ### 9.2 Admin KPI Dashboard
-**GET** `/admin/kpis`
+**GET** `/api/v1/admin/kpis`
 
 Returns rescue performance KPIs for the admin dashboard.
 
@@ -1303,7 +1300,7 @@ Returns rescue performance KPIs for the admin dashboard.
 
 **Sample Request:**
 ```
-GET {{base_url}}/admin/kpis?from=2026-01-01T00:00:00&to=2026-04-30T23:59:59
+GET {{base_url}}/api/v1/admin/kpis?from=2026-01-01T00:00:00&to=2026-04-30T23:59:59
 ```
 
 **Success Response (200):**
@@ -1323,7 +1320,7 @@ GET {{base_url}}/admin/kpis?from=2026-01-01T00:00:00&to=2026-04-30T23:59:59
 ---
 
 ### 9.3 Admin Live Rescue Map
-**GET** `/admin/rescues/live`
+**GET** `/api/v1/admin/rescues/live`
 
 Returns all active (non-completed) SOS reports for an admin map view.
 
@@ -1337,7 +1334,7 @@ Returns all active (non-completed) SOS reports for an admin map view.
 ---
 
 ### 9.4 Admin Reassign Rescue
-**PATCH** `/admin/rescues/{sosReportId}/reassign`
+**PATCH** `/api/v1/admin/rescues/{sosReportId}/reassign`
 
 Reassigns a stalled rescue to a different NGO or volunteer.
 
@@ -1932,7 +1929,7 @@ Hospital marks appointment as no-show when the pet owner doesn't arrive. No requ
 ---
 
 ### 16.1 Get User's Appointment History
-**GET** `/users/{userId}/appointments`
+**GET** `/api/v1/users/{userId}/appointments`
 
 Returns appointment history for a user (pet owner view).
 
@@ -1946,13 +1943,13 @@ Returns appointment history for a user (pet owner view).
 
 **Sample Request:**
 ```
-GET {{base_url}}/users/{userId}/appointments?from=2026-01-01&to=2026-04-30
+GET {{base_url}}/api/v1/users/{userId}/appointments?from=2026-01-01&to=2026-04-30
 ```
 
 ---
 
 ### 16.2 Hospital Dashboard
-**GET** `/hospitals/{hospitalId}/dashboard`
+**GET** `/api/v1/hospitals/{hospitalId}/dashboard`
 
 Returns the hospital's appointment dashboard — today's schedule, upcoming, stats.
 
@@ -1982,12 +1979,12 @@ Returns the hospital's appointment dashboard — today's schedule, upcoming, sta
 
 # Module 17 — Pet Management (Hospital)
 
-> **Base path:** `/users/{userId}/pets`
+> **Base path:** `/api/v1/users/{userId}/pets`
 
 ---
 
 ### 17.1 List User's Pets
-**GET** `/users/{userId}/pets`
+**GET** `/api/v1/users/{userId}/pets`
 
 Returns all pets registered under a user's account.
 
@@ -2013,7 +2010,7 @@ Returns all pets registered under a user's account.
 ---
 
 ### 17.2 Register a Pet
-**POST** `/users/{userId}/pets`
+**POST** `/api/v1/users/{userId}/pets`
 
 Adds a new pet to the user's account.
 
@@ -2046,20 +2043,20 @@ Adds a new pet to the user's account.
 
 # Module 18 — Hospital Admin
 
-> **Base path:** `/admin/hospitals`  
+> **Base path:** `/api/v1/admin/hospitals`  
 > **Auth required:** ✅ Role: `ADMIN`
 
 ---
 
 ### 18.1 Get Pending Hospital Registrations
-**GET** `/admin/hospitals/pending`
+**GET** `/api/v1/admin/hospitals/pending`
 
 Returns all hospitals waiting for verification.
 
 ---
 
 ### 18.2 Verify (Approve/Reject) Hospital
-**POST** `/admin/hospitals/{hospitalId}/verify`
+**POST** `/api/v1/admin/hospitals/{hospitalId}/verify`
 
 **Request Body:**
 ```json
@@ -2079,7 +2076,7 @@ Returns all hospitals waiting for verification.
 ---
 
 ### 18.3 Get Hospital Metrics
-**GET** `/admin/hospitals/metrics`
+**GET** `/api/v1/admin/hospitals/metrics`
 
 Returns appointment metrics across hospitals.
 
@@ -2094,7 +2091,7 @@ Returns appointment metrics across hospitals.
 ---
 
 ### 18.4 Disable Hospital
-**POST** `/admin/hospitals/{hospitalId}/disable`
+**POST** `/api/v1/admin/hospitals/{hospitalId}/disable`
 
 Disables a hospital. All future appointment slots are blocked. Active confirmed appointments are cancelled.
 
@@ -2915,7 +2912,7 @@ Any authenticated user (adopter or NGO) can raise a dispute about an adoption.
 ---
 
 ### 24.2 List Disputes (Admin)
-**GET** `/admin/adoptions/disputes`
+**GET** `/api/v1/admin/adoptions/disputes`
 
 **Auth:** ADMIN only
 
@@ -2929,14 +2926,14 @@ Any authenticated user (adopter or NGO) can raise a dispute about an adoption.
 ---
 
 ### 24.3 Get Dispute Detail (Admin)
-**GET** `/admin/adoptions/disputes/{id}`
+**GET** `/api/v1/admin/adoptions/disputes/{id}`
 
 Returns full dispute details with audit history.
 
 ---
 
 ### 24.4 Resolve Dispute (Admin)
-**POST** `/admin/adoptions/disputes/{id}/resolve`
+**POST** `/api/v1/admin/adoptions/disputes/{id}/resolve`
 
 **Auth:** ADMIN only
 
@@ -2962,13 +2959,13 @@ Returns full dispute details with audit history.
 
 # Module 25 — Adoption Admin
 
-> **Base path:** `/admin/adoptions`  
+> **Base path:** `/api/v1/admin/adoptions`  
 > **Auth required:** ✅ Role: `ADMIN` (or dev fallback)
 
 ---
 
 ### 25.1 Get Adoption Metrics (KPI Dashboard)
-**GET** `/admin/adoptions/metrics`
+**GET** `/api/v1/admin/adoptions/metrics`
 
 Returns platform-wide adoption KPIs.
 
@@ -3003,7 +3000,7 @@ Returns platform-wide adoption KPIs.
 ---
 
 ### 25.2 List NGOs (for Admin Verification)
-**GET** `/admin/adoptions/ngos`
+**GET** `/api/v1/admin/adoptions/ngos`
 
 Returns NGOs filtered by verification status.
 
@@ -3015,7 +3012,7 @@ Returns NGOs filtered by verification status.
 ---
 
 ### 25.3 Verify / Reject / Suspend NGO
-**POST** `/admin/adoptions/ngos/{ngoId}/verify`
+**POST** `/api/v1/admin/adoptions/ngos/{ngoId}/verify`
 
 Admin verifies, rejects, or suspends an NGO.
 
@@ -3041,7 +3038,7 @@ Admin verifies, rejects, or suspends an NGO.
 ---
 
 ### 25.4 Get Unified Audit Log
-**GET** `/admin/adoptions/audit-logs`
+**GET** `/api/v1/admin/adoptions/audit-logs`
 
 Returns a paginated, filterable audit log of all adoption-related actions across the platform.
 
@@ -3058,8 +3055,8 @@ Returns a paginated, filterable audit log of all adoption-related actions across
 
 **Sample Requests:**
 ```
-GET {{base_url}}/admin/adoptions/audit-logs?targetType=APPLICATION&from=2026-04-01&to=2026-04-30
-GET {{base_url}}/admin/adoptions/audit-logs?targetType=NGO&targetId=ngo-uuid
+GET {{base_url}}/api/v1/admin/adoptions/audit-logs?targetType=APPLICATION&from=2026-04-01&to=2026-04-30
+GET {{base_url}}/api/v1/admin/adoptions/audit-logs?targetType=NGO&targetId=ngo-uuid
 ```
 
 **Success Response (200):**
@@ -3115,9 +3112,9 @@ GET {{base_url}}/admin/adoptions/audit-logs?targetType=NGO&targetId=ngo-uuid
 | 15 | GET hospital doctors | ✅ 200 |
 | 16 | Register NGO_REP user | ✅ 201 |
 | 17 | Login NGO_REP | ✅ 200 — JWT returned |
-| 18 | POST /ngo/register | ✅ 201 — NGO created (unverified) |
-| 19 | GET /ngo/profile | ✅ 200 — profile fetched |
-| 20 | GET /ngo/dashboard | ✅ 200 — all counts correct |
+| 18 | POST /api/v1/ngo/register | ✅ 201 — NGO created (unverified) |
+| 19 | GET /api/v1/ngo/profile | ✅ 200 — profile fetched |
+| 20 | GET /api/v1/ngo/dashboard | ✅ 200 — all counts correct |
 | 21 | POST NGO pet listing | ✅ 200 — pet created (LISTED) |
 | 22 | GET public browse (sees new pet) | ✅ 200 — pet appears |
 | 23 | GET public pet detail | ✅ 200 |
@@ -3129,7 +3126,7 @@ GET {{base_url}}/admin/adoptions/audit-logs?targetType=NGO&targetId=ngo-uuid
 | 29 | POST approve (confirm:true) | ✅ 200 — status → APPROVED |
 | 30 | POST schedule handover | ✅ 200 — HANDOVER_SCHEDULED |
 | 31 | POST confirm-handover | ✅ 200 — COMPLETED + 3 follow-ups auto-created |
-| 32 | Hospital bridge — pet in /users/{id}/pets | ✅ 200 — E2E Test Dog appears |
+| 32 | Hospital bridge — pet in /api/v1/users/{id}/pets | ✅ 200 — E2E Test Dog appears |
 | 33 | Pet status in catalog → ADOPTED | ✅ 200 — hidden from public browse |
 | 34 | GET adopter's adoptions | ✅ 200 |
 | 35 | GET follow-ups (DAY_7, 30, 90) | ✅ 200 — all 3 present |
@@ -3184,8 +3181,8 @@ GET {{base_url}}/admin/adoptions/audit-logs?targetType=NGO&targetId=ngo-uuid
 | US-1.2.1 | Create SOS Report | ✅ | POST /sos-reports |
 | US-1.2.2 | Upload Photo/Video | ✅ | POST /sos-reports/{id}/media |
 | US-1.2.3 | GPS Auto-capture | ✅ | lat/lon in request |
-| US-1.3 | NGO Assignment | ✅ | POST /ngo/assign |
-| US-1.3 | Accept/Decline Mission | ✅ | POST /ngo/missions/{id}/accept|decline |
+| US-1.3 | NGO Assignment | ✅ | POST /api/v1/ngo/assign |
+| US-1.3 | Accept/Decline Mission | ✅ | POST /api/v1/ngo/missions/{id}/accept|decline |
 | US-1.4.1 | Mark Arrival | ✅ | PATCH /rescue/{id}/arrival |
 | US-1.4.2 | On-Site Assessment | ✅ | POST /rescue/{id}/assessment |
 | US-1.5.1 | Nearby Hospitals | ✅ | GET /rescue/{id}/hospitals/nearby |
@@ -3195,11 +3192,11 @@ GET {{base_url}}/admin/adoptions/audit-logs?targetType=NGO&targetId=ngo-uuid
 | US-1.5.5 | Release Confirmation | ✅ | POST /rescue/{id}/release |
 | US-1.6 | Mission Summary | ✅ | POST /rescue-missions/{id}/summary |
 | US-1.6 | Case Verification | ✅ | POST /rescue-missions/{id}/verify |
-| US-1.7 | Rescue History | ✅ | GET /users/{id}/rescue-history |
-| US-1.8 | Rescue KPIs | ✅ | GET /admin/kpis |
-| US-1.8 | Admin Live Map | ✅ | GET /admin/rescues/live |
-| US-1.8 | Reassign Rescue | ✅ | PATCH /admin/rescues/{id}/reassign |
-| US-1.9 | Session Conversion | ✅ | POST /auth/convert-session |
+| US-1.7 | Rescue History | ✅ | GET /api/v1/users/{id}/rescue-history |
+| US-1.8 | Rescue KPIs | ✅ | GET /api/v1/admin/kpis |
+| US-1.8 | Admin Live Map | ✅ | GET /api/v1/admin/rescues/live |
+| US-1.8 | Reassign Rescue | ✅ | PATCH /api/v1/admin/rescues/{id}/reassign |
+| US-1.9 | Session Conversion | ✅ | POST /api/v1/auth/convert-session |
 
 ## ✅ Epic 2 — Pet Adoption
 
@@ -3209,30 +3206,30 @@ GET {{base_url}}/admin/adoptions/audit-logs?targetType=NGO&targetId=ngo-uuid
 | US-2.1.2 | Filter/Search Pets | ✅ | GET /adoptable-pets/search |
 | US-2.1.3 | Sort (newest/nearest/ready) | ✅ | sort query param |
 | US-2.1.4 | Full Pet Profile | ✅ | GET /adoptable-pets/{id} |
-| US-2.2.1 | Create Pet Listing | ✅ | POST /ngo/adoptable-pets |
-| US-2.2.2 | Update Listing + Audit | ✅ | PATCH /ngo/adoptable-pets/{id} |
-| US-2.2.3 | Media Gallery | ✅ | POST/GET/PATCH/DELETE /ngo/adoptable-pets/{id}/media |
-| US-2.2.4 | Archive Listing | ✅ | POST /ngo/adoptable-pets/{id}/archive |
+| US-2.2.1 | Create Pet Listing | ✅ | POST /api/v1/ngo/adoptable-pets |
+| US-2.2.2 | Update Listing + Audit | ✅ | PATCH /api/v1/ngo/adoptable-pets/{id} |
+| US-2.2.3 | Media Gallery | ✅ | POST/GET/PATCH/DELETE /api/v1/ngo/adoptable-pets/{id}/media |
+| US-2.2.4 | Archive Listing | ✅ | POST /api/v1/ngo/adoptable-pets/{id}/archive |
 | US-2.3.1 | Start Application | ✅ | POST /adoption-applications |
 | US-2.3.2 | Multi-Step Form | ✅ | PATCH /{id}/personal, /lifestyle, /experience, /consent |
 | US-2.3.3 | Submit Application | ✅ | POST /adoption-applications/{id}/submit |
 | US-2.3.4 | KYC Upload | ✅ | POST /adoption-applications/{id}/documents |
 | US-2.3.5 | View Application Status | ✅ | GET /adoption-applications/{id} |
 | US-2.3.6 | Withdraw Application | ✅ | POST /adoption-applications/{id}/withdraw |
-| US-2.4.1 | NGO Application Queue | ✅ | GET /ngo/adoption-applications |
-| US-2.4.2 | Review Detail | ✅ | GET /ngo/adoption-applications/{id} |
-| US-2.4.3 | Approve Application | ✅ | POST /ngo/adoption-applications/{id}/approve |
-| US-2.4.4 | Reject Application | ✅ | POST /ngo/adoption-applications/{id}/reject |
-| US-2.4.5 | Request Clarification | ✅ | POST /ngo/adoption-applications/{id}/clarify |
-| US-2.4.6 | Verify KYC Documents | ✅ | POST /ngo/adoption-applications/{id}/documents/{docId}/verify |
-| US-2.5.1 | Schedule Handover | ✅ | POST /ngo/adoptions/schedule |
-| US-2.5.2 | Confirm Handover | ✅ | POST /ngo/adoptions/{id}/confirm-handover |
+| US-2.4.1 | NGO Application Queue | ✅ | GET /api/v1/ngo/adoption-applications |
+| US-2.4.2 | Review Detail | ✅ | GET /api/v1/ngo/adoption-applications/{id} |
+| US-2.4.3 | Approve Application | ✅ | POST /api/v1/ngo/adoption-applications/{id}/approve |
+| US-2.4.4 | Reject Application | ✅ | POST /api/v1/ngo/adoption-applications/{id}/reject |
+| US-2.4.5 | Request Clarification | ✅ | POST /api/v1/ngo/adoption-applications/{id}/clarify |
+| US-2.4.6 | Verify KYC Documents | ✅ | POST /api/v1/ngo/adoption-applications/{id}/documents/{docId}/verify |
+| US-2.5.1 | Schedule Handover | ✅ | POST /api/v1/ngo/adoptions/schedule |
+| US-2.5.2 | Confirm Handover | ✅ | POST /api/v1/ngo/adoptions/{id}/confirm-handover |
 | US-2.5.3 | Auto Follow-ups | ✅ | Created on confirm-handover |
-| US-2.5.4 | Record Follow-up | ✅ | PATCH /ngo/adoptions/{id}/follow-ups/{fId} |
+| US-2.5.4 | Record Follow-up | ✅ | PATCH /api/v1/ngo/adoptions/{id}/follow-ups/{fId} |
 | US-2.5.5 | Hospital Module Bridge | ✅ | Pet auto-added on confirm-handover |
-| US-2.6.1 | Admin KPI Metrics | ✅ | GET /admin/adoptions/metrics |
-| US-2.6.2 | NGO Verification | ✅ | GET + POST /admin/adoptions/ngos/{id}/verify |
-| US-2.6.3 | Disputes | ✅ | POST + GET /admin/adoptions/disputes |
+| US-2.6.1 | Admin KPI Metrics | ✅ | GET /api/v1/admin/adoptions/metrics |
+| US-2.6.2 | NGO Verification | ✅ | GET + POST /api/v1/admin/adoptions/ngos/{id}/verify |
+| US-2.6.3 | Disputes | ✅ | POST + GET /api/v1/admin/adoptions/disputes |
 
 ## ✅ Epic 3 — Hospital Module
 
@@ -3256,11 +3253,11 @@ GET {{base_url}}/admin/adoptions/audit-logs?targetType=NGO&targetId=ngo-uuid
 | US-3.5.3 | Mark Attended | ✅ | PATCH /appointments/{id}/attended |
 | US-3.5.4 | Complete + Notes | ✅ | PATCH /appointments/{id}/complete |
 | US-3.5.5 | Mark No-Show | ✅ | PATCH /appointments/{id}/no-show |
-| US-3.6.1 | Appointment History | ✅ | GET /users/{id}/appointments |
-| US-3.6.2 | Hospital Dashboard | ✅ | GET /hospitals/{id}/dashboard |
-| US-3.7.1 | Verify Hospital | ✅ | GET /admin/hospitals/pending + POST verify |
-| US-3.7.2 | Hospital Metrics | ✅ | GET /admin/hospitals/metrics |
-| US-3.7.3 | Disable Hospital | ✅ | POST /admin/hospitals/{id}/disable |
+| US-3.6.1 | Appointment History | ✅ | GET /api/v1/users/{id}/appointments |
+| US-3.6.2 | Hospital Dashboard | ✅ | GET /api/v1/hospitals/{id}/dashboard |
+| US-3.7.1 | Verify Hospital | ✅ | GET /api/v1/admin/hospitals/pending + POST verify |
+| US-3.7.2 | Hospital Metrics | ✅ | GET /api/v1/admin/hospitals/metrics |
+| US-3.7.3 | Disable Hospital | ✅ | POST /api/v1/admin/hospitals/{id}/disable |
 
 ## ✅ Epic 4 — Platform Identity & Notifications
 
@@ -3275,7 +3272,7 @@ GET {{base_url}}/admin/adoptions/audit-logs?targetType=NGO&targetId=ngo-uuid
 | US-4.3.1 | NGO Self-Registration | ✅ | POST /api/v1/ngo/register |
 | US-4.3.2 | NGO Profile Management | ✅ | GET/PATCH /api/v1/ngo/profile |
 | US-4.3.3 | NGO Dashboard | ✅ | GET /api/v1/ngo/dashboard |
-| US-4.3.4 | Unified Audit Log | ✅ | GET /admin/adoptions/audit-logs |
+| US-4.3.4 | Unified Audit Log | ✅ | GET /api/v1/admin/adoptions/audit-logs |
 
 ---
 
@@ -3285,7 +3282,7 @@ GET {{base_url}}/admin/adoptions/audit-logs?targetType=NGO&targetId=ngo-uuid
 |------|------|
 | Webhook Signature | `POST /auth/webhook/missed-call-verified` — signature validation is a TODO. In production, validate `X-Webhook-Signature`. |
 | OTP in Dev | OTP is logged to console (SmsServiceStub). Check application logs for the OTP value in local testing. |
-| Pet Status Filter (NGO listing) | The `status` filter on `GET /ngo/adoptable-pets` is partially implemented — uses sort-hint approach. Full enum filtering deferred. |
+| Pet Status Filter (NGO listing) | The `status` filter on `GET /api/v1/ngo/adoptable-pets` is partially implemented — uses sort-hint approach. Full enum filtering deferred. |
 | Rate Limiting | SOS reports: 3/hour. OTP: 5/hour. Exceeding returns HTTP 429. |
 | File Storage | Files are stored locally under `uploads/` folder. In production this should be S3/GCS. |
 | Admin Account | ADMIN accounts cannot be created via API. They must be inserted directly in the database. |
