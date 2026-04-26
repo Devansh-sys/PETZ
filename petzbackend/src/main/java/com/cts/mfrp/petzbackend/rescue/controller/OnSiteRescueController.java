@@ -4,8 +4,9 @@
 // ============================================================
 package com.cts.mfrp.petzbackend.rescue.controller;
 
+import com.cts.mfrp.petzbackend.common.dto.ApiResponse;
 import com.cts.mfrp.petzbackend.rescue.dto.*;
-        import com.cts.mfrp.petzbackend.rescue.service.OnSiteRescueService;
+import com.cts.mfrp.petzbackend.rescue.service.OnSiteRescueService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class OnSiteRescueController {
 
     private final OnSiteRescueService service;
 
-    // US-1.4.1 — Mark Arrival
+//     US-1.4.1 — Mark Arrival
     @PatchMapping("/arrival")
     @PreAuthorize("hasRole('VOLUNTEER') or hasRole('NGO_REP')")
     public ResponseEntity<ApiResponse<Void>> markArrival(
@@ -32,7 +33,7 @@ public class OnSiteRescueController {
         return ResponseEntity.ok(ApiResponse.ok("Arrival marked. Status: ON_SITE.", null));
     }
 
-    // US-1.4.2 + US-1.4.3 — On-Site Assessment + Decision
+    // US-1.4.2 + US-1.4.3 — On-Site Assessment + Decision //it is to record the assessment
     @PostMapping("/assessment")
     @PreAuthorize("hasRole('VOLUNTEER') or hasRole('NGO_REP')")
     public ResponseEntity<ApiResponse<OnSiteAssessmentResponse>> submitAssessment(
@@ -53,7 +54,7 @@ public class OnSiteRescueController {
                         service.getNearbyEmergencyHospitals(sosReportId)));
     }
 
-    // US-1.5.2 — Send Incoming Rescue Alert
+    // US-1.5.2 — Send Incoming Rescue Alert //alerting hospital that animal is coming
     @PostMapping("/hospitals/{hospitalId}/alert")
     @PreAuthorize("hasRole('VOLUNTEER') or hasRole('NGO_REP')")
     public ResponseEntity<ApiResponse<Void>> sendAlert(

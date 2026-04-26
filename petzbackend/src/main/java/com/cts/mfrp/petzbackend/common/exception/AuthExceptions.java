@@ -47,4 +47,32 @@ public class AuthExceptions {
             super("Missed call verification failed. Please try again.");
         }
     }
+
+    // ── Epic 4.1 — Password login (US-4.1.2) ─────────────────────────────
+
+    /** Wrong password or unknown identifier. 401. */
+    public static class InvalidCredentialsException extends RuntimeException {
+        public InvalidCredentialsException() {
+            super("Invalid credentials. Please check and try again.");
+        }
+        public InvalidCredentialsException(String message) { super(message); }
+    }
+
+    /** Too many wrong password attempts — account locked. 423 Locked. */
+    public static class AccountLockedException extends RuntimeException {
+        private final java.time.LocalDateTime lockedUntil;
+        public AccountLockedException(java.time.LocalDateTime lockedUntil) {
+            super("Account locked due to too many failed attempts. Try again after "
+                    + lockedUntil + ".");
+            this.lockedUntil = lockedUntil;
+        }
+        public java.time.LocalDateTime getLockedUntil() { return lockedUntil; }
+    }
+
+    /** Account was disabled by an admin or via SUSPEND dispute action. 403. */
+    public static class AccountDisabledException extends RuntimeException {
+        public AccountDisabledException() {
+            super("This account is disabled. Please contact support.");
+        }
+    }
 }

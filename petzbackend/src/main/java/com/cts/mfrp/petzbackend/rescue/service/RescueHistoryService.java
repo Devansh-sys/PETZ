@@ -3,7 +3,7 @@
 
 import com.cts.mfrp.petzbackend.enums.ReportStatus;
 import com.cts.mfrp.petzbackend.rescue.dto.RescueHistoryResponse;
-import com.cts.mfrp.petzbackend.rescue.repository.SosReportRescueRepository;
+import com.cts.mfrp.petzbackend.sosreport.repository.SosReportRepository;
 import com.cts.mfrp.petzbackend.sosreport.model.SosReport;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RescueHistoryService {
 
-    private final SosReportRescueRepository sosReportRepo;
+    private final SosReportRepository sosReportRepo;
 
     @Transactional(readOnly = true)
     public List<RescueHistoryResponse> getHistoryForUser(UUID userId) {

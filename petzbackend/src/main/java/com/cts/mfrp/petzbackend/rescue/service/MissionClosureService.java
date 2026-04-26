@@ -72,6 +72,7 @@ public class MissionClosureService {
         return mapToResponse(saved);
     }
 
+    @Transactional(readOnly = true)
     public MissionSummaryResponse getSummaryByMissionId(UUID missionId) {
         MissionSummary summary = missionSummaryRepository.findByRescueMissionId(missionId)
                 .orElseThrow(() -> new ResourceNotFoundException(

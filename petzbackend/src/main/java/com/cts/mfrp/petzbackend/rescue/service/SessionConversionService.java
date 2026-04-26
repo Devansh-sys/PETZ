@@ -3,7 +3,7 @@ package com.cts.mfrp.petzbackend.rescue.service;
 
 import com.cts.mfrp.petzbackend.rescue.dto.ConvertSessionRequest;
 import com.cts.mfrp.petzbackend.rescue.dto.ConvertSessionResponse;
-import com.cts.mfrp.petzbackend.rescue.repository.UserRescueRepository;
+import com.cts.mfrp.petzbackend.user.repository.UserRepository;
 import com.cts.mfrp.petzbackend.user.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,7 +25,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SessionConversionService {
 
-    private final UserRescueRepository userRepo;
+    private final UserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional

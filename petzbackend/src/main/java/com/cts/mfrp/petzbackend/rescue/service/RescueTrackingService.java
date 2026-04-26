@@ -94,6 +94,7 @@ public class RescueTrackingService {
         return mapToResponse(saved);
     }
 
+    @Transactional(readOnly = true)
     public RescueMissionResponse getMissionById(UUID missionId) {
         RescueMission mission = rescueMissionRepository.findById(missionId)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -101,6 +102,7 @@ public class RescueTrackingService {
         return mapToResponse(mission);
     }
 
+    @Transactional(readOnly = true)
     public RescueMissionResponse getMissionBySosReportId(UUID sosReportId) {
         RescueMission mission = rescueMissionRepository.findBySosReportId(sosReportId)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -108,6 +110,7 @@ public class RescueTrackingService {
         return mapToResponse(mission);
     }
 
+    @Transactional(readOnly = true)
     public List<RescueMissionResponse> getMissionsByStatus(ReportStatus status) {
         return rescueMissionRepository.findByRescueStatus(status).stream()
                 .map(this::mapToResponse)

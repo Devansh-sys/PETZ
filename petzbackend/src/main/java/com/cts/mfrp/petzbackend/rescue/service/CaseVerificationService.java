@@ -78,6 +78,7 @@ public class CaseVerificationService {
         return mapToResponse(saved, finalStatus);
     }
 
+    @Transactional(readOnly = true)
     public CaseVerificationResponse getVerificationByMissionId(UUID missionId) {
         CaseVerification verification = caseVerificationRepository.findByRescueMissionId(missionId)
                 .orElseThrow(() -> new ResourceNotFoundException(

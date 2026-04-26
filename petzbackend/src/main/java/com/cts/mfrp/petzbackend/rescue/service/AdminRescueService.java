@@ -8,7 +8,7 @@ import com.cts.mfrp.petzbackend.rescue.dto.ReassignResponse;
 import com.cts.mfrp.petzbackend.rescue.model.NgoAssignment;
 import com.cts.mfrp.petzbackend.rescue.model.NgoAssignment.AssignmentStatus;
 import com.cts.mfrp.petzbackend.rescue.repository.NgoAssignmentRepository;
-import com.cts.mfrp.petzbackend.rescue.repository.SosReportRescueRepository;
+import com.cts.mfrp.petzbackend.sosreport.repository.SosReportRepository;
 import com.cts.mfrp.petzbackend.sosreport.model.SosReport;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AdminRescueService {
 
-    private final SosReportRescueRepository sosReportRepo;
+    private final SosReportRepository sosReportRepo;
     private final NgoAssignmentRepository   ngoAssignmentRepo;
 
     // ── US-1.8.1 ─────────────────────────────────────────────────────────────

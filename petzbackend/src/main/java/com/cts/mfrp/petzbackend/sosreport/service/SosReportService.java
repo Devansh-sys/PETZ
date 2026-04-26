@@ -167,4 +167,12 @@ public class SosReportService {
                 .media(mediaResponses)
                 .build();
     }
+
+    @Transactional(readOnly = true)
+    public List<SosReportResponse> getReportsByReporter(UUID reporterId) {
+        return sosReportRepository.findByReporter_IdOrderByReportedAtDesc(reporterId)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
 }
