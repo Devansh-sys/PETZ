@@ -1,0 +1,78 @@
+<petz-navbar></petz-navbar>
+
+<div class="admin-page">
+  <div class="admin-container">
+    <div class="admin-header">
+      <h1>⚙️ Admin Dashboard</h1>
+      <p class="sub">System overview and management</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🚨</div>
+        <div class="stat-body">
+          <div class="stat-num">{{ stats.totalRescues }}</div>
+          <div class="stat-label">Total Rescues</div>
+        </div>
+      </div>
+      <div class="stat-card highlight">
+        <div class="stat-icon">🔴</div>
+        <div class="stat-body">
+          <div class="stat-num">{{ stats.activeRescues }}</div>
+          <div class="stat-label">Active Rescues</div>
+        </div>
+      </div>
+      <div class="stat-card" [class.highlight]="stats.pendingHospitals > 0">
+        <div class="stat-icon">🏥</div>
+        <div class="stat-body">
+          <div class="stat-num">{{ stats.pendingHospitals }}</div>
+          <div class="stat-label">Pending Hospital Approvals</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏢</div>
+        <div class="stat-body">
+          <div class="stat-num">{{ stats.totalNgos }}</div>
+          <div class="stat-label">Registered NGOs</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modules-grid">
+      <a routerLink="/admin/rescues" class="module-card">
+        <div class="module-icon">🚨</div>
+        <div class="module-info">
+          <h3>Rescue Operations</h3>
+          <p>Monitor SOS reports, active missions, and rescue KPIs</p>
+        </div>
+        <span class="arrow">→</span>
+      </a>
+      <a routerLink="/admin/hospitals" class="module-card">
+        <div class="module-icon">🏥</div>
+        <div class="module-info">
+          <h3>Hospital Management</h3>
+          <p>Verify hospitals, manage listings, and review approvals</p>
+        </div>
+        <span class="arrow" [class.badge-alert]="stats.pendingHospitals > 0">
+          {{ stats.pendingHospitals > 0 ? stats.pendingHospitals + ' pending' : '→' }}
+        </span>
+      </a>
+      <a routerLink="/adopt" class="module-card">
+        <div class="module-icon">🐾</div>
+        <div class="module-info">
+          <h3>Adoption Network</h3>
+          <p>Browse all pet listings and monitor adoption activity</p>
+        </div>
+        <span class="arrow">→</span>
+      </a>
+      <a routerLink="/hospitals" class="module-card">
+        <div class="module-icon">📅</div>
+        <div class="module-info">
+          <h3>Appointment System</h3>
+          <p>View hospital schedules and appointment activity</p>
+        </div>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+  </div>
+</div>

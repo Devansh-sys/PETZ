@@ -1,0 +1,50 @@
+<petz-navbar></petz-navbar>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">🐾</div>
+    <h1>Sign in to PETZ</h1>
+    <p class="auth-sub">We'll send a one-time code to your mobile.</p>
+
+    <!-- STEP 1: Phone -->
+    <div *ngIf="step() === 'PHONE'">
+      <div class="field">
+        <label>Mobile number</label>
+        <input type="tel" placeholder="+91 98765 43210" [value]="phone()" (input)="phone.set($any($event.target).value)" (keyup.enter)="sendOtp()" autofocus />
+        <small class="hint">10-digit Indian number, or with country code</small>
+      </div>
+
+      <div *ngIf="error()" class="alert error mt">⚠️ {{ error() }}</div>
+
+      <button class="btn btn-primary full mt" [disabled]="!canSubmitPhone || loading()" (click)="sendOtp()">
+        {{ loading() ? 'Sending…' : 'Send OTP' }}
+      </button>
+
+      <p class="auth-footer">New to PETZ? <a routerLink="/register">Create account</a></p>
+    </div>
+
+    <!-- STEP 2: OTP -->
+    <div *ngIf="step() === 'OTP'">
+      <p class="auth-sub">Enter the 6-digit code sent to <strong>{{ maskedPhone }}</strong></p>
+
+      <div class="field">
+        <label>One-time code</label>
+        <input type="text" inputmode="numeric" maxlength="6" placeholder="• • • • • •"
+          [value]="otp()" (input)="onOtpInput($any($event.target).value)" class="otp-input" autofocus />
+      </div>
+
+      <div *ngIf="error()" class="alert error mt">⚠️ {{ error() }}</div>
+
+      <button class="btn btn-primary full mt" [disabled]="!canSubmitOtp || loading()" (click)="verifyOtp()">
+        {{ loading() ? 'Verifying…' : 'Sign In' }}
+      </button>
+
+      <div class="resend-row">
+        <button class="btn-link" (click)="back()">← Change number</button>
+        <button class="btn-link" [disabled]="resendCooldown() > 0" (click)="resend()">
+          {{ resendCooldown() > 0 ? 'Resend in ' + resendCooldown() + 's' : 'Resend code' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

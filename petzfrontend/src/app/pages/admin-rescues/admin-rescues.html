@@ -1,0 +1,44 @@
+<petz-navbar></petz-navbar>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <div>
+      <a routerLink="/admin" class="back-link">← Admin Dashboard</a>
+      <h1>🚨 Rescue Operations</h1>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn" [class.active]="filterStatus === ''" (click)="filterStatus = ''; load()">All</button>
+    <button class="filter-btn" [class.active]="filterStatus === 'PENDING'" (click)="filterStatus = 'PENDING'; load()">Pending</button>
+    <button class="filter-btn" [class.active]="filterStatus === 'ASSIGNED'" (click)="filterStatus = 'ASSIGNED'; load()">Assigned</button>
+    <button class="filter-btn" [class.active]="filterStatus === 'IN_PROGRESS'" (click)="filterStatus = 'IN_PROGRESS'; load()">In Progress</button>
+    <button class="filter-btn" [class.active]="filterStatus === 'COMPLETED'" (click)="filterStatus = 'COMPLETED'; load()">Completed</button>
+  </div>
+
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+  <div class="error-state" *ngIf="error && !loading"><p>{{ error }}</p><button class="btn btn-primary" (click)="load()">Retry</button></div>
+
+  <div class="empty-state" *ngIf="!loading && !error && reports.length === 0">
+    <p>No rescue reports found for this filter.</p>
+  </div>
+
+  <div class="reports-table" *ngIf="!loading && !error && reports.length > 0">
+    <div class="table-row header">
+      <span>Report ID</span>
+      <span>Reporter</span>
+      <span>Location</span>
+      <span>Animal Type</span>
+      <span>Reported At</span>
+      <span>Status</span>
+    </div>
+    <div class="table-row" *ngFor="let r of reports">
+      <code class="id-cell">{{ r.sosId?.toString()?.slice(0,8) }}…</code>
+      <span>{{ r.reporterPhone || '—' }}</span>
+      <span class="location-cell">{{ r.latitude }}, {{ r.longitude }}</span>
+      <span>{{ r.urgencyLevel || '—' }}</span>
+      <span>{{ r.reportedAt | date:'short' }}</span>
+      <span class="status-badge" [class]="statusClass(r.status)">{{ r.status }}</span>
+    </div>
+  </div>
+</div>

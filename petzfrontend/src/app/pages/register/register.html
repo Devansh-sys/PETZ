@@ -1,0 +1,81 @@
+<petz-navbar></petz-navbar>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">🐾</div>
+
+    <div class="step-indicator">
+      <span [class.done]="step() !== 'PHONE'" [class.active]="step() === 'PHONE'">1</span>
+      <span class="line"></span>
+      <span [class.done]="step() === 'PROFILE'" [class.active]="step() === 'OTP'">2</span>
+      <span class="line"></span>
+      <span [class.active]="step() === 'PROFILE'">3</span>
+    </div>
+
+    <!-- STEP 1: Phone -->
+    <ng-container *ngIf="step() === 'PHONE'">
+      <h1>Create your account</h1>
+      <p class="auth-sub">Enter your mobile number to get started.</p>
+
+      <div class="field">
+        <label>Mobile number</label>
+        <input type="tel" placeholder="+91 98765 43210" [value]="phone()"
+          (input)="phone.set($any($event.target).value)" (keyup.enter)="sendOtp()" autofocus />
+      </div>
+
+      <div *ngIf="error()" class="alert error mt">⚠️ {{ error() }}</div>
+
+      <button class="btn btn-primary full mt" [disabled]="!canPhone || loading()" (click)="sendOtp()">
+        {{ loading() ? 'Sending…' : 'Send OTP' }}
+      </button>
+      <p class="auth-footer">Already have an account? <a routerLink="/login">Sign in</a></p>
+    </ng-container>
+
+    <!-- STEP 2: OTP -->
+    <ng-container *ngIf="step() === 'OTP'">
+      <h1>Verify your number</h1>
+      <p class="auth-sub">Code sent to <strong>{{ maskedPhone }}</strong></p>
+
+      <div class="field">
+        <label>6-digit OTP</label>
+        <input type="text" inputmode="numeric" maxlength="6" placeholder="• • • • • •"
+          [value]="otp()" (input)="onOtpInput($any($event.target).value)" class="otp-input" autofocus />
+      </div>
+
+      <div *ngIf="error()" class="alert error mt">⚠️ {{ error() }}</div>
+
+      <button class="btn btn-primary full mt" [disabled]="!canOtp || loading()" (click)="verifyOtp()">
+        {{ loading() ? 'Verifying…' : 'Verify OTP' }}
+      </button>
+      <div class="resend-row">
+        <button class="btn-link" (click)="back()">← Back</button>
+        <button class="btn-link" [disabled]="resendCooldown() > 0" (click)="resend()">
+          {{ resendCooldown() > 0 ? 'Resend in ' + resendCooldown() + 's' : 'Resend code' }}
+        </button>
+      </div>
+    </ng-container>
+
+    <!-- STEP 3: Profile -->
+    <ng-container *ngIf="step() === 'PROFILE'">
+      <h1>Complete your profile</h1>
+      <p class="auth-sub">Just your name and email — you're almost done!</p>
+
+      <div class="field">
+        <label>Full name</label>
+        <input type="text" placeholder="Priya Sharma" [value]="fullName()"
+          (input)="fullName.set($any($event.target).value)" autofocus />
+      </div>
+      <div class="field mt">
+        <label>Email address</label>
+        <input type="email" placeholder="priya@example.com" [value]="email()"
+          (input)="email.set($any($event.target).value)" (keyup.enter)="saveProfile()" />
+      </div>
+
+      <div *ngIf="error()" class="alert error mt">⚠️ {{ error() }}</div>
+
+      <button class="btn btn-primary full mt" [disabled]="!canProfile || loading()" (click)="saveProfile()">
+        {{ loading() ? 'Saving…' : 'Create Account 🎉' }}
+      </button>
+    </ng-container>
+  </div>
+</div>

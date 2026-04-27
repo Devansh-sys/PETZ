@@ -1,0 +1,51 @@
+<petz-navbar></petz-navbar>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <div>
+      <a routerLink="/admin" class="back-link">← Admin Dashboard</a>
+      <h1>🏥 Hospital Management</h1>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn" [class.active]="filterVerified === ''" (click)="filterVerified = ''; load()">All</button>
+    <button class="filter-btn" [class.active]="filterVerified === 'false'" (click)="filterVerified = 'false'; load()">Pending Verification</button>
+    <button class="filter-btn" [class.active]="filterVerified === 'true'" (click)="filterVerified = 'true'; load()">Verified</button>
+  </div>
+
+  <div class="alert error" *ngIf="actionError"><span>⚠️</span><span>{{ actionError }}</span></div>
+
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+  <div class="error-state" *ngIf="error && !loading"><p>{{ error }}</p><button class="btn btn-primary" (click)="load()">Retry</button></div>
+
+  <div class="empty-state" *ngIf="!loading && !error && hospitals.length === 0">
+    <p>No hospitals found.</p>
+  </div>
+
+  <div class="hospitals-list" *ngIf="!loading && !error && hospitals.length > 0">
+    <div class="hospital-card" *ngFor="let h of hospitals">
+      <div class="hospital-info">
+        <div class="hospital-name">
+          <h3>{{ h.name }}</h3>
+          <span class="verified-badge" *ngIf="h.isVerified">✓ Verified</span>
+          <span class="pending-badge" *ngIf="!h.isVerified">Pending</span>
+        </div>
+        <p class="hospital-address">📍 {{ h.address }}, {{ h.city }}</p>
+        <p class="hospital-meta">📞 {{ h.contactPhone || '—' }} · {{ h.contactEmail || '—' }}</p>
+      </div>
+      <div class="hospital-actions">
+        <button class="btn btn-primary btn-sm"
+          (click)="verify(h.id)"
+          [disabled]="busy === h.id">
+          {{ busy === h.id ? '…' : 'Verify' }}
+        </button>
+        <button class="btn btn-secondary btn-sm"
+          (click)="toggleActive(h.id, true)"
+          [disabled]="busy === h.id">
+          Disable
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

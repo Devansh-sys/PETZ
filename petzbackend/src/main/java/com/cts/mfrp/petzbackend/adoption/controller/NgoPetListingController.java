@@ -12,18 +12,27 @@ import com.cts.mfrp.petzbackend.adoption.dto.PageResponse;
 import com.cts.mfrp.petzbackend.adoption.service.AdoptablePetService;
 import com.cts.mfrp.petzbackend.adoption.service.AdoptionMediaService;
 import com.cts.mfrp.petzbackend.common.dto.ApiResponse;
+<<<<<<< Updated upstream
 import com.cts.mfrp.petzbackend.user.model.User;
 import com.cts.mfrp.petzbackend.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+=======
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+>>>>>>> Stashed changes
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+<<<<<<< Updated upstream
 import java.util.Optional;
+=======
+>>>>>>> Stashed changes
 import java.util.UUID;
 
 /**
@@ -50,14 +59,20 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/ngo/adoptable-pets")
 @RequiredArgsConstructor
+<<<<<<< Updated upstream
 // US-4.1.3 — NGO_REP or ADMIN only when JWT is present. Dev-mode fallback
 // (no JWT) stays open so existing X-User-Id test flows keep working.
 @PreAuthorize("hasAnyRole('NGO_REP','ADMIN') or !isAuthenticated()")
+=======
+>>>>>>> Stashed changes
 public class NgoPetListingController {
 
     private final AdoptablePetService  petService;
     private final AdoptionMediaService mediaService;
+<<<<<<< Updated upstream
     private final UserRepository       userRepo;
+=======
+>>>>>>> Stashed changes
 
     // US-2.2.1 — create listing
     @PostMapping
@@ -200,7 +215,12 @@ public class NgoPetListingController {
      * ngoId (CreateRequest only) or throw 400 otherwise.
      */
     private UUID resolveNgoId(UUID userId) {
+<<<<<<< Updated upstream
         Optional<User> user = userRepo.findById(userId);
         return user.map(User::getNgoId).orElse(null);
+=======
+        // User entity has no ngoId field; fall back to body-supplied ngoId
+        return null;
+>>>>>>> Stashed changes
     }
 }
