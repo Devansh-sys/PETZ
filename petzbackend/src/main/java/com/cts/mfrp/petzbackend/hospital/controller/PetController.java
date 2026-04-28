@@ -19,7 +19,6 @@ import java.util.UUID;
  * POST /users/{userId}/pets  — register a new pet (the "add new pet" option)
  */
 @RestController
-@RequestMapping("/api/v1/users/{userId}/pets")
 @RequiredArgsConstructor
 public class PetController {
 

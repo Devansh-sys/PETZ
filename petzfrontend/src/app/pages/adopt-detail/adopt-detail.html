@@ -1,0 +1,76 @@
+<petz-navbar></petz-navbar>
+
+<div class="detail-page">
+  <div class="detail-container">
+
+    <div class="loading-state" *ngIf="loading">
+      <div class="spinner"></div><p>Loading pet details…</p>
+    </div>
+
+    <div class="error-state" *ngIf="error && !loading">
+      <p>{{ error }}</p>
+      <a routerLink="/adopt" class="btn btn-primary">Back to Browse</a>
+    </div>
+
+    <ng-container *ngIf="pet && !loading">
+      <a routerLink="/adopt" class="back-link">← Back to Browse</a>
+
+      <div class="detail-grid">
+        <div class="gallery-col">
+          <div class="main-image">
+            <img *ngIf="selectedImage" [src]="selectedImage" [alt]="pet.name" />
+            <div *ngIf="!selectedImage" class="img-placeholder">{{ speciesIcon(pet.species) }}</div>
+            <span class="ready-badge" *ngIf="pet.isAdoptionReady">Ready for Adoption</span>
+          </div>
+          <div class="thumbnails" *ngIf="pet.media && pet.media.length > 1">
+            <img *ngFor="let m of pet.media" [src]="m.fileUrl" [class.active]="m.fileUrl === selectedImage" (click)="selectImage(m.fileUrl)" />
+          </div>
+        </div>
+
+        <div class="info-col">
+          <div class="pet-title">
+            <h1>{{ pet.name }} {{ speciesIcon(pet.species) }}</h1>
+            <p class="pet-sub">{{ pet.breed || pet.species }} · {{ ageLabel(pet.ageMonths) }} · {{ pet.gender }}</p>
+            <p class="pet-city">📍 {{ pet.locationCity }}</p>
+          </div>
+
+          <div class="tags-row">
+            <span class="tag green" *ngIf="pet.vaccinationStatus && pet.vaccinationStatus !== 'NOT_VACCINATED'">✓ Vaccinated</span>
+            <span class="tag orange" *ngIf="pet.specialNeeds">Special Needs</span>
+          </div>
+
+          <div class="section">
+            <h3>About {{ pet.name }}</h3>
+            <p>{{ pet.description || 'No description provided.' }}</p>
+          </div>
+
+          <div class="section" *ngIf="pet.temperament">
+            <h3>Temperament</h3>
+            <p>{{ pet.temperament }}</p>
+          </div>
+
+          <div class="section" *ngIf="pet.medicalSummary">
+            <h3>Medical History</h3>
+            <p>{{ pet.medicalSummary }}</p>
+          </div>
+
+          <div class="section" *ngIf="pet.specialNeeds && pet.specialNeedsNotes">
+            <h3>Special Needs</h3>
+            <div class="alert warn"><span>⚠️</span><span>{{ pet.specialNeedsNotes }}</span></div>
+          </div>
+
+          <div class="ngo-info section">
+            <h3>Listed By</h3>
+            <p class="ngo-name">🏢 {{ pet.ngoName }}</p>
+          </div>
+
+          <button class="btn btn-primary apply-btn" (click)="applyToAdopt()" [disabled]="!pet.isAdoptionReady">
+            {{ pet.isAdoptionReady ? 'Apply to Adopt ' + pet.name : 'Not Available Yet' }}
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+<petz-footer></petz-footer>

@@ -1,0 +1,32 @@
+:host { display: block; }
+.page-wrap { max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
+.back-link { display: inline-block; color: var(--peach); font-size: 13px; font-weight: 600; text-decoration: none; margin-bottom: 4px; }
+.page-header { margin-bottom: 24px; h1 { font-size: 28px; font-weight: 900; } }
+.filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+.filter-btn {
+  padding: 8px 16px; border-radius: 999px; border: 1px solid var(--line); background: #fff;
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: .15s;
+  &:hover { border-color: var(--peach); color: var(--peach); }
+  &.active { background: var(--peach); color: #fff; border-color: var(--peach); }
+}
+.alert.error { display: flex; gap: 10px; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 10px; padding: 12px 14px; font-size: 14px; margin-bottom: 16px; }
+.loading-state { text-align: center; padding: 60px;
+  .spinner { width: 36px; height: 36px; border: 4px solid var(--line); border-top-color: var(--peach); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty-state, .error-state { text-align: center; padding: 60px; color: var(--muted); }
+.hospitals-list { display: flex; flex-direction: column; gap: 12px; }
+.hospital-card {
+  background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 20px 24px;
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+  @media (max-width: 600px) { flex-direction: column; }
+}
+.hospital-name { display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+  h3 { font-size: 17px; font-weight: 800; }
+}
+.verified-badge { background: #dcfce7; color: #16a34a; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
+.pending-badge { background: #fef3c7; color: #92400e; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
+.inactive-badge { background: #fee2e2; color: #dc2626; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
+.hospital-address, .hospital-meta, .hospital-services { font-size: 13px; color: var(--muted); margin-bottom: 3px; }
+.hospital-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+.btn-sm { padding: 8px 16px; font-size: 13px; border-radius: 8px; }

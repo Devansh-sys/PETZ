@@ -1,0 +1,29 @@
+:host { display: block; }
+.page-wrap { max-width: 640px; margin: 40px auto; padding: 0 20px; }
+.profile-card { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 40px; }
+.profile-avatar {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--peach), var(--deep));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 16px;
+}
+.profile-info { margin-bottom: 32px;
+  h2 { font-size: 22px; font-weight: 800; }
+}
+.role-badge { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--cream); color: var(--deep); font-size: 12px; font-weight: 700; margin-top: 6px; }
+.temp-badge { display: inline-block; padding: 4px 12px; border-radius: 999px; background: #fef3c7; color: #92400e; font-size: 12px; font-weight: 700; margin-top: 6px; margin-left: 8px; }
+.section { margin-bottom: 28px;
+  h3 { font-size: 14px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px; }
+}
+.detail-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line);
+  span { font-size: 13px; color: var(--muted); }
+  strong, code { font-size: 14px; }
+  code { font-family: monospace; font-size: 12px; background: var(--cream); padding: 3px 8px; border-radius: 6px; }
+}
+.links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.link-card { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; font-size: 14px; font-weight: 600; transition: .15s;
+  &:hover { border-color: var(--peach); color: var(--peach); }
+  .lc-icon { font-size: 20px; }
+}
+.link { color: var(--peach); font-weight: 600; }
+.full { width: 100%; margin-top: 8px; }

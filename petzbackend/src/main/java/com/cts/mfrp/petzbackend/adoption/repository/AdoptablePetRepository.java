@@ -37,10 +37,13 @@ public interface AdoptablePetRepository
 
     /** Filtered NGO view (e.g. only LISTED pets for this NGO). */
     List<AdoptablePet> findByNgoIdAndStatus(UUID ngoId, AdoptablePetStatus status);
+<<<<<<< Updated upstream
 
     /** US-4.3 dashboard — pet count per status for an NGO. */
     long countByNgoIdAndStatus(UUID ngoId, AdoptablePetStatus status);
 
     /** US-4.3 dashboard — total pets ever listed by this NGO. */
     long countByNgoId(UUID ngoId);
+=======
+>>>>>>> Stashed changes
 }

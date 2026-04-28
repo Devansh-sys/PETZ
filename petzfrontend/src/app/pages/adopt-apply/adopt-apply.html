@@ -1,0 +1,174 @@
+<petz-navbar></petz-navbar>
+
+<div class="apply-page">
+  <div class="apply-container">
+
+    <!-- Success State -->
+    <div class="success-card" *ngIf="submitted">
+      <div class="success-icon">🎉</div>
+      <h1>Application Submitted!</h1>
+      <p>Your adoption application has been sent to the NGO. They will review it and get back to you.</p>
+      <div class="success-actions">
+        <a routerLink="/adopt/my-applications" class="btn btn-primary">View My Applications</a>
+        <a routerLink="/adopt" class="btn btn-secondary">Browse More Pets</a>
+      </div>
+    </div>
+
+    <ng-container *ngIf="!submitted">
+      <a [routerLink]="['/adopt', petId]" class="back-link">← Back to Pet</a>
+      <h1>Adoption Application</h1>
+
+      <!-- Step Indicator -->
+      <div class="step-indicator">
+        <ng-container *ngFor="let s of steps; let i = index">
+          <div class="step-dot" [class.active]="step === s" [class.done]="stepIndex > i">
+            <span *ngIf="stepIndex <= i">{{ i + 1 }}</span>
+            <span *ngIf="stepIndex > i">✓</span>
+          </div>
+          <div class="step-line" *ngIf="i < steps.length - 1" [class.done]="stepIndex > i"></div>
+        </ng-container>
+      </div>
+      <p class="step-label">Step {{ stepIndex + 1 }} of {{ steps.length }}: {{ stepLabels[step] }}</p>
+
+      <div class="alert error" *ngIf="error"><span>⚠️</span><span>{{ error }}</span></div>
+
+      <div class="form-card">
+
+        <!-- PERSONAL -->
+        <div *ngIf="step === 'personal'">
+          <h2>Personal Information</h2>
+          <div class="form-grid">
+            <div class="field"><label>Full Name *</label><input [(ngModel)]="personal.fullName" name="fullName" placeholder="Your full name" /></div>
+            <div class="field"><label>Email *</label><input type="email" [(ngModel)]="personal.email" name="email" placeholder="you@email.com" /></div>
+            <div class="field"><label>Phone *</label><input [(ngModel)]="personal.phone" name="phone" placeholder="+91 98765 43210" /></div>
+            <div class="field"><label>City *</label><input [(ngModel)]="personal.city" name="city" placeholder="Mumbai" /></div>
+            <div class="field full"><label>Address *</label><input [(ngModel)]="personal.addressLine" name="addressLine" placeholder="Street address" /></div>
+            <div class="field"><label>Pincode</label><input [(ngModel)]="personal.pincode" name="pincode" placeholder="400001" /></div>
+          </div>
+        </div>
+
+        <!-- LIFESTYLE -->
+        <div *ngIf="step === 'lifestyle'">
+          <h2>Living Situation</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label>Housing Type *</label>
+              <select [(ngModel)]="lifestyle.housingType" name="housingType">
+                <option value="APARTMENT">Apartment</option>
+                <option value="HOUSE">House</option>
+                <option value="VILLA">Villa</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Hours Pet Alone Per Day</label>
+              <input type="number" [(ngModel)]="lifestyle.workScheduleHours" name="workScheduleHours" min="0" max="24" />
+            </div>
+            <div class="field">
+              <label>Other Pets Count</label>
+              <input type="number" [(ngModel)]="lifestyle.otherPetsCount" name="otherPetsCount" min="0" />
+            </div>
+          </div>
+          <div class="checkboxes">
+            <label class="checkbox-label"><input type="checkbox" [(ngModel)]="lifestyle.hasYard" name="hasYard" /> Has Yard / Outdoor Space</label>
+          </div>
+        </div>
+
+        <!-- EXPERIENCE -->
+        <div *ngIf="step === 'experience'">
+          <h2>Experience & Background</h2>
+          <div class="checkboxes">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="experience.prevPetOwnership" name="prevPetOwnership" />
+              I have owned pets before
+            </label>
+          </div>
+          <div class="field full" *ngIf="experience.prevPetOwnership">
+            <label>Previous Pet Details</label>
+            <textarea [(ngModel)]="experience.prevPetDetails" name="prevPetDetails" rows="3" placeholder="Describe any pets you've owned before…"></textarea>
+          </div>
+          <div class="field full">
+            <label>Veterinary Support</label>
+            <textarea [(ngModel)]="experience.vetSupport" name="vetSupport" rows="3" placeholder="Which vet or clinic would you use for this pet?"></textarea>
+          </div>
+        </div>
+
+        <!-- CONSENT -->
+        <div *ngIf="step === 'consent'">
+          <h2>Agreements & Consent</h2>
+          <div class="consent-list">
+            <label class="consent-item">
+              <input type="checkbox" [(ngModel)]="consent.agreedToTerms" name="terms" />
+              <div>
+                <strong>I agree to the Adoption Terms & Conditions</strong>
+                <p>I understand the responsibilities of pet ownership and commit to providing a safe, loving home.</p>
+              </div>
+            </label>
+            <label class="consent-item">
+              <input type="checkbox" [(ngModel)]="consent.consentHomeVisit" name="consentHomeVisit" />
+              <div>
+                <strong>I consent to a home visit</strong>
+                <p>I allow the NGO to conduct a home visit to ensure the pet's living environment is suitable.</p>
+              </div>
+            </label>
+            <label class="consent-item">
+              <input type="checkbox" [(ngModel)]="consent.consentFollowUp" name="consentFollowUp" />
+              <div>
+                <strong>I agree to follow-up check-ins</strong>
+                <p>I consent to periodic welfare check-ins after the adoption is completed.</p>
+              </div>
+            </label>
+            <label class="consent-item">
+              <input type="checkbox" [(ngModel)]="consent.consentBackgroundCheck" name="consentBackgroundCheck" />
+              <div>
+                <strong>I consent to a background check</strong>
+                <p>I allow the NGO to perform a background verification as part of the adoption process.</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- REVIEW -->
+        <div *ngIf="step === 'review'">
+          <h2>Review Your Application</h2>
+          <div class="review-section">
+            <h3>Personal</h3>
+            <div class="review-row"><span>Name</span><strong>{{ personal.fullName || '—' }}</strong></div>
+            <div class="review-row"><span>Email</span><strong>{{ personal.email || '—' }}</strong></div>
+            <div class="review-row"><span>City</span><strong>{{ personal.city || '—' }}</strong></div>
+            <div class="review-row"><span>Address</span><strong>{{ personal.addressLine || '—' }}</strong></div>
+          </div>
+          <div class="review-section">
+            <h3>Lifestyle</h3>
+            <div class="review-row"><span>Housing</span><strong>{{ lifestyle.housingType }}</strong></div>
+            <div class="review-row"><span>Has Yard</span><strong>{{ lifestyle.hasYard ? 'Yes' : 'No' }}</strong></div>
+            <div class="review-row"><span>Hours Alone</span><strong>{{ lifestyle.workScheduleHours }}h/day</strong></div>
+            <div class="review-row"><span>Other Pets</span><strong>{{ lifestyle.otherPetsCount }}</strong></div>
+          </div>
+          <div class="review-section">
+            <h3>Consent</h3>
+            <div class="review-row"><span>Terms</span><strong>{{ consent.agreedToTerms ? '✓ Agreed' : '✗ Not agreed' }}</strong></div>
+            <div class="review-row"><span>Home Visit</span><strong>{{ consent.consentHomeVisit ? '✓ Agreed' : '✗ Not agreed' }}</strong></div>
+            <div class="review-row"><span>Follow-up</span><strong>{{ consent.consentFollowUp ? '✓ Agreed' : '✗ Not agreed' }}</strong></div>
+            <div class="review-row"><span>Background Check</span><strong>{{ consent.consentBackgroundCheck ? '✓ Agreed' : '✗ Not agreed' }}</strong></div>
+          </div>
+          <div class="alert warn" *ngIf="!consent.agreedToTerms">
+            <span>⚠️</span><span>You must agree to the terms before submitting.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="step-nav">
+        <button class="btn btn-secondary" *ngIf="step !== 'personal'" (click)="goBack()" [disabled]="saving">← Back</button>
+        <span></span>
+        <button class="btn btn-primary" *ngIf="step !== 'review'" (click)="saveAndNext()" [disabled]="saving">
+          {{ saving ? 'Saving…' : 'Save & Continue →' }}
+        </button>
+        <button class="btn btn-primary" *ngIf="step === 'review'" (click)="submit()" [disabled]="saving || !consent.agreedToTerms">
+          {{ saving ? 'Submitting…' : 'Submit Application' }}
+        </button>
+      </div>
+    </ng-container>
+  </div>
+</div>

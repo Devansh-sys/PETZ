@@ -4,6 +4,10 @@
 // ─────────────────────────────────────────────
 package com.cts.mfrp.petzbackend.hospital.dto;
 
+<<<<<<< Updated upstream
+=======
+import com.fasterxml.jackson.annotation.JsonProperty;
+>>>>>>> Stashed changes
 import lombok.Builder;
 import lombok.Data;
 
@@ -20,7 +24,13 @@ public class HospitalProfileResponse {
     private String                contactEmail;
     private String                operatingHours;
     private boolean               emergencyReady;
+<<<<<<< Updated upstream
     private boolean               isOpenNow;
+=======
+    @JsonProperty("isOpenNow")
+    private boolean               isOpenNow;
+    @JsonProperty("isVerified")
+>>>>>>> Stashed changes
     private boolean               isVerified;
     private double                distanceKm;
     private List<DoctorResponse>  doctors;

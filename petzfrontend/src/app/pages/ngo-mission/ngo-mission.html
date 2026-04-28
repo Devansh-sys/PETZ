@@ -1,0 +1,260 @@
+<petz-navbar></petz-navbar>
+
+<section class="mission-page">
+  <div class="mission-wrap">
+    <a routerLink="/ngo/queue" class="back-link">← Back to queue</a>
+
+    <p *ngIf="loading" class="state">Loading mission…</p>
+
+    <div *ngIf="error" class="alert error">
+      <span>⚠️</span>
+      <span>{{ error }}</span>
+    </div>
+
+    <div *ngIf="!loading && mission">
+
+      <!-- HEADER -->
+      <header class="mission-head">
+        <div>
+          <span class="eyebrow">Mission</span>
+          <h1>#{{ caseCode() }}</h1>
+        </div>
+        <div class="status-pill" [ngClass]="'s-' + status.toLowerCase()">
+          {{ statusLabel(status) }}
+        </div>
+      </header>
+
+      <!-- REPORT SUMMARY -->
+      <div *ngIf="report" class="panel report">
+        <div class="row-top">
+          <span class="urg">{{ urgencyLabel() }}</span>
+          <small>Reported {{ formatTime(report.reportedAt) }}</small>
+        </div>
+        <h3>Case details</h3>
+        <p class="notes" *ngIf="report.description">{{ report.description }}</p>
+        <p class="notes muted" *ngIf="!report.description">No notes provided by reporter.</p>
+        <div class="meta-grid">
+          <div>
+            <small>Location</small>
+            <strong class="mono">{{ report.latitude }}, {{ report.longitude }}</strong>
+          </div>
+          <div *ngIf="report.reporterName">
+            <small>Reporter</small>
+            <strong>{{ report.reporterName }}</strong>
+          </div>
+          <div *ngIf="report.media.length">
+            <small>Media</small>
+            <strong>{{ report.media.length }} attached</strong>
+          </div>
+        </div>
+        <div *ngIf="report.media.length" class="media-grid">
+          <ng-container *ngFor="let mm of report.media">
+            <a *ngIf="mm.mediaType === 'PHOTO'" [href]="mm.fileUrl" target="_blank" rel="noopener">
+              <img [src]="mm.fileUrl" [alt]="'Case media ' + mm.id">
+            </a>
+            <a *ngIf="mm.mediaType === 'VIDEO'" [href]="mm.fileUrl" target="_blank" rel="noopener" class="video-tile">
+              🎥 View video
+            </a>
+          </ng-container>
+        </div>
+        <div class="quick-actions">
+          <button type="button" class="btn btn-ghost" (click)="openMaps()">🗺️ Navigate</button>
+        </div>
+      </div>
+
+      <!-- TIMELINE -->
+      <div class="panel timeline-panel">
+        <h3>Mission timeline</h3>
+        <ul class="t-list">
+          <li [class.done]="mission.dispatchedAt">
+            <span class="dot"></span>
+            <div><strong>Dispatched</strong><small>{{ formatTime(mission.dispatchedAt) || '—' }}</small></div>
+          </li>
+          <li [class.done]="mission.onSiteAt">
+            <span class="dot"></span>
+            <div><strong>On site</strong><small>{{ formatTime(mission.onSiteAt) || '—' }}</small></div>
+          </li>
+          <li [class.done]="mission.transportingAt">
+            <span class="dot"></span>
+            <div><strong>Transporting</strong><small>{{ formatTime(mission.transportingAt) || '—' }}</small></div>
+          </li>
+          <li [class.done]="mission.completedAt">
+            <span class="dot"></span>
+            <div><strong>Complete</strong><small>{{ formatTime(mission.completedAt) || '—' }}</small></div>
+          </li>
+        </ul>
+        <div *ngIf="mission.assignedNgoUserName" class="assigned">
+          <small>Assigned to</small>
+          <strong>{{ mission.assignedNgoUserName }}</strong>
+          <span *ngIf="mission.etaMinutes != null" class="eta">ETA {{ mission.etaMinutes }} min</span>
+        </div>
+      </div>
+
+      <!-- ── PHASE: REPORTED (accept mission) ── -->
+      <div *ngIf="phase === 'REPORTED'" class="panel action-panel">
+        <label class="eta-field">
+          <span>Your ETA</span>
+          <div class="eta-row">
+            <input type="number" min="1" max="180" [(ngModel)]="etaInput">
+            <span class="unit">min</span>
+          </div>
+          <small>The reporter sees this live.</small>
+        </label>
+        <button type="button" class="btn btn-primary btn-big" [disabled]="busy" (click)="acceptDispatch()">
+          {{ busy ? 'Updating…' : '🚀 Accept & dispatch' }}
+        </button>
+      </div>
+
+      <!-- ── PHASE: AWAITING_ARRIVAL (en route + navigation) ── -->
+      <div *ngIf="phase === 'AWAITING_ARRIVAL'" class="panel action-panel">
+        <p class="panel-hint">
+          📍 Once you're at the location, tap below to check in. We'll verify your GPS is within 200 m of the SOS.
+        </p>
+
+        <!-- Navigation section -->
+        <div class="nav-section">
+          <button *ngIf="!navigation" type="button" class="btn btn-ghost" [disabled]="loadingNav" (click)="loadNavigation()">
+            {{ loadingNav ? 'Loading…' : '🧭 Get Navigation Details' }}
+          </button>
+          <div *ngIf="navigation" class="nav-card">
+            <div class="nav-title">🧭 Navigation</div>
+            <div class="nav-row"><span>Destination</span><strong>{{ navigation.lat }}, {{ navigation.lon }}</strong></div>
+            <div class="nav-row"><span>ETA</span><strong>{{ navigation.eta }}</strong></div>
+            <a class="btn btn-ghost nav-maps-btn"
+               [href]="'https://www.google.com/maps/dir/?api=1&destination=' + navigation.lat + ',' + navigation.lon"
+               target="_blank" rel="noopener">
+              Open in Google Maps
+            </a>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary btn-big" [disabled]="busy" (click)="markArrival()">
+          {{ busy ? 'Checking GPS…' : '📍 I\'ve arrived on site' }}
+        </button>
+      </div>
+
+      <!-- ── PHASE: ASSESSMENT ── -->
+      <div *ngIf="phase === 'ASSESSMENT'" class="panel action-panel assessment">
+        <h3>On-site assessment</h3>
+
+        <div class="field">
+          <label for="cond">Animal condition *</label>
+          <input id="cond" type="text" placeholder="e.g. Conscious, leg injury, bleeding mild" [(ngModel)]="animalCondition">
+        </div>
+
+        <div class="field">
+          <label for="inj">Injury description <small>(optional)</small></label>
+          <textarea id="inj" rows="2" placeholder="Visible wounds, behaviour, response to stimuli…" [(ngModel)]="injuryDescription"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Decision *</label>
+          <div class="decision-grid">
+            <button type="button" class="dec-chip" [class.selected]="decision === 'TRANSPORT_TO_HOSPITAL'" (click)="decision = 'TRANSPORT_TO_HOSPITAL'">
+              <span class="emoji">🚑</span>
+              <span class="label">Transport to hospital</span>
+              <small>Needs veterinary care</small>
+            </button>
+            <button type="button" class="dec-chip" [class.selected]="decision === 'RELEASE'" (click)="decision = 'RELEASE'">
+              <span class="emoji">🐾</span>
+              <span class="label">Release on site</span>
+              <small>Healthy / minor</small>
+            </button>
+            <button type="button" class="dec-chip" [class.selected]="decision === 'CANNOT_LOCATE'" (click)="decision = 'CANNOT_LOCATE'">
+              <span class="emoji">🔍</span>
+              <span class="label">Cannot locate</span>
+              <small>Animal not found</small>
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="just">Justification *</label>
+          <textarea id="just" rows="3" placeholder="Why this decision? (seen by hospital & closure review)" [(ngModel)]="decisionJustification"></textarea>
+        </div>
+
+        <button type="button" class="btn btn-primary btn-big" [disabled]="!canSubmitAssessment" (click)="submitAssessment()">
+          {{ busy ? 'Submitting…' : '✍️ Submit assessment' }}
+        </button>
+      </div>
+
+      <!-- ── PHASE: HOSPITAL_SELECTION ── -->
+      <div *ngIf="phase === 'HOSPITAL_SELECTION'" class="panel action-panel">
+        <h3>Pick a nearby hospital</h3>
+        <p class="panel-hint">Selecting a hospital alerts them to expect an incoming rescue.</p>
+
+        <div *ngIf="hospitals.length === 0" class="empty-hosp">
+          <span>😕</span>
+          <p>No emergency hospitals found nearby. Refresh or try again.</p>
+          <button type="button" class="btn btn-ghost" (click)="loadHospitals()">Refresh list</button>
+        </div>
+
+        <div class="hospital-list">
+          <div *ngFor="let h of hospitals" class="hospital">
+            <div class="h-head">
+              <strong>{{ h.name }}</strong>
+              <span *ngIf="h.emergencyReady" class="tag-er">🟢 Emergency ready</span>
+            </div>
+            <div class="h-meta">
+              <span>📍 {{ h.distanceKm.toFixed(1) }} km away</span>
+              <span *ngIf="h.services">🩺 {{ h.services }}</span>
+            </div>
+            <button type="button" class="btn btn-primary" [disabled]="busy" (click)="alertAndSelectHospital(h)">
+              Alert & transport here →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PHASE: HOSPITAL_ALERTED (handover + complete) ── -->
+      <div *ngIf="phase === 'HOSPITAL_ALERTED'" class="panel action-panel alerted">
+        <div class="icon-circle">🚑</div>
+        <h3>Hospital alerted</h3>
+        <p>They know you're coming. Record the handover once you've arrived at the hospital.</p>
+
+        <!-- Step 1: Record Handover -->
+        <div *ngIf="!handover" class="handover-step">
+          <button type="button" class="btn btn-primary btn-big" [disabled]="busy" (click)="recordHandover()">
+            {{ busy ? 'Recording…' : '🏥 Record Handover' }}
+          </button>
+          <p class="panel-hint">Tap after handing the animal to hospital staff.</p>
+        </div>
+
+        <!-- Step 2: Handover recorded — show details + complete -->
+        <div *ngIf="handover" class="handover-done">
+          <div class="handover-card">
+            <div class="handover-row"><span>Handover time</span><strong>{{ formatTime(handover.handoverAt) }}</strong></div>
+            <div class="handover-row"><span>Status</span><strong>{{ handover.rescueStatus }}</strong></div>
+          </div>
+          <button type="button" class="btn btn-primary btn-big" [disabled]="busy" (click)="completeTransport()">
+            {{ busy ? 'Finalising…' : '✅ Mission Complete' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- ── PHASE: RELEASE_CONFIRMATION ── -->
+      <div *ngIf="phase === 'RELEASE_CONFIRMATION'" class="panel action-panel">
+        <h3>Release confirmation</h3>
+        <p class="panel-hint">A quick note for the closure record — where and in what state the animal was released.</p>
+        <div class="field">
+          <label for="rnotes">Release notes</label>
+          <textarea id="rnotes" rows="3"
+            placeholder="Released healthy at &lt;location&gt;. Observed eating / resting before leaving."
+            [(ngModel)]="releaseNotes"></textarea>
+        </div>
+        <button type="button" class="btn btn-primary btn-big" [disabled]="busy" (click)="submitRelease()">
+          {{ busy ? 'Submitting…' : '🐾 Confirm release' }}
+        </button>
+      </div>
+
+      <!-- ── PHASE: CANNOT_LOCATE or CLOSED ── -->
+      <div *ngIf="phase === 'CANNOT_LOCATE' || phase === 'CLOSED'" class="panel closed-panel">
+        <div class="check">✓</div>
+        <h3>Mission closed</h3>
+        <p *ngIf="phase === 'CANNOT_LOCATE'">Animal was not found at the location. The case is recorded for follow-up.</p>
+        <p *ngIf="phase === 'CLOSED'">Thank you for saving a life today. The closure summary will be sent for review.</p>
+      </div>
+
+    </div>
+  </div>
+</section>

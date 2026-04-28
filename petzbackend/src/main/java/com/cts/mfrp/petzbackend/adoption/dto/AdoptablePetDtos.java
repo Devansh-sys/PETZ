@@ -1,5 +1,9 @@
 package com.cts.mfrp.petzbackend.adoption.dto;
 
+<<<<<<< Updated upstream
+=======
+import com.fasterxml.jackson.annotation.JsonProperty;
+>>>>>>> Stashed changes
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
@@ -40,6 +44,10 @@ public class AdoptablePetDtos {
         private Integer ageMonths;
         private String gender;
         private String locationCity;
+<<<<<<< Updated upstream
+=======
+        @JsonProperty("isAdoptionReady")
+>>>>>>> Stashed changes
         private boolean isAdoptionReady;   // US-2.1.1 AC#2 "readiness badge"
         private String status;
         private String primaryImageUrl;    // AC#2 "image"
@@ -73,6 +81,10 @@ public class AdoptablePetDtos {
         private String locationCity;
         private BigDecimal latitude;
         private BigDecimal longitude;
+<<<<<<< Updated upstream
+=======
+        @JsonProperty("isAdoptionReady")
+>>>>>>> Stashed changes
         private boolean isAdoptionReady;
         private String status;
         private LocalDateTime createdAt;

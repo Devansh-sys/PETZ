@@ -1,0 +1,39 @@
+<petz-navbar></petz-navbar>
+
+<div class="report-card">
+  <div class="step-dots">
+    <span class="dot done"></span>
+    <span class="dot done"></span>
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="block-head">
+    <div class="block-title">Step 3 of 5 — Choose a Doctor</div>
+    <div *ngIf="state" class="block-sub">{{ state.hospitalName }} · {{ state.serviceName }}</div>
+  </div>
+
+  <div class="block">
+    <div *ngIf="loading" class="state-msg">Loading doctors...</div>
+
+    <div *ngIf="!loading && error" class="alert error">{{ error }}</div>
+
+    <div *ngIf="!loading && !error && doctors.length === 0" class="state-msg">
+      No doctors available.
+    </div>
+
+    <div *ngIf="!loading && !error && doctors.length > 0" class="pick-list">
+      <button *ngFor="let d of doctors" class="pick-item" (click)="select(d)">
+        <div class="pick-info">
+          <div class="pick-name">Dr. {{ d.name }}</div>
+          <div class="pick-meta">{{ d.specialization }}</div>
+          <div *ngIf="d.availability" class="pick-meta">{{ d.availability }}</div>
+        </div>
+        <span class="pick-arrow">›</span>
+      </button>
+    </div>
+  </div>
+
+  <button class="btn-link" (click)="back()">‹ Back</button>
+</div>

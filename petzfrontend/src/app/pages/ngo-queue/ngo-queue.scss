@@ -1,0 +1,119 @@
+:host { display: block; }
+
+.queue-page {
+  min-height: calc(100vh - 150px);
+  padding: 36px 20px;
+  background: linear-gradient(180deg, var(--cream) 0%, var(--bg) 40%);
+}
+.queue-wrap {
+  max-width: 1080px; margin: 0 auto;
+}
+
+.queue-head {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;
+  margin-bottom: 22px;
+  .eyebrow {
+    display: inline-block;
+    font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--deep); font-weight: 700; margin-bottom: 6px;
+  }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -.6px; }
+  .sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  .refresh-meta {
+    display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+    small { color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+  }
+}
+.btn-link {
+  background: transparent; color: var(--deep); font-weight: 600; font-size: 13px;
+  padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line);
+  &:hover { background: var(--cream); }
+  &:disabled { color: var(--muted); cursor: not-allowed; }
+}
+
+.filters {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 20px;
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 999px;
+    background: #fff; border: 1.5px solid var(--line);
+    color: var(--ink); font-size: 13px; font-weight: 600;
+    transition: .15s;
+    .count {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 22px; height: 22px; padding: 0 6px;
+      border-radius: 999px; background: var(--line); color: var(--ink);
+      font-size: 11px; font-weight: 700;
+    }
+    &:hover { border-color: var(--peach-soft); }
+    &.on {
+      background: var(--deep); color: #fff; border-color: var(--deep);
+      .count { background: rgba(255,255,255,.2); color: #fff; }
+    }
+    &.critical.on { background: var(--danger); border-color: var(--danger); }
+    &.moderate.on { background: var(--warning); border-color: var(--warning); }
+    &.low.on      { background: var(--peach); border-color: var(--peach); }
+  }
+}
+
+.state, .empty {
+  text-align: center; padding: 40px 20px;
+  background: #fff; border: 1px dashed var(--line); border-radius: 14px;
+  color: var(--muted);
+}
+.empty {
+  .emoji { font-size: 38px; margin-bottom: 8px; }
+  h3 { font-size: 18px; color: var(--ink); font-weight: 700; margin-bottom: 4px; }
+  p { font-size: 14px; }
+}
+
+.cards {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+.case {
+  text-align: left;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
+  display: flex; flex-direction: column; gap: 10px;
+  transition: .15s;
+  cursor: pointer;
+  &:hover { border-color: var(--peach); transform: translateY(-1px); box-shadow: 0 12px 32px -16px rgba(154,52,18,.25); }
+
+  .tag-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 700; letter-spacing: .4px;
+    &.crit { background: #fee2e2; color: #991b1b; }
+    &.mod  { background: #fef3c7; color: #92400e; }
+    &.low  { background: var(--sunset); color: var(--deep); }
+  }
+  .time { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+  .case-title {
+    font-size: 14px; letter-spacing: 1.2px; color: var(--deep);
+    font-family: 'SF Mono', Menlo, monospace; font-weight: 800;
+  }
+  .desc {
+    font-size: 13px; line-height: 1.5; color: var(--ink);
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+    &.muted { color: var(--muted); font-style: italic; }
+  }
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums;
+  }
+  .cta-row { margin-top: 4px; }
+  .cta { color: var(--peach); font-size: 13px; font-weight: 700; }
+
+  // Left accent by urgency
+  &:has(.tag.crit) { border-left-color: var(--danger); }
+  &:has(.tag.mod)  { border-left-color: var(--warning); }
+  &:has(.tag.low)  { border-left-color: var(--peach); }
+}

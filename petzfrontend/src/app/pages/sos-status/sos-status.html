@@ -1,0 +1,131 @@
+<petz-navbar />
+
+<section class="status-page">
+  <div class="status-card">
+    <div class="case-head">
+      <div>
+        <span class="case-label">Case</span>
+        <h1>#{{ caseCode() }}</h1>
+      </div>
+      <div class="pulse" [class.dim]="isClosed()">
+        <span class="ring"></span>
+        <span class="live">{{ isClosed() ? 'Closed' : 'Live' }}</span>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <p class="loading">Fetching latest status…</p>
+    }
+
+    @if (error()) {
+      <div class="alert error">
+        <span>⚠️</span>
+        <span>{{ error() }}</span>
+      </div>
+    }
+
+    @if (!loading() && !error()) {
+      <!-- ASSIGNMENT CARD -->
+      @if (mission(); as m) {
+        <div class="assignment">
+          @if (m.assignedNgoUserName) {
+            <div class="avatar">🐾</div>
+            <div class="who">
+              <small>Assigned rescuer</small>
+              <strong>{{ m.assignedNgoUserName }}</strong>
+            </div>
+            @if (m.etaMinutes != null && !isClosed()) {
+              <div class="eta">
+                <small>ETA</small>
+                <strong>{{ m.etaMinutes }} min</strong>
+              </div>
+            }
+          } @else {
+            <div class="searching">
+              <span class="dot-flash"></span>
+              <span>Finding the nearest verified rescuer…</span>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="assignment">
+          <div class="searching">
+            <span class="dot-flash"></span>
+            <span>Finding the nearest verified rescuer…</span>
+          </div>
+        </div>
+      }
+
+      <!-- TIMELINE -->
+      <ol class="timeline">
+        @for (step of steps(); track step.status) {
+          <li [class.done]="step.done" [class.active]="step.active">
+            <span class="icon">{{ step.emoji }}</span>
+            <div class="body">
+              <strong>{{ step.label }}</strong>
+              @if (step.at) {
+                <small>{{ formatTime(step.at) }}</small>
+              } @else if (step.active) {
+                <small class="in-progress">In progress…</small>
+              } @else {
+                <small class="pending">Pending</small>
+              }
+            </div>
+          </li>
+        }
+      </ol>
+
+      <!-- REPORT SNAPSHOT -->
+      @if (report(); as r) {
+        <div class="snapshot">
+          <div class="row">
+            <span class="label">Urgency</span>
+            <span class="value">{{ r.urgencyLevel }}</span>
+          </div>
+          <div class="row">
+            <span class="label">Location</span>
+            <span class="value mono">{{ r.latitude }}, {{ r.longitude }}</span>
+          </div>
+          @if (r.media.length) {
+            <div class="row">
+              <span class="label">Media</span>
+              <span class="value">{{ r.media.length }} file(s)</span>
+            </div>
+          }
+          @if (r.description) {
+            <div class="row col">
+              <span class="label">Notes</span>
+              <span class="value notes">{{ r.description }}</span>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- CLOSURE SUMMARY -->
+      @if (isClosed() && summary(); as s) {
+        <div class="closure">
+          <h3>Case closed</h3>
+          <p class="outcome"><strong>Outcome:</strong> {{ s.outcome }}</p>
+          @if (s.timeline) { <p class="notes">{{ s.timeline }}</p> }
+          @if (s.notes) { <p class="notes">{{ s.notes }}</p> }
+          @if (s.submittedByUserName) {
+            <small class="by">— {{ s.submittedByUserName }}, {{ formatTime(s.submittedAt) }}</small>
+          }
+        </div>
+      }
+
+      <div class="polled">
+        @if (!isClosed()) {
+          <span>🔄 Updates automatically · last checked {{ formatPolled() }}</span>
+        } @else {
+          <span>🔒 This case is closed.</span>
+        }
+      </div>
+
+      <button type="button" class="btn btn-ghost btn-big" (click)="refresh(false)" [disabled]="loading()">
+        Refresh now
+      </button>
+      <a routerLink="/" class="btn btn-ghost btn-big">Back to Home</a>
+    }
+  </div>
+</section>

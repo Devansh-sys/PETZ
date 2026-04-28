@@ -1,0 +1,60 @@
+<petz-navbar></petz-navbar>
+
+<div class="page-wrap">
+  <div class="page-head">
+    <div>
+      <h1>My Rescue Reports</h1>
+      <p class="lead">SOS reports you have submitted.</p>
+    </div>
+    <a routerLink="/sos/report" class="btn btn-primary">+ New SOS</a>
+  </div>
+
+  <div *ngIf="loading" class="state-msg">Loading your reports...</div>
+
+  <div *ngIf="!loading && error" class="alert error">{{ error }}</div>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && !error && reports.length === 0" class="empty-state">
+    <div class="empty-icon">🐾</div>
+    <h3>No reports yet</h3>
+    <p class="lead">When you submit an SOS report it will appear here.</p>
+    <a routerLink="/sos/report" class="btn btn-primary">Report an animal in distress</a>
+  </div>
+
+  <!-- Reports list -->
+  <div *ngIf="!loading && !error && reports.length > 0" class="report-list">
+    <div *ngFor="let r of reports" class="report-card-item">
+
+      <div class="card-head">
+        <div class="card-meta">
+          <span class="urgency-badge">{{ urgencyLabel(r.urgencyLevel) }}</span>
+          <span class="report-date">{{ formatDate(r.reportedAt) }}</span>
+        </div>
+        <span class="tag" [ngClass]="statusClass(r.status)">{{ r.status }}</span>
+      </div>
+
+      <div class="card-body">
+        <div *ngIf="r.description" class="description">{{ r.description }}</div>
+        <div *ngIf="!r.description" class="description muted">No description provided.</div>
+
+        <div class="details-grid">
+          <div class="detail-row">
+            <span class="detail-label">📍 Location</span>
+            <span>{{ r.latitude }}, {{ r.longitude }}</span>
+          </div>
+          <div *ngIf="r.outcome" class="detail-row">
+            <span class="detail-label">✅ Outcome</span>
+            <span>{{ r.outcome }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <a [routerLink]="['/sos/report', r.sosId, 'status']" class="btn btn-ghost btn-sm">
+          Track Status →
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>

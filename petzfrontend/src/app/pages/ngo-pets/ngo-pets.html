@@ -1,0 +1,50 @@
+<petz-navbar></petz-navbar>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <div>
+      <a routerLink="/ngo/dashboard" class="back-link">← Dashboard</a>
+      <h1>Pet Listings</h1>
+    </div>
+    <a routerLink="/ngo/pets/new" class="btn btn-primary">+ Add Pet</a>
+  </div>
+
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+  <div class="error-state" *ngIf="error && !loading"><p>{{ error }}</p></div>
+
+  <div class="empty-state" *ngIf="!loading && !error && pets.length === 0">
+    <div class="empty-icon">🐾</div>
+    <h3>No pet listings yet</h3>
+    <p>Add your first pet to start accepting adoption applications.</p>
+    <a routerLink="/ngo/pets/new" class="btn btn-primary">Add First Pet</a>
+  </div>
+
+  <div class="pets-table" *ngIf="!loading && !error && pets.length > 0">
+    <div class="table-row header">
+      <span>Pet</span>
+      <span>Species / Age</span>
+      <span>City</span>
+      <span>Status</span>
+      <span>Actions</span>
+    </div>
+    <div class="table-row" *ngFor="let pet of pets" [class.archived]="pet.status === 'ARCHIVED'">
+      <div class="pet-name-col">
+        <span class="pet-icon">{{ speciesIcon(pet.species) }}</span>
+        <span class="pet-name">{{ pet.name }}</span>
+      </div>
+      <div>{{ pet.breed || pet.species }} · {{ ageLabel(pet.ageMonths) }}</div>
+      <div>{{ pet.locationCity }}</div>
+      <div>
+        <span class="badge green" *ngIf="pet.isAdoptionReady && pet.status !== 'ARCHIVED'">Ready</span>
+        <span class="badge grey" *ngIf="!pet.isAdoptionReady && pet.status !== 'ARCHIVED'">Not Ready</span>
+        <span class="badge red" *ngIf="pet.status === 'ARCHIVED'">Archived</span>
+      </div>
+      <div class="actions">
+        <a [routerLink]="['/ngo/pets', pet.id, 'edit']" class="btn-sm">Edit</a>
+        <button class="btn-sm danger" *ngIf="pet.status !== 'ARCHIVED'" (click)="archive(pet.id)" [disabled]="archiving === pet.id">
+          {{ archiving === pet.id ? '…' : 'Archive' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

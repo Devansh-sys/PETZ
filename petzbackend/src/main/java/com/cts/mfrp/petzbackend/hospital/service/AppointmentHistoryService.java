@@ -1,5 +1,6 @@
 package com.cts.mfrp.petzbackend.hospital.service;
 
+<<<<<<< Updated upstream
 import com.cts.mfrp.petzbackend.common.exception.ResourceNotFoundException;
 import com.cts.mfrp.petzbackend.hospital.dto.AppointmentHistoryResponse;
 import com.cts.mfrp.petzbackend.hospital.dto.HospitalDashboardResponse;
@@ -7,6 +8,18 @@ import com.cts.mfrp.petzbackend.hospital.model.Appointment;
 import com.cts.mfrp.petzbackend.hospital.model.Hospital;
 import com.cts.mfrp.petzbackend.hospital.repository.AppointmentRepository;
 import com.cts.mfrp.petzbackend.hospital.repository.HospitalRepository;
+=======
+import com.cts.mfrp.petzbackend.hospital.dto.AppointmentHistoryResponse;
+import com.cts.mfrp.petzbackend.hospital.dto.HospitalDashboardResponse;
+import com.cts.mfrp.petzbackend.hospital.model.Appointment;
+import com.cts.mfrp.petzbackend.hospital.model.Doctor;
+import com.cts.mfrp.petzbackend.hospital.model.Hospital;
+import com.cts.mfrp.petzbackend.hospital.model.Pet;
+import com.cts.mfrp.petzbackend.hospital.repository.AppointmentRepository;
+import com.cts.mfrp.petzbackend.hospital.repository.DoctorRepository;
+import com.cts.mfrp.petzbackend.hospital.repository.HospitalRepository;
+import com.cts.mfrp.petzbackend.hospital.repository.PetRepository;
+>>>>>>> Stashed changes
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +35,11 @@ public class AppointmentHistoryService {
 
     private final AppointmentRepository appointmentRepository;
     private final HospitalRepository hospitalRepository;
+<<<<<<< Updated upstream
+=======
+    private final DoctorRepository doctorRepository;
+    private final PetRepository petRepository;
+>>>>>>> Stashed changes
 
     @Transactional(readOnly = true)
     public List<AppointmentHistoryResponse> getUserHistory(
@@ -68,6 +86,7 @@ public class AppointmentHistoryService {
     }
 
     private AppointmentHistoryResponse toHistoryResponse(Appointment a) {
+<<<<<<< Updated upstream
         Hospital hospital = hospitalRepository.findById(a.getHospitalId())
                 .orElse(null);
 
@@ -82,6 +101,35 @@ public class AppointmentHistoryService {
                 .appointmentDate(a.getAppointmentDate())
                 .appointmentTime(a.getAppointmentTime())
                 .status(a.getStatus())
+=======
+        Hospital hospital = a.getHospitalId() != null ? hospitalRepository.findById(a.getHospitalId()).orElse(null) : null;
+        Doctor   doctor   = a.getDoctorId()   != null ? doctorRepository.findById(a.getDoctorId()).orElse(null)     : null;
+        Pet      pet      = a.getPetId()       != null ? petRepository.findById(a.getPetId()).orElse(null)           : null;
+
+        return AppointmentHistoryResponse.builder()
+                .appointmentId(a.getId())
+                .id(a.getId() != null ? a.getId().toString() : null)
+                .petId(a.getPetId())
+                .petName(pet != null ? pet.getName() : null)
+                .petSpecies(pet != null ? pet.getSpecies() : null)
+                .hospitalId(a.getHospitalId())
+                .hospitalName(hospital != null ? hospital.getName() : null)
+                .hospitalAddress(hospital != null ? hospital.getAddress() : null)
+                .hospitalPhone(hospital != null ? hospital.getContactPhone() : null)
+                .hospitalCity(hospital != null ? hospital.getCity() : null)
+                .doctorId(a.getDoctorId())
+                .doctorName(doctor != null ? doctor.getName() : null)
+                .serviceName(a.getServiceType())
+                .serviceType(a.getServiceType())
+                .appointmentDate(a.getAppointmentDate())
+                .appointmentTime(a.getAppointmentTime())
+                .slotDate(a.getAppointmentDate())
+                .startTime(a.getAppointmentTime())
+                .endTime(a.getEndTime())
+                .appointmentType(a.getBookingType() != null ? a.getBookingType().name() : "ROUTINE")
+                .status(a.getStatus())
+                .bookedAt(a.getCreatedAt())
+>>>>>>> Stashed changes
                 .clinicalNotes(a.getClinicalNotes())
                 .build();
     }

@@ -1,0 +1,53 @@
+<petz-navbar></petz-navbar>
+
+<div class="page-wrap">
+  <div class="page-head">
+    <h1>Hospital Directory</h1>
+    <p class="lead">340+ verified veterinary hospitals across India.</p>
+  </div>
+
+  <div class="filters">
+    <input class="filter-input" type="text" placeholder="Search by name..." [(ngModel)]="filterName" />
+    <input class="filter-input" type="text" placeholder="City..." [(ngModel)]="filterCity" />
+    <label class="check-label">
+      <input type="checkbox" [(ngModel)]="filterEmergency" />
+      Emergency ready
+    </label>
+    <label class="check-label">
+      <input type="checkbox" [(ngModel)]="filterOpenNow" />
+      Open now
+    </label>
+    <button class="btn btn-primary" (click)="load()">Search</button>
+    <button class="btn btn-ghost" (click)="reset()">Reset</button>
+  </div>
+
+  <div *ngIf="loading" class="state-msg">Loading hospitals...</div>
+
+  <div *ngIf="!loading && error" class="alert error">{{ error }}</div>
+
+  <div *ngIf="!loading && !error && hospitals.length === 0" class="state-msg">
+    No hospitals found. Try different filters.
+  </div>
+
+  <div *ngIf="!loading && !error && hospitals.length > 0" class="hospital-grid">
+    <div *ngFor="let h of hospitals" class="hospital-card">
+      <div class="hcard-head">
+        <div>
+          <div class="hcard-name">{{ h.name }}</div>
+          <div class="hcard-city">{{ h.city }}</div>
+        </div>
+        <div class="hcard-badges">
+          <span *ngIf="h.emergencyReady" class="tag ok">Emergency</span>
+          <span *ngIf="h.isOpenNow" class="tag ok">Open now</span>
+          <span *ngIf="!h.isOpenNow" class="tag warn">Closed</span>
+        </div>
+      </div>
+      <div class="hcard-body">
+        <div class="hcard-row">📍 {{ h.address }}</div>
+        <div class="hcard-row">📞 {{ h.contactPhone }}</div>
+        <div *ngIf="h.operatingHours" class="hcard-row">🕐 {{ h.operatingHours }}</div>
+      </div>
+      <a routerLink="/book" class="btn btn-primary hcard-btn">Book Appointment</a>
+    </div>
+  </div>
+</div>

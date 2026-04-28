@@ -1,0 +1,67 @@
+<petz-navbar></petz-navbar>
+
+<div class="report-card">
+  <div class="step-dots">
+    <span class="dot done"></span>
+    <span class="dot done"></span>
+    <span class="dot done"></span>
+    <span class="dot done"></span>
+    <span class="dot active"></span>
+  </div>
+
+  <div class="block-head">
+    <div class="block-title">Step 5 of 5 — Select Your Pet</div>
+  </div>
+
+  <div *ngIf="error" class="alert error">{{ error }}</div>
+
+  <div class="block">
+    <div *ngIf="loading" class="state-msg">Loading your pets...</div>
+
+    <div *ngIf="!loading">
+      <div *ngIf="pets.length > 0" class="pick-list">
+        <button *ngFor="let pet of pets" class="pick-item"
+          [class.selected]="selectedPetId === pet.id"
+          (click)="selectPet(pet)">
+          <div class="pick-info">
+            <div class="pick-name">{{ pet.name }}</div>
+            <div class="pick-meta">{{ pet.species }}<span *ngIf="pet.breed"> · {{ pet.breed }}</span></div>
+          </div>
+          <span *ngIf="selectedPetId === pet.id" class="tag ok">Selected</span>
+        </button>
+      </div>
+
+      <button *ngIf="!showNewForm" class="btn-link add-pet-btn" (click)="showNewForm = true">
+        + Add a new pet
+      </button>
+
+      <div *ngIf="showNewForm" class="new-pet-form">
+        <div class="field">
+          <label>Pet name <span class="req">*</span></label>
+          <input type="text" placeholder="e.g. Bruno" [(ngModel)]="newName" />
+        </div>
+        <div class="field">
+          <label>Species <span class="req">*</span></label>
+          <input type="text" placeholder="e.g. Dog, Cat" [(ngModel)]="newSpecies" />
+        </div>
+        <div class="field">
+          <label>Breed <span class="optional">(optional)</span></label>
+          <input type="text" placeholder="e.g. Labrador" [(ngModel)]="newBreed" />
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" [disabled]="!canAddPet || saving" (click)="addPet()">
+            {{ saving ? 'Saving...' : 'Save Pet' }}
+          </button>
+          <button class="btn btn-ghost" (click)="showNewForm = false">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-actions">
+    <button class="btn-link" (click)="back()">‹ Back</button>
+    <button class="btn btn-primary" [disabled]="!selectedPetId" (click)="proceed()">
+      Review Booking ›
+    </button>
+  </div>
+</div>

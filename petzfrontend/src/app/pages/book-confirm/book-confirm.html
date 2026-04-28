@@ -1,0 +1,107 @@
+<petz-navbar></petz-navbar>
+
+<div class="report-card">
+
+  <!-- Success screen shown after booking is confirmed -->
+  <div *ngIf="confirmation" class="success-wrap">
+    <div class="success-icon">✅</div>
+    <h2>Appointment Confirmed!</h2>
+    <p class="lead">{{ confirmation.confirmationMessage }}</p>
+
+    <div class="block">
+      <div class="summary-row">
+        <span class="summary-label">Ref</span>
+        <span class="ref-id">{{ refCode(confirmation.appointmentId) }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Hospital</span>
+        <span>{{ confirmation.hospitalName }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Doctor</span>
+        <span>Dr. {{ confirmation.doctorName }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Service</span>
+        <span>{{ confirmation.serviceName }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Date</span>
+        <span>{{ confirmation.appointmentDate }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Time</span>
+        <span>{{ formatTime(confirmation.appointmentStartTime) }} – {{ formatTime(confirmation.appointmentEndTime) }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Pet</span>
+        <span>{{ confirmation.petName }} ({{ confirmation.petSpecies }})</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Status</span>
+        <span class="tag ok">{{ confirmation.status }}</span>
+      </div>
+    </div>
+
+    <div class="footer-actions">
+      <button class="btn btn-primary" (click)="goAppointments()">My Appointments</button>
+      <button class="btn btn-ghost" (click)="goHome()">Back to Home</button>
+    </div>
+  </div>
+
+  <!-- Review screen shown before confirming -->
+  <div *ngIf="!confirmation">
+    <div class="block-head">
+      <div class="block-title">Review & Confirm</div>
+    </div>
+
+    <div *ngIf="loading && !state?.lockId" class="state-msg">Securing your slot...</div>
+
+    <div *ngIf="error" class="alert error">
+      {{ error }}
+      <div class="back-link">
+        <button class="btn-link" (click)="back()">‹ Choose another slot</button>
+      </div>
+    </div>
+
+    <div *ngIf="state && !error">
+      <div *ngIf="isLocked" class="lock-banner">
+        Slot reserved for <strong>{{ lockLabel }}</strong> — confirm before it expires
+      </div>
+
+      <div class="block">
+        <div class="summary-row">
+          <span class="summary-label">Hospital</span><span>{{ state.hospitalName }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Address</span><span>{{ state.hospitalAddress }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Phone</span><span>{{ state.hospitalPhone }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Service</span><span>{{ state.serviceName }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Doctor</span><span>Dr. {{ state.doctorName }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Date</span><span>{{ state.slotDate }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Time</span>
+          <span>{{ formatTime(state.slotStart!) }} – {{ formatTime(state.slotEnd!) }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Pet</span><span>{{ state.petName }} ({{ state.petSpecies }})</span>
+        </div>
+      </div>
+
+      <button class="btn-big" [disabled]="!isLocked || loading" (click)="confirm()">
+        {{ loading ? 'Booking...' : 'Confirm Appointment' }}
+      </button>
+      <button class="btn-link" (click)="back()">‹ Back</button>
+    </div>
+  </div>
+
+</div>

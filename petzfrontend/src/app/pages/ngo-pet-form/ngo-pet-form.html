@@ -1,0 +1,98 @@
+<petz-navbar></petz-navbar>
+
+<div class="form-page">
+  <div class="form-container">
+    <a routerLink="/ngo/pets" class="back-link">← Back to Listings</a>
+    <h1>{{ isEdit ? 'Edit Pet Listing' : 'Add New Pet Listing' }}</h1>
+
+    <div class="alert error" *ngIf="error"><span>⚠️</span><span>{{ error }}</span></div>
+
+    <form (ngSubmit)="save()" class="pet-form">
+      <div class="form-section">
+        <h3>Basic Information</h3>
+        <div class="form-grid">
+          <div class="field">
+            <label>Pet Name *</label>
+            <input type="text" [(ngModel)]="form.name" name="name" required placeholder="e.g. Buddy" />
+          </div>
+          <div class="field">
+            <label>Species *</label>
+            <select [(ngModel)]="form.species" name="species">
+              <option value="DOG">Dog</option>
+              <option value="CAT">Cat</option>
+              <option value="BIRD">Bird</option>
+              <option value="RABBIT">Rabbit</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Breed</label>
+            <input type="text" [(ngModel)]="form.breed" name="breed" placeholder="e.g. Labrador" />
+          </div>
+          <div class="field">
+            <label>Age (months)</label>
+            <input type="number" [(ngModel)]="form.ageMonths" name="ageMonths" min="0" />
+          </div>
+          <div class="field">
+            <label>Gender</label>
+            <select [(ngModel)]="form.gender" name="gender">
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+              <option value="UNKNOWN">Unknown</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>City *</label>
+            <input type="text" [(ngModel)]="form.locationCity" name="locationCity" required placeholder="e.g. Mumbai" />
+          </div>
+        </div>
+        <div class="field full">
+          <label>Description</label>
+          <textarea [(ngModel)]="form.description" name="description" rows="3" placeholder="Tell adopters about this pet's personality…"></textarea>
+        </div>
+        <div class="field full">
+          <label>Temperament</label>
+          <textarea [(ngModel)]="form.temperament" name="temperament" rows="2" placeholder="Calm, playful, good with kids…"></textarea>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Medical & Health</h3>
+        <div class="field full">
+          <label>Medical Summary</label>
+          <textarea [(ngModel)]="form.medicalSummary" name="medicalSummary" rows="3" placeholder="Vaccination records, past treatments…"></textarea>
+        </div>
+        <div class="field">
+          <label>Vaccination Status</label>
+          <select [(ngModel)]="form.vaccinationStatus" name="vaccinationStatus">
+            <option value="FULLY_VACCINATED">Fully Vaccinated</option>
+            <option value="PARTIALLY_VACCINATED">Partially Vaccinated</option>
+            <option value="NOT_VACCINATED">Not Vaccinated</option>
+            <option value="UNKNOWN">Unknown</option>
+          </select>
+        </div>
+        <div class="checkboxes">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="form.specialNeeds" name="specialNeeds" />
+            Has Special Needs
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="form.isAdoptionReady" name="isAdoptionReady" />
+            Ready for Adoption
+          </label>
+        </div>
+        <div class="field full" *ngIf="form.specialNeeds">
+          <label>Special Needs Description</label>
+          <textarea [(ngModel)]="form.specialNeedsNotes" name="specialNeedsNotes" rows="2" placeholder="Describe the special needs…"></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a routerLink="/ngo/pets" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary" [disabled]="saving || !form.name || !form.locationCity">
+          {{ saving ? 'Saving…' : (isEdit ? 'Save Changes' : 'Create Listing') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,52 @@
+<petz-navbar />
+
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="step-dots">
+      <span class="dot done"></span>
+      <span class="dot active"></span>
+      <span class="dot"></span>
+    </div>
+
+    <div class="title-row">
+      <a routerLink="/sos/auth" class="back" aria-label="Back">←</a>
+      <h1>Give us a missed call</h1>
+    </div>
+
+    @if (status() === 'initiating') {
+      <p class="lead">Setting up your verification line…</p>
+      <div class="spinner"></div>
+    }
+
+    @if (status() === 'waiting') {
+      <p class="lead">
+        Dial the number below from <strong>{{ phone() }}</strong> and disconnect
+        after one ring. We'll verify you automatically.
+      </p>
+      <a class="call-number" href="tel:{{ callbackNumber() }}">
+        <span class="cn-icon">📞</span>
+        <span class="cn-main">
+          <span class="cn-label">Tap to call</span>
+          <span class="cn-value">{{ callbackNumber() }}</span>
+        </span>
+      </a>
+      <div class="waiting-row">
+        <div class="dots-anim"><span></span><span></span><span></span></div>
+        <span class="waiting-text">Waiting for your call · expires in <strong>{{ formatTime }}</strong></span>
+      </div>
+    }
+
+    @if (status() === 'error') {
+      <div class="alert error">
+        <span>⚠️</span>
+        <span>{{ error() }}</span>
+      </div>
+      <button class="btn btn-primary btn-big" (click)="retry()">Try again</button>
+    }
+
+    <div class="divider"><span>or</span></div>
+    <button type="button" class="btn btn-ghost btn-big" (click)="tryOtp()">
+      Use OTP instead
+    </button>
+  </div>
+</section>

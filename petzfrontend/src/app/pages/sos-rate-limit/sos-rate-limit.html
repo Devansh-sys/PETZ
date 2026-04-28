@@ -1,0 +1,19 @@
+<petz-navbar />
+
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="icon-circle">⚠️</div>
+    <h1>Too many SOS reports</h1>
+    <p class="lead">{{ message() }}</p>
+    <div class="countdown">
+      <span class="label">Try again in</span>
+      <span class="time">{{ formatTime }}</span>
+    </div>
+    <p class="urgent">
+      If this is a <strong>life-threatening animal emergency</strong>,
+      please call our helpline directly.
+    </p>
+    <a href="tel:1800-PETZ-911" class="btn btn-primary btn-big">📞 Call 1800-PETZ-911</a>
+    <a routerLink="/" class="btn btn-ghost btn-big">Back to Home</a>
+  </div>
+</section>

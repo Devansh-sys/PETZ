@@ -1,0 +1,108 @@
+<petz-navbar></petz-navbar>
+
+<div class="review-page">
+  <div class="review-container">
+    <a routerLink="/ngo/adoptions" class="back-link">← All Applications</a>
+
+    <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+    <div class="error-state" *ngIf="error && !loading"><p>{{ error }}</p></div>
+
+    <ng-container *ngIf="application && !loading">
+      <div class="review-header">
+        <div>
+          <h1>Application Review</h1>
+          <p class="sub">{{ application.petName }} · {{ application.adopterName }}</p>
+        </div>
+        <span class="status-badge" [class]="statusClass(application.status)">{{ application.status }}</span>
+      </div>
+
+      <div class="alert error" *ngIf="actionError"><span>⚠️</span><span>{{ actionError }}</span></div>
+
+      <div class="action-bar" *ngIf="application.status === 'PENDING' || application.status === 'UNDER_REVIEW'">
+        <button class="btn btn-secondary" *ngIf="application.status === 'PENDING'" (click)="startReview()" [disabled]="busy">
+          {{ busy ? '…' : 'Start Review' }}
+        </button>
+        <button class="btn btn-primary" *ngIf="application.status === 'UNDER_REVIEW'" (click)="approve()" [disabled]="busy">
+          {{ busy ? '…' : '✓ Approve' }}
+        </button>
+        <button class="btn btn-warn" *ngIf="application.status === 'UNDER_REVIEW'" (click)="showClarifyDialog = true" [disabled]="busy">
+          Ask for Clarification
+        </button>
+        <button class="btn btn-danger" *ngIf="application.status === 'UNDER_REVIEW'" (click)="showRejectDialog = true" [disabled]="busy">
+          Reject
+        </button>
+      </div>
+
+      <div class="approved-banner" *ngIf="application.status === 'APPROVED'">
+        🎉 This application has been approved! {{ application.petName }} has found a home.
+      </div>
+
+      <div class="review-grid">
+        <div class="review-section">
+          <h3>Personal Information</h3>
+          <div class="detail-row"><span>Full Name</span><strong>{{ application.fullName || '—' }}</strong></div>
+          <div class="detail-row"><span>Email</span><strong>{{ application.email || '—' }}</strong></div>
+          <div class="detail-row"><span>Phone</span><strong>{{ application.phone || '—' }}</strong></div>
+          <div class="detail-row"><span>Address</span><strong>{{ application.addressLine || '—' }}</strong></div>
+          <div class="detail-row"><span>City</span><strong>{{ application.city || '—' }}</strong></div>
+        </div>
+
+        <div class="review-section">
+          <h3>Living Situation</h3>
+          <div class="detail-row"><span>Housing Type</span><strong>{{ application.housingType || '—' }}</strong></div>
+          <div class="detail-row"><span>Has Yard</span><strong>{{ application.hasYard ? 'Yes' : 'No' }}</strong></div>
+          <div class="detail-row"><span>Other Pets</span><strong>{{ application.otherPetsCount ?? '—' }}</strong></div>
+          <div class="detail-row"><span>Hours Alone/Day</span><strong>{{ application.workScheduleHours ?? '—' }}</strong></div>
+        </div>
+
+        <div class="review-section full">
+          <h3>Experience & Background</h3>
+          <div class="detail-row"><span>Previously Owned Pets</span><strong>{{ application.prevPetOwnership ? 'Yes' : 'No' }}</strong></div>
+          <div *ngIf="application.prevPetDetails">
+            <div class="detail-row"><span>Pet Details</span></div>
+            <p class="detail-text">{{ application.prevPetDetails }}</p>
+          </div>
+          <div *ngIf="application.vetSupport">
+            <div class="detail-row" style="margin-top:12px"><span>Veterinary Support</span></div>
+            <p class="detail-text">{{ application.vetSupport }}</p>
+          </div>
+        </div>
+
+        <div class="review-section full" *ngIf="application.ngoComments">
+          <h3>NGO Comments</h3>
+          <p class="detail-text">{{ application.ngoComments }}</p>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Reject Dialog -->
+    <div class="dialog-overlay" *ngIf="showRejectDialog" (click)="showRejectDialog = false">
+      <div class="dialog" (click)="$event.stopPropagation()">
+        <h3>Reject Application</h3>
+        <p>Provide a reason for the applicant.</p>
+        <textarea [(ngModel)]="rejectReason" rows="4" placeholder="Reason for rejection…"></textarea>
+        <div class="dialog-actions">
+          <button class="btn btn-secondary" (click)="showRejectDialog = false">Cancel</button>
+          <button class="btn btn-danger" (click)="confirmReject()" [disabled]="!rejectReason || busy">
+            {{ busy ? '…' : 'Reject' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clarify Dialog -->
+    <div class="dialog-overlay" *ngIf="showClarifyDialog" (click)="showClarifyDialog = false">
+      <div class="dialog" (click)="$event.stopPropagation()">
+        <h3>Request Clarification</h3>
+        <p>Enter the questions you need answered.</p>
+        <textarea [(ngModel)]="clarifyQuestion" rows="4" placeholder="What information do you need?"></textarea>
+        <div class="dialog-actions">
+          <button class="btn btn-secondary" (click)="showClarifyDialog = false">Cancel</button>
+          <button class="btn btn-primary" (click)="confirmClarify()" [disabled]="!clarifyQuestion || busy">
+            {{ busy ? '…' : 'Send Questions' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,76 @@
+<petz-navbar />
+
+<section class="confirm-page">
+  <div class="confirm-card">
+    <div class="step-dots">
+      <span class="dot done"></span>
+      <span class="dot done"></span>
+      <span class="dot done"></span>
+      <span class="dot active"></span>
+    </div>
+
+    @if (loading()) {
+      <p class="loading">Loading your rescue case…</p>
+    }
+
+    @if (error()) {
+      <div class="alert error">
+        <span>⚠️</span>
+        <span>{{ error() }}</span>
+      </div>
+    }
+
+    @if (report(); as r) {
+      <div class="check-circle">
+        <svg viewBox="0 0 52 52" aria-hidden="true">
+          <circle class="check-bg" cx="26" cy="26" r="25" />
+          <path class="check-mark" d="M14 27 l8 8 l16 -18" />
+        </svg>
+      </div>
+
+      <h1>Rescue dispatched.</h1>
+      <p class="lead">
+        Case <strong>#{{ caseCode() }}</strong> is live. The nearest verified partner is being notified right now.
+      </p>
+
+      <div class="summary">
+        <div class="row">
+          <span class="label">Urgency</span>
+          <span class="value">{{ urgencyLabel(r.urgencyLevel) }}</span>
+        </div>
+        <div class="row">
+          <span class="label">Location</span>
+          <span class="value mono">{{ r.latitude }}, {{ r.longitude }}</span>
+        </div>
+        <div class="row">
+          <span class="label">Status</span>
+          <span class="value"><span class="badge">{{ r.currentStatus }}</span></span>
+        </div>
+        @if (r.media.length) {
+          <div class="row">
+            <span class="label">Media</span>
+            <span class="value">{{ r.media.length }} file(s) attached</span>
+          </div>
+        }
+        @if (r.description) {
+          <div class="row col">
+            <span class="label">Notes</span>
+            <span class="value notes">{{ r.description }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="next">
+        <h3>What happens next</h3>
+        <ol>
+          <li>A verified rescuer is being dispatched to the location.</li>
+          <li>You'll get an SMS when they're on the way.</li>
+          <li>Stay nearby if it's safe — your live update helps them.</li>
+        </ol>
+      </div>
+
+      <a [routerLink]="['/sos/report', r.id, 'status']" class="btn btn-primary btn-big">Track this case →</a>
+      <a routerLink="/" class="btn btn-ghost btn-big">Back to Home</a>
+    }
+  </div>
+</section>

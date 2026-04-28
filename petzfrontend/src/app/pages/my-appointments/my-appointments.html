@@ -1,0 +1,42 @@
+<petz-navbar></petz-navbar>
+
+<div class="page-wrap">
+  <div class="page-head">
+    <h1>My Appointments</h1>
+    <a routerLink="/book" class="btn btn-primary">+ Book New</a>
+  </div>
+
+  <div *ngIf="loading" class="state-msg">Loading appointments...</div>
+
+  <div *ngIf="!loading && error" class="alert error">{{ error }}</div>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && !error && appointments.length === 0" class="empty-state">
+    <div class="empty-icon">📅</div>
+    <h3>No appointments yet</h3>
+    <p class="lead">Book a slot at a verified veterinary hospital.</p>
+    <a routerLink="/book" class="btn btn-primary">Book an Appointment</a>
+  </div>
+
+  <!-- Appointments list -->
+  <div *ngIf="!loading && !error && appointments.length > 0" class="appt-list">
+    <div *ngFor="let a of appointments" class="appt-card">
+      <div class="appt-head">
+        <div>
+          <div class="appt-pet">{{ a.petName }} <span class="lead">· {{ a.petSpecies }}</span></div>
+          <div class="appt-hospital">{{ a.hospitalName }}</div>
+        </div>
+        <span class="tag" [ngClass]="statusClass(a.status)">{{ a.status }}</span>
+      </div>
+      <div class="appt-body">
+        <div class="appt-row">👨‍⚕️ Dr. {{ a.doctorName }} · {{ a.serviceName }}</div>
+        <div class="appt-row">📅 {{ formatDate(a.slotDate) }} · {{ formatTime(a.startTime) }} – {{ formatTime(a.endTime) }}</div>
+        <div class="appt-row">📍 {{ a.hospitalAddress }}</div>
+        <div *ngIf="a.hospitalPhone" class="appt-row">📞 {{ a.hospitalPhone }}</div>
+      </div>
+      <div *ngIf="a.appointmentType === 'EMERGENCY'" class="appt-emergency">
+        Emergency Appointment
+      </div>
+    </div>
+  </div>
+</div>
