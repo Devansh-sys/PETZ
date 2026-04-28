@@ -21,6 +21,13 @@ public class FileStorageService {
             List.of("image/jpeg", "image/png");
     private static final List<String> ALLOWED_VIDEO_TYPES =
             List.of("video/mp4");
+    /**
+     * Epic 2.3.4 (Wave 2) KYC document uploads accept PDFs plus scans of
+     * ID / address proof. Separate list so the main {@code storeFile}
+     * contract stays unchanged for SOS / adoption-gallery callers.
+     */
+    private static final List<String> ALLOWED_DOCUMENT_TYPES =
+            List.of("application/pdf", "image/jpeg", "image/png");
 
     private Path rootLocation;
 
@@ -65,6 +72,67 @@ public class FileStorageService {
 
     public boolean isVideo(MultipartFile file) {
         return ALLOWED_VIDEO_TYPES.contains(file.getContentType());
+    }
+
+    /**
+     * Epic 2.3.4 — accept PDF / JPEG / PNG files for KYC documents.
+     * Stored under a distinct subdirectory so they're easy to purge later
+     * and so ACL rules can differ from public pet-gallery media.
+     */
+    public boolean isDocument(MultipartFile file) {
+        return ALLOWED_DOCUMENT_TYPES.contains(file.getContentType());
+    }
+
+    /**
+     * Store a KYC document. Same semantics as {@link #storeFile} but with
+     * PDF allowed and a different public URL prefix. Used by Wave 2
+     * {@code KycDocumentService}.
+     */
+    public String storeKycDocument(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new FileValidationException("Uploaded file is empty");
+        }
+        if (!isDocument(file)) {
+            throw new FileValidationException(
+                    "Invalid KYC document type: " + file.getContentType() +
+                            ". Allowed: PDF, JPEG, PNG");
+        }
+        String ext = getExtension(file.getOriginalFilename());
+        String storedName = UUID.randomUUID() + ext;
+        try {
+            Path target = rootLocation.resolve(storedName);
+            Files.copy(file.getInputStream(), target,
+                    StandardCopyOption.REPLACE_EXISTING);
+            return "/uploads/adoption-kyc/" + storedName;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store KYC document", e);
+        }
+    }
+
+    /**
+     * US-4.1.4 — profile photo upload. Accepts JPEG/PNG only; 5 MB cap
+     * enforced by caller (or by spring.servlet.multipart.max-file-size).
+     * Stored under {@code /uploads/profile-photos/} for easy ACL / purge.
+     */
+    public String storeProfilePhoto(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new FileValidationException("Uploaded file is empty");
+        }
+        if (!ALLOWED_IMAGE_TYPES.contains(file.getContentType())) {
+            throw new FileValidationException(
+                    "Invalid profile photo type: " + file.getContentType() +
+                            ". Allowed: JPEG, PNG");
+        }
+        String ext = getExtension(file.getOriginalFilename());
+        String storedName = UUID.randomUUID() + ext;
+        try {
+            Path target = rootLocation.resolve(storedName);
+            Files.copy(file.getInputStream(), target,
+                    StandardCopyOption.REPLACE_EXISTING);
+            return "/uploads/profile-photos/" + storedName;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store profile photo", e);
+        }
     }
 
     private boolean isAllowedType(String contentType) {

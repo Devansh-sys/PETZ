@@ -20,7 +20,7 @@ import java.util.UUID;
  *   - sosId, reportedAt, latitude, longitude, urgencyLevel, status, description, outcome
  */
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class RescueHistoryController {
 

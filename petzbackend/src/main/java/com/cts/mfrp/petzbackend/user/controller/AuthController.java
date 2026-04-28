@@ -1,6 +1,11 @@
 package com.cts.mfrp.petzbackend.user.controller;
 
+import com.cts.mfrp.petzbackend.common.dto.ApiResponse;
 import com.cts.mfrp.petzbackend.user.dto.AuthDtos.*;
+import com.cts.mfrp.petzbackend.user.dto.RegistrationDtos.LoginRequest;
+import com.cts.mfrp.petzbackend.user.dto.RegistrationDtos.LoginResponse;
+import com.cts.mfrp.petzbackend.user.dto.RegistrationDtos.RegisterRequest;
+import com.cts.mfrp.petzbackend.user.dto.RegistrationDtos.RegisterResponse;
 import com.cts.mfrp.petzbackend.user.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -122,5 +127,36 @@ public class AuthController {
         // TODO: Validate webhook signature in production
         authService.verifyMissedCall(request);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
+    //  US-4.1.1 — Full Account Registration
+    // ═════════════════════════════════════════════════════════════════════
+
+    /**
+     * Create a full account with password + email + phone.
+     * Fires an OTP to the phone so the caller can finish verification.
+     */
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<RegisterResponse>> register(
+            @Valid @RequestBody RegisterRequest request) {
+        RegisterResponse response = authService.registerFullAccount(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok("Account created.", response));
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
+    //  US-4.1.2 — Password Login (with lockout)
+    // ═════════════════════════════════════════════════════════════════════
+
+    /**
+     * Password-based login. Identifier may be email or phone.
+     * Returns 401 on bad credentials, 423 on lockout, 403 on disabled account.
+     */
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<LoginResponse>> login(
+            @Valid @RequestBody LoginRequest request) {
+        LoginResponse response = authService.loginWithPassword(request);
+        return ResponseEntity.ok(ApiResponse.ok("Login successful.", response));
     }
 }

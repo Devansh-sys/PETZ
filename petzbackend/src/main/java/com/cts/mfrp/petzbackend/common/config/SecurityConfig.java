@@ -32,7 +32,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  */
 @Configuration
 //@EnableWebSecurity
-// @EnableMethodSecurity  // TODO: Re-enable when JWT auth is active — disabled for Postman dev testing
+@EnableMethodSecurity  // US-4.1.3 — turn on @PreAuthorize / @PostAuthorize
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;

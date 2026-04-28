@@ -1,13 +1,9 @@
-
-// ─────────────────────────────────────────────
-// FILE 21: hospital/service/SlotManagementService.java
-// ─────────────────────────────────────────────
 package com.cts.mfrp.petzbackend.hospital.service;
 
 import com.cts.mfrp.petzbackend.hospital.dto.*;
 import com.cts.mfrp.petzbackend.hospital.model.*;
-import com.cts.mfrp.petzbackend.hospital.model.AppointmentSlot.BookingType;
-import com.cts.mfrp.petzbackend.hospital.model.AppointmentSlot.SlotStatus;
+import com.cts.mfrp.petzbackend.hospital.model.Appointment.BookingType;
+import com.cts.mfrp.petzbackend.hospital.model.Appointment.SlotStatus;
 import com.cts.mfrp.petzbackend.hospital.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,10 +20,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SlotManagementService {
 
-    private final AppointmentSlotRepository slotRepo;
-    private final BlackoutDateRepository    blackoutRepo;
-    private final HospitalRepository        hospitalRepo;
-    private final DoctorRepository          doctorRepo;
+    private final AppointmentRepository    appointmentRepo;
+    private final BlackoutDateRepository   blackoutRepo;
+    private final HospitalRepository       hospitalRepo;
+    private final DoctorRepository         doctorRepo;
 
     // US-3.3.1 — Create appointment slots (single or recurring)
     @Transactional
@@ -57,30 +54,34 @@ public class SlotManagementService {
 
         List<SlotResponse> created = new ArrayList<>();
         LocalTime endTime = req.getStartTime().plusMinutes(req.getDurationMinutes());
-        final Doctor finalDoctor = doctor;
+        final UUID finalDoctorId   = doctor != null ? doctor.getId()   : null;
+        final String finalDoctorName = doctor != null ? doctor.getName() : null;
 
         for (LocalDate date : dates) {
             if (blackoutRepo.existsByHospitalAndBlackoutDate(hospital, date)) continue;
 
-            if (finalDoctor != null) {
-                List<AppointmentSlot> overlap = slotRepo.findOverlappingSlots(
-                        hospital, finalDoctor, date, req.getStartTime(), endTime);
+            if (finalDoctorId != null) {
+                List<Appointment> overlap = appointmentRepo.findOverlappingAppointments(
+                        req.getHospitalId(), finalDoctorId, date, req.getStartTime(), endTime);
                 if (!overlap.isEmpty()) throw new IllegalStateException(
                         "Overlapping slot for doctor on " + date + " at " + req.getStartTime());
             }
 
-            AppointmentSlot slot = AppointmentSlot.builder()
-                    .hospital(hospital).doctor(finalDoctor)
-                    .slotDate(date).startTime(req.getStartTime()).endTime(endTime)
-                    .durationMinutes(req.getDurationMinutes())
-                    .slotStatus(SlotStatus.AVAILABLE)
-                    .bookingType(req.getBookingType() != null
-                            ? BookingType.valueOf(req.getBookingType().toUpperCase())
-                            : BookingType.ROUTINE)
-                    .build();
+            Appointment appointment = new Appointment();
+            appointment.setHospitalId(req.getHospitalId());
+            appointment.setDoctorId(finalDoctorId);
+            appointment.setAppointmentDate(date);
+            appointment.setAppointmentTime(req.getStartTime());
+            appointment.setEndTime(endTime);
+            appointment.setDurationMinutes(req.getDurationMinutes());
+            appointment.setSlotStatus(SlotStatus.AVAILABLE);
+            appointment.setBookingType(req.getBookingType() != null
+                    ? BookingType.valueOf(req.getBookingType().toUpperCase())
+                    : BookingType.ROUTINE);
+            appointment.setCreatedAt(LocalDateTime.now());
 
-            slotRepo.save(slot);
-            created.add(toSlotResponse(slot));
+            appointmentRepo.save(appointment);
+            created.add(toSlotResponse(appointment, finalDoctorName));
         }
         return created;
     }
@@ -93,11 +94,12 @@ public class SlotManagementService {
                         "Hospital not found: " + hospitalId));
 
         if (blackoutRepo.existsByHospitalAndBlackoutDate(hospital, date))
-            return List.of(); // unavailable
+            return List.of();
 
-        return slotRepo.findByHospitalAndSlotDate(hospital, date).stream()
-                .map(this::toSlotResponse)
-                .sorted(Comparator.comparing(SlotResponse::getStartTime))
+        return appointmentRepo
+                .findByHospitalIdAndAppointmentDateOrderByAppointmentTimeAsc(hospitalId, date)
+                .stream()
+                .map(a -> toSlotResponse(a, getDoctorName(a.getDoctorId())))
                 .collect(Collectors.toList());
     }
 
@@ -116,10 +118,11 @@ public class SlotManagementService {
                 .hospital(hospital).blackoutDate(req.getBlackoutDate())
                 .reason(req.getReason()).build());
 
-        List<AppointmentSlot> toBlock = slotRepo
-                .findAvailableSlotsByHospitalAndDate(hospital, req.getBlackoutDate());
-        toBlock.forEach(s -> s.setSlotStatus(SlotStatus.BLOCKED));
-        slotRepo.saveAll(toBlock);
+        List<Appointment> toBlock = appointmentRepo
+                .findByHospitalIdAndAppointmentDateAndSlotStatus(
+                        req.getHospitalId(), req.getBlackoutDate(), SlotStatus.AVAILABLE);
+        toBlock.forEach(a -> a.setSlotStatus(SlotStatus.BLOCKED));
+        appointmentRepo.saveAll(toBlock);
     }
 
     // US-3.3.2 — Remove blackout date
@@ -136,9 +139,10 @@ public class SlotManagementService {
 
         blackoutRepo.delete(blackout);
 
-        slotRepo.findByHospitalAndSlotDate(hospital, date).stream()
-                .filter(s -> s.getSlotStatus() == SlotStatus.BLOCKED)
-                .forEach(s -> s.setSlotStatus(SlotStatus.AVAILABLE));
+        appointmentRepo.findByHospitalIdAndAppointmentDateOrderByAppointmentTimeAsc(hospitalId, date)
+                .stream()
+                .filter(a -> a.getSlotStatus() == SlotStatus.BLOCKED)
+                .forEach(a -> a.setSlotStatus(SlotStatus.AVAILABLE));
     }
 
     // US-3.3.2 — Get all blackout dates
@@ -156,28 +160,28 @@ public class SlotManagementService {
     public List<SlotUtilizationResponse> getUtilization(
             UUID hospitalId, LocalDate from, LocalDate to, UUID doctorId) {
 
-        Hospital hospital = hospitalRepo.findById(hospitalId)
+        hospitalRepo.findById(hospitalId)
                 .orElseThrow(() -> new NoSuchElementException(
                         "Hospital not found: " + hospitalId));
 
-        List<AppointmentSlot> slots = slotRepo
-                .findByHospitalAndDateRange(hospital, from, to);
+        List<Appointment> appointments = appointmentRepo
+                .findByHospitalIdAndAppointmentDateBetweenOrderByAppointmentDateAscAppointmentTimeAsc(
+                        hospitalId, from, to);
 
         if (doctorId != null) {
-            slots = slots.stream()
-                    .filter(s -> s.getDoctor() != null
-                            && s.getDoctor().getId().equals(doctorId))
+            appointments = appointments.stream()
+                    .filter(a -> doctorId.equals(a.getDoctorId()))
                     .collect(Collectors.toList());
         }
 
-        Map<LocalDate, List<AppointmentSlot>> byDate = slots.stream()
-                .collect(Collectors.groupingBy(AppointmentSlot::getSlotDate));
+        Map<LocalDate, List<Appointment>> byDate = appointments.stream()
+                .collect(Collectors.groupingBy(Appointment::getAppointmentDate));
 
         return byDate.entrySet().stream().map(e -> {
-                    List<AppointmentSlot> day = e.getValue();
+                    List<Appointment> day = e.getValue();
                     long total     = day.size();
-                    long booked    = day.stream().filter(s -> s.getSlotStatus() == SlotStatus.BOOKED).count();
-                    long available = day.stream().filter(s -> s.getSlotStatus() == SlotStatus.AVAILABLE).count();
+                    long booked    = day.stream().filter(a -> a.getSlotStatus() == SlotStatus.BOOKED).count();
+                    long available = day.stream().filter(a -> a.getSlotStatus() == SlotStatus.AVAILABLE).count();
                     double pct = total > 0 ? Math.round((booked * 100.0 / total) * 10.0) / 10.0 : 0.0;
                     return SlotUtilizationResponse.builder()
                             .date(e.getKey()).totalSlots(total)
@@ -187,21 +191,28 @@ public class SlotManagementService {
                 .collect(Collectors.toList());
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────
+    // ── Helpers ──────────────────────────────────────────────────────────
 
-    private SlotResponse toSlotResponse(AppointmentSlot s) {
+    private SlotResponse toSlotResponse(Appointment a, String doctorName) {
         return SlotResponse.builder()
-                .id(s.getId())
-                .hospitalId(s.getHospital().getId())
-                .doctorId(s.getDoctor() != null ? s.getDoctor().getId() : null)
-                .doctorName(s.getDoctor() != null ? s.getDoctor().getName() : null)
-                .serviceId(s.getService() != null ? s.getService().getId() : null)
-                .serviceName(s.getService() != null ? s.getService().getServiceName() : null)
-                .slotDate(s.getSlotDate()).startTime(s.getStartTime())
-                .endTime(s.getEndTime()).durationMinutes(s.getDurationMinutes())
-                .slotStatus(s.getSlotStatus().name())
-                .bookingType(s.getBookingType().name())
+                .id(a.getId())
+                .hospitalId(a.getHospitalId())
+                .doctorId(a.getDoctorId())
+                .doctorName(doctorName)
+                .serviceId(null)
+                .serviceName(a.getServiceType())
+                .slotDate(a.getAppointmentDate())
+                .startTime(a.getAppointmentTime())
+                .endTime(a.getEndTime())
+                .durationMinutes(a.getDurationMinutes())
+                .slotStatus(a.getSlotStatus() != null ? a.getSlotStatus().name() : null)
+                .bookingType(a.getBookingType() != null ? a.getBookingType().name() : null)
                 .build();
+    }
+
+    private String getDoctorName(UUID doctorId) {
+        if (doctorId == null) return null;
+        return doctorRepo.findById(doctorId).map(Doctor::getName).orElse(null);
     }
 
     private Set<DayOfWeek> parseRecurringDays(String days) {

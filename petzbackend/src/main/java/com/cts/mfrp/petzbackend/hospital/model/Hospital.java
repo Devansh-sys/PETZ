@@ -49,6 +49,17 @@ public class Hospital {
     @Column(name = "operating_hours")
     private String operatingHours;
 
+    /**
+     * US-3.2.4 AC#1 — structured per-day operating hours (JSON).
+     * Shape: {"MON":{"open":"09:00","close":"17:00","closed":false}, ...}.
+     * The plain-text {@code operatingHours} column above is kept as a
+     * human-readable summary derived from this JSON, so existing read
+     * endpoints keep working unchanged.
+     */
+    @Lob
+    @Column(name = "operating_hours_json", columnDefinition = "TEXT")
+    private String operatingHoursJson;
+
     @Column(name = "is_verified", nullable = false)
     private boolean isVerified;
 

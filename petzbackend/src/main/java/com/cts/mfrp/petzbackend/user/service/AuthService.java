@@ -4,6 +4,10 @@ import com.cts.mfrp.petzbackend.common.exception.AuthExceptions;
 import com.cts.mfrp.petzbackend.common.util.JwtUtil;
 import com.cts.mfrp.petzbackend.common.util.SmsService;
 import com.cts.mfrp.petzbackend.user.dto.AuthDtos.*;
+import com.cts.mfrp.petzbackend.user.dto.RegistrationDtos.LoginRequest;
+import com.cts.mfrp.petzbackend.user.dto.RegistrationDtos.LoginResponse;
+import com.cts.mfrp.petzbackend.user.dto.RegistrationDtos.RegisterRequest;
+import com.cts.mfrp.petzbackend.user.dto.RegistrationDtos.RegisterResponse;
 import com.cts.mfrp.petzbackend.user.model.OtpVerification;
 import com.cts.mfrp.petzbackend.user.model.User;
 import com.cts.mfrp.petzbackend.user.repository.OtpVerificationRepository;
@@ -248,6 +252,13 @@ public class AuthService {
         if (existingUser.isPresent()) {
             User user = existingUser.get();
 
+            // US-4.1.1 / US-4.1.4 — OTP proves phone ownership, so mark it
+            // verified whenever we successfully issue a session.
+            if (!user.isPhoneVerifiedSafe()) {
+                user.setPhoneVerified(true);
+                user = userRepo.save(user);
+            }
+
             if (user.isTemporary()) {
                 // Still a temporary account from a previous SOS
                 String token = jwtUtil.generateTemporarySessionToken(user.getId(), phone);
@@ -278,8 +289,179 @@ public class AuthService {
     }
 
     // ═════════════════════════════════════════════════════════════════════
+    //  US-4.1.1 — Full Account Registration
+    // ═════════════════════════════════════════════════════════════════════
+
+    /**
+     * Create a full account (non-temporary) with password + OTP kickoff.
+     *
+     * Steps:
+     *   1. Validate email + phone uniqueness (409 on duplicate).
+     *   2. If a temporary reporter account already exists for this phone,
+     *      upgrade it in place (fills in name/email/password) so the user
+     *      doesn't get a second row.
+     *   3. Hash password with BCrypt and save.
+     *   4. Immediately fire an OTP so the phone can be verified.
+     *
+     * Roles:
+     *   - Clients can pick ADOPTER (default) / NGO_REP / VET.
+     *   - ADMIN is rejected — admin accounts must be created out-of-band.
+     */
+    @Transactional
+    public RegisterResponse registerFullAccount(RegisterRequest req) {
+        String phone = normalizePhone(req.getPhone());
+        String email = req.getEmail() == null ? null : req.getEmail().trim().toLowerCase();
+
+        // Email uniqueness (server-side, to match US-4.1.1 AC#3).
+        if (email != null && !email.isBlank() && userRepo.existsByEmail(email)) {
+            throw new IllegalStateException(
+                    "An account with this email already exists. Please log in instead.");
+        }
+
+        User.Role requestedRole = parseRole(req.getRole());
+
+        // Locate existing user (temporary reporter upgrade path) or create fresh.
+        User user = userRepo.findByPhone(phone).orElseGet(User::new);
+        if (user.getId() != null && !user.isTemporary() && user.getPasswordHash() != null) {
+            throw new IllegalStateException(
+                    "An account with this phone already exists. Please log in instead.");
+        }
+
+        user.setPhone(phone);
+        user.setFullName(req.getFullName().trim());
+        user.setEmail(email);
+        user.setPasswordHash(passwordEncoder.encode(req.getPassword()));
+        user.setRole(requestedRole);
+        user.setTemporary(false);
+        user.setActive(true);
+        user.setEmailVerified(false);
+        // If we're upgrading a reporter who already proved ownership of this
+        // phone via OTP, keep phoneVerified=true; otherwise start at false.
+        if (user.getPhoneVerified() == null) user.setPhoneVerified(false);
+        user.setFailedLoginAttempts(0);
+        user.setLockedUntil(null);
+
+        User saved = userRepo.save(user);
+
+        // Kick off OTP — lets the caller complete phone verification immediately.
+        SendOtpRequest otp = new SendOtpRequest(phone);
+        sendOtp(otp);
+
+        log.info("User {} registered (role={}, phoneVerified={})",
+                saved.getId(), saved.getRole(), saved.isPhoneVerifiedSafe());
+
+        return RegisterResponse.builder()
+                .userId(saved.getId())
+                .role(saved.getRole().name())
+                .phoneVerified(saved.isPhoneVerifiedSafe())
+                .emailVerified(saved.isEmailVerifiedSafe())
+                .otpExpiresInSeconds(otpExpiryMinutes * 60)
+                .message("Account created. A verification OTP has been sent to your phone.")
+                .build();
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
+    //  US-4.1.2 — Password login with lockout
+    // ═════════════════════════════════════════════════════════════════════
+
+    /**
+     * Password-based login.
+     *
+     *   - {@code identifier} may be email or phone.
+     *   - After {@value #MAX_LOGIN_FAILURES} consecutive failures, the
+     *     account is locked for {@value #LOCKOUT_MINUTES} minutes (401 ↔ 423).
+     *   - Successful login resets the failure counter and stamps lastLoginAt.
+     *   - Inactive (suspended) accounts are rejected with 403.
+     */
+    // noRollbackFor: we MUST persist the failed-attempt counter even when we
+    // ultimately throw 401/423; without this the @Transactional rolls back on
+    // RuntimeException and lockout never persists to the DB.
+    @Transactional(noRollbackFor = {
+            AuthExceptions.InvalidCredentialsException.class,
+            AuthExceptions.AccountLockedException.class,
+            AuthExceptions.AccountDisabledException.class
+    })
+    public LoginResponse loginWithPassword(LoginRequest req) {
+        String id = req.getIdentifier().trim();
+        User user = findByIdentifier(id)
+                .orElseThrow(AuthExceptions.InvalidCredentialsException::new);
+
+        if (!user.isActiveSafe()) {
+            throw new AuthExceptions.AccountDisabledException();
+        }
+        if (user.isLocked()) {
+            throw new AuthExceptions.AccountLockedException(user.getLockedUntil());
+        }
+        if (user.getPasswordHash() == null) {
+            // Temporary account — no password set yet. Point the user at OTP.
+            throw new AuthExceptions.InvalidCredentialsException(
+                    "This account has no password set. Use the OTP login flow.");
+        }
+        if (!passwordEncoder.matches(req.getPassword(), user.getPasswordHash())) {
+            int attempts = (user.getFailedLoginAttempts() == null ? 0
+                    : user.getFailedLoginAttempts()) + 1;
+            user.setFailedLoginAttempts(attempts);
+            if (attempts >= MAX_LOGIN_FAILURES) {
+                user.setLockedUntil(LocalDateTime.now().plusMinutes(LOCKOUT_MINUTES));
+                log.warn("User {} locked for {} minutes after {} failed logins",
+                        user.getId(), LOCKOUT_MINUTES, attempts);
+            }
+            userRepo.save(user);
+            throw new AuthExceptions.InvalidCredentialsException();
+        }
+
+        // Success — reset counter, stamp last login.
+        user.setFailedLoginAttempts(0);
+        user.setLockedUntil(null);
+        user.setLastLoginAt(LocalDateTime.now());
+        userRepo.save(user);
+
+        String token = jwtUtil.generateToken(user.getId(), user.getRole().name());
+        log.info("User {} logged in via password", user.getId());
+        return LoginResponse.builder()
+                .accessToken(token)
+                .tokenType("Bearer")
+                .expiresIn(jwtUtil.getDefaultExpirationSeconds())
+                .userId(user.getId())
+                .role(user.getRole().name())
+                .message("Login successful.")
+                .build();
+    }
+
+    /** Look up a user by email OR phone — used by login. */
+    private Optional<User> findByIdentifier(String identifier) {
+        if (identifier == null || identifier.isBlank()) return Optional.empty();
+        if (identifier.contains("@")) {
+            return userRepo.findByEmail(identifier.toLowerCase());
+        }
+        return userRepo.findByPhone(normalizePhone(identifier));
+    }
+
+    /** Parses role string; defaults to ADOPTER; rejects ADMIN. */
+    private User.Role parseRole(String raw) {
+        if (raw == null || raw.isBlank()) return User.Role.ADOPTER;
+        User.Role parsed;
+        try {
+            parsed = User.Role.valueOf(raw.trim().toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException(
+                    "Invalid role '" + raw + "'. Allowed: ADOPTER, NGO_REP, VET, REPORTER, VOLUNTEER");
+        }
+        if (parsed == User.Role.ADMIN) {
+            throw new IllegalArgumentException(
+                    "ADMIN accounts cannot be created via self-registration.");
+        }
+        return parsed;
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
     //  Helpers
     // ═════════════════════════════════════════════════════════════════════
+
+    /** US-4.1.2 AC#5 — lockout after this many consecutive failures. */
+    private static final int MAX_LOGIN_FAILURES = 5;
+    /** US-4.1.2 AC#5 — how long the lockout lasts. */
+    private static final int LOCKOUT_MINUTES    = 15;
 
     /** Generate cryptographically secure 6-digit OTP */
     private String generateOtp() {

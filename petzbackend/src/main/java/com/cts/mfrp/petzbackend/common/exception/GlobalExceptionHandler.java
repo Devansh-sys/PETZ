@@ -2,14 +2,21 @@ package com.cts.mfrp.petzbackend.common.exception;
 
 import com.cts.mfrp.petzbackend.common.dto.ApiErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 /**
@@ -82,12 +89,146 @@ public class GlobalExceptionHandler {
         );
     }
 
+    // ─── Epic 4.1 Password Login Errors (US-4.1.2) ───────────────────────
+
+    @ExceptionHandler(AuthExceptions.InvalidCredentialsException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidCredentials(
+            AuthExceptions.InvalidCredentialsException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                ApiErrorResponse.of(401, "Invalid Credentials",
+                        ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    @ExceptionHandler(AuthExceptions.AccountLockedException.class)
+    public ResponseEntity<ApiErrorResponse> handleAccountLocked(
+            AuthExceptions.AccountLockedException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.LOCKED).body(
+                ApiErrorResponse.of(423, "Account Locked",
+                        ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    @ExceptionHandler(AuthExceptions.AccountDisabledException.class)
+    public ResponseEntity<ApiErrorResponse> handleAccountDisabled(
+            AuthExceptions.AccountDisabledException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                ApiErrorResponse.of(403, "Account Disabled",
+                        ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    // ─── Booking conflicts / validation (Epic 3.4) ───────────────────────
+
+    /**
+     * {@link IllegalStateException} is used by the booking service for
+     * "Slot Unavailable" / "Slot lock expired" / "pet not emergency slot"
+     * and similar state-machine errors. Surface as 409 Conflict so
+     * clients can distinguish from a true server failure.
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalState(
+            IllegalStateException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ApiErrorResponse.of(409, "Conflict", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    /** Bad user input (enum parse, wrong booking type, etc.) → 400. */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalArgument(
+            IllegalArgumentException ex, HttpServletRequest request) {
+        return ResponseEntity.badRequest().body(
+                ApiErrorResponse.of(400, "Bad Request", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    // ─── Spring MVC + JPA / Jackson exceptions → clean 4xx ───────────────
+
+    /** Malformed JSON / wrong types in the body → 400, not 500. */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiErrorResponse> handleUnreadable(
+            HttpMessageNotReadableException ex, HttpServletRequest request) {
+        String root = ex.getMostSpecificCause() != null
+                ? ex.getMostSpecificCause().getMessage() : ex.getMessage();
+        return ResponseEntity.badRequest().body(
+                ApiErrorResponse.of(400, "Bad Request",
+                        "Malformed request body: " + root, request.getRequestURI())
+        );
+    }
+
+    /** Missing @RequestParam → 400. */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiErrorResponse> handleMissingParam(
+            MissingServletRequestParameterException ex, HttpServletRequest request) {
+        return ResponseEntity.badRequest().body(
+                ApiErrorResponse.of(400, "Bad Request", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    /** Wrong type in path/query (e.g. non-UUID where UUID expected) → 400. */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiErrorResponse> handleTypeMismatch(
+            MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+        String msg = "Invalid value '" + ex.getValue() + "' for parameter '" + ex.getName() + "'";
+        return ResponseEntity.badRequest().body(
+                ApiErrorResponse.of(400, "Bad Request", msg, request.getRequestURI())
+        );
+    }
+
+    /** Validation on method/path parameters (service-layer @Validated) → 400. */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiErrorResponse> handleConstraintViolation(
+            ConstraintViolationException ex, HttpServletRequest request) {
+        String errors = ex.getConstraintViolations().stream()
+                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                .collect(Collectors.joining("; "));
+        return ResponseEntity.badRequest().body(
+                ApiErrorResponse.of(400, "Validation Failed", errors, request.getRequestURI())
+        );
+    }
+
+    /**
+     * DB constraint violations (NOT NULL, UNIQUE, FK). These happen when
+     * bean validation was bypassed or the caller sent a technically-valid
+     * payload that the schema still rejects. 409 Conflict beats 500.
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiErrorResponse> handleDataIntegrity(
+            DataIntegrityViolationException ex, HttpServletRequest request) {
+        String root = ex.getMostSpecificCause() != null
+                ? ex.getMostSpecificCause().getMessage() : ex.getMessage();
+        log.warn("DataIntegrityViolation at {}: {}", request.getRequestURI(), root);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ApiErrorResponse.of(409, "Data Conflict", root, request.getRequestURI())
+        );
+    }
+
+    // ─── Spring MVC — path not mapped → 404 (not 500) ───────────────────
+
+    /**
+     * Spring 6 throws NoResourceFoundException when no handler/static resource
+     * matches the request path (e.g. /health when actuator is not on classpath).
+     * Without this handler it falls through to the generic Exception catch-all
+     * and comes back as 500 — confusing callers who expect 404.
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleNoResourceFound(
+            NoResourceFoundException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiErrorResponse.of(404, "Not Found",
+                        "No endpoint mapped to " + request.getRequestURI(),
+                        request.getRequestURI())
+        );
+    }
+
     // ─── Catch-all ───────────────────────────────────────────────────────
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGenericException(
             Exception ex, HttpServletRequest request) {
-        log.error("Unhandled exception at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
+        log.error("Unhandled exception at {}: {} ({})",
+                request.getRequestURI(), ex.getMessage(), ex.getClass().getName(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 ApiErrorResponse.of(500, "Internal Server Error",
                         "Something went wrong. Please try again.", request.getRequestURI())
@@ -99,6 +240,22 @@ public class GlobalExceptionHandler {
             ResourceNotFoundException ex, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 ApiErrorResponse.of(404, "Not Found", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
+    /**
+     * Several services throw {@link NoSuchElementException} on lookup
+     * misses (e.g. OnSiteRescueService when no NgoAssignment matches).
+     * Map it to 404 so callers know the referenced resource isn't there,
+     * instead of falling through to the generic 500.
+     */
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<ApiErrorResponse> handleNoSuchElement(
+            NoSuchElementException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiErrorResponse.of(404, "Not Found",
+                        ex.getMessage() != null ? ex.getMessage() : "Resource not found",
+                        request.getRequestURI())
         );
     }
     @ExceptionHandler(FileValidationException.class)
