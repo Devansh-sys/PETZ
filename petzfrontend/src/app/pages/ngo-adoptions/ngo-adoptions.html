@@ -1,0 +1,42 @@
+<petz-navbar></petz-navbar>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <div>
+      <a routerLink="/ngo/dashboard" class="back-link">← Dashboard</a>
+      <h1>Adoption Applications</h1>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn" [class.active]="filterStatus === ''" (click)="filterStatus = ''; load()">All</button>
+    <button class="filter-btn" [class.active]="filterStatus === 'PENDING'" (click)="filterStatus = 'PENDING'; load()">Pending</button>
+    <button class="filter-btn" [class.active]="filterStatus === 'UNDER_REVIEW'" (click)="filterStatus = 'UNDER_REVIEW'; load()">Under Review</button>
+    <button class="filter-btn" [class.active]="filterStatus === 'CLARIFICATION_REQUESTED'" (click)="filterStatus = 'CLARIFICATION_REQUESTED'; load()">Clarification</button>
+    <button class="filter-btn" [class.active]="filterStatus === 'APPROVED'" (click)="filterStatus = 'APPROVED'; load()">Approved</button>
+    <button class="filter-btn" [class.active]="filterStatus === 'REJECTED'" (click)="filterStatus = 'REJECTED'; load()">Rejected</button>
+  </div>
+
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+  <div class="error-state" *ngIf="error && !loading"><p>{{ error }}</p></div>
+
+  <div class="empty-state" *ngIf="!loading && !error && applications.length === 0">
+    <p>No applications found for this filter.</p>
+  </div>
+
+  <div class="apps-list" *ngIf="!loading && !error && applications.length > 0">
+    <a class="app-card" *ngFor="let app of applications" [routerLink]="['/ngo/adoptions', app.id]">
+      <div class="app-main">
+        <div class="app-info">
+          <h3>{{ app.adopterName || 'Anonymous Applicant' }}</h3>
+          <p class="app-pet">Applying for <strong>{{ app.petName }}</strong></p>
+          <p class="app-date">Submitted {{ (app.submittedAt || app.lastActivityAt) | date:'mediumDate' }}</p>
+        </div>
+        <div class="app-right">
+          <span class="status-badge" [class]="statusClass(app.status)">{{ statusLabel(app.status) }}</span>
+          <span class="arrow">→</span>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>

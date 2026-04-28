@@ -1,0 +1,57 @@
+<petz-navbar></petz-navbar>
+
+<div class="page-wrap">
+  <div class="profile-card" *ngIf="session()">
+    <div class="profile-avatar">{{ session()!.phone?.slice(-2) ?? '🐾' }}</div>
+    <div class="profile-info">
+      <h2>{{ session()!.phone }}</h2>
+      <span class="role-badge">{{ role }}</span>
+      <span *ngIf="isTemporary" class="temp-badge">Temporary Session</span>
+    </div>
+
+    <div class="section">
+      <h3>Account Details</h3>
+      <div class="detail-row"><span>User ID</span><code>{{ session()!.userId }}</code></div>
+      <div class="detail-row"><span>Phone</span><strong>{{ session()!.phone }}</strong></div>
+      <div class="detail-row"><span>Role</span><strong>{{ role }}</strong></div>
+      <div class="detail-row"><span>Session Type</span>
+        <strong>{{ isTemporary ? 'Temporary (SOS Reporter)' : 'Full Account' }}</strong>
+      </div>
+    </div>
+
+    <div class="section" *ngIf="isTemporary">
+      <div class="alert info">
+        <span>💡</span>
+        <span>You're using a temporary session. <a routerLink="/register" class="link">Convert to full account</a> to access adoption, appointments, and rescue history.</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Quick Links</h3>
+      <div class="links-grid">
+        <a routerLink="/my-reports" class="link-card">
+          <span class="lc-icon">📋</span>
+          <span>My Rescue Reports</span>
+        </a>
+        <a routerLink="/appointments" class="link-card">
+          <span class="lc-icon">📅</span>
+          <span>My Appointments</span>
+        </a>
+        <a routerLink="/adopt/my-applications" class="link-card">
+          <span class="lc-icon">🏠</span>
+          <span>My Adoptions</span>
+        </a>
+        <a *ngIf="role === 'NGO Representative' || role === 'NGO'" routerLink="/ngo/dashboard" class="link-card">
+          <span class="lc-icon">🏢</span>
+          <span>NGO Dashboard</span>
+        </a>
+        <a *ngIf="role === 'Administrator'" routerLink="/admin" class="link-card">
+          <span class="lc-icon">⚙️</span>
+          <span>Admin Dashboard</span>
+        </a>
+      </div>
+    </div>
+
+    <button class="btn btn-danger full" (click)="signOut()">Sign Out</button>
+  </div>
+</div>

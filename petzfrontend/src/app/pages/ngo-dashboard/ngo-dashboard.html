@@ -1,0 +1,87 @@
+<petz-navbar></petz-navbar>
+
+<div class="dashboard-page">
+  <div class="dashboard-container">
+    <div class="dash-header">
+      <h1>NGO Dashboard</h1>
+      <div class="dash-actions">
+        <a routerLink="/ngo/pets/new" class="btn btn-primary">+ Add Pet Listing</a>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🐾</div>
+        <div class="stat-body">
+          <div class="stat-num">{{ stats.totalPets }}</div>
+          <div class="stat-label">Total Listings</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-body">
+          <div class="stat-num">{{ stats.activePets }}</div>
+          <div class="stat-label">Active Pets</div>
+        </div>
+      </div>
+      <div class="stat-card highlight">
+        <div class="stat-icon">📋</div>
+        <div class="stat-body">
+          <div class="stat-num">{{ stats.pendingApplications }}</div>
+          <div class="stat-label">Pending Reviews</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏠</div>
+        <div class="stat-body">
+          <div class="stat-num">{{ stats.approvedAdoptions }}</div>
+          <div class="stat-label">Approved Adoptions</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="dash-section">
+        <div class="section-header">
+          <h2>Pending Applications</h2>
+          <a routerLink="/ngo/adoptions" class="link-sm">View All →</a>
+        </div>
+        <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+        <div class="empty-msg" *ngIf="!loading && recentApplications.length === 0">No pending applications.</div>
+        <div class="app-list" *ngIf="!loading && recentApplications.length > 0">
+          <a class="app-row" *ngFor="let app of recentApplications" [routerLink]="['/ngo/adoptions', app.id]">
+            <div class="app-row-info">
+              <span class="app-name">{{ app.adopterName || 'Anonymous' }}</span>
+              <span class="app-pet">for {{ app.petName }}</span>
+            </div>
+            <span class="status-badge" [class]="statusClass(app.status)">{{ app.status }}</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="dash-section">
+        <div class="section-header">
+          <h2>Quick Links</h2>
+        </div>
+        <div class="quick-links">
+          <a routerLink="/ngo/pets" class="ql-card">
+            <span class="ql-icon">🐾</span>
+            <span>Manage Pet Listings</span>
+          </a>
+          <a routerLink="/ngo/adoptions" class="ql-card">
+            <span class="ql-icon">📋</span>
+            <span>Review Applications</span>
+          </a>
+          <a routerLink="/ngo/pets/new" class="ql-card">
+            <span class="ql-icon">➕</span>
+            <span>Add New Pet</span>
+          </a>
+          <a routerLink="/my-reports" class="ql-card">
+            <span class="ql-icon">🚨</span>
+            <span>Rescue Reports</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

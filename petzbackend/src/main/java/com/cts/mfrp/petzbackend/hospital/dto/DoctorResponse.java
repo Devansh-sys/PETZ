@@ -4,6 +4,10 @@
 // ─────────────────────────────────────────────
 package com.cts.mfrp.petzbackend.hospital.dto;
 
+<<<<<<< Updated upstream
+=======
+import com.fasterxml.jackson.annotation.JsonProperty;
+>>>>>>> Stashed changes
 import lombok.Builder;
 import lombok.Data;
 
@@ -24,6 +28,10 @@ public class DoctorResponse {
     private String specialization;
     private String contactPhone;
     private String availability;
+<<<<<<< Updated upstream
+=======
+    @JsonProperty("isActive")
+>>>>>>> Stashed changes
     private Boolean isActive;
     /** IDs of the hospital services this doctor offers (US-3.2.3 AC#3). */
     private List<UUID>   serviceIds;

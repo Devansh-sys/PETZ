@@ -1,15 +1,19 @@
 package com.cts.mfrp.petzbackend.common.service;
 
 import com.cts.mfrp.petzbackend.ngo.model.Ngo;
+<<<<<<< Updated upstream
 import com.cts.mfrp.petzbackend.notification.enums.NotificationType;
 import com.cts.mfrp.petzbackend.notification.service.InAppNotificationService;
 import com.cts.mfrp.petzbackend.user.model.User;
 import com.cts.mfrp.petzbackend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+=======
+>>>>>>> Stashed changes
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+<<<<<<< Updated upstream
 import java.util.List;
 import java.util.UUID;
 
@@ -28,10 +32,20 @@ import java.util.UUID;
  */
 @Service
 @RequiredArgsConstructor
+=======
+import java.util.UUID;
+
+/**
+ * TEMPORARY STUB — delete once a real Notifications module is available.
+ * Logs all notifications to console instead of sending real alerts.
+ */
+@Service
+>>>>>>> Stashed changes
 public class NotificationServiceStub implements NotificationService {
 
     private static final Logger log = LoggerFactory.getLogger(NotificationServiceStub.class);
 
+<<<<<<< Updated upstream
     private final InAppNotificationService inApp;
     private final UserRepository           userRepo;
 
@@ -46,10 +60,19 @@ public class NotificationServiceStub implements NotificationService {
                 "🚨 SOS Alert Nearby",
                 "A rescue case was reported near [" + sosLat + ", " + sosLon + "]. Respond now.",
                 ngo.getId(), "NGO");
+=======
+    // ── NGO notifications ────────────────────────────────────────
+
+    @Override
+    public void sendSirenAlert(Ngo ngo, double sosLat, double sosLon) {
+        log.info("[STUB] SIREN ALERT → NGO '{}' notified for rescue at [{}, {}]",
+                ngo.getName(), sosLat, sosLon);
+>>>>>>> Stashed changes
     }
 
     @Override
     public void notifyOthersMissionClaimed(UUID missionId, UUID ngoId) {
+<<<<<<< Updated upstream
         log.info("[STUB] Mission {} claimed by NGO {}.", missionId, ngoId);
         fanOutToNgo(ngoId,
                 NotificationType.MISSION_CLAIMED,
@@ -59,17 +82,27 @@ public class NotificationServiceStub implements NotificationService {
     }
 
     // ── Rescue workflow ──────────────────────────────────────────────────
+=======
+        log.info("[STUB] Mission {} claimed by NGO {}. Other NGOs notified.", missionId, ngoId);
+    }
+
+    // ── Rescue workflow notifications ────────────────────────────
+>>>>>>> Stashed changes
 
     @Override
     public void notifyReporter(UUID reporterId, String message) {
         log.info("[STUB] Notify reporter {}: {}", reporterId, message);
+<<<<<<< Updated upstream
         inApp.create(reporterId, NotificationType.RESCUE_UPDATE,
                 "Rescue Update", message);
+=======
+>>>>>>> Stashed changes
     }
 
     @Override
     public void notifyVolunteer(UUID volunteerId, String message) {
         log.info("[STUB] Notify volunteer {}: {}", volunteerId, message);
+<<<<<<< Updated upstream
         inApp.create(volunteerId, NotificationType.RESCUE_UPDATE,
                 "Mission Update", message);
     }
@@ -113,21 +146,63 @@ public class NotificationServiceStub implements NotificationService {
                 NotificationType.ADOPTION_APPLICATION,
                 "New Adoption Application",
                 details, applicationId, "APPLICATION");
+=======
+    }
+
+    @Override
+    public void sendIncomingRescueAlert(UUID hospitalOwnerId, UUID sosReportId, String animalCondition) {
+        log.info("[STUB] Rescue alert to hospital owner {} for SOS {}: {}",
+                hospitalOwnerId, sosReportId, animalCondition);
+    }
+
+    // ── Appointment notifications (Epic 3.4) ─────────────────────────
+
+    @Override
+    public void notifyAppointmentConfirmed(UUID userId, UUID appointmentId, String details) {
+        log.info("═══════════════════════════════════════════");
+        log.info("  [STUB] APPOINTMENT CONFIRMED → user {}", userId);
+        log.info("  appointmentId: {}", appointmentId);
+        log.info("  {}", details);
+        log.info("═══════════════════════════════════════════");
+    }
+
+    @Override
+    public void notifyHospitalEmergencyBooking(UUID hospitalOwnerId, UUID appointmentId, String details) {
+        log.info("[STUB] 🚨 EMERGENCY BOOKING → hospital owner {} | appt {} | {}",
+                hospitalOwnerId, appointmentId, details);
+    }
+
+    // ── Adoption application notifications (Epic 2.3 + 2.4) ──────────
+
+    @Override
+    public void notifyNgoNewApplication(UUID ngoId, UUID applicationId, String details) {
+        log.info("[STUB] 📬 NGO {} has new adoption application {} | {}",
+                ngoId, applicationId, details);
+>>>>>>> Stashed changes
     }
 
     @Override
     public void notifyAdopterDecision(UUID adopterId, UUID applicationId,
                                       String decision, String reason) {
+<<<<<<< Updated upstream
         log.info("[STUB] ADOPTION DECISION → adopter {} | app {} | {}", adopterId, applicationId, decision);
         String body = "Your adoption application has been " + decision.toLowerCase() + ".";
         if (reason != null && !reason.isBlank()) body += " Reason: " + reason;
         inApp.create(adopterId, NotificationType.ADOPTION_DECISION,
                 "Adoption Application " + capitalize(decision),
                 body, applicationId, "APPLICATION");
+=======
+        log.info("═══════════════════════════════════════════");
+        log.info("  [STUB] ADOPTION DECISION → adopter {}", adopterId);
+        log.info("  applicationId: {}  decision: {}", applicationId, decision);
+        if (reason != null) log.info("  reason: {}", reason);
+        log.info("═══════════════════════════════════════════");
+>>>>>>> Stashed changes
     }
 
     @Override
     public void notifyAdopterClarification(UUID adopterId, UUID applicationId, String questions) {
+<<<<<<< Updated upstream
         log.info("[STUB] CLARIFICATION REQUESTED → adopter {} | app {}", adopterId, applicationId);
         inApp.create(adopterId, NotificationType.ADOPTION_CLARIFICATION,
                 "Clarification Needed",
@@ -223,5 +298,16 @@ public class NotificationServiceStub implements NotificationService {
     private static String capitalize(String s) {
         if (s == null || s.isBlank()) return s;
         return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+=======
+        log.info("[STUB] ❓ CLARIFICATION REQUESTED → adopter {} | app {} | questions: {}",
+                adopterId, applicationId, questions);
+    }
+
+    @Override
+    public void notifyAdopterKycDecision(UUID adopterId, UUID applicationId, UUID documentId,
+                                         String status, String reason) {
+        log.info("[STUB] KYC doc {} on app {} -> {} (adopter {})  reason={}",
+                documentId, applicationId, status, adopterId, reason);
+>>>>>>> Stashed changes
     }
 }

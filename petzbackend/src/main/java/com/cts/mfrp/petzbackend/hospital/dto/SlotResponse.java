@@ -25,4 +25,8 @@ public class SlotResponse {
     private int       durationMinutes;
     private String    slotStatus;
     private String    bookingType;
+<<<<<<< Updated upstream
+=======
+    private boolean   available;
+>>>>>>> Stashed changes
 }

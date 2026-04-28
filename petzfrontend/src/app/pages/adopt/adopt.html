@@ -1,0 +1,104 @@
+<petz-navbar></petz-navbar>
+
+<div class="adopt-page">
+  <div class="adopt-hero">
+    <h1>Find Your Perfect Companion</h1>
+    <p>Browse pets available for adoption from verified NGOs across the country.</p>
+  </div>
+
+  <div class="adopt-container">
+    <aside class="filter-panel">
+      <div class="filter-header">
+        <h3>Filters</h3>
+        <button class="btn-link" (click)="reset()">Reset</button>
+      </div>
+
+      <div class="filter-group">
+        <label>Species</label>
+        <select [(ngModel)]="filterSpecies" (change)="load()">
+          <option value="">All Species</option>
+          <option value="DOG">🐕 Dog</option>
+          <option value="CAT">🐈 Cat</option>
+          <option value="BIRD">🦜 Bird</option>
+          <option value="RABBIT">🐇 Rabbit</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>City</label>
+        <input type="text" [(ngModel)]="filterCity" placeholder="e.g. Mumbai" (keyup.enter)="load()" />
+      </div>
+
+      <div class="filter-group">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="filterVaccinated" (change)="load()" />
+          Vaccinated only
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="filterReady" (change)="load()" />
+          Ready for adoption
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="filterSpecialNeeds" (change)="load()" />
+          Special needs
+        </label>
+      </div>
+
+      <button class="btn btn-primary full" (click)="load()">Apply Filters</button>
+    </aside>
+
+    <main class="pets-main">
+      <div class="sort-bar">
+        <span class="result-count" *ngIf="!loading">{{ pets.length }} pet{{ pets.length !== 1 ? 's' : '' }} found</span>
+        <select [(ngModel)]="sortBy" (change)="load()" *ngIf="!filterSpecies && !filterCity && !filterVaccinated && !filterReady && !filterSpecialNeeds">
+          <option value="NEWEST">Newest First</option>
+          <option value="OLDEST">Oldest First</option>
+          <option value="YOUNGEST">Youngest</option>
+          <option value="OLDEST_PET">Oldest Pet</option>
+        </select>
+      </div>
+
+      <div class="loading-state" *ngIf="loading">
+        <div class="spinner"></div>
+        <p>Finding pets…</p>
+      </div>
+
+      <div class="error-state" *ngIf="error && !loading">
+        <p>{{ error }}</p>
+        <button class="btn btn-primary" (click)="load()">Try Again</button>
+      </div>
+
+      <div class="empty-state" *ngIf="!loading && !error && pets.length === 0">
+        <div class="empty-icon">🐾</div>
+        <h3>No pets found</h3>
+        <p>Try adjusting your filters or check back later.</p>
+        <button class="btn btn-primary" (click)="reset()">Clear Filters</button>
+      </div>
+
+      <div class="pets-grid" *ngIf="!loading && !error && pets.length > 0">
+        <a class="pet-card" *ngFor="let pet of pets" [routerLink]="['/adopt', pet.id]">
+          <div class="pet-image">
+            <img *ngIf="pet.primaryImageUrl" [src]="pet.primaryImageUrl" [alt]="pet.name" />
+            <div *ngIf="!pet.primaryImageUrl" class="pet-placeholder">{{ speciesIcon(pet.species) }}</div>
+            <span class="ready-badge" *ngIf="pet.isAdoptionReady">Ready</span>
+          </div>
+          <div class="pet-info">
+            <div class="pet-header">
+              <h3>{{ pet.name }}</h3>
+              <span class="species-icon">{{ speciesIcon(pet.species) }}</span>
+            </div>
+            <p class="pet-meta">{{ pet.breed || pet.species }} · {{ ageLabel(pet.ageMonths) }} · {{ pet.gender }}</p>
+            <p class="pet-city">📍 {{ pet.locationCity }}</p>
+            <div class="pet-tags">
+              <span class="tag green" *ngIf="pet.vaccinationStatus && pet.vaccinationStatus !== 'NOT_VACCINATED'">Vaccinated</span>
+              <span class="tag orange" *ngIf="pet.specialNeeds">Special Needs</span>
+            </div>
+            <p class="pet-ngo">via {{ pet.ngoName }}</p>
+          </div>
+        </a>
+      </div>
+    </main>
+  </div>
+</div>
+
+<petz-footer></petz-footer>

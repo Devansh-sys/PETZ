@@ -64,6 +64,7 @@ public interface NotificationService {
      */
     void notifyAdopterKycDecision(UUID adopterId, UUID applicationId, UUID documentId,
                                   String status, String reason);
+<<<<<<< Updated upstream
 
     // ── Adoption completion + admin notifications (Epic 2.5 + 2.6) ───
     /**
@@ -88,4 +89,6 @@ public interface NotificationService {
 
     /** US-2.6.3 — parties informed of dispute resolution (adopter / NGO owner). */
     void notifyDisputeResolved(UUID userId, UUID disputeId, String action, String resolution);
+=======
+>>>>>>> Stashed changes
 }

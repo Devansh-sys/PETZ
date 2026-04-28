@@ -1,6 +1,10 @@
 package com.cts.mfrp.petzbackend.hospital.dto;
 
 import com.cts.mfrp.petzbackend.hospital.model.Hospital;
+<<<<<<< Updated upstream
+=======
+import com.fasterxml.jackson.annotation.JsonProperty;
+>>>>>>> Stashed changes
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -22,8 +26,15 @@ public class HospitalResponse {
     private String operatingHours;
     /** Structured per-day hours JSON (US-3.2.4 AC#1). Null until first update. */
     private String operatingHoursJson;
+<<<<<<< Updated upstream
     private boolean isVerified;
     private boolean emergencyReady;
+=======
+    @JsonProperty("isVerified")
+    private boolean isVerified;
+    private boolean emergencyReady;
+    @JsonProperty("isOpenNow")
+>>>>>>> Stashed changes
     private boolean isOpenNow;
     /**
      * US-3.2.1 AC#3 — "Status: Pending" — derived from isVerified.

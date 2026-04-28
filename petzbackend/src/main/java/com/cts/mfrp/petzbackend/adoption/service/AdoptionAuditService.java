@@ -1,16 +1,25 @@
 package com.cts.mfrp.petzbackend.adoption.service;
 
+<<<<<<< Updated upstream
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.AuditLogResponse;
 import com.cts.mfrp.petzbackend.adoption.dto.PageResponse;
+=======
+>>>>>>> Stashed changes
 import com.cts.mfrp.petzbackend.adoption.enums.AuditTargetType;
 import com.cts.mfrp.petzbackend.adoption.model.AdoptionAuditLog;
 import com.cts.mfrp.petzbackend.adoption.repository.AdoptionAuditLogRepository;
 import lombok.RequiredArgsConstructor;
+<<<<<<< Updated upstream
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+=======
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+>>>>>>> Stashed changes
 import java.util.List;
 import java.util.UUID;
 
@@ -69,6 +78,7 @@ public class AdoptionAuditService {
         return auditRepo.findByTargetTypeAndTargetIdOrderByPerformedAtDesc(
                 targetType, targetId);
     }
+<<<<<<< Updated upstream
 
     /**
      * US-4.3 — paginated admin audit-log query with optional filters.
@@ -87,4 +97,6 @@ public class AdoptionAuditService {
                 PageRequest.of(page, size));
         return PageResponse.from(result, AuditLogResponse::from);
     }
+=======
+>>>>>>> Stashed changes
 }

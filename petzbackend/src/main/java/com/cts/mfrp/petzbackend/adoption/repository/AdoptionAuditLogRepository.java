@@ -2,6 +2,7 @@ package com.cts.mfrp.petzbackend.adoption.repository;
 
 import com.cts.mfrp.petzbackend.adoption.enums.AuditTargetType;
 import com.cts.mfrp.petzbackend.adoption.model.AdoptionAuditLog;
+<<<<<<< Updated upstream
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +11,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+=======
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+>>>>>>> Stashed changes
 import java.util.List;
 import java.util.UUID;
 
@@ -25,6 +31,7 @@ public interface AdoptionAuditLogRepository extends JpaRepository<AdoptionAuditL
     /** Audit history for a given entity, newest first. */
     List<AdoptionAuditLog> findByTargetTypeAndTargetIdOrderByPerformedAtDesc(
             AuditTargetType targetType, UUID targetId);
+<<<<<<< Updated upstream
 
     /**
      * US-4.3 — unified admin audit log query with optional filters.
@@ -46,4 +53,6 @@ public interface AdoptionAuditLogRepository extends JpaRepository<AdoptionAuditL
             @Param("from")       LocalDateTime from,
             @Param("to")         LocalDateTime to,
             Pageable pageable);
+=======
+>>>>>>> Stashed changes
 }

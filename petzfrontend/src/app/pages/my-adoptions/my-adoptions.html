@@ -1,0 +1,39 @@
+<petz-navbar></petz-navbar>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <h1>My Adoption Applications</h1>
+    <a routerLink="/adopt" class="btn btn-primary">Browse Pets</a>
+  </div>
+
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+  <div class="error-state" *ngIf="error && !loading"><p>{{ error }}</p></div>
+
+  <div class="empty-state" *ngIf="!loading && !error && applications.length === 0">
+    <div class="empty-icon">🐾</div>
+    <h3>No applications yet</h3>
+    <p>Find a pet you love and start the adoption process.</p>
+    <a routerLink="/adopt" class="btn btn-primary">Browse Available Pets</a>
+  </div>
+
+  <div class="apps-list" *ngIf="!loading && !error && applications.length > 0">
+    <a class="app-card" *ngFor="let app of applications"
+       [routerLink]="['/adopt', app.adoptablePetId, 'apply']"
+       [queryParams]="{applicationId: app.id}">
+      <div class="app-icon">🐾</div>
+      <div class="app-info">
+        <h3>{{ app.petName || 'Adoption Application' }}</h3>
+        <p class="app-sub">Applied {{ (app.submittedAt || app.lastActivityAt) | date:'mediumDate' }}</p>
+        <p class="app-updated" *ngIf="app.lastActivityAt && app.lastActivityAt !== app.submittedAt">
+          Updated {{ app.lastActivityAt | date:'mediumDate' }}
+        </p>
+      </div>
+      <div class="app-status">
+        <span class="status-badge" [class]="statusClass(app.status)">{{ statusLabel(app.status) }}</span>
+        <span class="arrow">→</span>
+      </div>
+    </a>
+  </div>
+</div>
+
+<petz-footer></petz-footer>

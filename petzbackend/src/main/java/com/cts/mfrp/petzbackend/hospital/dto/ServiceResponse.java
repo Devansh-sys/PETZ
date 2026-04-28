@@ -13,7 +13,17 @@ import java.util.UUID;
 @Data @Builder
 public class ServiceResponse {
     private UUID       id;
+<<<<<<< Updated upstream
     private String     serviceName;
     private String     serviceType;
     private BigDecimal price;
+=======
+    private UUID       hospitalId;
+    private String     serviceName;
+    private String     description;
+    private String     serviceType;
+    private BigDecimal price;
+    private boolean    emergencyDedicated;
+    private boolean    active;
+>>>>>>> Stashed changes
 }

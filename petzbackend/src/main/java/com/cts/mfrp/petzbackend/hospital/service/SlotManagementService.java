@@ -207,6 +207,10 @@ public class SlotManagementService {
                 .durationMinutes(a.getDurationMinutes())
                 .slotStatus(a.getSlotStatus() != null ? a.getSlotStatus().name() : null)
                 .bookingType(a.getBookingType() != null ? a.getBookingType().name() : null)
+<<<<<<< Updated upstream
+=======
+                .available(a.getSlotStatus() == null || a.getSlotStatus() == Appointment.SlotStatus.AVAILABLE)
+>>>>>>> Stashed changes
                 .build();
     }
 

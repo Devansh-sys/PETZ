@@ -10,18 +10,27 @@ import com.cts.mfrp.petzbackend.adoption.dto.KycDocumentDtos.VerifyRequest;
 import com.cts.mfrp.petzbackend.adoption.dto.PageResponse;
 import com.cts.mfrp.petzbackend.adoption.service.AdoptionReviewService;
 import com.cts.mfrp.petzbackend.common.dto.ApiResponse;
+<<<<<<< Updated upstream
 import com.cts.mfrp.petzbackend.user.model.User;
 import com.cts.mfrp.petzbackend.user.repository.UserRepository;
+=======
+>>>>>>> Stashed changes
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+<<<<<<< Updated upstream
 import org.springframework.security.access.prepost.PreAuthorize;
+=======
+>>>>>>> Stashed changes
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+<<<<<<< Updated upstream
 import java.util.Optional;
+=======
+>>>>>>> Stashed changes
 import java.util.UUID;
 
 /**
@@ -41,6 +50,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/ngo/adoption-applications")
 @RequiredArgsConstructor
+<<<<<<< Updated upstream
 // US-4.1.3 — NGO review queue is restricted to NGO_REP / ADMIN when a JWT
 // is present. Dev-mode (no JWT) remains open for existing X-User-Id flows.
 @PreAuthorize("hasAnyRole('NGO_REP','ADMIN') or !isAuthenticated()")
@@ -48,6 +58,11 @@ public class AdoptionReviewController {
 
     private final AdoptionReviewService reviewService;
     private final UserRepository        userRepo;
+=======
+public class AdoptionReviewController {
+
+    private final AdoptionReviewService reviewService;
+>>>>>>> Stashed changes
 
     // US-2.4.1 — list with filters + pagination
     @GetMapping
@@ -162,8 +177,13 @@ public class AdoptionReviewController {
     }
 
     private UUID resolveNgoId(UUID principalUserId, UUID headerUserId) {
+<<<<<<< Updated upstream
         UUID actor = resolveActor(principalUserId, headerUserId);
         Optional<User> user = userRepo.findById(actor);
         return user.map(User::getNgoId).orElse(null);
+=======
+        // User entity has no ngoId field; fall back to body-supplied ngoId
+        return null;
+>>>>>>> Stashed changes
     }
 }
