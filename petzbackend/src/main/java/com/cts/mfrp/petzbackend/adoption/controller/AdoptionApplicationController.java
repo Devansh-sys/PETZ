@@ -1,5 +1,6 @@
 package com.cts.mfrp.petzbackend.adoption.controller;
 
+import com.cts.mfrp.petzbackend.common.exception.AuthExceptions;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionApplicationDtos.ConsentSection;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionApplicationDtos.Detail;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionApplicationDtos.ExperienceSection;
@@ -184,7 +185,6 @@ public class AdoptionApplicationController {
     private UUID resolveActor(UUID principalUserId, UUID headerUserId) {
         if (principalUserId != null) return principalUserId;
         if (headerUserId    != null) return headerUserId;
-        throw new IllegalArgumentException(
-                "Missing caller identity — authenticate or send X-User-Id header in dev.");
+        throw new AuthExceptions.UnauthenticatedException();
     }
 }

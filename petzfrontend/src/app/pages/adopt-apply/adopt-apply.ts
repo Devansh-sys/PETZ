@@ -19,6 +19,7 @@ export class AdoptApply implements OnInit {
   applicationId = '';
   step: Step = 'personal';
   saving = false;
+  starting = false;
   error = '';
   submitted = false;
 
@@ -38,19 +39,24 @@ export class AdoptApply implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.petId = this.route.snapshot.paramMap.get('petId')!;
+    this.petId = this.route.snapshot.paramMap.get('id')!;
     const userId = this.auth.session()?.userId!;
     const existingId = this.route.snapshot.queryParamMap.get('applicationId');
     if (existingId) { this.applicationId = existingId; return; }
+    this.starting = true;
     this.adoptionService.startApplication(this.petId, userId).subscribe({
-      next: (app) => { this.applicationId = app.id; },
-      error: () => { this.error = 'Could not start application. Please try again.'; }
+      next: (app) => { this.applicationId = app.id; this.starting = false; },
+      error: () => { this.error = 'Could not start application. Please try again.'; this.starting = false; }
     });
   }
 
   get stepIndex(): number { return this.steps.indexOf(this.step); }
 
   saveAndNext(): void {
+    if (!this.applicationId) {
+      this.error = 'Application is still initializing. Please wait a moment.';
+      return;
+    }
     this.saving = true;
     this.error = '';
     let call$;
