@@ -321,6 +321,8 @@ public class AdoptablePetService {
         return switch (sort.toLowerCase()) {
             case "ready" -> Sort.by(Sort.Order.desc("isAdoptionReady"),
                                     Sort.Order.desc("createdAt"));
+            case "youngest" -> Sort.by(Sort.Direction.ASC, "ageMonths");
+            case "oldest", "oldest_pet" -> Sort.by(Sort.Direction.DESC, "ageMonths");
             case "newest", "nearest" -> Sort.by(Sort.Direction.DESC, "createdAt");
             default -> Sort.by(Sort.Direction.DESC, "createdAt");
         };

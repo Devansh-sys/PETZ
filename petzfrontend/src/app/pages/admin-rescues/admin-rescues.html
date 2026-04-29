@@ -10,10 +10,12 @@
 
   <div class="filter-bar">
     <button class="filter-btn" [class.active]="filterStatus === ''" (click)="filterStatus = ''; load()">All</button>
-    <button class="filter-btn" [class.active]="filterStatus === 'PENDING'" (click)="filterStatus = 'PENDING'; load()">Pending</button>
-    <button class="filter-btn" [class.active]="filterStatus === 'ASSIGNED'" (click)="filterStatus = 'ASSIGNED'; load()">Assigned</button>
-    <button class="filter-btn" [class.active]="filterStatus === 'IN_PROGRESS'" (click)="filterStatus = 'IN_PROGRESS'; load()">In Progress</button>
-    <button class="filter-btn" [class.active]="filterStatus === 'COMPLETED'" (click)="filterStatus = 'COMPLETED'; load()">Completed</button>
+    <button class="filter-btn" [class.active]="filterStatus === 'REPORTED'" (click)="filterStatus = 'REPORTED'; load()">Reported</button>
+    <button class="filter-btn" [class.active]="filterStatus === 'DISPATCHED'" (click)="filterStatus = 'DISPATCHED'; load()">Dispatched</button>
+    <button class="filter-btn" [class.active]="filterStatus === 'ON_SITE'" (click)="filterStatus = 'ON_SITE'; load()">On Site</button>
+    <button class="filter-btn" [class.active]="filterStatus === 'TRANSPORTING'" (click)="filterStatus = 'TRANSPORTING'; load()">Transporting</button>
+    <button class="filter-btn" [class.active]="filterStatus === 'COMPLETE'" (click)="filterStatus = 'COMPLETE'; load()">Complete</button>
+    <button class="filter-btn" [class.active]="filterStatus === 'FLAGGED'" (click)="filterStatus = 'FLAGGED'; load()">Flagged</button>
   </div>
 
   <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>

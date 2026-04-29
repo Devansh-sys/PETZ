@@ -47,6 +47,8 @@ export const routes: Routes = [
 
   // Adoption — public browsing + protected apply/manage
   { path: 'adopt', loadComponent: () => import('./pages/adopt/adopt').then(m => m.Adopt) },
+  // Static sub-paths MUST be declared before the :id route so they win the match.
+  { path: 'adopt/my-applications', loadComponent: () => import('./pages/my-adoptions/my-adoptions').then(m => m.MyAdoptions), canActivate: [authGuard] },
   { path: 'adopt/:id', loadComponent: () => import('./pages/adopt-detail/adopt-detail').then(m => m.AdoptDetail) },
   { path: 'adopt/:id/apply', loadComponent: () => import('./pages/adopt-apply/adopt-apply').then(m => m.AdoptApply), canActivate: [authGuard] },
   { path: 'my-adoptions', loadComponent: () => import('./pages/my-adoptions/my-adoptions').then(m => m.MyAdoptions), canActivate: [authGuard] },

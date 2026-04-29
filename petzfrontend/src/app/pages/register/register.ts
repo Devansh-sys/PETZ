@@ -28,10 +28,17 @@ export class Register {
   otp = signal('');
   fullName = signal('');
   email = signal('');
+  password = signal('');
+  confirmPassword = signal('');
+  passwordVisible = signal(false);
+  confirmVisible = signal(false);
   loading = signal(false);
   error = signal<string | null>(null);
   resendCooldown = signal(0);
   private cooldownTimer?: number;
+
+  togglePasswordVisibility(): void { this.passwordVisible.update(v => !v); }
+  toggleConfirmVisibility(): void { this.confirmVisible.update(v => !v); }
 
   get normalizedPhone(): string {
     const raw = this.phone().trim();
@@ -42,7 +49,13 @@ export class Register {
 
   get canPhone(): boolean { return PHONE_RE.test(this.normalizedPhone); }
   get canOtp(): boolean { return /^\d{6}$/.test(this.otp()); }
-  get canProfile(): boolean { return this.fullName().trim().length >= 2 && /\S+@\S+\.\S+/.test(this.email()); }
+  get passwordsMatch(): boolean { return this.password() === this.confirmPassword(); }
+  get canProfile(): boolean {
+    return this.fullName().trim().length >= 2
+      && /\S+@\S+\.\S+/.test(this.email())
+      && this.password().length >= 8
+      && this.passwordsMatch;
+  }
 
   async sendOtp(): Promise<void> {
     if (!this.canPhone || this.loading()) return;
@@ -90,7 +103,7 @@ export class Register {
     this.error.set(null);
     this.http.post<any>(
       `${environment.apiBaseUrl}/auth/convert-session?userId=${session.userId}`,
-      { fullName: this.fullName().trim(), email: this.email().trim(), password: 'Petz@2025!' }
+      { fullName: this.fullName().trim(), email: this.email().trim(), password: this.password() }
     ).subscribe({
       next: (res) => {
         this.auth.updateSession({

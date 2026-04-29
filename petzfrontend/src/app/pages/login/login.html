@@ -62,7 +62,16 @@
 
       <div class="field">
         <label>Password</label>
-        <input type="password" placeholder="Your password" [value]="password()" (input)="password.set($any($event.target).value)" (keyup.enter)="passwordLogin()" />
+        <div class="password-wrap">
+          <input [type]="passwordVisible() ? 'text' : 'password'" placeholder="Your password"
+            [value]="password()" (input)="password.set($any($event.target).value)" (keyup.enter)="passwordLogin()" autocomplete="current-password" />
+          <button type="button" class="password-toggle" (click)="togglePasswordVisibility()"
+            [attr.aria-label]="passwordVisible() ? 'Hide password' : 'Show password'"
+            [attr.aria-pressed]="passwordVisible()">
+            <span *ngIf="!passwordVisible()">👁️ Show</span>
+            <span *ngIf="passwordVisible()">🙈 Hide</span>
+          </button>
+        </div>
       </div>
 
       <div *ngIf="error()" class="alert error mt">⚠️ {{ error() }}</div>

@@ -26,7 +26,7 @@ export class AdminDashboard implements OnInit {
     forkJoin({
       kpis: this.http.get<any>(`${this.base}/admin/kpis`)
         .pipe(map(r => r.data ?? r), catchError(() => of(null))),
-      pending: this.http.get<any>(`${this.base}/admin/hospitals?verified=false`)
+      pending: this.http.get<any>(`${this.base}/admin/hospitals/pending`)
         .pipe(map(r => r.data ?? r), catchError(() => of([])))
     }).subscribe({
       next: ({ kpis, pending }) => {

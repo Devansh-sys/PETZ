@@ -304,3 +304,123 @@ SELECT UNHEX(MD5(CONCAT(HEX(h.id), '-SL-D2-PM'))),
        30, 'AVAILABLE', 'ROUTINE', 0, NOW(), NOW()
 FROM hospitals h WHERE h.is_verified = 1
   AND NOT EXISTS (SELECT 1 FROM appointments a WHERE a.hospital_id = h.id AND a.slot_status = 'AVAILABLE' AND a.appointment_date = DATE_ADD(CURDATE(), INTERVAL 2 DAY) AND a.appointment_time = '14:00:00');
+
+-- ═════════════════════════════════════════════════════════════════════════════
+-- SESSION 2026-04-29 — schema fixes + demo accounts + 4-hour shift slot seeding
+-- ═════════════════════════════════════════════════════════════════════════════
+-- These statements are idempotent. Spring Boot runs data.sql on every restart
+-- (spring.sql.init.mode=always, jpa.defer-datasource-initialization=true), so
+-- each ALTER uses IF EXISTS / IF NOT EXISTS, every UPDATE re-asserts state, and
+-- every INSERT uses IGNORE keyed on UUID-derived deterministic IDs.
+
+-- ── Schema cleanup: drop orphan NOT-NULL columns left over from old entities ──
+-- MySQL's ALTER TABLE ... DROP INDEX has no IF EXISTS form, so wrap each ALTER
+-- in a conditional PREPARE that no-ops when the index/column is already gone.
+-- Fresh installs run the no-ops; legacy installs perform the drops.
+
+SET @sql := IF(
+    (SELECT COUNT(*) FROM information_schema.STATISTICS
+       WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME   = 'hospital_audit_logs'
+         AND INDEX_NAME   = 'idx_audit_clinic') > 0,
+    'ALTER TABLE hospital_audit_logs DROP INDEX idx_audit_clinic',
+    'DO 0');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @sql := IF(
+    (SELECT COUNT(*) FROM information_schema.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME   = 'hospital_audit_logs'
+         AND COLUMN_NAME  = 'clinic_id') > 0,
+    'ALTER TABLE hospital_audit_logs DROP COLUMN clinic_id',
+    'DO 0');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Make appointments.appointment_type tolerant of inserts that don't set it.
+-- The current entity has no field for this column; it was kept as a NOT NULL
+-- enum from a previous schema. Adding a default lets every API path that
+-- writes to `appointments` succeed without code changes. Skip if the column
+-- isn't present (fresh installs from current entities don't create it).
+SET @sql := IF(
+    (SELECT COUNT(*) FROM information_schema.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME   = 'appointments'
+         AND COLUMN_NAME  = 'appointment_type') > 0,
+    'ALTER TABLE appointments MODIFY appointment_type ENUM(''EMERGENCY'',''ROUTINE'') NOT NULL DEFAULT ''ROUTINE''',
+    'DO 0');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- ── Demo accounts: one row per role, all with password Petz@1234 ──
+-- BCrypt hash of "Petz@1234" (cost=10). Re-using the same hash across rows is
+-- intentional and dev-only; production accounts hash unique passwords each.
+SET @petz_pwd = '$2a$10$FRaElkIfKSxPqegRndfQL.MDfm5EZQgb00X0uhym9pyuxzPEn6CWK';
+
+-- Upsert two extra demo users so every PETZ role has at least one login. The
+-- ADMIN, NGO_REP, ADOPTER and REPORTER rows are already created by DataSeeder
+-- on a fresh DB; this block only adds VOLUNTEER and VET if missing.
+INSERT IGNORE INTO users (
+    id, role, full_name, phone, email, password,
+    active, email_verified, phone_verified, is_temporary,
+    failed_login_attempts, created_at
+) VALUES
+  (UNHEX(REPLACE('a0000000-0000-0000-0000-000000000001','-','')),
+   'VOLUNTEER', 'Volunteer Demo', '+919000010001', 'volunteer@petz.dev',
+   @petz_pwd, 1, 1, 1, 0, 0, NOW()),
+  (UNHEX(REPLACE('a0000000-0000-0000-0000-000000000002','-','')),
+   'VET',       'Dr. Vet Demo',   '+919000010002', 'vet@petz.dev',
+   @petz_pwd, 1, 1, 1, 0, 0, NOW());
+
+-- Re-assert known-good password + activation flags for every demo account.
+-- Lets a teammate log in with Petz@1234 even after a wrong-password lockout.
+UPDATE users
+SET password = @petz_pwd,
+    active = 1,
+    email_verified = 1,
+    phone_verified = 1,
+    failed_login_attempts = 0,
+    locked_until = NULL
+WHERE email IN (
+    'admin@petz.dev',
+    'ngo@petz.dev',
+    'owner@petz.test',
+    'john@test.com',
+    'volunteer@petz.dev',
+    'vet@petz.dev'
+);
+
+-- ── 4-hour shift slots × 12 days per doctor (96 slots/doctor, 768 total) ──
+-- Each active doctor gets 8 × 30-minute AVAILABLE slots on each of 12
+-- pre-chosen day-offsets in the next 30 days. Half the doctors run a 09:00
+-- morning shift (deterministic from the doctor's UUID), the other half
+-- a 14:00 afternoon shift — gives the booking-page calendar a varied feel.
+-- Slot IDs are derived from MD5(doctor_id || day_offset || slot_idx) so the
+-- block is fully idempotent: re-runs INSERT IGNORE the same rows.
+INSERT IGNORE INTO appointments (
+    id, hospital_id, doctor_id, appointment_date, appointment_time, end_time,
+    duration_minutes, slot_status, booking_type, version, created_at, updated_at
+)
+SELECT
+    UNHEX(MD5(CONCAT(HEX(d.id), '-', LPAD(days.n, 2, '0'), '-', slots.n))),
+    d.hospital_id,
+    d.id,
+    DATE_ADD(CURDATE(), INTERVAL days.n DAY),
+    SEC_TO_TIME(
+        IF(MOD(ASCII(SUBSTRING(HEX(d.id), 1, 1)), 2) = 0, 9, 14) * 3600
+        + slots.n * 1800
+    ),
+    SEC_TO_TIME(
+        IF(MOD(ASCII(SUBSTRING(HEX(d.id), 1, 1)), 2) = 0, 9, 14) * 3600
+        + (slots.n + 1) * 1800
+    ),
+    30, 'AVAILABLE', 'ROUTINE', 0, NOW(), NOW()
+FROM doctors d
+CROSS JOIN (
+    SELECT 1  AS n UNION ALL SELECT 3  UNION ALL SELECT 5  UNION ALL SELECT 7
+    UNION ALL SELECT 9  UNION ALL SELECT 11 UNION ALL SELECT 14 UNION ALL SELECT 17
+    UNION ALL SELECT 20 UNION ALL SELECT 23 UNION ALL SELECT 26 UNION ALL SELECT 29
+) AS days
+CROSS JOIN (
+    SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3
+    UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7
+) AS slots
+WHERE d.is_active = 1;

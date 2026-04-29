@@ -46,7 +46,14 @@ public class AppointmentHistoryService {
             appointments = appointmentRepository.findByUserIdOrderByAppointmentDateDesc(userId);
         }
 
-        return appointments.stream().map(this::toHistoryResponse).collect(Collectors.toList());
+        // Exclude rows that exist only because of a transient slot lock
+        // (status = NULL, set by AppointmentBookingService.lockSlot before
+        // the user actually confirms). Without this filter, abandoned
+        // checkouts pollute "My Appointments" with petId-less ghost rows.
+        return appointments.stream()
+                .filter(a -> a.getStatus() != null)
+                .map(this::toHistoryResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
