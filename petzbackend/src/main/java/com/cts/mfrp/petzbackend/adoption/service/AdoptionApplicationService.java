@@ -10,6 +10,7 @@ import com.cts.mfrp.petzbackend.adoption.dto.AdoptionApplicationDtos.StatusHisto
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionApplicationDtos.Summary;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionApplicationDtos.WithdrawRequest;
 import com.cts.mfrp.petzbackend.adoption.dto.KycDocumentDtos.DocumentResponse;
+import com.cts.mfrp.petzbackend.adoption.enums.AdoptablePetStatus;
 import com.cts.mfrp.petzbackend.adoption.enums.AdoptionApplicationStatus;
 import com.cts.mfrp.petzbackend.adoption.enums.ApplicationStep;
 import com.cts.mfrp.petzbackend.adoption.enums.AuditTargetType;
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -60,6 +62,11 @@ public class AdoptionApplicationService {
             AdoptionApplicationStatus.UNDER_REVIEW,
             AdoptionApplicationStatus.CLARIFICATION_REQUESTED);
 
+    private static final List<AdoptionApplicationStatus> SUBMITTED_STATUSES = List.of(
+            AdoptionApplicationStatus.SUBMITTED,
+            AdoptionApplicationStatus.UNDER_REVIEW,
+            AdoptionApplicationStatus.CLARIFICATION_REQUESTED);
+
     private final AdoptionApplicationRepository appRepo;
     private final AdoptablePetRepository        petRepo;
     private final KycDocumentRepository         docRepo;
@@ -79,21 +86,22 @@ public class AdoptionApplicationService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "AdoptablePet", req.getAdoptablePetId()));
 
-        // Only pets in LISTED / ON_HOLD can receive new applications.
-        if (pet.getStatus() == null || !pet.getStatus().name().matches("LISTED|ON_HOLD")) {
-            throw new IllegalStateException(
-                    "Pet is not currently accepting applications (status="
-                            + pet.getStatus() + ").");
+        // If this adopter already has an active application, let them resume regardless of pet status.
+        Optional<AdoptionApplication> existing = appRepo.findFirstByAdopterIdAndAdoptablePetIdAndStatusIn(
+                adopterId, pet.getId(), ACTIVE_STATUSES);
+        if (existing.isPresent()) {
+            return toDetail(existing.get());
         }
 
-        // AC#2 — one active application per (adopter, pet).
-        appRepo.findFirstByAdopterIdAndAdoptablePetIdAndStatusIn(
-                        adopterId, pet.getId(), ACTIVE_STATUSES)
-                .ifPresent(existing -> {
-                    throw new IllegalStateException(
-                            "You already have an active application for this pet ("
-                                    + existing.getStatus() + ").");
-                });
+        // No existing application — check pet availability for new applications.
+        if (pet.getStatus() == AdoptablePetStatus.ON_HOLD) {
+            throw new IllegalStateException(
+                    "This pet is currently under consideration by another adopter.");
+        }
+        if (pet.getStatus() != AdoptablePetStatus.LISTED) {
+            throw new IllegalStateException(
+                    "Pet is not currently accepting applications (status=" + pet.getStatus() + ").");
+        }
 
         AdoptionApplication app = AdoptionApplication.builder()
                 .adopterId(adopterId)
@@ -196,6 +204,14 @@ public class AdoptionApplicationService {
         app.setLastActivityAt(LocalDateTime.now());
         AdoptionApplication saved = appRepo.save(app);
 
+        // Put pet ON_HOLD so no other adopter can start a new application.
+        petRepo.findById(saved.getAdoptablePetId()).ifPresent(p -> {
+            if (p.getStatus() == AdoptablePetStatus.LISTED) {
+                p.setStatus(AdoptablePetStatus.ON_HOLD);
+                petRepo.save(p);
+            }
+        });
+
         auditService.log(AuditTargetType.APPLICATION, saved.getId(), adopterId,
                 "APPLICATION_SUBMITTED", null, null);
 
@@ -243,16 +259,29 @@ public class AdoptionApplicationService {
         String reason = req != null ? req.getReason() : null;
         AdoptionApplication saved = appRepo.save(app);
 
+        // Release pet back to LISTED if no other active submissions remain.
+        releaseIfNoActiveSubmissions(saved.getAdoptablePetId());
+
         auditService.log(AuditTargetType.APPLICATION, saved.getId(), adopterId,
                 "WITHDRAWN", reason, null);
 
-        // US-2.3.6 AC#3 — NGO notified; AC#4 "Slot freed" — application no
-        // longer counts as active, so new adopters can apply for this pet.
         notifications.notifyNgoNewApplication(saved.getNgoId(), saved.getId(),
                 "Application withdrawn by adopter");
 
         log.info("Application {} withdrawn by adopter {}", saved.getId(), adopterId);
         return toDetail(saved);
+    }
+
+    private void releaseIfNoActiveSubmissions(UUID petId) {
+        boolean hasActive = !appRepo.findByAdoptablePetIdAndStatusIn(petId, SUBMITTED_STATUSES).isEmpty();
+        if (!hasActive) {
+            petRepo.findById(petId).ifPresent(p -> {
+                if (p.getStatus() == AdoptablePetStatus.ON_HOLD) {
+                    p.setStatus(AdoptablePetStatus.LISTED);
+                    petRepo.save(p);
+                }
+            });
+        }
     }
 
     // ─── helpers ─────────────────────────────────────────────────────

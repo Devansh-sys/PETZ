@@ -80,7 +80,9 @@
           <div class="pet-image">
             <img *ngIf="pet.primaryImageUrl" [src]="pet.primaryImageUrl" [alt]="pet.name" />
             <div *ngIf="!pet.primaryImageUrl" class="pet-placeholder">{{ speciesIcon(pet.species) }}</div>
-            <span class="ready-badge" *ngIf="pet.isAdoptionReady">Ready</span>
+            <span class="ready-badge" *ngIf="pet.isAdoptionReady && pet.status === 'LISTED'">Ready</span>
+            <span class="status-badge on-hold" *ngIf="pet.status === 'ON_HOLD'">Under Consideration</span>
+            <span class="status-badge adopted" *ngIf="pet.status === 'ADOPTED'">Adopted</span>
           </div>
           <div class="pet-info">
             <div class="pet-header">

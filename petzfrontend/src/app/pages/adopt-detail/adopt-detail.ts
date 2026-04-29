@@ -41,7 +41,24 @@ export class AdoptDetail implements OnInit {
 
   selectImage(url: string): void { this.selectedImage = url; }
 
+  get applyLabel(): string {
+    if (!this.pet) return '';
+    if (this.pet.status === 'ON_HOLD') return 'Under Consideration';
+    if (this.pet.status === 'ADOPTED') return 'Already Adopted';
+    if (this.pet.status === 'ARCHIVED') return 'No Longer Listed';
+    return this.pet.isAdoptionReady ? `Apply to Adopt ${this.pet.name}` : 'Not Available Yet';
+  }
+
+  get applyDisabled(): boolean {
+    if (!this.pet) return true;
+    return this.pet.status === 'ON_HOLD'
+      || this.pet.status === 'ADOPTED'
+      || this.pet.status === 'ARCHIVED'
+      || !this.pet.isAdoptionReady;
+  }
+
   applyToAdopt(): void {
+    if (this.applyDisabled) return;
     if (!this.auth.isAuthenticated()) {
       this.router.navigate(['/login'], { queryParams: { redirect: `/adopt/${this.pet!.id}/apply` } });
       return;

@@ -64,8 +64,21 @@
             <p class="ngo-name">🏢 {{ pet.ngoName }}</p>
           </div>
 
-          <button class="btn btn-primary apply-btn" (click)="applyToAdopt()" [disabled]="!pet.isAdoptionReady">
-            {{ pet.isAdoptionReady ? 'Apply to Adopt ' + pet.name : 'Not Available Yet' }}
+          <div class="status-notice" *ngIf="pet.status === 'ON_HOLD'">
+            <span>⏳</span>
+            <span>This pet is currently being considered by another adopter. Check back if the application is not approved.</span>
+          </div>
+          <div class="status-notice adopted" *ngIf="pet.status === 'ADOPTED'">
+            <span>🏠</span>
+            <span>This pet has found a home!</span>
+          </div>
+
+          <button class="btn apply-btn"
+            [class.btn-primary]="!applyDisabled"
+            [class.btn-muted]="applyDisabled"
+            (click)="applyToAdopt()"
+            [disabled]="applyDisabled">
+            {{ applyLabel }}
           </button>
         </div>
       </div>
