@@ -7,17 +7,16 @@
   </div>
 
   <div class="filters">
-    <input class="filter-input" type="text" placeholder="Search by name..." [(ngModel)]="filterName" />
-    <input class="filter-input" type="text" placeholder="City..." [(ngModel)]="filterCity" />
+    <input class="filter-input" type="text" placeholder="Search by name..." [(ngModel)]="filterName" (ngModelChange)="load()" />
+    <input class="filter-input" type="text" placeholder="City..." [(ngModel)]="filterCity" (ngModelChange)="load()" />
     <label class="check-label">
-      <input type="checkbox" [(ngModel)]="filterEmergency" />
+      <input type="checkbox" [(ngModel)]="filterEmergency" (change)="load()" />
       Emergency ready
     </label>
     <label class="check-label">
-      <input type="checkbox" [(ngModel)]="filterOpenNow" />
+      <input type="checkbox" [(ngModel)]="filterOpenNow" (change)="load()" />
       Open now
     </label>
-    <button class="btn btn-primary" (click)="load()">Search</button>
     <button class="btn btn-ghost" (click)="reset()">Reset</button>
   </div>
 
@@ -47,7 +46,7 @@
         <div class="hcard-row">📞 {{ h.contactPhone }}</div>
         <div *ngIf="h.operatingHours" class="hcard-row">🕐 {{ h.operatingHours }}</div>
       </div>
-      <a routerLink="/book" class="btn btn-primary hcard-btn">Book Appointment</a>
+      <button class="btn btn-primary hcard-btn" (click)="bookHospital(h)">Book Appointment</button>
     </div>
   </div>
 </div>

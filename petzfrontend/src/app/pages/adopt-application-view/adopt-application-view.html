@@ -1,0 +1,158 @@
+<petz-navbar></petz-navbar>
+
+<div class="view-page">
+  <div class="view-container">
+
+    <div class="loading-state" *ngIf="loading">
+      <div class="spinner"></div><p>Loading application…</p>
+    </div>
+
+    <div class="error-state" *ngIf="error && !loading">
+      <p>{{ error }}</p>
+      <a routerLink="/my-adoptions" class="btn btn-primary">Back to My Adoptions</a>
+    </div>
+
+    <ng-container *ngIf="app && !loading">
+      <div class="view-header">
+        <a routerLink="/my-adoptions" class="back-link">← My Adoptions</a>
+        <div class="header-right">
+          <span class="status-badge" [class]="statusClass(app.status)">{{ statusLabel(app.status) }}</span>
+        </div>
+      </div>
+
+      <div class="view-card">
+        <div class="card-hero">
+          <div class="pet-avatar">🐾</div>
+          <div class="pet-info">
+            <h1>{{ app.petName || 'Adoption Application' }}</h1>
+            <p class="sub">Application ID: <code>{{ app.id.slice(0, 8) }}…</code></p>
+            <p class="sub" *ngIf="app.submittedAt">Submitted {{ app.submittedAt | date:'mediumDate' }}</p>
+            <p class="sub" *ngIf="app.lastActivityAt">Last updated {{ app.lastActivityAt | date:'mediumDate' }}</p>
+          </div>
+        </div>
+
+        <!-- Status notice for non-draft applications -->
+        <div class="status-notice approved" *ngIf="app.status === 'APPROVED'">
+          <span>🎉</span>
+          <div>
+            <strong>Congratulations! Your adoption has been approved.</strong>
+            <p *ngIf="app.ngoComments">{{ app.ngoComments }}</p>
+          </div>
+        </div>
+        <div class="status-notice rejected" *ngIf="app.status === 'REJECTED'">
+          <span>❌</span>
+          <div>
+            <strong>Application not approved</strong>
+            <p *ngIf="app.ngoComments">{{ app.ngoComments }}</p>
+          </div>
+        </div>
+        <div class="status-notice clarification" *ngIf="app.status === 'CLARIFICATION_REQUESTED'">
+          <span>❓</span>
+          <div>
+            <strong>Clarification requested by NGO</strong>
+            <p *ngIf="app.ngoComments">{{ app.ngoComments }}</p>
+          </div>
+        </div>
+
+        <!-- Personal Information -->
+        <div class="section" *ngIf="app.fullName || app.email || app.phone">
+          <h3 class="section-title">Personal Information</h3>
+          <div class="info-grid">
+            <div class="info-item" *ngIf="app.fullName">
+              <span class="info-label">Full Name</span>
+              <span class="info-value">{{ app.fullName }}</span>
+            </div>
+            <div class="info-item" *ngIf="app.email">
+              <span class="info-label">Email</span>
+              <span class="info-value">{{ app.email }}</span>
+            </div>
+            <div class="info-item" *ngIf="app.phone">
+              <span class="info-label">Phone</span>
+              <span class="info-value">{{ app.phone }}</span>
+            </div>
+            <div class="info-item" *ngIf="app.city">
+              <span class="info-label">City</span>
+              <span class="info-value">{{ app.city }}</span>
+            </div>
+            <div class="info-item full" *ngIf="app.addressLine">
+              <span class="info-label">Address</span>
+              <span class="info-value">{{ app.addressLine }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lifestyle -->
+        <div class="section" *ngIf="app.housingType || app.otherPetsCount != null">
+          <h3 class="section-title">Lifestyle</h3>
+          <div class="info-grid">
+            <div class="info-item" *ngIf="app.housingType">
+              <span class="info-label">Housing Type</span>
+              <span class="info-value">{{ app.housingType }}</span>
+            </div>
+            <div class="info-item" *ngIf="app.hasYard != null">
+              <span class="info-label">Has Yard</span>
+              <span class="info-value">{{ app.hasYard ? 'Yes' : 'No' }}</span>
+            </div>
+            <div class="info-item" *ngIf="app.otherPetsCount != null">
+              <span class="info-label">Other Pets</span>
+              <span class="info-value">{{ app.otherPetsCount }}</span>
+            </div>
+            <div class="info-item" *ngIf="app.workScheduleHours != null">
+              <span class="info-label">Work Hours/Day</span>
+              <span class="info-value">{{ app.workScheduleHours }}h</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Experience -->
+        <div class="section" *ngIf="app.prevPetOwnership != null || app.vetSupport">
+          <h3 class="section-title">Experience</h3>
+          <div class="info-grid">
+            <div class="info-item" *ngIf="app.prevPetOwnership != null">
+              <span class="info-label">Previous Pet Owner</span>
+              <span class="info-value">{{ app.prevPetOwnership ? 'Yes' : 'No' }}</span>
+            </div>
+            <div class="info-item full" *ngIf="app.prevPetDetails">
+              <span class="info-label">Pet History</span>
+              <span class="info-value">{{ app.prevPetDetails }}</span>
+            </div>
+            <div class="info-item" *ngIf="app.vetSupport">
+              <span class="info-label">Vet Support</span>
+              <span class="info-value">{{ app.vetSupport }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Consent -->
+        <div class="section">
+          <h3 class="section-title">Consent</h3>
+          <div class="consent-list">
+            <div class="consent-item" [class.granted]="app.consentHomeVisit">
+              <span class="consent-icon">{{ app.consentHomeVisit ? '✓' : '○' }}</span>
+              <span>Home visit consent</span>
+            </div>
+            <div class="consent-item" [class.granted]="app.consentFollowUp">
+              <span class="consent-icon">{{ app.consentFollowUp ? '✓' : '○' }}</span>
+              <span>Follow-up check consent</span>
+            </div>
+            <div class="consent-item" [class.granted]="app.consentBackgroundCheck">
+              <span class="consent-icon">{{ app.consentBackgroundCheck ? '✓' : '○' }}</span>
+              <span>Background check consent</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+          <a [routerLink]="['/adopt', app.adoptablePetId]" class="btn btn-ghost">View Pet</a>
+          <button *ngIf="canWithdraw" class="btn btn-danger" [disabled]="withdrawing" (click)="withdraw()">
+            {{ withdrawing ? 'Withdrawing…' : 'Withdraw Application' }}
+          </button>
+        </div>
+      </div>
+    </ng-container>
+
+  </div>
+</div>
+
+<petz-footer></petz-footer>

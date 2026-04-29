@@ -50,6 +50,7 @@ export const routes: Routes = [
   { path: 'adopt/:id', loadComponent: () => import('./pages/adopt-detail/adopt-detail').then(m => m.AdoptDetail) },
   { path: 'adopt/:id/apply', loadComponent: () => import('./pages/adopt-apply/adopt-apply').then(m => m.AdoptApply), canActivate: [authGuard] },
   { path: 'my-adoptions', loadComponent: () => import('./pages/my-adoptions/my-adoptions').then(m => m.MyAdoptions), canActivate: [authGuard] },
+  { path: 'my-adoptions/:id', loadComponent: () => import('./pages/adopt-application-view/adopt-application-view').then(m => m.AdoptApplicationView), canActivate: [authGuard] },
 
   // NGO portal
   {

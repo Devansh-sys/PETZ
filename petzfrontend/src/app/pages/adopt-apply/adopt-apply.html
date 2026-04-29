@@ -9,7 +9,7 @@
       <h1>Application Submitted!</h1>
       <p>Your adoption application has been sent to the NGO. They will review it and get back to you.</p>
       <div class="success-actions">
-        <a routerLink="/adopt/my-applications" class="btn btn-primary">View My Applications</a>
+        <a routerLink="/my-adoptions" class="btn btn-primary">View My Applications</a>
         <a routerLink="/adopt" class="btn btn-secondary">Browse More Pets</a>
       </div>
     </div>
@@ -135,6 +135,7 @@
             <h3>Personal</h3>
             <div class="review-row"><span>Name</span><strong>{{ personal.fullName || '—' }}</strong></div>
             <div class="review-row"><span>Email</span><strong>{{ personal.email || '—' }}</strong></div>
+            <div class="review-row"><span>Phone</span><strong>{{ personal.phone || '—' }}</strong></div>
             <div class="review-row"><span>City</span><strong>{{ personal.city || '—' }}</strong></div>
             <div class="review-row"><span>Address</span><strong>{{ personal.addressLine || '—' }}</strong></div>
           </div>
@@ -152,8 +153,8 @@
             <div class="review-row"><span>Follow-up</span><strong>{{ consent.consentFollowUp ? '✓ Agreed' : '✗ Not agreed' }}</strong></div>
             <div class="review-row"><span>Background Check</span><strong>{{ consent.consentBackgroundCheck ? '✓ Agreed' : '✗ Not agreed' }}</strong></div>
           </div>
-          <div class="alert warn" *ngIf="!consent.agreedToTerms">
-            <span>⚠️</span><span>You must agree to the terms before submitting.</span>
+          <div class="alert warn" *ngIf="!canSubmit">
+            <span>⚠️</span><span>You must agree to all terms and consent checkboxes before submitting.</span>
           </div>
         </div>
       </div>
@@ -165,7 +166,7 @@
         <button class="btn btn-primary" *ngIf="step !== 'review'" (click)="saveAndNext()" [disabled]="saving || starting">
           {{ starting ? 'Initializing…' : saving ? 'Saving…' : 'Save & Continue →' }}
         </button>
-        <button class="btn btn-primary" *ngIf="step === 'review'" (click)="submit()" [disabled]="saving || !consent.agreedToTerms">
+        <button class="btn btn-primary" *ngIf="step === 'review'" (click)="submit()" [disabled]="saving || !canSubmit">
           {{ saving ? 'Submitting…' : 'Submit Application' }}
         </button>
       </div>

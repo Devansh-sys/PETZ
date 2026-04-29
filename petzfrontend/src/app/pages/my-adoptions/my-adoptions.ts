@@ -30,16 +30,16 @@ export class MyAdoptions implements OnInit {
 
   statusLabel(s: string): string {
     const m: Record<string, string> = {
-      DRAFT: 'Draft', PENDING: 'Pending Review', UNDER_REVIEW: 'Under Review',
-      CLARIFICATION_REQUESTED: 'Clarification Needed', APPROVED: 'Approved',
-      REJECTED: 'Rejected', WITHDRAWN: 'Withdrawn'
+      DRAFT: 'Draft', SUBMITTED: 'Submitted', PENDING: 'Pending Review',
+      UNDER_REVIEW: 'Under Review', CLARIFICATION_REQUESTED: 'Clarification Needed',
+      APPROVED: 'Approved', REJECTED: 'Rejected', WITHDRAWN: 'Withdrawn'
     };
     return m[s] ?? s;
   }
 
   statusClass(s: string): string {
     const m: Record<string, string> = {
-      DRAFT: 'grey', PENDING: 'blue', UNDER_REVIEW: 'blue',
+      DRAFT: 'grey', SUBMITTED: 'blue', PENDING: 'blue', UNDER_REVIEW: 'blue',
       CLARIFICATION_REQUESTED: 'orange', APPROVED: 'green',
       REJECTED: 'red', WITHDRAWN: 'grey'
     };
