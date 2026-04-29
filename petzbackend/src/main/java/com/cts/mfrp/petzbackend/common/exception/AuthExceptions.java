@@ -75,4 +75,11 @@ public class AuthExceptions {
             super("This account is disabled. Please contact support.");
         }
     }
+
+    /** No valid authentication — token missing, expired, or invalid. 401. */
+    public static class UnauthenticatedException extends RuntimeException {
+        public UnauthenticatedException() {
+            super("Authentication required. Please log in and try again.");
+        }
+    }
 }
