@@ -4,10 +4,10 @@
   <div class="auth-card">
     <div class="auth-logo">🐾</div>
     <h1>Sign in to PETZ</h1>
-    <p class="auth-sub">We'll send a one-time code to your mobile.</p>
 
     <!-- STEP 1: Phone -->
     <div *ngIf="step() === 'PHONE'">
+      <p class="auth-sub">We'll send a one-time code to your mobile.</p>
       <div class="field">
         <label>Mobile number</label>
         <input type="tel" placeholder="+91 98765 43210" [value]="phone()" (input)="phone.set($any($event.target).value)" (keyup.enter)="sendOtp()" autofocus />
@@ -16,9 +16,13 @@
 
       <div *ngIf="error()" class="alert error mt">⚠️ {{ error() }}</div>
 
-      <button class="btn btn-primary full mt" [disabled]="!canSubmitPhone || loading()" (click)="sendOtp()">
+      <button type="button" class="btn btn-primary full mt" [disabled]="!canSubmitPhone || loading()" (click)="sendOtp()">
         {{ loading() ? 'Sending…' : 'Send OTP' }}
       </button>
+
+      <div class="auth-alt">
+        <button type="button" class="btn-link" (click)="switchToPassword()">Sign in with password instead →</button>
+      </div>
 
       <p class="auth-footer">New to PETZ? <a routerLink="/register">Create account</a></p>
     </div>
@@ -35,15 +39,40 @@
 
       <div *ngIf="error()" class="alert error mt">⚠️ {{ error() }}</div>
 
-      <button class="btn btn-primary full mt" [disabled]="!canSubmitOtp || loading()" (click)="verifyOtp()">
+      <button type="button" class="btn btn-primary full mt" [disabled]="!canSubmitOtp || loading()" (click)="verifyOtp()">
         {{ loading() ? 'Verifying…' : 'Sign In' }}
       </button>
 
       <div class="resend-row">
-        <button class="btn-link" (click)="back()">← Change number</button>
-        <button class="btn-link" [disabled]="resendCooldown() > 0" (click)="resend()">
+        <button type="button" class="btn-link" (click)="back()">← Change number</button>
+        <button type="button" class="btn-link" [disabled]="resendCooldown() > 0" (click)="resend()">
           {{ resendCooldown() > 0 ? 'Resend in ' + resendCooldown() + 's' : 'Resend code' }}
         </button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Password -->
+    <div *ngIf="step() === 'PASSWORD'">
+      <p class="auth-sub">Enter your email or phone and password.</p>
+
+      <div class="field">
+        <label>Email or phone</label>
+        <input type="text" placeholder="you@example.com" [value]="identifier()" (input)="identifier.set($any($event.target).value)" autofocus />
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input type="password" placeholder="Your password" [value]="password()" (input)="password.set($any($event.target).value)" (keyup.enter)="passwordLogin()" />
+      </div>
+
+      <div *ngIf="error()" class="alert error mt">⚠️ {{ error() }}</div>
+
+      <button type="button" class="btn btn-primary full mt" [disabled]="!canSubmitPassword || loading()" (click)="passwordLogin()">
+        {{ loading() ? 'Signing in…' : 'Sign In' }}
+      </button>
+
+      <div class="auth-alt">
+        <button type="button" class="btn-link" (click)="switchToPhone()">← Use phone OTP instead</button>
       </div>
     </div>
   </div>

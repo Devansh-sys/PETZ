@@ -19,7 +19,8 @@
     <a routerLink="/ngo/pets/new" class="btn btn-primary">Add First Pet</a>
   </div>
 
-  <div class="pets-table" *ngIf="!loading && !error && pets.length > 0">
+  <div class="table-scroll" *ngIf="!loading && !error && pets.length > 0">
+  <div class="pets-table">
     <div class="table-row header">
       <span>Pet</span>
       <span>Species / Age</span>
@@ -46,5 +47,6 @@
         </button>
       </div>
     </div>
+  </div>
   </div>
 </div>

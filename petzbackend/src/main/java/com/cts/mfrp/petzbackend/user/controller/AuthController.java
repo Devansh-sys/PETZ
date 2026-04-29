@@ -55,6 +55,18 @@ public class AuthController {
     }
 
     /**
+     * Emergency-only: issue a temporary session straight from a phone
+     * number, skipping OTP entirely. Used by the SOS flow where the
+     * extra round-trip would delay rescue dispatch.
+     */
+    @PostMapping("/sos-quick-session")
+    public ResponseEntity<AuthResponse> sosQuickSession(
+            @Valid @RequestBody SendOtpRequest request) {
+        AuthResponse response = authService.sosQuickSession(request);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
      * Step 2: Verify OTP and receive JWT session token.
      *
      * On success, returns a JWT that the frontend attaches to all

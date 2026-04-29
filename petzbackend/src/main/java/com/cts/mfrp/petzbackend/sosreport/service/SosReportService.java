@@ -4,6 +4,8 @@ import com.cts.mfrp.petzbackend.common.exception.FileValidationException;
 import com.cts.mfrp.petzbackend.common.exception.ResourceNotFoundException;
 import com.cts.mfrp.petzbackend.enums.ReportStatus;
 import com.cts.mfrp.petzbackend.enums.SosMediaType;
+import com.cts.mfrp.petzbackend.rescue.model.RescueMission;
+import com.cts.mfrp.petzbackend.rescue.repository.RescueMissionRepository;
 import com.cts.mfrp.petzbackend.sosmedia.dto.SosMediaResponse;
 import com.cts.mfrp.petzbackend.sosmedia.model.SosMedia;
 import com.cts.mfrp.petzbackend.sosmedia.repository.SosMediaRepository;
@@ -13,8 +15,8 @@ import com.cts.mfrp.petzbackend.sosreport.dto.SosReportResponse;
 import com.cts.mfrp.petzbackend.sosreport.model.SosReport;
 import com.cts.mfrp.petzbackend.sosreport.repository.SosReportRepository;
 import com.cts.mfrp.petzbackend.statuslog.service.StatusLogService;
-import com.cts.mfrp.petzbackend.user.model.User;             // ← adjust path
-import com.cts.mfrp.petzbackend.user.repository.UserRepository; // ← adjust path
+import com.cts.mfrp.petzbackend.user.model.User;
+import com.cts.mfrp.petzbackend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,7 @@ public class SosReportService {
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
     private final StatusLogService statusLogService;
+    private final RescueMissionRepository rescueMissionRepository;
 
     @Transactional
     public SosReportResponse createReport(SosReportCreateRequest request) {
@@ -56,11 +59,19 @@ public class SosReportService {
 
         SosReport saved = sosReportRepository.save(report);
 
-        // 3. Audit trail
+        // 3. Auto-create a rescue mission so the status page can track it immediately
+        RescueMission mission = RescueMission.builder()
+                .sosReport(saved)
+                .rescueStatus(ReportStatus.REPORTED)
+                .sosLat(request.getLatitude() != null ? request.getLatitude().doubleValue() : null)
+                .sosLon(request.getLongitude() != null ? request.getLongitude().doubleValue() : null)
+                .build();
+        rescueMissionRepository.save(mission);
+
+        // 4. Audit trail
         statusLogService.logStatusChange(saved, ReportStatus.REPORTED.name());
 
-        log.info("SOS Report created: id={}, urgency={}",
-                saved.getId(), saved.getUrgencyLevel());
+        log.info("SOS Report created: id={}, urgency={}", saved.getId(), saved.getUrgencyLevel());
 
         return mapToResponse(saved);
     }

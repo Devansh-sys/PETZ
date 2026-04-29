@@ -58,3 +58,11 @@ h3 { font-size: 1.4rem; font-weight: 700; color: var(--deep); margin: 0; }
 
 .state-msg { text-align: center; padding: 60px 0; color: var(--muted); font-size: 15px; }
 .alert.error { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; border-radius: 10px; padding: 14px 18px; font-size: 14px; }
+
+@media (max-width: 600px) {
+  .page-wrap { padding: 28px 14px 60px; }
+  .page-head { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .page-head h1 { font-size: 1.4rem; }
+  .appt-head { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .appt-card { padding: 16px; }
+}

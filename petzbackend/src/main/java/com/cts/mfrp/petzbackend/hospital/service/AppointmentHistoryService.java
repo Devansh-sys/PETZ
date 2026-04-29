@@ -1,14 +1,5 @@
 package com.cts.mfrp.petzbackend.hospital.service;
 
-<<<<<<< Updated upstream
-import com.cts.mfrp.petzbackend.common.exception.ResourceNotFoundException;
-import com.cts.mfrp.petzbackend.hospital.dto.AppointmentHistoryResponse;
-import com.cts.mfrp.petzbackend.hospital.dto.HospitalDashboardResponse;
-import com.cts.mfrp.petzbackend.hospital.model.Appointment;
-import com.cts.mfrp.petzbackend.hospital.model.Hospital;
-import com.cts.mfrp.petzbackend.hospital.repository.AppointmentRepository;
-import com.cts.mfrp.petzbackend.hospital.repository.HospitalRepository;
-=======
 import com.cts.mfrp.petzbackend.hospital.dto.AppointmentHistoryResponse;
 import com.cts.mfrp.petzbackend.hospital.dto.HospitalDashboardResponse;
 import com.cts.mfrp.petzbackend.hospital.model.Appointment;
@@ -19,7 +10,6 @@ import com.cts.mfrp.petzbackend.hospital.repository.AppointmentRepository;
 import com.cts.mfrp.petzbackend.hospital.repository.DoctorRepository;
 import com.cts.mfrp.petzbackend.hospital.repository.HospitalRepository;
 import com.cts.mfrp.petzbackend.hospital.repository.PetRepository;
->>>>>>> Stashed changes
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,12 +24,9 @@ import java.util.stream.Collectors;
 public class AppointmentHistoryService {
 
     private final AppointmentRepository appointmentRepository;
-    private final HospitalRepository hospitalRepository;
-<<<<<<< Updated upstream
-=======
-    private final DoctorRepository doctorRepository;
-    private final PetRepository petRepository;
->>>>>>> Stashed changes
+    private final HospitalRepository    hospitalRepository;
+    private final DoctorRepository      doctorRepository;
+    private final PetRepository         petRepository;
 
     @Transactional(readOnly = true)
     public List<AppointmentHistoryResponse> getUserHistory(
@@ -64,18 +51,18 @@ public class AppointmentHistoryService {
 
     @Transactional(readOnly = true)
     public HospitalDashboardResponse getHospitalDashboard(UUID hospitalId, UUID doctorId) {
-        LocalDate today = LocalDate.now();
+        LocalDate today    = LocalDate.now();
         LocalDate tomorrow = today.plusDays(1);
-        LocalDate weekEnd = today.plusDays(8);
+        LocalDate weekEnd  = today.plusDays(8);
 
         List<Appointment> todayAppointments;
         List<Appointment> upcomingAppointments;
 
         if (doctorId != null) {
-            todayAppointments = appointmentRepository.findByHospitalIdAndDoctorIdAndAppointmentDateOrderByAppointmentTimeAsc(hospitalId, doctorId, today);
+            todayAppointments    = appointmentRepository.findByHospitalIdAndDoctorIdAndAppointmentDateOrderByAppointmentTimeAsc(hospitalId, doctorId, today);
             upcomingAppointments = appointmentRepository.findByHospitalIdAndDoctorIdAndAppointmentDateBetweenOrderByAppointmentDateAscAppointmentTimeAsc(hospitalId, doctorId, tomorrow, weekEnd);
         } else {
-            todayAppointments = appointmentRepository.findByHospitalIdAndAppointmentDateOrderByAppointmentTimeAsc(hospitalId, today);
+            todayAppointments    = appointmentRepository.findByHospitalIdAndAppointmentDateOrderByAppointmentTimeAsc(hospitalId, today);
             upcomingAppointments = appointmentRepository.findByHospitalIdAndAppointmentDateBetweenOrderByAppointmentDateAscAppointmentTimeAsc(hospitalId, tomorrow, weekEnd);
         }
 
@@ -86,22 +73,6 @@ public class AppointmentHistoryService {
     }
 
     private AppointmentHistoryResponse toHistoryResponse(Appointment a) {
-<<<<<<< Updated upstream
-        Hospital hospital = hospitalRepository.findById(a.getHospitalId())
-                .orElse(null);
-
-        return AppointmentHistoryResponse.builder()
-                .appointmentId(a.getId())
-                .petId(a.getPetId())
-                .hospitalId(a.getHospitalId())
-                .hospitalName(hospital != null ? hospital.getName() : null)
-                .hospitalCity(hospital != null ? hospital.getCity() : null)
-                .doctorId(a.getDoctorId())
-                .serviceType(a.getServiceType())
-                .appointmentDate(a.getAppointmentDate())
-                .appointmentTime(a.getAppointmentTime())
-                .status(a.getStatus())
-=======
         Hospital hospital = a.getHospitalId() != null ? hospitalRepository.findById(a.getHospitalId()).orElse(null) : null;
         Doctor   doctor   = a.getDoctorId()   != null ? doctorRepository.findById(a.getDoctorId()).orElse(null)     : null;
         Pet      pet      = a.getPetId()       != null ? petRepository.findById(a.getPetId()).orElse(null)           : null;
@@ -129,7 +100,6 @@ public class AppointmentHistoryService {
                 .appointmentType(a.getBookingType() != null ? a.getBookingType().name() : "ROUTINE")
                 .status(a.getStatus())
                 .bookedAt(a.getCreatedAt())
->>>>>>> Stashed changes
                 .clinicalNotes(a.getClinicalNotes())
                 .build();
     }
@@ -143,8 +113,6 @@ public class AppointmentHistoryService {
                 .appointmentDate(a.getAppointmentDate())
                 .appointmentTime(a.getAppointmentTime())
                 .status(a.getStatus())
-                // US-3.4.5 AC#4 — expose booking type so hospital UI can show
-                // an emergency indicator alongside each appointment row.
                 .bookingType(a.getBookingType() != null ? a.getBookingType().name() : null)
                 .build();
     }

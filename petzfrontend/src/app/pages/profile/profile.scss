@@ -27,3 +27,10 @@
 }
 .link { color: var(--peach); font-weight: 600; }
 .full { width: 100%; margin-top: 8px; }
+
+@media (max-width: 520px) {
+  .page-wrap { margin: 20px auto; padding: 0 12px; }
+  .profile-card { padding: 24px 16px; }
+  .links-grid { grid-template-columns: 1fr; }
+  .detail-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+}

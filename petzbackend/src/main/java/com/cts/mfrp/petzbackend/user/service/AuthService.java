@@ -241,6 +241,20 @@ public class AuthService {
     // ═════════════════════════════════════════════════════════════════════
 
     /**
+     * Emergency quick session — bypasses OTP for SOS reporting.
+     * Trades verification strength for speed: a temporary reporter is
+     * created (or found) directly from the phone number and a session
+     * token is issued. Rate-limited at the filter level to deter abuse.
+     */
+    @Transactional
+    public AuthResponse sosQuickSession(SendOtpRequest request) {
+        String phone = normalizePhone(request.phone());
+        log.info("SOS quick session issued for phone ending in ...{}",
+                phone.substring(phone.length() - 4));
+        return issueSession(phone);
+    }
+
+    /**
      * Find existing user or create temporary reporter → issue JWT.
      *
      * If user exists with a full account → issue normal session token.

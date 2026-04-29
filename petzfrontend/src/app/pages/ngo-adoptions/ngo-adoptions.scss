@@ -36,3 +36,12 @@
   &.grey { background: var(--cream); color: var(--muted); }
 }
 .arrow { color: var(--muted); font-size: 18px; }
+
+@media (max-width: 600px) {
+  .page-wrap { padding: 24px 14px; }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .page-header h1 { font-size: 22px; }
+  .app-main { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .app-right { width: 100%; justify-content: space-between; }
+  .app-card { padding: 16px; }
+}

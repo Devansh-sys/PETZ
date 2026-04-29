@@ -45,3 +45,15 @@
   textarea { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 14px; resize: vertical; box-sizing: border-box; &:focus { outline: none; border-color: var(--peach); } }
 }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
+
+@media (max-width: 640px) {
+  .review-container { padding: 24px 14px; }
+  .review-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .review-header h1 { font-size: 22px; }
+  .review-grid { grid-template-columns: 1fr; }
+  .action-bar { flex-direction: column; }
+  .action-bar button { width: 100%; }
+  .dialog { padding: 24px 16px; }
+  .dialog-actions { flex-direction: column-reverse; }
+  .dialog-actions .btn { width: 100%; }
+}

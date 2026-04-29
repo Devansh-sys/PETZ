@@ -59,3 +59,9 @@ h1 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
   color: var(--muted);
   a { color: var(--peach); font-weight: 600; }
 }
+
+@media (max-width: 480px) {
+  .auth-card { padding: 32px 20px; border-radius: 14px; }
+  h1 { font-size: 22px; }
+  .otp-input { font-size: 22px; letter-spacing: 8px; }
+}

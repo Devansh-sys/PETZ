@@ -63,6 +63,12 @@ input, textarea, select { font-family: inherit; color: inherit; }
 
 .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
 
+@media (max-width: 480px) {
+  .container { padding: 0 16px; }
+  .btn { padding: 12px 20px; font-size: 14px; }
+  .card { padding: 20px 16px; }
+}
+
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field label { font-size: 13px; font-weight: 600; color: var(--ink); }
 .field input, .field textarea {

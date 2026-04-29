@@ -126,3 +126,12 @@ h3 { font-size: 1.4rem; font-weight: 700; color: var(--deep); margin: 0; }
   padding: 14px 18px;
   font-size: 14px;
 }
+
+@media (max-width: 600px) {
+  .page-wrap { padding: 28px 14px 60px; }
+  .page-head { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .page-head h1 { font-size: 1.4rem; }
+  .card-head { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .report-card-item { padding: 16px; }
+  .detail-label { min-width: 70px; }
+}

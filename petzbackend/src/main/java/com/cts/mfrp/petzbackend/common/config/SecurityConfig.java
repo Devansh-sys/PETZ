@@ -53,6 +53,9 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
+                        // ── CORS preflight — must be permitted before any auth check ──
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                         // ── Public endpoints (no auth needed) ──
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/webhook/**").permitAll()

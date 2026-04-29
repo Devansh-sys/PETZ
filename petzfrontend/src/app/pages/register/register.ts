@@ -89,15 +89,13 @@ export class Register {
     this.loading.set(true);
     this.error.set(null);
     this.http.post<any>(
-      `${environment.serverUrl}/api/auth/convert-session?userId=${session.userId}`,
+      `${environment.apiBaseUrl}/auth/convert-session?userId=${session.userId}`,
       { fullName: this.fullName().trim(), email: this.email().trim(), password: 'Petz@2025!' }
     ).subscribe({
       next: (res) => {
-        this.auth.setSession({
-          ...session,
+        this.auth.updateSession({
           accessToken: res.accessToken ?? session.accessToken,
-          isTemporarySession: false,
-          role: session.role
+          isTemporarySession: false
         });
         this.loading.set(false);
         this.router.navigate(['/']);

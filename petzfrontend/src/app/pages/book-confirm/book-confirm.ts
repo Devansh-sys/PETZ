@@ -98,9 +98,24 @@ export class BookConfirm implements OnInit, OnDestroy {
       doctorId: s.doctorId!,
       slotId: s.slotId!
     }).subscribe({
-      next: (conf) => {
+      next: (raw) => {
         clearInterval(this.lockTimer);
-        this.confirmation = conf;
+        this.confirmation = {
+          appointmentId: raw.appointmentId,
+          status: raw.status,
+          appointmentType: raw.bookingType ?? 'ROUTINE',
+          petName: s.petName ?? '',
+          petSpecies: s.petSpecies ?? '',
+          hospitalName: s.hospitalName ?? '',
+          hospitalAddress: s.hospitalAddress ?? '',
+          hospitalPhone: s.hospitalPhone ?? '',
+          doctorName: s.doctorName ?? '',
+          serviceName: s.serviceName ?? '',
+          appointmentDate: raw.appointmentDate,
+          appointmentStartTime: raw.appointmentTime,
+          appointmentEndTime: raw.endTime,
+          confirmationMessage: raw.message ?? 'Your appointment is confirmed.'
+        };
         this.loading = false;
         sessionStorage.removeItem(BOOKING_KEY);
       },
