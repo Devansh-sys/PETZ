@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import {
   AuthSession,
@@ -28,6 +29,29 @@ export class AuthService {
     return this.http.post<SendOtpResponse>(`${this.base}/send-otp`, body);
   }
 
+  /**
+   * Emergency-only: trade OTP verification for speed. Backend creates or
+   * finds a temporary reporter from the phone and returns a session token.
+   */
+  quickSosSession(phone: string): Observable<AuthSession> {
+    return this.http
+      .post<AuthSession>(`${this.base}/sos-quick-session`, { phone })
+      .pipe(tap(session => this.setSession({ ...session, phone })));
+  }
+
+  /**
+   * Password login (email or phone). Returns AuthSession on success.
+   * Backend wraps response in {success, message, data}.
+   */
+  passwordLogin(identifier: string, password: string): Observable<AuthSession> {
+    return this.http
+      .post<{ data: AuthSession }>(`${this.base}/login`, { identifier, password })
+      .pipe(
+        map(r => r.data),
+        tap(session => this.setSession({ ...session, isTemporarySession: false }))
+      );
+  }
+
   verifyOtp(phone: string, otp: string): Observable<AuthSession> {
     const body: VerifyOtpRequest = { phone, otp };
     return this.http
@@ -44,6 +68,13 @@ export class AuthService {
     return this.http
       .post<AuthSession>(`${this.base}/missed-call/verify`, body)
       .pipe(tap(session => this.setSession({ ...session, phone })));
+  }
+
+  /** Merges partial updates into the current session (e.g. after session conversion). */
+  updateSession(updates: Partial<AuthSession>): void {
+    const current = this._session();
+    if (!current) return;
+    this.setSession({ ...current, ...updates });
   }
 
   logout(): void {

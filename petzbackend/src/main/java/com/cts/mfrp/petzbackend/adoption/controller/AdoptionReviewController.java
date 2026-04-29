@@ -10,61 +10,29 @@ import com.cts.mfrp.petzbackend.adoption.dto.KycDocumentDtos.VerifyRequest;
 import com.cts.mfrp.petzbackend.adoption.dto.PageResponse;
 import com.cts.mfrp.petzbackend.adoption.service.AdoptionReviewService;
 import com.cts.mfrp.petzbackend.common.dto.ApiResponse;
-<<<<<<< Updated upstream
 import com.cts.mfrp.petzbackend.user.model.User;
 import com.cts.mfrp.petzbackend.user.repository.UserRepository;
-=======
->>>>>>> Stashed changes
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-<<<<<<< Updated upstream
 import org.springframework.security.access.prepost.PreAuthorize;
-=======
->>>>>>> Stashed changes
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-<<<<<<< Updated upstream
 import java.util.Optional;
-=======
->>>>>>> Stashed changes
 import java.util.UUID;
 
-/**
- * Epic 2.4 — NGO reviewer endpoints.
- *
- *   GET    /api/v1/ngo/adoption-applications                      US-2.4.1
- *   GET    /api/v1/ngo/adoption-applications/{id}                 US-2.4.2
- *   POST   /api/v1/ngo/adoption-applications/{id}/review-start    US-2.4.2
- *   POST   /api/v1/ngo/adoption-applications/{id}/approve         US-2.4.3
- *   POST   /api/v1/ngo/adoption-applications/{id}/reject          US-2.4.4
- *   POST   /api/v1/ngo/adoption-applications/{id}/clarify         US-2.4.5
- *   POST   /api/v1/ngo/adoption-applications/{id}/documents/{docId}/verify  US-2.4.6
- *
- * NGO scoping is enforced by the service using the caller's
- * {@code User.ngoId}. Dev mode still honors the {@code X-User-Id} header.
- */
 @RestController
 @RequestMapping("/api/v1/ngo/adoption-applications")
 @RequiredArgsConstructor
-<<<<<<< Updated upstream
-// US-4.1.3 — NGO review queue is restricted to NGO_REP / ADMIN when a JWT
-// is present. Dev-mode (no JWT) remains open for existing X-User-Id flows.
 @PreAuthorize("hasAnyRole('NGO_REP','ADMIN') or !isAuthenticated()")
 public class AdoptionReviewController {
 
     private final AdoptionReviewService reviewService;
     private final UserRepository        userRepo;
-=======
-public class AdoptionReviewController {
 
-    private final AdoptionReviewService reviewService;
->>>>>>> Stashed changes
-
-    // US-2.4.1 — list with filters + pagination
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<Summary>>> list(
             @AuthenticationPrincipal UUID principalUserId,
@@ -80,23 +48,18 @@ public class AdoptionReviewController {
         UUID ngoId = resolveNgoId(principalUserId, headerUserId);
         return ResponseEntity.ok(ApiResponse.ok(
                 "Applications fetched.",
-                reviewService.list(ngoId, status, petId, from, to,
-                        unreviewed, sort, page, size)));
+                reviewService.list(ngoId, status, petId, from, to, unreviewed, sort, page, size)));
     }
 
-    // US-2.4.2 — view detail
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Detail>> detail(
             @AuthenticationPrincipal UUID principalUserId,
             @RequestHeader(value = "X-User-Id", required = false) UUID headerUserId,
             @PathVariable UUID id) {
         UUID ngoId = resolveNgoId(principalUserId, headerUserId);
-        return ResponseEntity.ok(ApiResponse.ok(
-                "Application detail fetched.",
-                reviewService.getDetail(ngoId, id)));
+        return ResponseEntity.ok(ApiResponse.ok("Application detail fetched.", reviewService.getDetail(ngoId, id)));
     }
 
-    // US-2.4.2 helper — start review
     @PostMapping("/{id}/review-start")
     public ResponseEntity<ApiResponse<Detail>> startReview(
             @AuthenticationPrincipal UUID principalUserId,
@@ -104,12 +67,9 @@ public class AdoptionReviewController {
             @PathVariable UUID id) {
         UUID reviewerId = resolveActor(principalUserId, headerUserId);
         UUID ngoId      = resolveNgoId(principalUserId, headerUserId);
-        return ResponseEntity.ok(ApiResponse.ok(
-                "Review started.",
-                reviewService.startReview(reviewerId, ngoId, id)));
+        return ResponseEntity.ok(ApiResponse.ok("Review started.", reviewService.startReview(reviewerId, ngoId, id)));
     }
 
-    // US-2.4.3 — approve
     @PostMapping("/{id}/approve")
     public ResponseEntity<ApiResponse<Detail>> approve(
             @AuthenticationPrincipal UUID principalUserId,
@@ -118,12 +78,9 @@ public class AdoptionReviewController {
             @Valid @RequestBody ApproveRequest body) {
         UUID reviewerId = resolveActor(principalUserId, headerUserId);
         UUID ngoId      = resolveNgoId(principalUserId, headerUserId);
-        return ResponseEntity.ok(ApiResponse.ok(
-                "Application approved.",
-                reviewService.approve(reviewerId, ngoId, id, body)));
+        return ResponseEntity.ok(ApiResponse.ok("Application approved.", reviewService.approve(reviewerId, ngoId, id, body)));
     }
 
-    // US-2.4.4 — reject
     @PostMapping("/{id}/reject")
     public ResponseEntity<ApiResponse<Detail>> reject(
             @AuthenticationPrincipal UUID principalUserId,
@@ -132,12 +89,9 @@ public class AdoptionReviewController {
             @Valid @RequestBody RejectRequest body) {
         UUID reviewerId = resolveActor(principalUserId, headerUserId);
         UUID ngoId      = resolveNgoId(principalUserId, headerUserId);
-        return ResponseEntity.ok(ApiResponse.ok(
-                "Application rejected.",
-                reviewService.reject(reviewerId, ngoId, id, body)));
+        return ResponseEntity.ok(ApiResponse.ok("Application rejected.", reviewService.reject(reviewerId, ngoId, id, body)));
     }
 
-    // US-2.4.5 — clarify
     @PostMapping("/{id}/clarify")
     public ResponseEntity<ApiResponse<Detail>> clarify(
             @AuthenticationPrincipal UUID principalUserId,
@@ -146,12 +100,9 @@ public class AdoptionReviewController {
             @Valid @RequestBody ClarifyRequest body) {
         UUID reviewerId = resolveActor(principalUserId, headerUserId);
         UUID ngoId      = resolveNgoId(principalUserId, headerUserId);
-        return ResponseEntity.ok(ApiResponse.ok(
-                "Clarification requested.",
-                reviewService.clarify(reviewerId, ngoId, id, body)));
+        return ResponseEntity.ok(ApiResponse.ok("Clarification requested.", reviewService.clarify(reviewerId, ngoId, id, body)));
     }
 
-    // US-2.4.6 — verify KYC document
     @PostMapping("/{id}/documents/{docId}/verify")
     public ResponseEntity<ApiResponse<DocumentResponse>> verifyDocument(
             @AuthenticationPrincipal UUID principalUserId,
@@ -161,29 +112,19 @@ public class AdoptionReviewController {
             @Valid @RequestBody VerifyRequest body) {
         UUID reviewerId = resolveActor(principalUserId, headerUserId);
         UUID ngoId      = resolveNgoId(principalUserId, headerUserId);
-        return ResponseEntity.ok(ApiResponse.ok(
-                "KYC verification recorded.",
-                reviewService.verifyDocument(reviewerId, ngoId, id, docId,
-                        body.getStatus(), body.getReason())));
+        return ResponseEntity.ok(ApiResponse.ok("KYC verification recorded.",
+                reviewService.verifyDocument(reviewerId, ngoId, id, docId, body.getStatus(), body.getReason())));
     }
-
-    // ─── helpers ─────────────────────────────────────────────────────
 
     private UUID resolveActor(UUID principalUserId, UUID headerUserId) {
         if (principalUserId != null) return principalUserId;
         if (headerUserId    != null) return headerUserId;
-        throw new IllegalArgumentException(
-                "Missing caller identity — authenticate or send X-User-Id header in dev.");
+        throw new IllegalArgumentException("Missing caller identity — authenticate or send X-User-Id header in dev.");
     }
 
     private UUID resolveNgoId(UUID principalUserId, UUID headerUserId) {
-<<<<<<< Updated upstream
         UUID actor = resolveActor(principalUserId, headerUserId);
         Optional<User> user = userRepo.findById(actor);
         return user.map(User::getNgoId).orElse(null);
-=======
-        // User entity has no ngoId field; fall back to body-supplied ngoId
-        return null;
->>>>>>> Stashed changes
     }
 }

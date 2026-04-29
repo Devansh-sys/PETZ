@@ -6,7 +6,7 @@
   .sub { color: var(--muted); font-size: 15px; margin-top: 4px; }
 }
 .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px;
-  @media (max-width: 768px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
 }
 .stat-card {
   background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 20px;
@@ -18,6 +18,16 @@
 }
 .modules-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
   @media (max-width: 640px) { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .admin-container { padding: 24px 14px; }
+  .admin-header h1 { font-size: 24px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .stat-card { padding: 14px; gap: 10px; }
+  .stat-card .stat-num { font-size: 22px; }
+  .stat-card .stat-icon { font-size: 22px; }
+  .module-card { padding: 16px; }
 }
 .module-card {
   background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 24px;

@@ -1,7 +1,3 @@
-
-// ─────────────────────────────────────────────
-// FILE 12: hospital/dto/ServiceResponse.java
-// ─────────────────────────────────────────────
 package com.cts.mfrp.petzbackend.hospital.dto;
 
 import lombok.Builder;
@@ -13,11 +9,6 @@ import java.util.UUID;
 @Data @Builder
 public class ServiceResponse {
     private UUID       id;
-<<<<<<< Updated upstream
-    private String     serviceName;
-    private String     serviceType;
-    private BigDecimal price;
-=======
     private UUID       hospitalId;
     private String     serviceName;
     private String     description;
@@ -25,5 +16,4 @@ public class ServiceResponse {
     private BigDecimal price;
     private boolean    emergencyDedicated;
     private boolean    active;
->>>>>>> Stashed changes
 }

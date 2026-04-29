@@ -2,17 +2,12 @@
 
 <section class="auth-page">
   <div class="auth-card">
-    <div class="step-dots">
-      <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
-    </div>
-
     <div class="title-row">
       <a routerLink="/" class="back" aria-label="Back to home">←</a>
-      <h1>Verify your number</h1>
+      <h1>Your number</h1>
     </div>
     <p class="lead">
-      Enter your mobile number so we can verify you and dispatch the nearest rescue partner.
-      <strong>This takes under 5 seconds.</strong>
+      So we can call you back if needed. <strong>No OTP, no waiting.</strong>
     </p>
 
     <div class="field">
@@ -28,9 +23,9 @@
           maxlength="15"
           [ngModel]="phone()"
           (ngModelChange)="phone.set($event)"
-          (keyup.enter)="requestOtp()">
+          (keyup.enter)="proceed()">
       </div>
-      <small class="hint">We'll send a 6-digit code. No account, no profile creation.</small>
+      <small class="hint">We'll dispatch the nearest rescuer immediately.</small>
     </div>
 
     @if (notice()) {
@@ -51,21 +46,8 @@
       type="button"
       class="btn btn-primary btn-big"
       [disabled]="!canSubmit || loading()"
-      (click)="requestOtp()">
-      @if (loading()) { Sending OTP… } @else { Send OTP → }
+      (click)="proceed()">
+      @if (loading()) { Starting… } @else { Continue to report → }
     </button>
-
-    <div class="divider"><span>or</span></div>
-
-    <button
-      type="button"
-      class="btn btn-ghost btn-big"
-      [disabled]="!canSubmit"
-      (click)="useMissedCall()">
-      📞 Use missed-call verification
-    </button>
-    <small class="fallback-hint">Best for weak-network areas.</small>
-
-    <div id="recaptcha-container"></div>
   </div>
 </section>

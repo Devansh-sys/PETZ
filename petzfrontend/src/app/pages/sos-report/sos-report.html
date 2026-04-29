@@ -74,9 +74,7 @@
       <div class="urgency-grid">
         @for (opt of urgencyOptions; track opt.value) {
           <button type="button"
-                  class="urgency-chip"
-                  [class.selected]="urgency() === opt.value"
-                  [class]="'u-' + opt.value.toLowerCase()"
+                  [class]="'urgency-chip u-' + opt.value.toLowerCase() + (urgency() === opt.value ? ' selected' : '')"
                   (click)="urgency.set(opt.value)">
             <span class="emoji">{{ opt.emoji }}</span>
             <span class="label">{{ opt.label }}</span>

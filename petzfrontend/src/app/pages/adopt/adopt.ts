@@ -1,7 +1,9 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, switchMap } from 'rxjs/operators';
 import { Navbar } from '../../shared/navbar/navbar';
 import { Footer } from '../../shared/footer/footer';
 import { AdoptionService } from '../../core/adoption/adoption.service';
@@ -13,7 +15,7 @@ import { AdoptablePet } from '../../core/adoption/adoption.models';
   templateUrl: './adopt.html',
   styleUrl: './adopt.scss'
 })
-export class Adopt implements OnInit {
+export class Adopt implements OnInit, OnDestroy {
   pets: AdoptablePet[] = [];
   loading = true;
   error = '';
@@ -25,28 +27,39 @@ export class Adopt implements OnInit {
   filterSpecialNeeds = false;
   sortBy = 'NEWEST';
 
+  private filterChange$ = new Subject<void>();
+  private sub!: Subscription;
+
   constructor(private adoptionService: AdoptionService) {}
 
-  ngOnInit(): void { this.load(); }
-
-  load(): void {
-    this.loading = true;
-    this.error = '';
-    const hasFilters = this.filterSpecies || this.filterCity || this.filterVaccinated || this.filterReady || this.filterSpecialNeeds;
-    const call = hasFilters
-      ? this.adoptionService.search({
-          species: this.filterSpecies || undefined,
-          city: this.filterCity || undefined,
-          vaccinated: this.filterVaccinated || undefined,
-          adoptionReady: this.filterReady || undefined,
-          specialNeeds: this.filterSpecialNeeds || undefined
-        })
-      : this.adoptionService.browse(this.sortBy);
-    call.subscribe({
+  ngOnInit(): void {
+    this.sub = this.filterChange$.pipe(
+      debounceTime(300),
+      switchMap(() => {
+        this.loading = true;
+        this.error = '';
+        const hasFilters = this.filterSpecies || this.filterCity ||
+          this.filterVaccinated || this.filterReady || this.filterSpecialNeeds;
+        return hasFilters
+          ? this.adoptionService.search({
+              species: this.filterSpecies || undefined,
+              city: this.filterCity || undefined,
+              vaccinated: this.filterVaccinated || undefined,
+              adoptionReady: this.filterReady || undefined,
+              specialNeeds: this.filterSpecialNeeds || undefined
+            })
+          : this.adoptionService.browse(this.sortBy);
+      })
+    ).subscribe({
       next: (list) => { this.pets = list; this.loading = false; },
       error: () => { this.error = 'Could not load pets. Please try again.'; this.loading = false; }
     });
+    this.load();
   }
+
+  ngOnDestroy(): void { this.sub.unsubscribe(); }
+
+  load(): void { this.filterChange$.next(); }
 
   reset(): void {
     this.filterSpecies = '';

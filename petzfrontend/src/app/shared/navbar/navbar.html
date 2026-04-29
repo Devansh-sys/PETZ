@@ -1,22 +1,76 @@
 <div class="top-strip">
   <span>🩺 Verified hospitals · Licensed veterinarians · 24/7 rescue dispatch</span>
-  <span>Helpline: <a>1800-PETZ-911</a></span>
+  <span class="strip-helpline">Helpline: <a>1800-PETZ-911</a></span>
 </div>
 <nav class="nav">
-  <a routerLink="/" class="logo">
+  <a routerLink="/" class="logo" (click)="closeMenu()">
     <span class="logo-mark">P</span>
     <span class="logo-text">PETZ</span>
   </a>
   <div class="nav-links">
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Home</a>
-    <a routerLink="/book" routerLinkActive="active">Book Slot</a>
     <a routerLink="/hospitals" routerLinkActive="active">Hospitals</a>
-    <a routerLink="/appointments" routerLinkActive="active">My Appointments</a>
-    <a routerLink="/my-reports" routerLinkActive="active">My Reports</a>
-    <a routerLink="/ngo/queue" routerLinkActive="active">Rescuer Dashboard</a>
+    <a routerLink="/adopt" routerLinkActive="active">Adopt</a>
+    <a routerLink="/book" routerLinkActive="active">Book Slot</a>
+    @if (isAuthenticated()) {
+      <a routerLink="/appointments" routerLinkActive="active">My Appointments</a>
+      <a routerLink="/my-reports" routerLinkActive="active">My Reports</a>
+    }
+    @if (isNgo()) {
+      <a routerLink="/ngo/dashboard" routerLinkActive="active">NGO Portal</a>
+    }
+    @if (isAdmin()) {
+      <a routerLink="/admin" routerLinkActive="active">Admin</a>
+    }
   </div>
   <div class="nav-right">
-    <button class="btn btn-ghost">Sign In</button>
+    @if (isAuthenticated()) {
+      <span class="role-badge">{{ roleLabel() }}</span>
+      <a routerLink="/profile" class="btn btn-ghost">My Profile</a>
+      <button type="button" class="btn btn-ghost" (click)="signOut()">Sign Out</button>
+    } @else {
+      <a routerLink="/login" class="btn btn-ghost">Sign In</a>
+      <a routerLink="/register" class="btn btn-ghost">Register</a>
+    }
     <a routerLink="/sos/auth" class="btn btn-primary sos-cta">🚨 Report SOS</a>
   </div>
+  <button type="button" class="hamburger" (click)="toggleMenu()" [class.open]="menuOpen()" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<!-- Mobile drawer -->
+@if (menuOpen()) {
+  <div class="mobile-overlay" (click)="closeMenu()"></div>
+}
+<div class="mobile-drawer" [class.open]="menuOpen()">
+  <div class="mobile-drawer-inner">
+    <div class="mobile-links">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="closeMenu()">🏠 Home</a>
+      <a routerLink="/hospitals" routerLinkActive="active" (click)="closeMenu()">🏥 Hospitals</a>
+      <a routerLink="/adopt" routerLinkActive="active" (click)="closeMenu()">🐾 Adopt</a>
+      <a routerLink="/book" routerLinkActive="active" (click)="closeMenu()">📅 Book Slot</a>
+      @if (isAuthenticated()) {
+        <a routerLink="/appointments" routerLinkActive="active" (click)="closeMenu()">📋 My Appointments</a>
+        <a routerLink="/my-reports" routerLinkActive="active" (click)="closeMenu()">📝 My Reports</a>
+      }
+      @if (isNgo()) {
+        <a routerLink="/ngo/dashboard" routerLinkActive="active" (click)="closeMenu()">🌿 NGO Portal</a>
+      }
+      @if (isAdmin()) {
+        <a routerLink="/admin" routerLinkActive="active" (click)="closeMenu()">⚙️ Admin</a>
+      }
+    </div>
+    <div class="mobile-auth">
+      @if (isAuthenticated()) {
+        <span class="role-badge">{{ roleLabel() }}</span>
+        <a routerLink="/profile" class="btn btn-ghost full" (click)="closeMenu()">My Profile</a>
+        <button type="button" class="btn btn-ghost full" (click)="signOut()">Sign Out</button>
+      } @else {
+        <a routerLink="/login" class="btn btn-ghost full" (click)="closeMenu()">Sign In</a>
+        <a routerLink="/register" class="btn btn-ghost full" (click)="closeMenu()">Register</a>
+      }
+      <a routerLink="/sos/auth" class="btn btn-primary sos-cta full" (click)="closeMenu()">🚨 Report SOS</a>
+    </div>
+  </div>
+</div>

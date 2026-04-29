@@ -1,7 +1,3 @@
-
-// ─────────────────────────────────────────────
-// FILE 17: hospital/dto/SlotResponse.java
-// ─────────────────────────────────────────────
 package com.cts.mfrp.petzbackend.hospital.dto;
 
 import lombok.Builder;
@@ -25,8 +21,5 @@ public class SlotResponse {
     private int       durationMinutes;
     private String    slotStatus;
     private String    bookingType;
-<<<<<<< Updated upstream
-=======
     private boolean   available;
->>>>>>> Stashed changes
 }

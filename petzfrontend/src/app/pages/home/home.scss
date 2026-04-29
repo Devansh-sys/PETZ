@@ -251,15 +251,30 @@
 
 /* Responsive */
 @media (max-width: 900px) {
-  .hero-inner { grid-template-columns: 1fr; padding: 40px 20px; }
+  .hero-inner { grid-template-columns: 1fr; padding: 40px 20px; gap: 32px; }
   .hero-copy h1 { font-size: 40px; }
   .sos-button { min-width: 100%; }
   .steps, .action-grid { grid-template-columns: 1fr 1fr; }
   .stats-card { grid-template-columns: 1fr; padding: 32px; }
   .stats-grid { grid-template-columns: 1fr 1fr; }
+  .section-head h2 { font-size: 28px; }
 }
 @media (max-width: 520px) {
-  .sos-title { font-size: 24px; }
-  .sos-icon { font-size: 36px; }
+  .hero-inner { padding: 28px 16px; }
+  .hero-copy h1 { font-size: 32px; letter-spacing: -1px; }
+  .hero-copy > p { font-size: 15px; }
+  .sos-title { font-size: 22px; }
+  .sos-icon { font-size: 34px; }
+  .sos-button { padding: 20px 20px; border-radius: 14px; }
+  .sos-meta { gap: 10px; font-size: 12px; }
   .action-grid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; }
+  .step { padding: 28px 20px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stat h3 { font-size: 26px; }
+  .stats-card { padding: 24px 20px; }
+  .stats-head h2 { font-size: 22px; }
+  .how, .actions, .stats-section { padding: 48px 0; }
+  .section-head { margin-bottom: 24px; }
+  .section-head h2 { font-size: 24px; }
 }

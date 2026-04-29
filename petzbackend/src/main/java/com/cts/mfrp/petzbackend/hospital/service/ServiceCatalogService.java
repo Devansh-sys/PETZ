@@ -103,11 +103,6 @@ public class ServiceCatalogService {
     private ServiceResponse toResponse(HospitalService s) {
         return ServiceResponse.builder()
                 .id(s.getId())
-<<<<<<< Updated upstream
-                .serviceName(s.getServiceName())
-                .serviceType(s.getServiceType() != null ? s.getServiceType().name() : null)
-                .price(s.getPrice())
-=======
                 .hospitalId(s.getHospital() != null ? s.getHospital().getId() : null)
                 .serviceName(s.getServiceName())
                 .description(s.getServiceName())
@@ -115,7 +110,6 @@ public class ServiceCatalogService {
                 .price(s.getPrice())
                 .emergencyDedicated(s.getServiceType() == HospitalService.ServiceType.EMERGENCY)
                 .active(true)
->>>>>>> Stashed changes
                 .build();
     }
 }

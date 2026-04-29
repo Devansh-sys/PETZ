@@ -2,11 +2,12 @@ import { Component, signal, inject } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Navbar } from '../../shared/navbar/navbar';
 import { FirebasePhoneService } from '../../core/auth/firebase-phone.service';
 import { AuthService } from '../../core/auth/auth.service';
 
-type Step = 'PHONE' | 'OTP';
+type Step = 'PHONE' | 'OTP' | 'PASSWORD';
 const PHONE_RE = /^\+?[1-9]\d{7,14}$/;
 
 @Component({
@@ -23,6 +24,8 @@ export class Login {
   step = signal<Step>('PHONE');
   phone = signal('');
   otp = signal('');
+  identifier = signal('');
+  password = signal('');
   loading = signal(false);
   error = signal<string | null>(null);
   resendCooldown = signal(0);
@@ -38,6 +41,35 @@ export class Login {
 
   get canSubmitPhone(): boolean { return PHONE_RE.test(this.normalizedPhone); }
   get canSubmitOtp(): boolean { return /^\d{6}$/.test(this.otp()); }
+  get canSubmitPassword(): boolean { return this.identifier().trim().length > 2 && this.password().length >= 6; }
+
+  switchToPassword(): void {
+    this.step.set('PASSWORD');
+    this.error.set(null);
+  }
+
+  switchToPhone(): void {
+    this.step.set('PHONE');
+    this.error.set(null);
+  }
+
+  passwordLogin(): void {
+    if (!this.canSubmitPassword || this.loading()) return;
+    this.error.set(null);
+    this.loading.set(true);
+    this.auth.passwordLogin(this.identifier().trim(), this.password()).subscribe({
+      next: (session) => {
+        this.loading.set(false);
+        if (session.role === 'ADMIN') { this.router.navigate(['/admin']); return; }
+        if (session.role === 'NGO_REP' || session.role === 'NGO') { this.router.navigate(['/ngo/dashboard']); return; }
+        this.router.navigate(['/']);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.loading.set(false);
+        this.error.set(err.error?.message ?? 'Invalid email/phone or password.');
+      }
+    });
+  }
 
   async sendOtp(): Promise<void> {
     if (!this.canSubmitPhone || this.loading()) return;

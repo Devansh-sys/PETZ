@@ -14,7 +14,7 @@
   <div *ngIf="!loading && error" class="alert error">{{ error }}</div>
 
   <!-- Empty state -->
-  <div *ngIf="!loading && !error && reports.length === 0" class="empty-state">
+  <div *ngIf="!loading && !error && (reports?.length ?? 0) === 0" class="empty-state">
     <div class="empty-icon">🐾</div>
     <h3>No reports yet</h3>
     <p class="lead">When you submit an SOS report it will appear here.</p>
@@ -22,7 +22,7 @@
   </div>
 
   <!-- Reports list -->
-  <div *ngIf="!loading && !error && reports.length > 0" class="report-list">
+  <div *ngIf="!loading && !error && (reports?.length ?? 0) > 0" class="report-list">
     <div *ngFor="let r of reports" class="report-card-item">
 
       <div class="card-head">

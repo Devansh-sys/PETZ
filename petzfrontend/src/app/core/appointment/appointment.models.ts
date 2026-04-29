@@ -23,6 +23,23 @@ export interface SlotLockResponse {
   remainingSeconds: number;
 }
 
+export interface RawBookingResponse {
+  appointmentId: string;
+  slotId: string;
+  userId: string;
+  petId: string;
+  hospitalId: string;
+  doctorId: string;
+  serviceType?: string;
+  bookingType?: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  endTime: string;
+  status: string;
+  confirmedAt: string;
+  message: string;
+}
+
 export interface AppointmentCreateRequest {
   userId: string;
   petId: string;

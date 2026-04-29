@@ -29,7 +29,7 @@
         <span class="tag" [ngClass]="statusClass(a.status)">{{ a.status }}</span>
       </div>
       <div class="appt-body">
-        <div class="appt-row">👨‍⚕️ Dr. {{ a.doctorName }} · {{ a.serviceName }}</div>
+        <div class="appt-row">👨‍⚕️ {{ a.doctorName }} · {{ a.serviceName }}</div>
         <div class="appt-row">📅 {{ formatDate(a.slotDate) }} · {{ formatTime(a.startTime) }} – {{ formatTime(a.endTime) }}</div>
         <div class="appt-row">📍 {{ a.hospitalAddress }}</div>
         <div *ngIf="a.hospitalPhone" class="appt-row">📞 {{ a.hospitalPhone }}</div>

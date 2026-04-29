@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Navbar } from '../../shared/navbar/navbar';
 import { HttpClient } from '@angular/common/http';
+import { map, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'petz-admin-rescues',
@@ -11,6 +14,8 @@ import { HttpClient } from '@angular/common/http';
   styleUrl: './admin-rescues.scss'
 })
 export class AdminRescues implements OnInit {
+  private base = environment.apiBaseUrl;
+
   reports: any[] = [];
   loading = true;
   error = '';
@@ -22,16 +27,30 @@ export class AdminRescues implements OnInit {
 
   load(): void {
     this.loading = true;
+    this.error = '';
     const params = this.filterStatus ? `?status=${this.filterStatus}` : '';
-    this.http.get<any[]>(`/api/admin/rescues/live${params}`)
+    this.http.get<any>(`${this.base}/admin/rescues/live${params}`)
+      .pipe(
+        map(r => r.data ?? r),
+        catchError(err => {
+          this.error = err.error?.message ?? 'Could not load rescue reports.';
+          return of([]);
+        })
+      )
       .subscribe({
-        next: (data) => { this.reports = Array.isArray(data) ? data : []; this.loading = false; },
-        error: () => { this.error = 'Could not load rescue reports.'; this.loading = false; }
+        next: (data) => {
+          this.reports = Array.isArray(data) ? data : (data?.content ?? []);
+          this.loading = false;
+        }
       });
   }
 
   statusClass(s: string): string {
-    const m: Record<string, string> = { PENDING: 'orange', ASSIGNED: 'blue', IN_PROGRESS: 'blue', COMPLETED: 'green', CANCELLED: 'grey' };
+    const m: Record<string, string> = {
+      REPORTED: 'orange', DISPATCHED: 'blue', ON_SITE: 'blue',
+      TRANSPORTING: 'blue', COMPLETE: 'green', MISSION_COMPLETE: 'green',
+      FLAGGED: 'orange', CLOSED: 'grey'
+    };
     return m[s] ?? 'grey';
   }
 }

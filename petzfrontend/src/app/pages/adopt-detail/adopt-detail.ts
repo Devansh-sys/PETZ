@@ -27,7 +27,7 @@ export class AdoptDetail implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('petId')!;
+    const id = this.route.snapshot.paramMap.get('id')!;
     this.adoptionService.getById(id).subscribe({
       next: (pet) => {
         this.pet = pet;

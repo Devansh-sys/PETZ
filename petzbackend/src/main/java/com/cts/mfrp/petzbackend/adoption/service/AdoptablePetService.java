@@ -353,11 +353,9 @@ public class AdoptablePetService {
 
     private Map<UUID, AdoptionMedia> fetchPrimaryMedia(List<UUID> petIds) {
         if (petIds == null || petIds.isEmpty()) return Map.of();
-        Map<UUID, AdoptionMedia> map = new java.util.HashMap<>();
-        for (UUID id : petIds.stream().distinct().toList()) {
-            mediaRepo.findByAdoptablePetIdAndIsPrimaryTrue(id).ifPresent(m -> map.put(id, m));
-        }
-        return map;
+        List<UUID> distinct = petIds.stream().distinct().toList();
+        return mediaRepo.findPrimaryByPetIdIn(distinct).stream()
+                .collect(Collectors.toMap(AdoptionMedia::getAdoptablePetId, m -> m, (a, b) -> a));
     }
 
     private Summary toSummary(AdoptablePet p, String ngoName, AdoptionMedia primary,
