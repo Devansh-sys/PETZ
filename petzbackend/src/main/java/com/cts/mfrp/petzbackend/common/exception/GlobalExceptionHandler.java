@@ -118,6 +118,14 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(AuthExceptions.UnauthenticatedException.class)
+    public ResponseEntity<ApiErrorResponse> handleUnauthenticated(
+            AuthExceptions.UnauthenticatedException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                ApiErrorResponse.of(401, "Unauthorized", ex.getMessage(), request.getRequestURI())
+        );
+    }
+
     // ─── Booking conflicts / validation (Epic 3.4) ───────────────────────
 
     /**
