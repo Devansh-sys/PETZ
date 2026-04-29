@@ -68,7 +68,46 @@
       <div class="field mt">
         <label>Email address</label>
         <input type="email" placeholder="priya@example.com" [value]="email()"
-          (input)="email.set($any($event.target).value)" (keyup.enter)="saveProfile()" />
+          (input)="email.set($any($event.target).value)" autocomplete="email" />
+      </div>
+      <div class="field mt">
+        <label>Password</label>
+        <div class="password-wrap">
+          <input [type]="passwordVisible() ? 'text' : 'password'"
+            placeholder="At least 8 characters"
+            [value]="password()"
+            (input)="password.set($any($event.target).value)"
+            autocomplete="new-password" />
+          <button type="button" class="password-toggle" (click)="togglePasswordVisibility()"
+            [attr.aria-label]="passwordVisible() ? 'Hide password' : 'Show password'"
+            [attr.aria-pressed]="passwordVisible()">
+            <span *ngIf="!passwordVisible()">👁️ Show</span>
+            <span *ngIf="passwordVisible()">🙈 Hide</span>
+          </button>
+        </div>
+        <small class="hint" *ngIf="password().length > 0 && password().length < 8">
+          Password must be at least 8 characters.
+        </small>
+      </div>
+      <div class="field mt">
+        <label>Confirm password</label>
+        <div class="password-wrap">
+          <input [type]="confirmVisible() ? 'text' : 'password'"
+            placeholder="Re-enter your password"
+            [value]="confirmPassword()"
+            (input)="confirmPassword.set($any($event.target).value)"
+            (keyup.enter)="saveProfile()"
+            autocomplete="new-password" />
+          <button type="button" class="password-toggle" (click)="toggleConfirmVisibility()"
+            [attr.aria-label]="confirmVisible() ? 'Hide password' : 'Show password'"
+            [attr.aria-pressed]="confirmVisible()">
+            <span *ngIf="!confirmVisible()">👁️ Show</span>
+            <span *ngIf="confirmVisible()">🙈 Hide</span>
+          </button>
+        </div>
+        <small class="hint mismatch" *ngIf="confirmPassword().length > 0 && !passwordsMatch">
+          Passwords do not match.
+        </small>
       </div>
 
       <div *ngIf="error()" class="alert error mt">⚠️ {{ error() }}</div>

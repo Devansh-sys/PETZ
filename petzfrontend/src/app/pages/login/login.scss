@@ -33,6 +33,41 @@ h1 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
   font-weight: 700;
 }
 
+.password-wrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+
+  input {
+    flex: 1;
+    padding-right: 92px; /* leaves room for the toggle */
+  }
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  background: var(--cream);
+  border: 1px solid var(--sunset);
+  color: var(--deep);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+  white-space: nowrap;
+  user-select: none;
+
+  &:hover, &:focus-visible {
+    background: var(--sunset);
+    border-color: var(--peach);
+    outline: none;
+  }
+}
+
 .resend-row {
   display: flex;
   justify-content: space-between;

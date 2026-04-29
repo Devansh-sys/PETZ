@@ -18,6 +18,38 @@ h1 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
 .mt { margin-top: 16px; }
 .full { width: 100%; }
 .otp-input { font-size: 28px; letter-spacing: 12px; text-align: center; font-weight: 700; }
+
+.password-wrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  input { flex: 1; padding-right: 92px; }
+}
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  background: var(--cream);
+  border: 1px solid var(--sunset);
+  color: var(--deep);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+  white-space: nowrap;
+  user-select: none;
+  &:hover, &:focus-visible { background: var(--sunset); border-color: var(--peach); outline: none; }
+}
+.hint {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+  &.mismatch { color: var(--danger); font-weight: 500; }
+}
 .resend-row { display: flex; justify-content: space-between; margin-top: 16px; }
 .btn-link { background: none; border: none; color: var(--peach); font-size: 13px; font-weight: 600; cursor: pointer; padding: 0;
   &:disabled { color: var(--muted); cursor: default; } }

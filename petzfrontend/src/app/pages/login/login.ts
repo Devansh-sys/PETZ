@@ -26,9 +26,12 @@ export class Login {
   otp = signal('');
   identifier = signal('');
   password = signal('');
+  passwordVisible = signal(false);
   loading = signal(false);
   error = signal<string | null>(null);
   resendCooldown = signal(0);
+
+  togglePasswordVisibility(): void { this.passwordVisible.update(v => !v); }
 
   private cooldownTimer?: number;
 

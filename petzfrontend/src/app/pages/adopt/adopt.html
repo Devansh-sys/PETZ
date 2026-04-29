@@ -51,10 +51,8 @@
       <div class="sort-bar">
         <span class="result-count" *ngIf="!loading">{{ pets.length }} pet{{ pets.length !== 1 ? 's' : '' }} found</span>
         <select [(ngModel)]="sortBy" (change)="load()" *ngIf="!filterSpecies && !filterCity && !filterVaccinated && !filterReady && !filterSpecialNeeds">
-          <option value="NEWEST">Newest First</option>
-          <option value="OLDEST">Oldest First</option>
           <option value="YOUNGEST">Youngest</option>
-          <option value="OLDEST_PET">Oldest Pet</option>
+          <option value="OLDEST">Oldest</option>
         </select>
       </div>
 
