@@ -25,7 +25,7 @@ export class Adopt implements OnInit, OnDestroy {
   filterVaccinated = false;
   filterReady = false;
   filterSpecialNeeds = false;
-  sortBy = 'NEWEST';
+  sortBy = 'YOUNGEST';
 
   private filterChange$ = new Subject<void>();
   private sub!: Subscription;

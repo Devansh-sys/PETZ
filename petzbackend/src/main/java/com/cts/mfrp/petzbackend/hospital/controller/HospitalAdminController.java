@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/admin/hospitals")
+@RequestMapping("/api/v1/admin/hospitals")
 @RequiredArgsConstructor
 public class HospitalAdminController {
 
