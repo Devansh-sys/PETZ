@@ -1,0 +1,97 @@
+<petz-navbar></petz-navbar>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <a routerLink="/admin" class="back-link">← Admin Dashboard</a>
+    <h1>📅 Appointment System</h1>
+  </div>
+
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+  <div class="error-state" *ngIf="error && !loading">
+    <p>{{ error }}</p>
+    <button class="btn btn-primary" (click)="load()">Retry</button>
+  </div>
+
+  <ng-container *ngIf="!loading && !error">
+    <!-- Summary cards -->
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-num">{{ totals.total }}</div>
+        <div class="summary-label">Total Appointments</div>
+      </div>
+      <div class="summary-card blue">
+        <div class="summary-num">{{ totals.confirmed }}</div>
+        <div class="summary-label">Confirmed</div>
+      </div>
+      <div class="summary-card green">
+        <div class="summary-num">{{ totals.completed }}</div>
+        <div class="summary-label">Completed</div>
+      </div>
+      <div class="summary-card orange">
+        <div class="summary-num">{{ totals.cancelled }}</div>
+        <div class="summary-label">Cancelled</div>
+      </div>
+      <div class="summary-card red">
+        <div class="summary-num">{{ totals.noShow }}</div>
+        <div class="summary-label">No Shows</div>
+      </div>
+    </div>
+
+    <!-- Donut chart -->
+    <div class="donut-section" *ngIf="donutSegments.length > 0">
+      <h2 class="section-title">Breakdown</h2>
+      <div class="donut-card">
+        <svg viewBox="0 0 100 100" class="donut-svg">
+          <path *ngFor="let seg of donutSegments; let i = index"
+            [attr.d]="donutPath(donutSegments, i)"
+            [attr.fill]="seg.color">
+            <title>{{ seg.label }}: {{ seg.value }}</title>
+          </path>
+          <circle cx="50" cy="50" r="25" fill="#fff"/>
+          <text x="50" y="48" text-anchor="middle" class="donut-num">{{ totals.total }}</text>
+          <text x="50" y="57" text-anchor="middle" class="donut-lbl">Total</text>
+        </svg>
+        <div class="donut-legend">
+          <div class="legend-item" *ngFor="let seg of donutSegments">
+            <span class="legend-dot" [style.background]="seg.color"></span>
+            <span class="legend-label">{{ seg.label }}</span>
+            <span class="legend-val">{{ seg.value }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Per-hospital table -->
+    <div class="empty-state" *ngIf="metrics.length === 0">
+      <p>No appointment data available yet.</p>
+    </div>
+
+    <div class="metrics-table" *ngIf="metrics.length > 0">
+      <h2 class="section-title">By Hospital</h2>
+      <div class="table-wrap">
+        <div class="table-row header">
+          <span>Hospital</span>
+          <span>City</span>
+          <span>Total</span>
+          <span>Confirmed</span>
+          <span>Attended</span>
+          <span>Completed</span>
+          <span>Cancelled</span>
+          <span>No-Show</span>
+          <span>Completion %</span>
+        </div>
+        <div class="table-row" *ngFor="let m of metrics">
+          <span class="hospital-name">{{ m.hospitalName }}</span>
+          <span>{{ m.city || '—' }}</span>
+          <span class="bold">{{ m.totalAppointments ?? 0 }}</span>
+          <span>{{ m.confirmedCount ?? 0 }}</span>
+          <span>{{ m.attendedCount ?? 0 }}</span>
+          <span class="green">{{ m.completedCount ?? 0 }}</span>
+          <span class="orange">{{ m.cancelledCount ?? 0 }}</span>
+          <span class="red">{{ m.noShowCount ?? 0 }}</span>
+          <span class="rate">{{ m.completionRate ?? 0 | number:'1.0-1' }}%</span>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

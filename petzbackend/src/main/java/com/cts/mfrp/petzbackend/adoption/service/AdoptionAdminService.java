@@ -1,8 +1,12 @@
 package com.cts.mfrp.petzbackend.adoption.service;
 
+import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.AddNgoRepresentativeRequest;
+import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.ApplicationDecideRequest;
+import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.ApplicationSummary;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.MetricsResponse;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.NgoResponse;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.VerifyNgoRequest;
+import com.cts.mfrp.petzbackend.adoption.dto.PageResponse;
 import com.cts.mfrp.petzbackend.adoption.enums.AdoptionApplicationStatus;
 import com.cts.mfrp.petzbackend.adoption.enums.AdoptionStatus;
 import com.cts.mfrp.petzbackend.adoption.enums.AuditTargetType;
@@ -14,8 +18,14 @@ import com.cts.mfrp.petzbackend.adoption.repository.AdoptionRepository;
 import com.cts.mfrp.petzbackend.common.exception.ResourceNotFoundException;
 import com.cts.mfrp.petzbackend.ngo.model.Ngo;
 import com.cts.mfrp.petzbackend.ngo.repository.NgoRepository;
+import com.cts.mfrp.petzbackend.notification.enums.NotificationType;
+import com.cts.mfrp.petzbackend.notification.service.InAppNotificationService;
 import com.cts.mfrp.petzbackend.user.model.User;
 import com.cts.mfrp.petzbackend.user.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -45,6 +55,7 @@ import java.util.stream.Collectors;
 public class AdoptionAdminService {
 
     private static final Logger log = LoggerFactory.getLogger(AdoptionAdminService.class);
+    private static final BCryptPasswordEncoder ENCODER = new BCryptPasswordEncoder();
 
     private final AdoptionApplicationRepository appRepo;
     private final AdoptionRepository            adoptionRepo;
@@ -52,6 +63,7 @@ public class AdoptionAdminService {
     private final NgoRepository                 ngoRepo;
     private final UserRepository                userRepo;
     private final AdoptionAuditService          auditService;
+    private final InAppNotificationService      notificationService;
 
     // ═════════════════════════════════════════════════════════════════
     //  US-2.6.1 — Metrics dashboard
@@ -195,7 +207,117 @@ public class AdoptionAdminService {
         return toNgoResponse(saved);
     }
 
+    // ═════════════════════════════════════════════════════════════════
+    //  Admin: list all adoption applications platform-wide
+    // ═════════════════════════════════════════════════════════════════
+
+    @Transactional(readOnly = true)
+    public PageResponse<ApplicationSummary> listAllApplications(int page, int size) {
+        Page<AdoptionApplication> result = appRepo.findAll(
+                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
+        return PageResponse.from(result, this::toApplicationSummary);
+    }
+
+    // ═════════════════════════════════════════════════════════════════
+    //  Admin: direct approve / reject (overrides NGO decision)
+    // ═════════════════════════════════════════════════════════════════
+
+    @Transactional
+    public ApplicationSummary adminDecide(UUID adminId, UUID applicationId,
+                                          ApplicationDecideRequest req) {
+        AdoptionApplication app = appRepo.findById(applicationId)
+                .orElseThrow(() -> new ResourceNotFoundException("AdoptionApplication", applicationId));
+
+        String action = req.getAction().trim().toUpperCase();
+        AdoptionApplicationStatus newStatus = switch (action) {
+            case "APPROVE" -> AdoptionApplicationStatus.APPROVED;
+            case "REJECT"  -> AdoptionApplicationStatus.REJECTED;
+            default -> throw new IllegalArgumentException(
+                    "Invalid action '" + req.getAction() + "'. Allowed: APPROVE, REJECT");
+        };
+
+        app.setStatus(newStatus);
+        app.setDecidedAt(LocalDateTime.now());
+        app.setDecisionReason(req.getReason());
+        app.setLastActivityAt(LocalDateTime.now());
+        appRepo.save(app);
+
+        String title = "APPROVE".equals(action) ? "Adoption Application Approved 🐾" : "Adoption Application Update";
+        String body  = "APPROVE".equals(action)
+                ? "Congratulations! Your adoption application has been approved by the platform administrator."
+                : "Your adoption application was reviewed by admin. " +
+                  (req.getReason() != null ? "Reason: " + req.getReason() : "");
+        try {
+            notificationService.create(app.getAdopterId(), NotificationType.ADOPTION_DECISION,
+                    title, body, applicationId, "ADOPTION_APPLICATION");
+        } catch (Exception ex) {
+            log.warn("Notification failed for application {}: {}", applicationId, ex.getMessage());
+        }
+
+        auditService.log(AuditTargetType.APPLICATION, applicationId, adminId,
+                "ADMIN_" + action, req.getReason(), null);
+        log.info("Admin {} {} application {}", adminId, action, applicationId);
+        return toApplicationSummary(app);
+    }
+
+    // ═════════════════════════════════════════════════════════════════
+    //  Admin: create NGO representative user
+    // ═════════════════════════════════════════════════════════════════
+
+    @Transactional
+    public NgoResponse addNgoRepresentative(UUID adminId, UUID ngoId,
+                                             AddNgoRepresentativeRequest req) {
+        Ngo ngo = ngoRepo.findById(ngoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ngo", ngoId));
+
+        User user = new User();
+        user.setFullName(req.getFullName());
+        user.setPhone(req.getPhone());
+        user.setEmail(req.getEmail());
+        user.setPasswordHash(ENCODER.encode(req.getPassword()));
+        user.setRole(User.Role.NGO_REP);
+        user.setNgoId(ngoId);
+        user.setActive(true);
+        user.setEmailVerified(false);
+        user.setPhoneVerified(false);
+        user.setFailedLoginAttempts(0);
+        userRepo.save(user);
+
+        ngo.setOwnerUserId(user.getId());
+        ngoRepo.save(ngo);
+
+        auditService.log(AuditTargetType.NGO, ngoId, adminId,
+                "NGO_REP_ADDED", "Added: " + req.getFullName(), null);
+        log.info("Admin {} added NGO rep {} to NGO {}", adminId, user.getId(), ngoId);
+        return toNgoResponse(ngo);
+    }
+
     // ─── helpers ─────────────────────────────────────────────────────
+
+    private ApplicationSummary toApplicationSummary(AdoptionApplication app) {
+        String ngoName = ngoRepo.findById(app.getNgoId()).map(Ngo::getName).orElse(null);
+        return ApplicationSummary.builder()
+                .id(app.getId())
+                .adopterId(app.getAdopterId())
+                .adoptablePetId(app.getAdoptablePetId())
+                .ngoId(app.getNgoId())
+                .ngoName(ngoName)
+                .status(app.getStatus())
+                .fullName(app.getFullName())
+                .phone(app.getPhone())
+                .email(app.getEmail())
+                .city(app.getCity())
+                .housingType(app.getHousingType())
+                .prevPetOwnership(app.getPrevPetOwnership())
+                .consentHomeVisit(app.getConsentHomeVisit())
+                .consentFollowUp(app.getConsentFollowUp())
+                .consentBackgroundCheck(app.getConsentBackgroundCheck())
+                .decisionReason(app.getDecisionReason())
+                .submittedAt(app.getSubmittedAt())
+                .createdAt(app.getCreatedAt())
+                .decidedAt(app.getDecidedAt())
+                .build();
+    }
 
     private NgoResponse toNgoResponse(Ngo n) {
         return NgoResponse.builder()

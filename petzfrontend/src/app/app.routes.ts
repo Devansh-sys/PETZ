@@ -78,7 +78,9 @@ export const routes: Routes = [
     children: [
       { path: '', loadComponent: () => import('./pages/admin-dashboard/admin-dashboard').then(m => m.AdminDashboard) },
       { path: 'hospitals', loadComponent: () => import('./pages/admin-hospitals/admin-hospitals').then(m => m.AdminHospitals) },
-      { path: 'rescues', loadComponent: () => import('./pages/admin-rescues/admin-rescues').then(m => m.AdminRescues) }
+      { path: 'rescues', loadComponent: () => import('./pages/admin-rescues/admin-rescues').then(m => m.AdminRescues) },
+      { path: 'adoptions', loadComponent: () => import('./pages/admin-adoptions/admin-adoptions').then(m => m.AdminAdoptions) },
+      { path: 'appointments', loadComponent: () => import('./pages/admin-appointments/admin-appointments').then(m => m.AdminAppointments) }
     ]
   },
 
