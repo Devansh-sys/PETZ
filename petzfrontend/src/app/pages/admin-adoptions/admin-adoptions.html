@@ -74,18 +74,17 @@
         📋 Applications
         <span class="tab-count" *ngIf="appTotal > 0">{{ appTotal }}</span>
       </button>
-      <button class="tab-btn" [class.active]="activeTab === 'ngos'" (click)="activeTab = 'ngos'">
-        🏢 NGO Management
+      <button class="tab-btn" [class.active]="activeTab === 'listings'" (click)="activeTab = 'listings'">
+        🐾 NGO Animal Listings
         <span class="tab-count">{{ ngos.length }}</span>
       </button>
       <button class="tab-btn" [class.active]="activeTab === 'rep'" (click)="activeTab = 'rep'">
-        👤 Add NGO Rep
+        ➕ Add NGO + Rep
       </button>
     </div>
 
-    <!-- ── TAB: Applications ── -->
+    <!-- ── TAB: Applications (view-only) ── -->
     <section *ngIf="activeTab === 'apps'" class="tab-content">
-      <!-- Filter bar -->
       <div class="filter-bar">
         <label class="filter-label">Filter by status:</label>
         <select class="filter-select" [(ngModel)]="filterStatus" (change)="loadApplications(0)">
@@ -141,7 +140,6 @@
         </table>
       </div>
 
-      <!-- Pagination -->
       <div class="pagination" *ngIf="appTotalPages > 1">
         <button class="page-btn" [disabled]="appPage === 0" (click)="loadApplications(appPage - 1)">‹ Prev</button>
         <span class="page-info">Page {{ appPage + 1 }} of {{ appTotalPages }}</span>
@@ -149,60 +147,71 @@
       </div>
     </section>
 
-    <!-- ── TAB: NGO Management ── -->
-    <section *ngIf="activeTab === 'ngos'" class="tab-content">
-      <div class="alert error" *ngIf="actionError">
-        <span>⚠️</span><span>{{ actionError }}</span>
-      </div>
+    <!-- ── TAB: NGO Animal Listings ── -->
+    <section *ngIf="activeTab === 'listings'" class="tab-content">
+      <p class="section-hint">View how many animals each NGO has listed and their adoption status. Click <strong>View Animals</strong> for details.</p>
 
       <div class="empty-state" *ngIf="ngos.length === 0">No NGOs registered yet.</div>
 
-      <div class="ngo-list" *ngIf="ngos.length > 0">
-        <div class="ngo-card" *ngFor="let n of ngos">
-          <div class="ngo-info">
-            <div class="ngo-name-row">
-              <h3>{{ n.name }}</h3>
+      <div class="ngo-listings-grid" *ngIf="ngos.length > 0">
+        <div class="ngo-listing-card" *ngFor="let n of ngos">
+          <div class="nlc-header">
+            <div class="nlc-name-row">
+              <h3 class="nlc-name">{{ n.name }}</h3>
               <span class="badge badge-green" *ngIf="n.isVerified">✓ Verified</span>
               <span class="badge badge-orange" *ngIf="!n.isVerified">Pending</span>
-              <span class="badge badge-grey" *ngIf="n.active === false">Inactive</span>
+              <span class="badge badge-grey" *ngIf="n.active === false">Suspended</span>
             </div>
-            <div class="ngo-details">
-              <span *ngIf="n.registrationNumber">Reg: {{ n.registrationNumber }}</span>
+            <div class="nlc-meta" *ngIf="n.contactPhone || n.contactEmail">
               <span *ngIf="n.contactPhone">📞 {{ n.contactPhone }}</span>
               <span *ngIf="n.contactEmail">✉️ {{ n.contactEmail }}</span>
-              <span *ngIf="n.ownerUserId" class="has-rep">✓ Has Rep</span>
-              <span *ngIf="!n.ownerUserId" class="no-rep">⚠ No Rep</span>
+            </div>
+            <div class="nlc-meta" *ngIf="n.registrationNumber">
+              Reg: {{ n.registrationNumber }}
             </div>
           </div>
-          <div class="ngo-actions">
-            <button class="btn btn-primary btn-sm"
-              *ngIf="!n.isVerified"
-              (click)="verifyNgo(n.id, 'APPROVE')"
-              [disabled]="busy === n.id + 'APPROVE'">
-              {{ busy === n.id + 'APPROVE' ? '…' : 'Approve' }}
-            </button>
-            <button class="btn btn-ghost btn-sm"
-              *ngIf="!n.isVerified"
-              (click)="verifyNgo(n.id, 'REJECT')"
-              [disabled]="busy === n.id + 'REJECT'">
-              {{ busy === n.id + 'REJECT' ? '…' : 'Reject' }}
-            </button>
-            <button class="btn btn-danger btn-sm"
-              *ngIf="n.isVerified && n.active !== false"
-              (click)="verifyNgo(n.id, 'SUSPEND')"
-              [disabled]="busy === n.id + 'SUSPEND'">
-              {{ busy === n.id + 'SUSPEND' ? '…' : 'Suspend' }}
-            </button>
+
+          <div class="nlc-stats">
+            <div class="nlc-stat total">
+              <span class="nlc-stat-num">{{ n.totalPets ?? 0 }}</span>
+              <span class="nlc-stat-label">Total</span>
+            </div>
+            <div class="nlc-stat listed">
+              <span class="nlc-stat-num">{{ n.listedPets ?? 0 }}</span>
+              <span class="nlc-stat-label">Listed</span>
+            </div>
+            <div class="nlc-stat onhold">
+              <span class="nlc-stat-num">{{ n.onHoldPets ?? 0 }}</span>
+              <span class="nlc-stat-label">On Hold</span>
+            </div>
+            <div class="nlc-stat adopted">
+              <span class="nlc-stat-num">{{ n.adoptedPets ?? 0 }}</span>
+              <span class="nlc-stat-label">Adopted</span>
+            </div>
+          </div>
+
+          <div class="nlc-footer">
+            <div *ngIf="n.ownerUserId" class="rep-details">
+              <span class="rep-status">✓ Representative</span>
+              <span class="rep-name" *ngIf="n.repFullName">{{ n.repFullName }}</span>
+              <span class="rep-contact" *ngIf="n.repPhone">📞 {{ n.repPhone }}</span>
+              <span class="rep-contact" *ngIf="n.repEmail">✉️ {{ n.repEmail }}</span>
+            </div>
+            <span class="rep-missing" *ngIf="!n.ownerUserId">⚠ No Representative</span>
+            <div class="nlc-footer-actions">
+              <button class="btn btn-ghost btn-sm" *ngIf="!n.ownerUserId" (click)="openAddRep(n)">+ Add Rep</button>
+              <button class="btn btn-primary btn-sm" (click)="openNgoPets(n)">View Animals</button>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ── TAB: Add NGO Representative ── -->
+    <!-- ── TAB: Add NGO + Representative ── -->
     <section *ngIf="activeTab === 'rep'" class="tab-content">
       <div class="form-card">
-        <h2 class="form-card-title">Add NGO Representative</h2>
-        <p class="form-card-desc">Create a new user account and assign them as the representative for a verified NGO.</p>
+        <h2 class="form-card-title">Add NGO + Representative</h2>
+        <p class="form-card-desc">Create a new verified NGO and its representative account in one step.</p>
 
         <div class="alert success" *ngIf="repSuccess">
           <span>✅</span><span>{{ repSuccess }}</span>
@@ -211,17 +220,46 @@
           <span>⚠️</span><span>{{ repError }}</span>
         </div>
 
+        <h3 class="form-section-title">NGO Details</h3>
         <div class="form-grid">
           <div class="form-field">
-            <label>NGO <span class="req">*</span></label>
-            <select [(ngModel)]="repNgoId" class="input" [disabled]="repBusy">
-              <option value="">— Select NGO —</option>
-              <option *ngFor="let n of ngos" [value]="n.id">
-                {{ n.name }}{{ !n.isVerified ? ' (Unverified)' : '' }}
-              </option>
-            </select>
+            <label>NGO Name <span class="req">*</span></label>
+            <input type="text" class="input" [(ngModel)]="ngoName" placeholder="Animal Welfare Society" [disabled]="repBusy"/>
           </div>
 
+          <div class="form-field">
+            <label>Registration Number</label>
+            <input type="text" class="input" [(ngModel)]="ngoRegistrationNumber" placeholder="Reg/Trust number" [disabled]="repBusy"/>
+          </div>
+
+          <div class="form-field">
+            <label>Contact Phone</label>
+            <input type="tel" class="input" [(ngModel)]="ngoContactPhone" placeholder="+91 XXXXX XXXXX" [disabled]="repBusy"/>
+          </div>
+
+          <div class="form-field">
+            <label>Contact Email</label>
+            <input type="email" class="input" [(ngModel)]="ngoContactEmail" placeholder="contact@ngo.org" [disabled]="repBusy"/>
+          </div>
+
+          <div class="form-field full-width">
+            <label>Address</label>
+            <input type="text" class="input" [(ngModel)]="ngoAddress" placeholder="Street, City, State" [disabled]="repBusy"/>
+          </div>
+
+          <div class="form-field">
+            <label>Latitude <span class="optional">(optional)</span></label>
+            <input type="number" class="input" [(ngModel)]="ngoLatitude" step="0.0001" [disabled]="repBusy"/>
+          </div>
+
+          <div class="form-field">
+            <label>Longitude <span class="optional">(optional)</span></label>
+            <input type="number" class="input" [(ngModel)]="ngoLongitude" step="0.0001" [disabled]="repBusy"/>
+          </div>
+        </div>
+
+        <h3 class="form-section-title">Representative Account</h3>
+        <div class="form-grid">
           <div class="form-field">
             <label>Full Name <span class="req">*</span></label>
             <input type="text" class="input" [(ngModel)]="repFullName" placeholder="Representative's full name" [disabled]="repBusy"/>
@@ -237,15 +275,15 @@
             <input type="email" class="input" [(ngModel)]="repEmail" placeholder="rep@ngo.org" [disabled]="repBusy"/>
           </div>
 
-          <div class="form-field full-width">
+          <div class="form-field">
             <label>Password <span class="req">*</span></label>
             <input type="password" class="input" [(ngModel)]="repPassword" placeholder="Set initial password" [disabled]="repBusy"/>
           </div>
         </div>
 
         <div class="form-actions">
-          <button class="btn btn-primary" (click)="submitAddRep()" [disabled]="repBusy">
-            {{ repBusy ? 'Adding…' : 'Add Representative' }}
+          <button class="btn btn-primary" (click)="submitCreateNgo()" [disabled]="repBusy">
+            {{ repBusy ? 'Creating…' : 'Create NGO + Representative' }}
           </button>
         </div>
       </div>
@@ -254,16 +292,23 @@
   </ng-container>
 </div>
 
-<!-- ── Application Detail Modal ── -->
+<!-- ── Application Detail Modal (read-only) ── -->
 <div class="modal-overlay" *ngIf="selectedApp" (click)="closeDetail()">
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Application Detail</h2>
+      <h2>Application Status View</h2>
       <button type="button" class="modal-close" (click)="closeDetail()">✕</button>
     </div>
 
     <div class="modal-body">
       <div class="detail-section">
+        <div class="status-banner" [class]="statusClass(selectedApp.status)">
+          <span class="status-pill lg" [class]="statusClass(selectedApp.status)">
+            {{ statusLabel(selectedApp.status) }}
+          </span>
+          <span class="status-ngo" *ngIf="selectedApp.ngoName">Managed by {{ selectedApp.ngoName }}</span>
+        </div>
+
         <div class="detail-grid">
           <div class="detail-row">
             <span class="detail-key">Applicant</span>
@@ -290,12 +335,6 @@
             <span class="detail-val">{{ selectedApp.ngoName ?? '—' }}</span>
           </div>
           <div class="detail-row">
-            <span class="detail-key">Status</span>
-            <span class="detail-val">
-              <span class="status-pill" [class]="statusClass(selectedApp.status)">{{ statusLabel(selectedApp.status) }}</span>
-            </span>
-          </div>
-          <div class="detail-row">
             <span class="detail-key">Submitted</span>
             <span class="detail-val">{{ (selectedApp.submittedAt | date:'dd MMM yyyy, HH:mm') ?? '—' }}</span>
           </div>
@@ -304,7 +343,7 @@
             <span class="detail-val">{{ selectedApp.decidedAt | date:'dd MMM yyyy, HH:mm' }}</span>
           </div>
           <div class="detail-row" *ngIf="selectedApp.decisionReason">
-            <span class="detail-key">Reason</span>
+            <span class="detail-key">Decision Note</span>
             <span class="detail-val">{{ selectedApp.decisionReason }}</span>
           </div>
         </div>
@@ -323,38 +362,113 @@
             {{ selectedApp.consentBackgroundCheck ? '✓' : '✗' }} Background Check
           </span>
         </div>
+
+        <p class="view-only-note">ℹ️ Adoption decisions are managed by the NGO. Admin view is read-only.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Add Rep Modal ── -->
+<div class="modal-overlay" *ngIf="addRepNgo" (click)="closeAddRep()">
+  <div class="modal modal-sm" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Add Representative</h2>
+      <button type="button" class="modal-close" (click)="closeAddRep()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-desc">Adding representative for <strong>{{ addRepNgo.name }}</strong></p>
+
+      <div class="alert success" *ngIf="addRepSuccess"><span>✅</span><span>{{ addRepSuccess }}</span></div>
+      <div class="alert error" *ngIf="addRepError"><span>⚠️</span><span>{{ addRepError }}</span></div>
+
+      <div class="form-grid">
+        <div class="form-field full-width">
+          <label>Full Name <span class="req">*</span></label>
+          <input type="text" class="input" [(ngModel)]="addRepForm.fullName" placeholder="Representative's full name" [disabled]="addRepBusy"/>
+        </div>
+        <div class="form-field">
+          <label>Phone <span class="req">*</span></label>
+          <input type="tel" class="input" [(ngModel)]="addRepForm.phone" placeholder="+91 XXXXX XXXXX" [disabled]="addRepBusy"/>
+        </div>
+        <div class="form-field">
+          <label>Email <span class="optional">(optional)</span></label>
+          <input type="email" class="input" [(ngModel)]="addRepForm.email" placeholder="rep@ngo.org" [disabled]="addRepBusy"/>
+        </div>
+        <div class="form-field full-width">
+          <label>Password <span class="req">*</span></label>
+          <input type="password" class="input" [(ngModel)]="addRepForm.password" placeholder="Set initial password" [disabled]="addRepBusy"/>
+        </div>
       </div>
 
-      <!-- Decide panel — only show if not already decided -->
-      <div class="decide-panel"
-        *ngIf="selectedApp.status !== 'APPROVED' && selectedApp.status !== 'REJECTED' && selectedApp.status !== 'WITHDRAWN'">
-        <h3 class="decide-title">Admin Decision</h3>
-
-        <div class="decide-actions">
-          <button class="btn btn-approve" [class.selected]="decideAction === 'APPROVE'" (click)="decideAction = 'APPROVE'">
-            ✓ Approve
-          </button>
-          <button class="btn btn-reject" [class.selected]="decideAction === 'REJECT'" (click)="decideAction = 'REJECT'">
-            ✗ Reject
-          </button>
-        </div>
-
-        <div class="form-field mt" *ngIf="decideAction">
-          <label>Reason <span class="optional">(optional)</span></label>
-          <textarea class="input" rows="3" [(ngModel)]="decideReason" placeholder="Add a note for the applicant…"></textarea>
-        </div>
-
-        <div class="alert error mt" *ngIf="decideError">
-          <span>⚠️</span><span>{{ decideError }}</span>
-        </div>
-
-        <button class="btn btn-primary mt" (click)="submitDecide()" [disabled]="!decideAction || decideBusy">
-          {{ decideBusy ? 'Submitting…' : 'Confirm Decision' }}
+      <div class="modal-footer-btns mt">
+        <button class="btn btn-ghost" (click)="closeAddRep()" [disabled]="addRepBusy">Cancel</button>
+        <button class="btn btn-primary" (click)="submitAddRep()" [disabled]="addRepBusy">
+          {{ addRepBusy ? 'Adding…' : 'Add Representative' }}
         </button>
       </div>
+    </div>
+  </div>
+</div>
 
-      <div class="decided-notice" *ngIf="selectedApp.status === 'APPROVED' || selectedApp.status === 'REJECTED' || selectedApp.status === 'WITHDRAWN'">
-        This application has already been decided.
+<!-- ── NGO Animal Listings Modal ── -->
+<div class="modal-overlay" *ngIf="selectedNgo" (click)="closeNgoPetsModal()">
+  <div class="modal modal-wide" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h2>{{ selectedNgo.name }} — Animals</h2>
+        <p class="modal-subtitle">{{ ngoPetsTotal }} animal{{ ngoPetsTotal !== 1 ? 's' : '' }} listed</p>
+      </div>
+      <button type="button" class="modal-close" (click)="closeNgoPetsModal()">✕</button>
+    </div>
+
+    <div class="modal-filter-bar">
+      <label class="filter-label">Filter:</label>
+      <select class="filter-select" [(ngModel)]="ngoPetsFilter" (change)="loadNgoPets(0)">
+        <option value="">All Statuses</option>
+        <option value="LISTED">Listed</option>
+        <option value="ON_HOLD">On Hold</option>
+        <option value="ADOPTED">Adopted</option>
+        <option value="ARCHIVED">Archived</option>
+      </select>
+    </div>
+
+    <div class="modal-body">
+      <div class="loading-inline" *ngIf="loadingNgoPets"><div class="spinner-sm"></div> Loading…</div>
+
+      <div class="empty-state" *ngIf="!loadingNgoPets && ngoPets.length === 0">
+        No animals found for this filter.
+      </div>
+
+      <div class="pets-grid" *ngIf="!loadingNgoPets && ngoPets.length > 0">
+        <div class="pet-card" *ngFor="let p of ngoPets">
+          <div class="pet-card-header">
+            <span class="pet-name">{{ p.name }}</span>
+            <span class="status-pill sm" [class]="petStatusClass(p.status)">{{ petStatusLabel(p.status) }}</span>
+          </div>
+          <div class="pet-card-body">
+            <div class="pet-info-row">
+              <span class="pet-species">{{ p.species }}<span *ngIf="p.breed"> · {{ p.breed }}</span></span>
+              <span class="pet-age">{{ ageLabel(p.ageMonths) }}</span>
+            </div>
+            <div class="pet-info-row" *ngIf="p.gender || p.locationCity">
+              <span *ngIf="p.gender">{{ p.gender }}</span>
+              <span *ngIf="p.locationCity">📍 {{ p.locationCity }}</span>
+            </div>
+            <div class="pet-ready" *ngIf="p.isAdoptionReady">
+              <span class="ready-badge">✓ Adoption Ready</span>
+            </div>
+          </div>
+          <div class="pet-card-footer">
+            <span class="pet-date">Listed {{ p.createdAt | date:'dd MMM yy' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pagination" *ngIf="ngoPetsTotalPages > 1">
+        <button class="page-btn" [disabled]="ngoPetsPage === 0" (click)="loadNgoPets(ngoPetsPage - 1)">‹ Prev</button>
+        <span class="page-info">Page {{ ngoPetsPage + 1 }} of {{ ngoPetsTotalPages }}</span>
+        <button class="page-btn" [disabled]="ngoPetsPage >= ngoPetsTotalPages - 1" (click)="loadNgoPets(ngoPetsPage + 1)">Next ›</button>
       </div>
     </div>
   </div>

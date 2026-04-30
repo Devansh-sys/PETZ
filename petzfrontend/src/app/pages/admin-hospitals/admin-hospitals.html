@@ -18,15 +18,15 @@
     <!-- Summary row -->
     <div class="summary-row">
       <div class="sum-card orange">
-        <div class="sum-num">{{ pendingHospitals.length }}</div>
+        <div class="sum-num">{{ pendingList.length }}</div>
         <div class="sum-label">Pending Verification</div>
       </div>
       <div class="sum-card green">
-        <div class="sum-num">{{ activeHospitals.length }}</div>
+        <div class="sum-num">{{ activeList.length }}</div>
         <div class="sum-label">Active & Verified</div>
       </div>
       <div class="sum-card grey">
-        <div class="sum-num">{{ disabledHospitals.length }}</div>
+        <div class="sum-num">{{ disabledList.length }}</div>
         <div class="sum-label">Disabled</div>
       </div>
     </div>
@@ -35,24 +35,24 @@
     <div class="tabs">
       <button class="tab-btn" [class.active]="activeTab === 'pending'" (click)="activeTab = 'pending'">
         Pending Verification
-        <span class="tab-badge orange" *ngIf="pendingHospitals.length > 0">{{ pendingHospitals.length }}</span>
+        <span class="tab-badge orange" *ngIf="pendingList.length > 0">{{ pendingList.length }}</span>
       </button>
       <button class="tab-btn" [class.active]="activeTab === 'active'" (click)="activeTab = 'active'">
         Active Hospitals
       </button>
       <button class="tab-btn" [class.active]="activeTab === 'disabled'" (click)="activeTab = 'disabled'">
         Disabled
-        <span class="tab-badge grey" *ngIf="disabledHospitals.length > 0">{{ disabledHospitals.length }}</span>
+        <span class="tab-badge grey" *ngIf="disabledList.length > 0">{{ disabledList.length }}</span>
       </button>
     </div>
 
     <!-- Pending tab -->
     <section *ngIf="activeTab === 'pending'" class="tab-content">
-      <div class="empty-state" *ngIf="pendingHospitals.length === 0">
+      <div class="empty-state" *ngIf="pendingList.length === 0">
         No hospitals pending verification. 🎉
       </div>
-      <div class="hospital-list" *ngIf="pendingHospitals.length > 0">
-        <div class="hospital-card" *ngFor="let h of pendingHospitals">
+      <div class="hospital-list" *ngIf="pendingList.length > 0">
+        <div class="hospital-card" *ngFor="let h of pendingList">
           <div class="hosp-info">
             <div class="hosp-name-row">
               <h3>{{ h.name }}</h3>
@@ -75,9 +75,9 @@
 
     <!-- Active tab -->
     <section *ngIf="activeTab === 'active'" class="tab-content">
-      <div class="empty-state" *ngIf="activeHospitals.length === 0">No active hospitals.</div>
-      <div class="hospital-list" *ngIf="activeHospitals.length > 0">
-        <div class="hospital-card" *ngFor="let h of activeHospitals">
+      <div class="empty-state" *ngIf="activeList.length === 0">No active hospitals.</div>
+      <div class="hospital-list" *ngIf="activeList.length > 0">
+        <div class="hospital-card" *ngFor="let h of activeList">
           <div class="hosp-info">
             <div class="hosp-name-row">
               <h3>{{ h.name }}</h3>
@@ -102,9 +102,9 @@
 
     <!-- Disabled tab -->
     <section *ngIf="activeTab === 'disabled'" class="tab-content">
-      <div class="empty-state" *ngIf="disabledHospitals.length === 0">No disabled hospitals.</div>
-      <div class="hospital-list" *ngIf="disabledHospitals.length > 0">
-        <div class="hospital-card disabled-card" *ngFor="let h of disabledHospitals">
+      <div class="empty-state" *ngIf="disabledList.length === 0">No disabled hospitals.</div>
+      <div class="hospital-list" *ngIf="disabledList.length > 0">
+        <div class="hospital-card disabled-card" *ngFor="let h of disabledList">
           <div class="hosp-info">
             <div class="hosp-name-row">
               <h3>{{ h.name }}</h3>

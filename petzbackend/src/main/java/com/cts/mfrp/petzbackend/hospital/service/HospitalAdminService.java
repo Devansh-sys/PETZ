@@ -40,6 +40,7 @@ public class HospitalAdminService {
     @Transactional(readOnly = true)
     public List<HospitalResponse> getPendingRegistrations() {
         return hospitalRepository.findByIsVerifiedFalse().stream()
+                .filter(Hospital::isActive)
                 .map(HospitalResponse::from)
                 .collect(Collectors.toList());
     }
@@ -86,12 +87,21 @@ public class HospitalAdminService {
         return hospitals.stream().map(h -> buildMetrics(h, rangeFrom, rangeTo)).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<HospitalResponse> getDisabledHospitals() {
+        return hospitalRepository.findAll().stream()
+                .filter(h -> !h.isActive())
+                .map(HospitalResponse::from)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public void disableHospital(UUID hospitalId, UUID adminId, DisableHospitalRequest req) {
         Hospital hospital = hospitalRepository.findById(hospitalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hospital", hospitalId));
 
         hospital.setVerified(false);
+        hospital.setActive(false);
         hospitalRepository.save(hospital);
 
         List<Appointment> confirmedAppointments = appointmentRepository
@@ -114,6 +124,7 @@ public class HospitalAdminService {
         Hospital hospital = hospitalRepository.findById(hospitalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hospital", hospitalId));
         hospital.setVerified(true);
+        hospital.setActive(true);
         hospitalRepository.save(hospital);
         auditLogRepository.save(HospitalAuditLog.builder()
                 .hospitalId(hospitalId)

@@ -353,55 +353,64 @@ PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 -- ── Demo accounts: one row per role, all with password Petz@1234 ──
 -- BCrypt hash of "Petz@1234" (cost=10). Re-using the same hash across rows is
 -- intentional and dev-only; production accounts hash unique passwords each.
-SET @petz_pwd = '$2a$10$FRaElkIfKSxPqegRndfQL.MDfm5EZQgb00X0uhym9pyuxzPEn6CWK';
- 
--- Upsert two extra demo users so every PETZ role has at least one login. The
--- ADMIN, NGO_REP, ADOPTER and REPORTER rows are already created by DataSeeder
--- on a fresh DB; this block only adds VOLUNTEER and VET if missing.
+SET @petz_pwd = '$2b$10$eSzW6YoFvablYt7VMlAjC.oODakv0VAlYZOQalNbELftfuYjeGRxu';
+
+-- Insert all demo accounts if they do not already exist.
+-- This runs before DataSeeder (ApplicationRunner), so on a fresh DB these rows
+-- are created here first; DataSeeder then upserts them (no conflict).
+-- On subsequent restarts INSERT IGNORE is a no-op and the UPDATE below re-asserts state.
 INSERT IGNORE INTO users (
     id, role, full_name, phone, email, password,
     active, email_verified, phone_verified, is_temporary,
     failed_login_attempts, created_at
 ) VALUES
-  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000001','-','')),
-   'ADMIN',   'Platform Admin',   '+91-9000000001', 'admin@petz.dev',
+  (UNHEX(REPLACE('b0000000-0000-0000-0000-000000000001','-','')),
+   'ADMIN',   'Platform Admin',    '+91-9000000001', 'admin@petz.dev',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
-  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000002','-','')),
-   'NGO_REP', 'Nandita Krishnan', '+91-9000000002', 'nandita@cupa.org.in',
+  (UNHEX(REPLACE('b0000000-0000-0000-0000-000000000002','-','')),
+   'NGO_REP', 'Nandita Krishnan',  '+91-9000000002', 'nandita@cupa.org.in',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
-  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000003','-','')),
-   'NGO_REP', 'Geeta Seshamani',  '+91-9000000003', 'geeta@friendicoes.org',
+  (UNHEX(REPLACE('b0000000-0000-0000-0000-000000000003','-','')),
+   'NGO_REP', 'Geeta Seshamani',   '+91-9000000003', 'geeta@friendicoes.org',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
-  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000004','-','')),
-   'NGO_REP', 'Rahul Sinha',      '+91-9000000004', 'rahul@bspca.org.in',
+  (UNHEX(REPLACE('b0000000-0000-0000-0000-000000000004','-','')),
+   'NGO_REP', 'Rahul Sinha',       '+91-9000000004', 'rahul@bspca.org.in',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
-  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000005','-','')),
-   'NGO_REP', 'Priya Menon',      '+91-9000000005', 'priya@pfa.org.in',
+  (UNHEX(REPLACE('b0000000-0000-0000-0000-000000000005','-','')),
+   'NGO_REP', 'Priya Menon',       '+91-9000000005', 'priya@pfa.org.in',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
-  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000006','-','')),
-   'ADOPTER', 'Arjun Verma',      '+91-9000000006', 'arjun.verma@gmail.com',
+  (UNHEX(REPLACE('b0000000-0000-0000-0000-000000000006','-','')),
+   'ADOPTER', 'Arjun Verma',       '+91-9000000006', 'arjun.verma@gmail.com',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
-  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000007','-','')),
-   'ADOPTER', 'Sneha Iyer',       '+91-9000000007', 'sneha.iyer@gmail.com',
+  (UNHEX(REPLACE('b0000000-0000-0000-0000-000000000007','-','')),
+   'ADOPTER', 'Sneha Iyer',        '+91-9000000007', 'sneha.iyer@gmail.com',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
   (UNHEX(REPLACE('a0000000-0000-0000-0000-000000000001','-','')),
-   'VOLUNTEER', 'Volunteer Demo', '+919000010001',  'volunteer@petz.dev',
+   'VOLUNTEER', 'Volunteer Demo',  '+919000010001',  'volunteer@petz.dev',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
   (UNHEX(REPLACE('a0000000-0000-0000-0000-000000000002','-','')),
-   'VET',       'Dr. Vet Demo',   '+919000010002',  'vet@petz.dev',
+   'VET',       'Dr. Vet Demo',    '+919000010002',  'vet@petz.dev',
+   @petz_pwd, 1, 1, 1, 0, 0, NOW()),
+  (UNHEX(REPLACE('c0000000-0000-0000-0000-000000000001','-','')),
+   'NGO_REP',  'NGO Representative', '+919000020001', 'ngo@petz.dev',
+   @petz_pwd, 1, 1, 1, 0, 0, NOW()),
+  (UNHEX(REPLACE('c0000000-0000-0000-0000-000000000002','-','')),
+   'ADOPTER',  'Owner Demo',         '+919000020002', 'owner@petz.test',
+   @petz_pwd, 1, 1, 1, 0, 0, NOW()),
+  (UNHEX(REPLACE('c0000000-0000-0000-0000-000000000003','-','')),
+   'REPORTER', 'John Test',          '+919000020003', 'john@test.com',
    @petz_pwd, 1, 1, 1, 0, 0, NOW());
- 
+
 -- Re-assert known-good password + activation flags for every demo account.
 -- Lets a teammate log in with Petz@1234 even after a wrong-password lockout.
 UPDATE users
-SET password             = @petz_pwd,
-    active               = 1,
-    email_verified       = 1,
-    phone_verified       = 1,
+SET password = @petz_pwd,
+    active = 1,
+    email_verified = 1,
+    phone_verified = 1,
     failed_login_attempts = 0,
-    locked_until         = NULL
+    locked_until = NULL
 WHERE email IN (
-    -- DataSeeder accounts (previously missing from this list — root cause of 403)
     'admin@petz.dev',
     'nandita@cupa.org.in',
     'geeta@friendicoes.org',
@@ -409,10 +418,6 @@ WHERE email IN (
     'priya@pfa.org.in',
     'arjun.verma@gmail.com',
     'sneha.iyer@gmail.com',
-    -- data.sql-only accounts
-    'volunteer@petz.dev',
-    'vet@petz.dev',
-    -- legacy / teammate test accounts (kept for backward compatibility)
     'ngo@petz.dev',
     'owner@petz.test',
     'john@test.com',

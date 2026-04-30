@@ -27,6 +27,12 @@ public class HospitalAdminController {
 
     private final HospitalAdminService adminService;
 
+    // GET /admin/hospitals/disabled — hospitals explicitly disabled by admin
+    @GetMapping("/disabled")
+    public ResponseEntity<ApiResponse<List<HospitalResponse>>> getDisabledHospitals() {
+        return ResponseEntity.ok(ApiResponse.ok("Disabled hospitals fetched.", adminService.getDisabledHospitals()));
+    }
+
     // US-3.7.1 — GET /admin/hospitals/pending
     @GetMapping("/pending")
     public ResponseEntity<ApiResponse<List<HospitalResponse>>> getPendingRegistrations() {

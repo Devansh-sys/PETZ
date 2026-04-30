@@ -17,8 +17,8 @@ import { environment } from '../../../environments/environment';
 export class AdminAdoptions implements OnInit {
   private base = environment.apiBaseUrl;
 
-  // tab: 'apps' | 'ngos' | 'rep'
-  activeTab: 'apps' | 'ngos' | 'rep' = 'apps';
+  // tab: 'apps' | 'listings' | 'rep'
+  activeTab: 'apps' | 'listings' | 'rep' = 'apps';
 
   metrics: any = null;
   ngos: any[] = [];
@@ -31,17 +31,26 @@ export class AdminAdoptions implements OnInit {
   error = '';
   filterStatus = '';
 
+  // Application detail modal (read-only view)
   selectedApp: any = null;
-  decideAction = '';
-  decideReason = '';
-  decideBusy = false;
-  decideError = '';
 
-  busy: string | null = null;
-  actionError = '';
+  // NGO pet listings modal
+  selectedNgo: any = null;
+  ngoPets: any[] = [];
+  ngoPetsTotal = 0;
+  ngoPetsPage = 0;
+  ngoPetsTotalPages = 1;
+  loadingNgoPets = false;
+  ngoPetsFilter = '';
 
-  // Add NGO rep form
-  repNgoId = '';
+  // Create NGO + Rep form
+  ngoName = '';
+  ngoAddress = '';
+  ngoContactPhone = '';
+  ngoContactEmail = '';
+  ngoRegistrationNumber = '';
+  ngoLatitude = 0;
+  ngoLongitude = 0;
   repFullName = '';
   repPhone = '';
   repEmail = '';
@@ -91,48 +100,80 @@ export class AdminAdoptions implements OnInit {
 
   openDetail(app: any): void {
     this.selectedApp = app;
-    this.decideAction = '';
-    this.decideReason = '';
-    this.decideError = '';
   }
 
   closeDetail(): void { this.selectedApp = null; }
 
-  submitDecide(): void {
-    if (!this.decideAction) return;
-    this.decideBusy = true;
-    this.decideError = '';
+  // NGO pet listings
+  openNgoPets(ngo: any): void {
+    this.selectedNgo = ngo;
+    this.ngoPetsFilter = '';
+    this.loadNgoPets(0);
+  }
+
+  loadNgoPets(page: number): void {
+    if (!this.selectedNgo) return;
+    this.loadingNgoPets = true;
+    const statusParam = this.ngoPetsFilter ? `&status=${this.ngoPetsFilter}` : '';
+    this.http.get<any>(
+      `${this.base}/admin/adoptions/ngos/${this.selectedNgo.id}/pets?page=${page}&size=12${statusParam}`
+    ).pipe(map(r => r.data ?? r), catchError(() => of({ content: [], totalElements: 0, totalPages: 1 })))
+     .subscribe(data => {
+       this.ngoPets = data.content ?? [];
+       this.ngoPetsTotal = data.totalElements ?? 0;
+       this.ngoPetsTotalPages = data.totalPages ?? 1;
+       this.ngoPetsPage = page;
+       this.loadingNgoPets = false;
+     });
+  }
+
+  closeNgoPetsModal(): void {
+    this.selectedNgo = null;
+    this.ngoPets = [];
+  }
+
+  // Add Rep to existing NGO
+  addRepNgo: any = null;
+  addRepBusy = false;
+  addRepError = '';
+  addRepSuccess = '';
+  addRepForm = { fullName: '', phone: '', email: '', password: '' };
+
+  openAddRep(ngo: any): void {
+    this.addRepNgo = ngo;
+    this.addRepError = '';
+    this.addRepSuccess = '';
+    this.addRepForm = { fullName: '', phone: '', email: '', password: '' };
+  }
+
+  closeAddRep(): void { this.addRepNgo = null; }
+
+  submitAddRep(): void {
+    if (!this.addRepForm.fullName || !this.addRepForm.phone || !this.addRepForm.password) {
+      this.addRepError = 'Full name, phone, and password are required.';
+      return;
+    }
+    this.addRepBusy = true;
+    this.addRepError = '';
     this.http.post<any>(
-      `${this.base}/admin/adoptions/applications/${this.selectedApp.id}/decide`,
-      { action: this.decideAction, reason: this.decideReason }
+      `${this.base}/admin/adoptions/ngos/${this.addRepNgo.id}/representative`,
+      this.addRepForm
     ).pipe(catchError(err => {
-      this.decideError = err.error?.message ?? 'Action failed.';
-      this.decideBusy = false;
+      this.addRepError = err.error?.message ?? 'Failed to add representative.';
+      this.addRepBusy = false;
       return of(null);
     })).subscribe(res => {
       if (res !== null) {
-        this.decideBusy = false;
-        this.selectedApp = null;
-        this.loadApplications(this.appPage);
-        this.loadAll();
+        this.addRepBusy = false;
+        this.addRepSuccess = `Representative "${this.addRepForm.fullName}" added successfully.`;
+        setTimeout(() => { this.addRepNgo = null; this.addRepSuccess = ''; this.loadAll(); }, 1500);
       }
     });
   }
 
-  verifyNgo(ngoId: string, action: string): void {
-    this.busy = ngoId + action;
-    this.actionError = '';
-    this.http.post<any>(`${this.base}/admin/adoptions/ngos/${ngoId}/verify`, { action })
-      .pipe(catchError(err => {
-        this.actionError = err.error?.message ?? 'Action failed.';
-        this.busy = null;
-        return of(null);
-      }))
-      .subscribe(res => { if (res !== null) { this.busy = null; this.loadAll(); } });
-  }
-
-  submitAddRep(): void {
-    if (!this.repNgoId || !this.repFullName || !this.repPhone || !this.repPassword) {
+  // Create NGO + Representative
+  submitCreateNgo(): void {
+    if (!this.ngoName || !this.repFullName || !this.repPhone || !this.repPassword) {
       this.repError = 'Please fill in all required fields.';
       return;
     }
@@ -140,20 +181,39 @@ export class AdminAdoptions implements OnInit {
     this.repError = '';
     this.repSuccess = '';
     this.http.post<any>(
-      `${this.base}/admin/adoptions/ngos/${this.repNgoId}/representative`,
-      { fullName: this.repFullName, phone: this.repPhone, email: this.repEmail, password: this.repPassword }
+      `${this.base}/admin/adoptions/ngos`,
+      {
+        ngoName: this.ngoName,
+        ngoAddress: this.ngoAddress,
+        ngoContactPhone: this.ngoContactPhone,
+        ngoContactEmail: this.ngoContactEmail,
+        ngoRegistrationNumber: this.ngoRegistrationNumber,
+        latitude: this.ngoLatitude,
+        longitude: this.ngoLongitude,
+        repFullName: this.repFullName,
+        repPhone: this.repPhone,
+        repEmail: this.repEmail,
+        repPassword: this.repPassword
+      }
     ).pipe(catchError(err => {
-      this.repError = err.error?.message ?? 'Failed to add representative.';
+      this.repError = err.error?.message ?? 'Failed to create NGO.';
       this.repBusy = false;
       return of(null);
     })).subscribe(res => {
       if (res !== null) {
         this.repBusy = false;
-        this.repSuccess = `Representative "${this.repFullName}" added successfully.`;
-        this.repFullName = ''; this.repPhone = ''; this.repEmail = ''; this.repPassword = ''; this.repNgoId = '';
+        this.repSuccess = `NGO "${this.ngoName}" created with representative "${this.repFullName}".`;
+        this.resetForm();
         this.loadAll();
       }
     });
+  }
+
+  private resetForm(): void {
+    this.ngoName = ''; this.ngoAddress = ''; this.ngoContactPhone = '';
+    this.ngoContactEmail = ''; this.ngoRegistrationNumber = '';
+    this.ngoLatitude = 0; this.ngoLongitude = 0;
+    this.repFullName = ''; this.repPhone = ''; this.repEmail = ''; this.repPassword = '';
   }
 
   statusLabel(s: string): string {
@@ -171,6 +231,28 @@ export class AdminAdoptions implements OnInit {
       SUBMITTED: 'orange', DRAFT: 'grey', WITHDRAWN: 'grey', CLARIFICATION_REQUESTED: 'orange'
     };
     return m[s] ?? 'grey';
+  }
+
+  petStatusLabel(s: string): string {
+    const m: Record<string, string> = {
+      LISTED: 'Listed', ON_HOLD: 'On Hold', ADOPTED: 'Adopted', ARCHIVED: 'Archived'
+    };
+    return m[s] ?? s;
+  }
+
+  petStatusClass(s: string): string {
+    const m: Record<string, string> = {
+      LISTED: 'green', ON_HOLD: 'orange', ADOPTED: 'blue', ARCHIVED: 'grey'
+    };
+    return m[s] ?? 'grey';
+  }
+
+  ageLabel(months: number | null): string {
+    if (months == null) return 'Unknown';
+    if (months < 12) return `${months}mo`;
+    const y = Math.floor(months / 12);
+    const m = months % 12;
+    return m > 0 ? `${y}y ${m}mo` : `${y}y`;
   }
 
   // SVG donut data

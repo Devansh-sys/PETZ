@@ -1,5 +1,5 @@
 export type ApplicationStatus =
-  | 'DRAFT' | 'PENDING' | 'UNDER_REVIEW'
+  | 'DRAFT' | 'PENDING' | 'SUBMITTED' | 'UNDER_REVIEW'
   | 'CLARIFICATION_REQUESTED' | 'APPROVED' | 'REJECTED' | 'WITHDRAWN';
 
 export interface AdoptablePet {

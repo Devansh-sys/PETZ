@@ -63,6 +63,10 @@ public class Hospital {
     @Column(name = "is_verified", nullable = false)
     private boolean isVerified;
 
+    @Column(name = "active", nullable = false, columnDefinition = "bit(1) default 1")
+    @Builder.Default
+    private boolean active = true;
+
     @Column(name = "emergency_ready", nullable = false)
     private boolean emergencyReady;
 

@@ -70,6 +70,55 @@ public class AdoptionAdminDtos {
         private boolean active;
         private boolean isVerified;
         private UUID ownerUserId;
+        private String contactPhone;
+        private String contactEmail;
+        private String registrationNumber;
+        private String address;
+        private long totalPets;
+        private long listedPets;
+        private long adoptedPets;
+        private long onHoldPets;
+        private String repFullName;
+        private String repPhone;
+        private String repEmail;
+    }
+
+    // ── Admin: NGO pet listing summary ───────────────────────────────────
+
+    @Data @NoArgsConstructor @AllArgsConstructor @Builder
+    public static class NgoAdminPetSummary {
+        private UUID id;
+        private String name;
+        private String species;
+        private String breed;
+        private String gender;
+        private Integer ageMonths;
+        private String status;
+        private String locationCity;
+        private boolean isAdoptionReady;
+        private LocalDateTime createdAt;
+    }
+
+    // ── Admin: create NGO + representative in one step ───────────────────
+
+    @Data @NoArgsConstructor @AllArgsConstructor
+    public static class CreateNgoWithRepRequest {
+        @NotBlank(message = "NGO name is required")
+        private String ngoName;
+        private String ngoAddress;
+        private String ngoContactPhone;
+        private String ngoContactEmail;
+        private String ngoRegistrationNumber;
+        private double latitude;
+        private double longitude;
+
+        @NotBlank(message = "Representative full name is required")
+        private String repFullName;
+        @NotBlank(message = "Representative phone is required")
+        private String repPhone;
+        private String repEmail;
+        @NotBlank(message = "Representative password is required")
+        private String repPassword;
     }
 
     // ── US-4.3 unified audit log ───────────────────────────────────────

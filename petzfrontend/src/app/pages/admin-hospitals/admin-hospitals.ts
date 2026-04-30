@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { Navbar } from '../../shared/navbar/navbar';
 import { HttpClient } from '@angular/common/http';
 import { map, catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { of, forkJoin } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -19,7 +19,9 @@ export class AdminHospitals implements OnInit {
 
   activeTab: 'active' | 'pending' | 'disabled' = 'pending';
 
-  allHospitals: any[] = [];
+  pendingList: any[] = [];
+  activeList: any[] = [];
+  disabledList: any[] = [];
   loading = true;
   error = '';
   busy: string | null = null;
@@ -61,28 +63,25 @@ export class AdminHospitals implements OnInit {
   load(): void {
     this.loading = true;
     this.error = '';
-    this.http.get<any>(`${this.base}/hospitals`)
-      .pipe(map(r => r.data ?? r), catchError(err => {
-        this.error = err.error?.message ?? 'Could not load hospitals.';
+    forkJoin({
+      pending: this.http.get<any>(`${this.base}/admin/hospitals/pending`)
+        .pipe(map(r => r.data ?? r), catchError(() => of([]))),
+      active: this.http.get<any>(`${this.base}/hospitals`)
+        .pipe(map(r => r.data ?? r), catchError(() => of([]))),
+      disabled: this.http.get<any>(`${this.base}/admin/hospitals/disabled`)
+        .pipe(map(r => r.data ?? r), catchError(() => of([])))
+    }).subscribe({
+      next: ({ pending, active, disabled }) => {
+        this.pendingList = Array.isArray(pending) ? pending : (pending?.content ?? []);
+        this.activeList = Array.isArray(active) ? active : (active?.content ?? []);
+        this.disabledList = Array.isArray(disabled) ? disabled : (disabled?.content ?? []);
         this.loading = false;
-        return of([]);
-      }))
-      .subscribe(data => {
-        this.allHospitals = Array.isArray(data) ? data : (data?.content ?? []);
+      },
+      error: () => {
+        this.error = 'Could not load hospitals.';
         this.loading = false;
-      });
-  }
-
-  get pendingHospitals(): any[] {
-    return this.allHospitals.filter(h => !(h.isVerified ?? h.verified) && h.active !== false);
-  }
-
-  get activeHospitals(): any[] {
-    return this.allHospitals.filter(h => (h.isVerified ?? h.verified) && h.active !== false);
-  }
-
-  get disabledHospitals(): any[] {
-    return this.allHospitals.filter(h => h.active === false);
+      }
+    });
   }
 
   // Verify popup

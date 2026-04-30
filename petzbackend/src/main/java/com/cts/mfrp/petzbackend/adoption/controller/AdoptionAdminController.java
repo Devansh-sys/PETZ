@@ -4,7 +4,9 @@ import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.AddNgoRepresentat
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.ApplicationDecideRequest;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.ApplicationSummary;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.AuditLogResponse;
+import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.CreateNgoWithRepRequest;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.MetricsResponse;
+import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.NgoAdminPetSummary;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.NgoResponse;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.VerifyNgoRequest;
 import com.cts.mfrp.petzbackend.adoption.dto.PageResponse;
@@ -113,10 +115,33 @@ public class AdoptionAdminController {
     // Admin: GET /admin/adoptions/applications — list all applications platform-wide
     @GetMapping("/applications")
     public ResponseEntity<ApiResponse<PageResponse<ApplicationSummary>>> listApplications(
+            @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0")  int page,
             @RequestParam(defaultValue = "20") int size) {
         return ResponseEntity.ok(ApiResponse.ok(
-                "Applications fetched.", adminService.listAllApplications(page, size)));
+                "Applications fetched.", adminService.listAllApplications(status, page, size)));
+    }
+
+    // Admin: GET /admin/adoptions/ngos/{ngoId}/pets — NGO-wise animal listings
+    @GetMapping("/ngos/{ngoId}/pets")
+    public ResponseEntity<ApiResponse<PageResponse<NgoAdminPetSummary>>> getNgoPets(
+            @PathVariable UUID ngoId,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0")  int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(ApiResponse.ok(
+                "NGO pets fetched.", adminService.getNgoPets(ngoId, status, page, size)));
+    }
+
+    // Admin: POST /admin/adoptions/ngos — create NGO + representative in one step
+    @PostMapping("/ngos")
+    public ResponseEntity<ApiResponse<NgoResponse>> createNgoWithRep(
+            @AuthenticationPrincipal UUID principalUserId,
+            @RequestHeader(value = "X-User-Id", required = false) UUID headerUserId,
+            @Valid @RequestBody CreateNgoWithRepRequest body) {
+        UUID adminId = resolveActor(principalUserId, headerUserId);
+        return ResponseEntity.ok(ApiResponse.ok(
+                "NGO and representative created.", adminService.createNgoWithRep(adminId, body)));
     }
 
     // Admin: POST /admin/adoptions/applications/{id}/decide — direct override

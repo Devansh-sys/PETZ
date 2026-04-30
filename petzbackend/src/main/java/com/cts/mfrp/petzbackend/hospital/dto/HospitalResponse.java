@@ -25,6 +25,7 @@ public class HospitalResponse {
     private String operatingHoursJson;
     @JsonProperty("isVerified")
     private boolean isVerified;
+    private boolean active;
     private boolean emergencyReady;
     @JsonProperty("isOpenNow")
     private boolean isOpenNow;
@@ -48,6 +49,7 @@ public class HospitalResponse {
                 .operatingHours(h.getOperatingHours())
                 .operatingHoursJson(h.getOperatingHoursJson())
                 .isVerified(h.isVerified())
+                .active(h.isActive())
                 .emergencyReady(h.isEmergencyReady())
                 .isOpenNow(h.isOpenNow())
                 .status(h.isVerified() ? "VERIFIED" : "PENDING")

@@ -3,15 +3,20 @@ package com.cts.mfrp.petzbackend.adoption.service;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.AddNgoRepresentativeRequest;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.ApplicationDecideRequest;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.ApplicationSummary;
+import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.CreateNgoWithRepRequest;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.MetricsResponse;
+import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.NgoAdminPetSummary;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.NgoResponse;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.VerifyNgoRequest;
 import com.cts.mfrp.petzbackend.adoption.dto.PageResponse;
+import com.cts.mfrp.petzbackend.adoption.enums.AdoptablePetStatus;
 import com.cts.mfrp.petzbackend.adoption.enums.AdoptionApplicationStatus;
 import com.cts.mfrp.petzbackend.adoption.enums.AdoptionStatus;
 import com.cts.mfrp.petzbackend.adoption.enums.AuditTargetType;
 import com.cts.mfrp.petzbackend.adoption.enums.FollowUpStatus;
+import com.cts.mfrp.petzbackend.adoption.model.AdoptablePet;
 import com.cts.mfrp.petzbackend.adoption.model.AdoptionApplication;
+import com.cts.mfrp.petzbackend.adoption.repository.AdoptablePetRepository;
 import com.cts.mfrp.petzbackend.adoption.repository.AdoptionApplicationRepository;
 import com.cts.mfrp.petzbackend.adoption.repository.AdoptionFollowUpRepository;
 import com.cts.mfrp.petzbackend.adoption.repository.AdoptionRepository;
@@ -62,6 +67,7 @@ public class AdoptionAdminService {
     private final AdoptionFollowUpRepository    followUpRepo;
     private final NgoRepository                 ngoRepo;
     private final UserRepository                userRepo;
+    private final AdoptablePetRepository        petRepo;
     private final AdoptionAuditService          auditService;
     private final InAppNotificationService      notificationService;
 
@@ -212,10 +218,77 @@ public class AdoptionAdminService {
     // ═════════════════════════════════════════════════════════════════
 
     @Transactional(readOnly = true)
-    public PageResponse<ApplicationSummary> listAllApplications(int page, int size) {
-        Page<AdoptionApplication> result = appRepo.findAll(
-                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
+    public PageResponse<ApplicationSummary> listAllApplications(String status, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<AdoptionApplication> result;
+        if (status != null && !status.isBlank()) {
+            AdoptionApplicationStatus statusEnum = AdoptionApplicationStatus.valueOf(status.toUpperCase());
+            Specification<AdoptionApplication> spec = (root, q, cb) ->
+                    cb.equal(root.get("status"), statusEnum);
+            result = appRepo.findAll(spec, pageRequest);
+        } else {
+            result = appRepo.findAll(pageRequest);
+        }
         return PageResponse.from(result, this::toApplicationSummary);
+    }
+
+    // ═════════════════════════════════════════════════════════════════
+    //  Admin: NGO-wise pet listings
+    // ═════════════════════════════════════════════════════════════════
+
+    @Transactional(readOnly = true)
+    public PageResponse<NgoAdminPetSummary> getNgoPets(UUID ngoId, String status, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<AdoptablePet> result;
+        if (status != null && !status.isBlank()) {
+            AdoptablePetStatus petStatus = AdoptablePetStatus.valueOf(status.toUpperCase());
+            Specification<AdoptablePet> spec = (root, q, cb) ->
+                    cb.and(cb.equal(root.get("ngoId"), ngoId), cb.equal(root.get("status"), petStatus));
+            result = petRepo.findAll(spec, pageRequest);
+        } else {
+            result = petRepo.findByNgoId(ngoId, pageRequest);
+        }
+        return PageResponse.from(result, this::toPetSummary);
+    }
+
+    // ═════════════════════════════════════════════════════════════════
+    //  Admin: create NGO + representative in one step
+    // ═════════════════════════════════════════════════════════════════
+
+    @Transactional
+    public NgoResponse createNgoWithRep(UUID adminId, CreateNgoWithRepRequest req) {
+        Ngo ngo = new Ngo();
+        ngo.setName(req.getNgoName().trim());
+        ngo.setAddress(req.getNgoAddress());
+        ngo.setContactPhone(req.getNgoContactPhone());
+        ngo.setContactEmail(req.getNgoContactEmail());
+        ngo.setRegistrationNumber(req.getNgoRegistrationNumber());
+        ngo.setLatitude(req.getLatitude());
+        ngo.setLongitude(req.getLongitude());
+        ngo.setActive(true);
+        ngo.setVerified(true);
+        Ngo savedNgo = ngoRepo.save(ngo);
+
+        User rep = new User();
+        rep.setFullName(req.getRepFullName());
+        rep.setPhone(req.getRepPhone());
+        rep.setEmail(req.getRepEmail());
+        rep.setPasswordHash(ENCODER.encode(req.getRepPassword()));
+        rep.setRole(User.Role.NGO_REP);
+        rep.setNgoId(savedNgo.getId());
+        rep.setActive(true);
+        rep.setEmailVerified(false);
+        rep.setPhoneVerified(false);
+        rep.setFailedLoginAttempts(0);
+        User savedRep = userRepo.save(rep);
+
+        savedNgo.setOwnerUserId(savedRep.getId());
+        ngoRepo.save(savedNgo);
+
+        auditService.log(AuditTargetType.NGO, savedNgo.getId(), adminId,
+                "NGO_CREATED_WITH_REP", "Created by admin with rep: " + req.getRepFullName(), null);
+        log.info("Admin {} created NGO {} with rep {}", adminId, savedNgo.getId(), savedRep.getId());
+        return toNgoResponse(savedNgo);
     }
 
     // ═════════════════════════════════════════════════════════════════
@@ -320,7 +393,12 @@ public class AdoptionAdminService {
     }
 
     private NgoResponse toNgoResponse(Ngo n) {
-        return NgoResponse.builder()
+        long total   = petRepo.countByNgoId(n.getId());
+        long listed  = petRepo.countByNgoIdAndStatus(n.getId(), AdoptablePetStatus.LISTED);
+        long adopted = petRepo.countByNgoIdAndStatus(n.getId(), AdoptablePetStatus.ADOPTED);
+        long onHold  = petRepo.countByNgoIdAndStatus(n.getId(), AdoptablePetStatus.ON_HOLD);
+
+        NgoResponse.NgoResponseBuilder builder = NgoResponse.builder()
                 .id(n.getId())
                 .name(n.getName())
                 .latitude(n.getLatitude())
@@ -328,6 +406,38 @@ public class AdoptionAdminService {
                 .active(n.isActive())
                 .isVerified(n.isVerified())
                 .ownerUserId(n.getOwnerUserId())
+                .contactPhone(n.getContactPhone())
+                .contactEmail(n.getContactEmail())
+                .registrationNumber(n.getRegistrationNumber())
+                .address(n.getAddress())
+                .totalPets(total)
+                .listedPets(listed)
+                .adoptedPets(adopted)
+                .onHoldPets(onHold);
+
+        if (n.getOwnerUserId() != null) {
+            userRepo.findById(n.getOwnerUserId()).ifPresent(u -> {
+                builder.repFullName(u.getFullName());
+                builder.repPhone(u.getPhone());
+                builder.repEmail(u.getEmail());
+            });
+        }
+
+        return builder.build();
+    }
+
+    private NgoAdminPetSummary toPetSummary(AdoptablePet p) {
+        return NgoAdminPetSummary.builder()
+                .id(p.getId())
+                .name(p.getName())
+                .species(p.getSpecies())
+                .breed(p.getBreed())
+                .gender(p.getGender())
+                .ageMonths(p.getAgeMonths())
+                .status(p.getStatus() != null ? p.getStatus().name() : null)
+                .locationCity(p.getLocationCity())
+                .isAdoptionReady(p.isAdoptionReady())
+                .createdAt(p.getCreatedAt())
                 .build();
     }
 
