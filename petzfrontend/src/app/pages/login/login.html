@@ -11,7 +11,8 @@
       <div class="field">
         <label>Mobile number</label>
         <input type="tel" placeholder="+91 98765 43210" [value]="phone()" (input)="phone.set($any($event.target).value)" (keyup.enter)="sendOtp()" autofocus />
-        <small class="hint">10-digit Indian number, or with country code</small>
+        <small class="hint" *ngIf="!phoneHint">10-digit Indian number, or with country code</small>
+        <small class="hint mismatch" *ngIf="phoneHint">{{ phoneHint }}</small>
       </div>
 
       <div *ngIf="error()" class="alert error mt">⚠️ {{ error() }}</div>
@@ -58,6 +59,7 @@
       <div class="field">
         <label>Email or phone</label>
         <input type="text" placeholder="you@example.com" [value]="identifier()" (input)="identifier.set($any($event.target).value)" autofocus />
+        <small class="hint mismatch" *ngIf="identifierHint">{{ identifierHint }}</small>
       </div>
 
       <div class="field">
@@ -72,6 +74,7 @@
             <span *ngIf="passwordVisible()">🙈 Hide</span>
           </button>
         </div>
+        <small class="hint mismatch" *ngIf="passwordHint">{{ passwordHint }}</small>
       </div>
 
       <div *ngIf="error()" class="alert error mt">⚠️ {{ error() }}</div>

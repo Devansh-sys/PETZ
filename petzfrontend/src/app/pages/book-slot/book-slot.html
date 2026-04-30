@@ -24,8 +24,11 @@
 
     <div *ngIf="!loading && error" class="alert error">{{ error }}</div>
 
-    <div *ngIf="!loading && !error && slots.length === 0" class="state-msg">
-      No available slots on this date. Try another day.
+    <div *ngIf="!loading && !error && slots.length === 0" class="empty-slots">
+      <p class="state-msg">No available slots on this date.</p>
+      <button class="btn btn-ghost btn-compact" [disabled]="searchingNext" (click)="findNextAvailable()">
+        {{ searchingNext ? 'Searching…' : 'Find next available date →' }}
+      </button>
     </div>
 
     <div *ngIf="!loading && !error && slots.length > 0" class="slot-grid">
@@ -36,5 +39,5 @@
     </div>
   </div>
 
-  <button class="btn-link" (click)="back()">‹ Back</button>
+  <button class="btn-back" (click)="back()">Back</button>
 </div>

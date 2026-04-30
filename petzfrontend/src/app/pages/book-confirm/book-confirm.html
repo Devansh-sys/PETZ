@@ -60,7 +60,7 @@
     <div *ngIf="error" class="alert error">
       {{ error }}
       <div class="back-link">
-        <button class="btn-link" (click)="back()">‹ Choose another slot</button>
+        <button class="btn-back" (click)="back()">Choose another slot</button>
       </div>
     </div>
 
@@ -100,7 +100,7 @@
       <button class="btn-big" [disabled]="!isLocked || loading" (click)="confirm()">
         {{ loading ? 'Booking...' : 'Confirm Appointment' }}
       </button>
-      <button class="btn-link" (click)="back()">‹ Back</button>
+      <button class="btn-back" (click)="back()">Back</button>
     </div>
   </div>
 

@@ -19,8 +19,11 @@ export class BookSlot implements OnInit {
   state: BookingState | null = null;
   slots: DoctorSlotResponse[] = [];
   loading = false;
+  searchingNext = false;
   error = '';
-  selectedDate: string = this.todayStr();
+  // Default to tomorrow — slot seeder guarantees tomorrow has openings, so the
+  // user lands on a date with data instead of an empty "today" view.
+  selectedDate: string = this.addDaysStr(1);
 
   constructor(
     private hospitalService: HospitalService,
@@ -45,6 +48,40 @@ export class BookSlot implements OnInit {
     });
   }
 
+  /**
+   * Walks forward from the current selectedDate up to 30 days, stopping on
+   * the first day that returns at least one available slot. Used by the
+   * "Find next available date" link in the empty state so the user doesn't
+   * have to click through the date picker manually.
+   */
+  findNextAvailable(): void {
+    if (this.searchingNext) return;
+    this.searchingNext = true;
+    this.error = '';
+    const tryOffset = (offset: number) => {
+      if (offset > 30) {
+        this.searchingNext = false;
+        this.error = 'No available slots in the next 30 days.';
+        return;
+      }
+      const d = this.addDaysStr(offset, this.selectedDate);
+      this.hospitalService.listSlots(this.state!.hospitalId!, this.state!.doctorId!, d, this.state!.serviceId).subscribe({
+        next: (list) => {
+          const open = list.filter(sl => sl.available);
+          if (open.length > 0) {
+            this.selectedDate = d;
+            this.slots = open;
+            this.searchingNext = false;
+          } else {
+            tryOffset(offset + 1);
+          }
+        },
+        error: () => { this.searchingNext = false; this.error = 'Could not load slots.'; }
+      });
+    };
+    tryOffset(1);
+  }
+
   select(slot: DoctorSlotResponse): void {
     const s = { ...this.state!, slotId: slot.id, slotDate: slot.slotDate, slotStart: slot.startTime, slotEnd: slot.endTime };
     sessionStorage.setItem(BOOKING_KEY, JSON.stringify(s));
@@ -57,6 +94,13 @@ export class BookSlot implements OnInit {
 
   private todayStr(): string {
     return new Date().toISOString().split('T')[0];
+  }
+
+  /** Returns YYYY-MM-DD for `today + days` (or `from + days` when given). */
+  private addDaysStr(days: number, from?: string): string {
+    const base = from ? new Date(from + 'T00:00:00Z') : new Date();
+    base.setUTCDate(base.getUTCDate() + days);
+    return base.toISOString().split('T')[0];
   }
 
   formatTime(t: string): string {

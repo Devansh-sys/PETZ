@@ -355,38 +355,110 @@ PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 -- intentional and dev-only; production accounts hash unique passwords each.
 SET @petz_pwd = '$2a$10$FRaElkIfKSxPqegRndfQL.MDfm5EZQgb00X0uhym9pyuxzPEn6CWK';
 
--- Upsert two extra demo users so every PETZ role has at least one login. The
--- ADMIN, NGO_REP, ADOPTER and REPORTER rows are already created by DataSeeder
--- on a fresh DB; this block only adds VOLUNTEER and VET if missing.
+-- ── DataSeeder-equivalent: 4 real Indian NGOs ────────────────────────────────
+-- Mirrors exactly what DataSeeder.java seeds. Deterministic UUIDs (22220000-…)
+-- make every INSERT IGNORE idempotent across restarts. These rows allow NGO_REP
+-- users below to reference a valid ngo_id even when DataSeeder is skipped
+-- (which happens whenever hospitals/NGOs already exist in the DB).
+INSERT IGNORE INTO ngo (id, name, latitude, longitude, active) VALUES
+  (UUID_TO_BIN('22220000-0000-0000-0000-000000000001'),
+   'Compassion Unlimited Plus Action (CUPA)',                      12.9279, 77.6271, 1),
+  (UUID_TO_BIN('22220000-0000-0000-0000-000000000002'),
+   'Friendicoes SECA',                                             28.5924, 77.2245, 1),
+  (UUID_TO_BIN('22220000-0000-0000-0000-000000000003'),
+   'Bombay Society for Prevention of Cruelty to Animals (BSPCA)', 18.9644, 72.8247, 1),
+  (UUID_TO_BIN('22220000-0000-0000-0000-000000000004'),
+   'People For Animals (PFA) — Hyderabad Chapter',                17.3850, 78.4867, 1);
+
+-- ── DataSeeder-equivalent: all 7 core demo users ─────────────────────────────
+-- FIX: DataSeeder.run() skips when hospitalRepo.count() > 0 && ngoRepo.count() > 0.
+-- Because data.sql already inserts 5 hospitals and 3 NGOs, DataSeeder always
+-- skips on a fresh machine — meaning admin@petz.dev and the NGO/adopter accounts
+-- are NEVER created, causing 403 (account disabled) or 401 (user not found) on login.
+-- This block makes data.sql the single source of truth for all demo accounts.
+-- Deterministic UUIDs (bbbb0000-…) keep every INSERT IGNORE idempotent.
+-- Password for ALL accounts: Petz@1234  (BCrypt hash defined as @petz_pwd above)
 INSERT IGNORE INTO users (
     id, role, full_name, phone, email, password,
     active, email_verified, phone_verified, is_temporary,
     failed_login_attempts, created_at
 ) VALUES
+  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000001','-','')),
+   'ADMIN',   'Platform Admin',   '+91-9000000001', 'admin@petz.dev',
+   @petz_pwd, 1, 1, 1, 0, 0, NOW()),
+  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000002','-','')),
+   'NGO_REP', 'Nandita Krishnan', '+91-9000000002', 'nandita@cupa.org.in',
+   @petz_pwd, 1, 1, 1, 0, 0, NOW()),
+  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000003','-','')),
+   'NGO_REP', 'Geeta Seshamani',  '+91-9000000003', 'geeta@friendicoes.org',
+   @petz_pwd, 1, 1, 1, 0, 0, NOW()),
+  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000004','-','')),
+   'NGO_REP', 'Rahul Sinha',      '+91-9000000004', 'rahul@bspca.org.in',
+   @petz_pwd, 1, 1, 1, 0, 0, NOW()),
+  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000005','-','')),
+   'NGO_REP', 'Priya Menon',      '+91-9000000005', 'priya@pfa.org.in',
+   @petz_pwd, 1, 1, 1, 0, 0, NOW()),
+  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000006','-','')),
+   'ADOPTER', 'Arjun Verma',      '+91-9000000006', 'arjun.verma@gmail.com',
+   @petz_pwd, 1, 1, 1, 0, 0, NOW()),
+  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000007','-','')),
+   'ADOPTER', 'Sneha Iyer',       '+91-9000000007', 'sneha.iyer@gmail.com',
+   @petz_pwd, 1, 1, 1, 0, 0, NOW()),
   (UNHEX(REPLACE('a0000000-0000-0000-0000-000000000001','-','')),
-   'VOLUNTEER', 'Volunteer Demo', '+919000010001', 'volunteer@petz.dev',
+   'VOLUNTEER', 'Volunteer Demo', '+919000010001',  'volunteer@petz.dev',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
   (UNHEX(REPLACE('a0000000-0000-0000-0000-000000000002','-','')),
-   'VET',       'Dr. Vet Demo',   '+919000010002', 'vet@petz.dev',
+   'VET',       'Dr. Vet Demo',   '+919000010002',  'vet@petz.dev',
    @petz_pwd, 1, 1, 1, 0, 0, NOW());
 
--- Re-assert known-good password + activation flags for every demo account.
--- Lets a teammate log in with Petz@1234 even after a wrong-password lockout.
+-- ── Link NGO_REP users to their NGOs ─────────────────────────────────────────
+-- Only updates rows where ngo_id is still NULL (idempotent — won't overwrite
+-- a DataSeeder-assigned ngo_id if DataSeeder happened to run first).
+UPDATE users SET ngo_id = UUID_TO_BIN('22220000-0000-0000-0000-000000000001')
+WHERE email = 'nandita@cupa.org.in'  AND ngo_id IS NULL;
+UPDATE users SET ngo_id = UUID_TO_BIN('22220000-0000-0000-0000-000000000002')
+WHERE email = 'geeta@friendicoes.org' AND ngo_id IS NULL;
+UPDATE users SET ngo_id = UUID_TO_BIN('22220000-0000-0000-0000-000000000003')
+WHERE email = 'rahul@bspca.org.in'   AND ngo_id IS NULL;
+UPDATE users SET ngo_id = UUID_TO_BIN('22220000-0000-0000-0000-000000000004')
+WHERE email = 'priya@pfa.org.in'     AND ngo_id IS NULL;
+
+-- Re-assert known-good password + activation flags for ALL demo accounts.
+-- Runs on every restart (spring.sql.init.mode=always) so a wrong-password
+-- lockout, a manual DB tweak, or a stale active=0 flag can never permanently
+-- block a developer from logging in. All accounts listed here use Petz@1234.
 UPDATE users
-SET password = @petz_pwd,
-    active = 1,
-    email_verified = 1,
-    phone_verified = 1,
+SET password             = @petz_pwd,
+    active               = 1,
+    email_verified       = 1,
+    phone_verified       = 1,
     failed_login_attempts = 0,
-    locked_until = NULL
+    locked_until         = NULL
 WHERE email IN (
+    -- DataSeeder accounts (previously missing from this list — root cause of 403)
     'admin@petz.dev',
+    'nandita@cupa.org.in',
+    'geeta@friendicoes.org',
+    'rahul@bspca.org.in',
+    'priya@pfa.org.in',
+    'arjun.verma@gmail.com',
+    'sneha.iyer@gmail.com',
+    -- data.sql-only accounts
+    'volunteer@petz.dev',
+    'vet@petz.dev',
+    -- legacy / teammate test accounts (kept for backward compatibility)
     'ngo@petz.dev',
     'owner@petz.test',
-    'john@test.com',
-    'volunteer@petz.dev',
-    'vet@petz.dev'
+    'john@test.com'
 );
+
+-- ── Backfill is_locked on legacy slot rows ──
+-- Appointment.isLocked is a primitive `boolean` in the entity; rows where
+-- is_locked is NULL throw JpaSystemException on read ("Null value was
+-- assigned to a property of primitive type"). Earlier SQL seeds (this file's
+-- original lines plus older migrations) didn't set the column, so any read
+-- of an AVAILABLE slot for those dates 500'd. Idempotent — only touches NULLs.
+UPDATE appointments SET is_locked = 0 WHERE is_locked IS NULL;
 
 -- ── 4-hour shift slots × 12 days per doctor (96 slots/doctor, 768 total) ──
 -- Each active doctor gets 8 × 30-minute AVAILABLE slots on each of 12
@@ -397,7 +469,8 @@ WHERE email IN (
 -- block is fully idempotent: re-runs INSERT IGNORE the same rows.
 INSERT IGNORE INTO appointments (
     id, hospital_id, doctor_id, appointment_date, appointment_time, end_time,
-    duration_minutes, slot_status, booking_type, version, created_at, updated_at
+    duration_minutes, slot_status, booking_type, version, created_at, updated_at,
+    is_locked, no_show_count, cancellation_policy_hours
 )
 SELECT
     UNHEX(MD5(CONCAT(HEX(d.id), '-', LPAD(days.n, 2, '0'), '-', slots.n))),
@@ -412,7 +485,8 @@ SELECT
         IF(MOD(ASCII(SUBSTRING(HEX(d.id), 1, 1)), 2) = 0, 9, 14) * 3600
         + (slots.n + 1) * 1800
     ),
-    30, 'AVAILABLE', 'ROUTINE', 0, NOW(), NOW()
+    30, 'AVAILABLE', 'ROUTINE', 0, NOW(), NOW(),
+    0, 0, 24
 FROM doctors d
 CROSS JOIN (
     SELECT 1  AS n UNION ALL SELECT 3  UNION ALL SELECT 5  UNION ALL SELECT 7

@@ -33,4 +33,14 @@
 }
 
 .state-msg { text-align: center; padding: 40px 0; color: var(--muted); font-size: 15px; }
+
+.empty-slots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 32px 16px 8px;
+  .state-msg { padding: 0 0 12px; }
+  .btn-compact { padding: 9px 18px; font-size: 14px; }
+}
 .alert.error { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; border-radius: 10px; padding: 14px 18px; font-size: 14px; }
