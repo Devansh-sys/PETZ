@@ -17,7 +17,7 @@ export class NgoAdoptions implements OnInit {
   applications: AdoptionApplication[] = [];
   loading = true;
   error = '';
-  filterStatus = 'PENDING';
+  filterStatus = 'SUBMITTED';
 
   constructor(private adoptionService: AdoptionService, private auth: AuthService) {}
 
@@ -33,7 +33,7 @@ export class NgoAdoptions implements OnInit {
 
   statusLabel(s: string): string {
     const m: Record<string, string> = {
-      DRAFT: 'Draft', PENDING: 'Pending', UNDER_REVIEW: 'Under Review',
+      DRAFT: 'Draft', SUBMITTED: 'Pending', UNDER_REVIEW: 'Under Review',
       CLARIFICATION_REQUESTED: 'Clarification', APPROVED: 'Approved',
       REJECTED: 'Rejected', WITHDRAWN: 'Withdrawn'
     };
@@ -42,7 +42,7 @@ export class NgoAdoptions implements OnInit {
 
   statusClass(s: string): string {
     const m: Record<string, string> = {
-      PENDING: 'blue', UNDER_REVIEW: 'blue', CLARIFICATION_REQUESTED: 'orange',
+      SUBMITTED: 'blue', UNDER_REVIEW: 'blue', CLARIFICATION_REQUESTED: 'orange',
       APPROVED: 'green', REJECTED: 'red', DRAFT: 'grey', WITHDRAWN: 'grey'
     };
     return m[s] ?? 'grey';

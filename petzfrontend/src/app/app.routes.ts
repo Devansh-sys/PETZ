@@ -67,7 +67,8 @@ export const routes: Routes = [
       { path: 'adoptions/:id/review', loadComponent: () => import('./pages/ngo-adoption-review/ngo-adoption-review').then(m => m.NgoAdoptionReview) },
       { path: 'pets', loadComponent: () => import('./pages/ngo-pets/ngo-pets').then(m => m.NgoPets) },
       { path: 'pets/new', loadComponent: () => import('./pages/ngo-pet-form/ngo-pet-form').then(m => m.NgoPetForm) },
-      { path: 'pets/:id/edit', loadComponent: () => import('./pages/ngo-pet-form/ngo-pet-form').then(m => m.NgoPetForm) }
+      { path: 'pets/:id/edit', loadComponent: () => import('./pages/ngo-pet-form/ngo-pet-form').then(m => m.NgoPetForm) },
+      { path: 'sos-reports', loadComponent: () => import('./pages/ngo-sos-reports/ngo-sos-reports').then(m => m.NgoSosReports) }
     ]
   },
 

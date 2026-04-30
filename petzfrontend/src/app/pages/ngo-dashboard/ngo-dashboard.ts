@@ -21,7 +21,7 @@ export class NgoDashboard implements OnInit {
   ngOnInit(): void {
     const ngoId = this.auth.session()?.userId;
     if (!ngoId) return;
-    this.adoptionService.ngoListApplications('PENDING').subscribe({
+    this.adoptionService.ngoListApplications('SUBMITTED').subscribe({
       next: (apps) => {
         this.recentApplications = apps.slice(0, 5);
         this.stats.pendingApplications = apps.length;
@@ -38,7 +38,7 @@ export class NgoDashboard implements OnInit {
   }
 
   statusClass(s: string): string {
-    const m: Record<string, string> = { PENDING: 'blue', UNDER_REVIEW: 'blue', APPROVED: 'green', REJECTED: 'red', CLARIFICATION_REQUESTED: 'orange' };
+    const m: Record<string, string> = { SUBMITTED: 'blue', UNDER_REVIEW: 'blue', APPROVED: 'green', REJECTED: 'red', CLARIFICATION_REQUESTED: 'orange' };
     return m[s] ?? 'grey';
   }
 }
