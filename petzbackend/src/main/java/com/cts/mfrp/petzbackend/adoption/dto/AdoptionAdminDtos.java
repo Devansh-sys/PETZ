@@ -1,5 +1,6 @@
 package com.cts.mfrp.petzbackend.adoption.dto;
 
+import com.cts.mfrp.petzbackend.adoption.enums.AdoptionApplicationStatus;
 import com.cts.mfrp.petzbackend.adoption.enums.AuditTargetType;
 import com.cts.mfrp.petzbackend.adoption.model.AdoptionAuditLog;
 import jakarta.validation.constraints.NotBlank;
@@ -102,5 +103,52 @@ public class AdoptionAdminDtos {
                     .performedAt(log.getPerformedAt())
                     .build();
         }
+    }
+
+    // ── Admin: list all applications ─────────────────────────────────────
+
+    @Data @NoArgsConstructor @AllArgsConstructor @Builder
+    public static class ApplicationSummary {
+        private UUID id;
+        private UUID adopterId;
+        private UUID adoptablePetId;
+        private UUID ngoId;
+        private String ngoName;
+        private AdoptionApplicationStatus status;
+        private String fullName;
+        private String phone;
+        private String email;
+        private String city;
+        private String housingType;
+        private Boolean prevPetOwnership;
+        private Boolean consentHomeVisit;
+        private Boolean consentFollowUp;
+        private Boolean consentBackgroundCheck;
+        private String decisionReason;
+        private LocalDateTime submittedAt;
+        private LocalDateTime createdAt;
+        private LocalDateTime decidedAt;
+    }
+
+    // ── Admin: direct approve/reject ────────────────────────────────────
+
+    @Data @NoArgsConstructor @AllArgsConstructor
+    public static class ApplicationDecideRequest {
+        @NotBlank(message = "action is required (APPROVE | REJECT)")
+        private String action;
+        private String reason;
+    }
+
+    // ── Admin: add NGO representative ───────────────────────────────────
+
+    @Data @NoArgsConstructor @AllArgsConstructor
+    public static class AddNgoRepresentativeRequest {
+        @NotBlank(message = "Full name is required")
+        private String fullName;
+        @NotBlank(message = "Phone is required")
+        private String phone;
+        private String email;
+        @NotBlank(message = "Password is required")
+        private String password;
     }
 }

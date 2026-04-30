@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { Navbar } from '../../shared/navbar/navbar';
@@ -27,7 +27,7 @@ export class Hospitals implements OnInit, OnDestroy {
   private filterChange$ = new Subject<void>();
   private sub!: Subscription;
 
-  constructor(private hospitalService: HospitalService) {}
+  constructor(private hospitalService: HospitalService, private router: Router) {}
 
   ngOnInit(): void {
     this.sub = this.filterChange$.pipe(
@@ -59,5 +59,15 @@ export class Hospitals implements OnInit, OnDestroy {
     this.filterEmergency = false;
     this.filterOpenNow = false;
     this.load();
+  }
+
+  bookHospital(h: HospitalResponse): void {
+    sessionStorage.setItem('petz.booking', JSON.stringify({
+      hospitalId: h.id,
+      hospitalName: h.name,
+      hospitalAddress: h.address,
+      hospitalPhone: h.contactPhone
+    }));
+    this.router.navigate(['/book/service']);
   }
 }

@@ -87,11 +87,31 @@ export class AdoptApply implements OnInit {
     if (idx > 0) this.step = this.steps[idx - 1];
   }
 
+  get canSubmit(): boolean {
+    return this.consent.agreedToTerms
+      && this.consent.consentHomeVisit
+      && this.consent.consentFollowUp
+      && this.consent.consentBackgroundCheck;
+  }
+
   submit(): void {
+    this.error = '';
+    if (!this.personal.fullName?.trim() || !this.personal.phone?.trim()) {
+      this.error = 'Full name and phone are required. Go back to Step 1 and fill them in.';
+      return;
+    }
+    if (!this.consent.consentHomeVisit || !this.consent.consentFollowUp || !this.consent.consentBackgroundCheck) {
+      this.error = 'Please accept all three consent checkboxes in Step 4 before submitting.';
+      return;
+    }
     this.saving = true;
     this.adoptionService.submitApplication(this.applicationId).subscribe({
       next: () => { this.saving = false; this.submitted = true; },
-      error: () => { this.error = 'Submission failed. Check all fields are filled.'; this.saving = false; }
+      error: (err) => {
+        const msg = err?.error?.message || err?.error?.error;
+        this.error = msg || 'Submission failed. Please check all fields are complete.';
+        this.saving = false;
+      }
     });
   }
 }

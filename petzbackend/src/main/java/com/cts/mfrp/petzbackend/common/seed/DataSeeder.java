@@ -63,12 +63,16 @@ public class DataSeeder implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
+        // Always run — creates missing demo accounts and resets their passwords.
+        // data.sql seeds hospitals+NGOs before this bean runs, so the old
+        // "skip if hospitals exist" guard was preventing user creation entirely.
+        ensureDemoUsers();
+
         if (hospitalRepo.count() > 0 && ngoRepo.count() > 0) {
-            log.info("[DataSeeder] Data already present — skipping.");
+            log.info("[DataSeeder] Non-user data already present — skipping.");
             return;
         }
         log.info("[DataSeeder] ▶  Seeding PETZ development data...");
-        seedUsers();
         seedNgosAndPets();
         seedHospitals();
         log.info("[DataSeeder] ✓  Seed complete — {} hospitals | {} NGOs | {} adoptable pets | {} users",
@@ -76,27 +80,22 @@ public class DataSeeder implements ApplicationRunner {
         log.info("[DataSeeder]    Default password for all accounts: {}", DEFAULT_PASSWORD);
     }
 
-    // ═════════════════════════════════════════════════════════════════════
-    // USERS
-    // ═════════════════════════════════════════════════════════════════════
-
-    private void seedUsers() {
+    private void ensureDemoUsers() {
         String hashed = ENCODER.encode(DEFAULT_PASSWORD);
-
-        saveUser("Platform Admin",     "+91-9000000001", "admin@petz.dev",              User.Role.ADMIN,    hashed, null);
-        saveUser("Nandita Krishnan",   "+91-9000000002", "nandita@cupa.org.in",          User.Role.NGO_REP,  hashed, null);
-        saveUser("Geeta Seshamani",    "+91-9000000003", "geeta@friendicoes.org",        User.Role.NGO_REP,  hashed, null);
-        saveUser("Rahul Sinha",        "+91-9000000004", "rahul@bspca.org.in",           User.Role.NGO_REP,  hashed, null);
-        saveUser("Priya Menon",        "+91-9000000005", "priya@pfa.org.in",             User.Role.NGO_REP,  hashed, null);
-        saveUser("Arjun Verma",        "+91-9000000006", "arjun.verma@gmail.com",        User.Role.ADOPTER,  hashed, null);
-        saveUser("Sneha Iyer",         "+91-9000000007", "sneha.iyer@gmail.com",         User.Role.ADOPTER,  hashed, null);
-
-        log.info("[DataSeeder]    Users seeded (1 admin, 4 NGO reps, 2 adopters)");
+        upsertUser("Platform Admin",   "+91-9000000001", "admin@petz.dev",          User.Role.ADMIN);
+        upsertUser("Nandita Krishnan", "+91-9000000002", "nandita@cupa.org.in",     User.Role.NGO_REP);
+        upsertUser("Geeta Seshamani",  "+91-9000000003", "geeta@friendicoes.org",   User.Role.NGO_REP);
+        upsertUser("Rahul Sinha",      "+91-9000000004", "rahul@bspca.org.in",      User.Role.NGO_REP);
+        upsertUser("Priya Menon",      "+91-9000000005", "priya@pfa.org.in",        User.Role.NGO_REP);
+        upsertUser("Arjun Verma",      "+91-9000000006", "arjun.verma@gmail.com",   User.Role.ADOPTER);
+        upsertUser("Sneha Iyer",       "+91-9000000007", "sneha.iyer@gmail.com",    User.Role.ADOPTER);
+        log.info("[DataSeeder] Demo users ensured. Login password: {}", DEFAULT_PASSWORD);
     }
 
-    private void saveUser(String name, String phone, String email, User.Role role, String hashed, UUID ngoId) {
-        if (userRepo.findByEmail(email).isPresent()) return;
-        User u = new User();
+    // Creates the user if missing; always resets password + unlocks so dev logins never break.
+    private void upsertUser(String name, String phone, String email, User.Role role) {
+        String hashed = ENCODER.encode(DEFAULT_PASSWORD);
+        User u = userRepo.findByEmail(email).orElseGet(User::new);
         u.setFullName(name);
         u.setPhone(phone);
         u.setEmail(email);
@@ -105,7 +104,8 @@ public class DataSeeder implements ApplicationRunner {
         u.setActive(true);
         u.setEmailVerified(true);
         u.setPhoneVerified(true);
-        u.setNgoId(ngoId);
+        u.setFailedLoginAttempts(0);
+        u.setLockedUntil(null);
         userRepo.save(u);
     }
 

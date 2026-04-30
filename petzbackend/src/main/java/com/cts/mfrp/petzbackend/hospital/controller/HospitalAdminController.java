@@ -2,7 +2,10 @@ package com.cts.mfrp.petzbackend.hospital.controller;
 
 import com.cts.mfrp.petzbackend.common.dto.ApiResponse;
 import com.cts.mfrp.petzbackend.hospital.dto.AppointmentMetricsResponse;
+import com.cts.mfrp.petzbackend.hospital.dto.CreateHospitalRequest;
 import com.cts.mfrp.petzbackend.hospital.dto.DisableHospitalRequest;
+import com.cts.mfrp.petzbackend.hospital.dto.DoctorManagementDtos.DoctorCreateRequest;
+import com.cts.mfrp.petzbackend.hospital.dto.DoctorResponse;
 import com.cts.mfrp.petzbackend.hospital.dto.HospitalResponse;
 import com.cts.mfrp.petzbackend.hospital.dto.HospitalVerificationRequest;
 import com.cts.mfrp.petzbackend.hospital.service.HospitalAdminService;
@@ -61,5 +64,30 @@ public class HospitalAdminController {
 
         adminService.disableHospital(hospitalId, adminId, req);
         return ResponseEntity.ok(ApiResponse.ok("Hospital disabled. Active appointments cancelled."));
+    }
+
+    // POST /admin/hospitals/{hospitalId}/enable — re-activate a disabled hospital
+    @PostMapping("/{hospitalId}/enable")
+    public ResponseEntity<ApiResponse<HospitalResponse>> enableHospital(
+            @PathVariable UUID hospitalId,
+            @AuthenticationPrincipal UUID adminId) {
+        return ResponseEntity.ok(ApiResponse.ok("Hospital enabled.", adminService.enableHospital(hospitalId, adminId)));
+    }
+
+    // POST /admin/hospitals — admin creates a hospital manually (pre-verified)
+    @PostMapping
+    public ResponseEntity<ApiResponse<HospitalResponse>> createHospital(
+            @Valid @RequestBody CreateHospitalRequest req,
+            @AuthenticationPrincipal UUID adminId) {
+        return ResponseEntity.ok(ApiResponse.ok("Hospital created.", adminService.createHospital(adminId, req)));
+    }
+
+    // POST /admin/hospitals/{hospitalId}/doctors — admin adds a doctor
+    @PostMapping("/{hospitalId}/doctors")
+    public ResponseEntity<ApiResponse<DoctorResponse>> addDoctor(
+            @PathVariable UUID hospitalId,
+            @Valid @RequestBody DoctorCreateRequest req,
+            @AuthenticationPrincipal UUID adminId) {
+        return ResponseEntity.ok(ApiResponse.ok("Doctor added.", adminService.addDoctor(hospitalId, adminId, req)));
     }
 }

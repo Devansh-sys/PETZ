@@ -18,8 +18,8 @@
 
   <div class="apps-list" *ngIf="!loading && !error && applications.length > 0">
     <a class="app-card" *ngFor="let app of applications"
-       [routerLink]="['/adopt', app.adoptablePetId, 'apply']"
-       [queryParams]="{applicationId: app.id}">
+       [routerLink]="app.status === 'DRAFT' ? ['/adopt', app.adoptablePetId, 'apply'] : ['/my-adoptions', app.id]"
+       [queryParams]="app.status === 'DRAFT' ? {applicationId: app.id} : {}">
       <div class="app-icon">🐾</div>
       <div class="app-info">
         <h3>{{ app.petName || 'Adoption Application' }}</h3>

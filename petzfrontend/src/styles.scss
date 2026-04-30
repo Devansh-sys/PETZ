@@ -143,3 +143,121 @@ input, textarea, select { font-family: inherit; color: inherit; }
   font-size: 12px; font-weight: 600;
   background: var(--sunset); color: var(--deep);
 }
+
+/* ── Shared Booking / Report Card Styles ───────────────────────── */
+
+.report-page {
+  min-height: calc(100vh - 64px);
+  padding: 40px 20px;
+  background: linear-gradient(180deg, var(--cream) 0%, var(--bg) 60%);
+  display: flex;
+  justify-content: center;
+}
+
+.report-card {
+  width: 100%;
+  max-width: 620px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow: 0 30px 80px -30px rgba(154, 52, 18, .2);
+  height: fit-content;
+}
+
+/* Step progress — circle nodes connected by a line (used in /book/* pages) */
+.step-dots {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  position: relative;
+  counter-reset: step-counter;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    right: 14px;
+    height: 2px;
+    background: var(--line);
+    transform: translateY(-50%);
+    z-index: 0;
+  }
+
+  .dot {
+    counter-increment: step-counter;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--line);
+    background: #fff;
+    color: #9ca3af;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 1;
+    transition: background .2s, border-color .2s;
+
+    &::before { content: counter(step-counter); }
+
+    &.done {
+      background: var(--success);
+      border-color: var(--success);
+      color: #fff;
+      &::before { content: '✓'; font-size: 13px; }
+    }
+
+    &.active {
+      background: var(--peach);
+      border-color: var(--peach);
+      color: #fff;
+      box-shadow: 0 0 0 4px rgba(249, 115, 22, .2);
+    }
+  }
+}
+
+.block-head {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  margin-bottom: 16px;
+
+  .block-title { font-size: 17px; font-weight: 700; color: var(--ink); }
+  .block-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+}
+
+.block {
+  margin-bottom: 24px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--line);
+
+  &:first-of-type { border-top: none; padding-top: 0; }
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--peach);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+
+  &:hover { color: var(--deep); }
+}
+
+.state-msg {
+  text-align: center;
+  padding: 40px 0;
+  color: var(--muted);
+  font-size: 15px;
+}

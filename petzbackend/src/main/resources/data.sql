@@ -1,7 +1,7 @@
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Seed data for local development  (INSERT IGNORE = safe to re-run on restart)
 -- ─────────────────────────────────────────────────────────────────────────────
-
+ 
 -- Hospitals  (is_verified=1 so they appear in discovery; owner_id is a placeholder UUID)
 INSERT IGNORE INTO hospitals
   (id, owner_id, name, address, city, contact_phone, contact_email,
@@ -16,7 +16,7 @@ VALUES
  19.1136, 72.8697,
  'Mon-Sat 9:00 AM – 7:00 PM', NULL,
  1, 1, 1, NOW()),
-
+ 
 (UUID_TO_BIN('cccc0000-0000-0000-0000-000000000002'),
  UUID_TO_BIN('ffffffff-0000-0000-0000-000000000001'),
  'Paws & Claws Vet Clinic',
@@ -25,7 +25,7 @@ VALUES
  19.0596, 72.8295,
  'Mon-Sun 8:00 AM – 9:00 PM', NULL,
  1, 0, 1, NOW()),
-
+ 
 (UUID_TO_BIN('cccc0000-0000-0000-0000-000000000003'),
  UUID_TO_BIN('ffffffff-0000-0000-0000-000000000001'),
  'Delhi Pet Hospital',
@@ -34,7 +34,7 @@ VALUES
  28.6315, 77.2167,
  'Mon-Sat 10:00 AM – 6:00 PM', NULL,
  1, 1, 1, NOW()),
-
+ 
 (UUID_TO_BIN('cccc0000-0000-0000-0000-000000000004'),
  UUID_TO_BIN('ffffffff-0000-0000-0000-000000000001'),
  'Green Leaf Animal Clinic',
@@ -43,7 +43,7 @@ VALUES
  12.9784, 77.6408,
  'Mon-Fri 9:00 AM – 8:00 PM, Sat 9:00 AM – 5:00 PM', NULL,
  1, 0, 1, NOW()),
-
+ 
 (UUID_TO_BIN('cccc0000-0000-0000-0000-000000000005'),
  UUID_TO_BIN('ffffffff-0000-0000-0000-000000000001'),
  'Bangalore Emergency Pet Care',
@@ -52,7 +52,7 @@ VALUES
  12.9352, 77.6245,
  'Open 24 Hours', NULL,
  1, 1, 1, NOW());
-
+ 
 -- Hospital Services
 INSERT IGNORE INTO hospital_services (id, hospital_id, service_name, service_type, price) VALUES
 -- PetCare Animal Hospital
@@ -72,7 +72,7 @@ INSERT IGNORE INTO hospital_services (id, hospital_id, service_name, service_typ
 -- Bangalore Emergency Pet Care
 (UUID_TO_BIN('dddd0000-0000-0000-0000-000000000011'), UUID_TO_BIN('cccc0000-0000-0000-0000-000000000005'), 'Emergency Care',        'EMERGENCY',     3000.00),
 (UUID_TO_BIN('dddd0000-0000-0000-0000-000000000012'), UUID_TO_BIN('cccc0000-0000-0000-0000-000000000005'), 'Surgery',               'SURGERY',       8000.00);
-
+ 
 -- Doctors
 INSERT IGNORE INTO doctors (id, hospital_id, name, specialization, contact_phone, availability, is_active) VALUES
 (UUID_TO_BIN('eeee0000-0000-0000-0000-000000000001'), UUID_TO_BIN('cccc0000-0000-0000-0000-000000000001'), 'Anita Sharma',  'Small Animals',           '+91-98100-11111', 'Mon-Fri 9 AM-5 PM',  1),
@@ -83,7 +83,7 @@ INSERT IGNORE INTO doctors (id, hospital_id, name, specialization, contact_phone
 (UUID_TO_BIN('eeee0000-0000-0000-0000-000000000006'), UUID_TO_BIN('cccc0000-0000-0000-0000-000000000004'), 'Arjun Singh',   'General Practice',        '+91-98400-66666', 'Mon-Fri 9 AM-8 PM',  1),
 (UUID_TO_BIN('eeee0000-0000-0000-0000-000000000007'), UUID_TO_BIN('cccc0000-0000-0000-0000-000000000005'), 'Meera Patel',   'Emergency & Surgery',     '+91-98500-77777', 'Open 24 Hours',       1),
 (UUID_TO_BIN('eeee0000-0000-0000-0000-000000000008'), UUID_TO_BIN('cccc0000-0000-0000-0000-000000000005'), 'Rohan Desai',   'Critical Care',           '+91-98500-88888', 'Open 24 Hours',       1);
-
+ 
 -- Doctor ↔ Service links
 INSERT IGNORE INTO doctor_services (doctor_id, service_id) VALUES
 (UUID_TO_BIN('eeee0000-0000-0000-0000-000000000001'), UUID_TO_BIN('dddd0000-0000-0000-0000-000000000001')),
@@ -101,7 +101,7 @@ INSERT IGNORE INTO doctor_services (doctor_id, service_id) VALUES
 (UUID_TO_BIN('eeee0000-0000-0000-0000-000000000007'), UUID_TO_BIN('dddd0000-0000-0000-0000-000000000011')),
 (UUID_TO_BIN('eeee0000-0000-0000-0000-000000000007'), UUID_TO_BIN('dddd0000-0000-0000-0000-000000000012')),
 (UUID_TO_BIN('eeee0000-0000-0000-0000-000000000008'), UUID_TO_BIN('dddd0000-0000-0000-0000-000000000011'));
-
+ 
 -- Appointment Slots (rolling — always 1-4 days ahead so they never expire)
 INSERT IGNORE INTO appointments
   (id, hospital_id, doctor_id, appointment_date, appointment_time, end_time,
@@ -132,13 +132,13 @@ VALUES
 (UUID_TO_BIN('ffff0000-0000-0000-0000-000000000015'), UUID_TO_BIN('cccc0000-0000-0000-0000-000000000005'), UUID_TO_BIN('eeee0000-0000-0000-0000-000000000007'), DATE_ADD(CURDATE(),INTERVAL 1 DAY), '08:00:00','08:30:00', 30,'AVAILABLE','ROUTINE',  0,NOW(),NOW()),
 (UUID_TO_BIN('ffff0000-0000-0000-0000-000000000016'), UUID_TO_BIN('cccc0000-0000-0000-0000-000000000005'), UUID_TO_BIN('eeee0000-0000-0000-0000-000000000007'), DATE_ADD(CURDATE(),INTERVAL 1 DAY), '20:00:00','20:30:00', 30,'AVAILABLE','EMERGENCY',0,NOW(),NOW()),
 (UUID_TO_BIN('ffff0000-0000-0000-0000-000000000017'), UUID_TO_BIN('cccc0000-0000-0000-0000-000000000005'), UUID_TO_BIN('eeee0000-0000-0000-0000-000000000008'), DATE_ADD(CURDATE(),INTERVAL 1 DAY), '10:00:00','10:30:00', 30,'AVAILABLE','ROUTINE',  0,NOW(),NOW());
-
+ 
 -- NGOs
 INSERT IGNORE INTO ngo (id, name, latitude, longitude, active) VALUES
 (UUID_TO_BIN('11110000-0000-0000-0000-000000000001'), 'Happy Paws NGO',        19.0760, 72.8777, 1),
 (UUID_TO_BIN('11110000-0000-0000-0000-000000000002'), 'Animal Care Trust',     28.7041, 77.1025, 1),
 (UUID_TO_BIN('11110000-0000-0000-0000-000000000003'), 'Paws & Love Foundation',12.9716, 77.5946, 1);
-
+ 
 -- Adoptable Pets  (status=LISTED so they appear in the public catalog)
 INSERT IGNORE INTO adoptable_pets
   (id, ngo_id, name, species, breed, gender, age_months,
@@ -155,7 +155,7 @@ VALUES
  'Friendly, energetic, loves fetch',
  'Healthy, fully vaccinated and dewormed',
  'FULLY_VACCINATED', 0, NULL, 1,'LISTED', NOW(), NOW(), 0),
-
+ 
 (UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000002'),
  UUID_TO_BIN('11110000-0000-0000-0000-000000000001'),
  'Luna','CAT','Persian','FEMALE',24,
@@ -164,7 +164,7 @@ VALUES
  'Calm, gentle, loves laps',
  'Spayed, vaccinated, healthy',
  'FULLY_VACCINATED', 0, NULL, 1,'LISTED', NOW(), NOW(), 0),
-
+ 
 (UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000003'),
  UUID_TO_BIN('11110000-0000-0000-0000-000000000002'),
  'Rocky','DOG','German Shepherd','MALE',36,
@@ -173,7 +173,7 @@ VALUES
  'Alert, loyal, energetic',
  'Fully vaccinated, regular health check-ups',
  'FULLY_VACCINATED', 0, NULL, 1,'LISTED', NOW(), NOW(), 0),
-
+ 
 (UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000004'),
  UUID_TO_BIN('11110000-0000-0000-0000-000000000002'),
  'Milo','DOG','Beagle','MALE',8,
@@ -182,7 +182,7 @@ VALUES
  'Playful, curious, loves everyone',
  'First vaccines completed, dewormed',
  'PARTIALLY_VACCINATED', 0, NULL, 0,'LISTED', NOW(), NOW(), 0),
-
+ 
 (UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000005'),
  UUID_TO_BIN('11110000-0000-0000-0000-000000000003'),
  'Whiskers','CAT','Tabby','FEMALE',12,
@@ -191,7 +191,7 @@ VALUES
  'Playful, independent, curious',
  'Spayed, vaccinated',
  'FULLY_VACCINATED', 0, NULL, 1,'LISTED', NOW(), NOW(), 0),
-
+ 
 (UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000006'),
  UUID_TO_BIN('11110000-0000-0000-0000-000000000003'),
  'Charlie','DOG','Indie','MALE',30,
@@ -200,7 +200,7 @@ VALUES
  'Adaptable, brave, affectionate',
  'Vaccinated, neutered, healthy',
  'FULLY_VACCINATED', 0, NULL, 1,'LISTED', NOW(), NOW(), 0),
-
+ 
 (UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000007'),
  UUID_TO_BIN('11110000-0000-0000-0000-000000000001'),
  'Bella','DOG','Golden Retriever','FEMALE',15,
@@ -209,7 +209,7 @@ VALUES
  'Sweet, gentle, obedient',
  'Fully vaccinated, spayed',
  'FULLY_VACCINATED', 1, 'Requires hypoallergenic diet', 1,'LISTED', NOW(), NOW(), 0),
-
+ 
 (UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000008'),
  UUID_TO_BIN('11110000-0000-0000-0000-000000000002'),
  'Oliver','CAT','Siamese','MALE',20,
@@ -218,14 +218,14 @@ VALUES
  'Vocal, affectionate, smart',
  'Neutered, vaccinated, healthy',
  'FULLY_VACCINATED', 0, NULL, 1,'LISTED', NOW(), NOW(), 0);
-
+ 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Dynamic catch-all: seed a Consultation service + one doctor + 4 slots for
 -- every VERIFIED hospital that still has NO services.
 -- Uses UNHEX(MD5(...)) for deterministic, collision-free BINARY(16) IDs.
 -- Safe to re-run: INSERT IGNORE skips duplicates on the same hospital.
 -- ─────────────────────────────────────────────────────────────────────────────
-
+ 
 -- Service: General Consultation
 INSERT IGNORE INTO hospital_services (id, hospital_id, service_name, service_type, price)
 SELECT UNHEX(MD5(CONCAT(HEX(h.id), '-CONS'))),
@@ -233,7 +233,7 @@ SELECT UNHEX(MD5(CONCAT(HEX(h.id), '-CONS'))),
 FROM hospitals h
 WHERE h.is_verified = 1
   AND NOT EXISTS (SELECT 1 FROM hospital_services hs WHERE hs.hospital_id = h.id);
-
+ 
 -- Service: Vaccination
 INSERT IGNORE INTO hospital_services (id, hospital_id, service_name, service_type, price)
 SELECT UNHEX(MD5(CONCAT(HEX(h.id), '-VACC'))),
@@ -241,7 +241,7 @@ SELECT UNHEX(MD5(CONCAT(HEX(h.id), '-VACC'))),
 FROM hospitals h
 WHERE h.is_verified = 1
   AND NOT EXISTS (SELECT 1 FROM hospital_services hs WHERE hs.hospital_id = h.id AND hs.service_name = 'Vaccination');
-
+ 
 -- Doctor
 INSERT IGNORE INTO doctors (id, hospital_id, name, specialization, availability, is_active)
 SELECT UNHEX(MD5(CONCAT(HEX(h.id), '-DR1'))),
@@ -249,21 +249,21 @@ SELECT UNHEX(MD5(CONCAT(HEX(h.id), '-DR1'))),
 FROM hospitals h
 WHERE h.is_verified = 1
   AND NOT EXISTS (SELECT 1 FROM doctors d WHERE d.hospital_id = h.id);
-
+ 
 -- Doctor ↔ Consultation service link
 INSERT IGNORE INTO doctor_services (doctor_id, service_id)
 SELECT UNHEX(MD5(CONCAT(HEX(h.id), '-DR1'))),
        UNHEX(MD5(CONCAT(HEX(h.id), '-CONS')))
 FROM hospitals h
 WHERE h.is_verified = 1;
-
+ 
 -- Doctor ↔ Vaccination service link
 INSERT IGNORE INTO doctor_services (doctor_id, service_id)
 SELECT UNHEX(MD5(CONCAT(HEX(h.id), '-DR1'))),
        UNHEX(MD5(CONCAT(HEX(h.id), '-VACC')))
 FROM hospitals h
 WHERE h.is_verified = 1;
-
+ 
 -- Appointment slots (day+1 through day+4, morning + afternoon each day)
 INSERT IGNORE INTO appointments
   (id, hospital_id, doctor_id, appointment_date, appointment_time, end_time,
@@ -274,7 +274,7 @@ SELECT UNHEX(MD5(CONCAT(HEX(h.id), '-SL-D1-AM'))),
        30, 'AVAILABLE', 'ROUTINE', 0, NOW(), NOW()
 FROM hospitals h WHERE h.is_verified = 1
   AND NOT EXISTS (SELECT 1 FROM appointments a WHERE a.hospital_id = h.id AND a.slot_status = 'AVAILABLE' AND a.appointment_date > CURDATE());
-
+ 
 INSERT IGNORE INTO appointments
   (id, hospital_id, doctor_id, appointment_date, appointment_time, end_time,
    duration_minutes, slot_status, booking_type, version, created_at, updated_at)
@@ -284,7 +284,7 @@ SELECT UNHEX(MD5(CONCAT(HEX(h.id), '-SL-D1-PM'))),
        30, 'AVAILABLE', 'ROUTINE', 0, NOW(), NOW()
 FROM hospitals h WHERE h.is_verified = 1
   AND NOT EXISTS (SELECT 1 FROM appointments a WHERE a.hospital_id = h.id AND a.slot_status = 'AVAILABLE' AND a.appointment_date = DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND a.appointment_time = '14:00:00');
-
+ 
 INSERT IGNORE INTO appointments
   (id, hospital_id, doctor_id, appointment_date, appointment_time, end_time,
    duration_minutes, slot_status, booking_type, version, created_at, updated_at)
@@ -294,7 +294,7 @@ SELECT UNHEX(MD5(CONCAT(HEX(h.id), '-SL-D2-AM'))),
        30, 'AVAILABLE', 'ROUTINE', 0, NOW(), NOW()
 FROM hospitals h WHERE h.is_verified = 1
   AND NOT EXISTS (SELECT 1 FROM appointments a WHERE a.hospital_id = h.id AND a.slot_status = 'AVAILABLE' AND a.appointment_date = DATE_ADD(CURDATE(), INTERVAL 2 DAY) AND a.appointment_time = '09:00:00');
-
+ 
 INSERT IGNORE INTO appointments
   (id, hospital_id, doctor_id, appointment_date, appointment_time, end_time,
    duration_minutes, slot_status, booking_type, version, created_at, updated_at)
@@ -304,7 +304,7 @@ SELECT UNHEX(MD5(CONCAT(HEX(h.id), '-SL-D2-PM'))),
        30, 'AVAILABLE', 'ROUTINE', 0, NOW(), NOW()
 FROM hospitals h WHERE h.is_verified = 1
   AND NOT EXISTS (SELECT 1 FROM appointments a WHERE a.hospital_id = h.id AND a.slot_status = 'AVAILABLE' AND a.appointment_date = DATE_ADD(CURDATE(), INTERVAL 2 DAY) AND a.appointment_time = '14:00:00');
-
+ 
 -- ═════════════════════════════════════════════════════════════════════════════
 -- SESSION 2026-04-29 — schema fixes + demo accounts + 4-hour shift slot seeding
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -312,12 +312,12 @@ FROM hospitals h WHERE h.is_verified = 1
 -- (spring.sql.init.mode=always, jpa.defer-datasource-initialization=true), so
 -- each ALTER uses IF EXISTS / IF NOT EXISTS, every UPDATE re-asserts state, and
 -- every INSERT uses IGNORE keyed on UUID-derived deterministic IDs.
-
+ 
 -- ── Schema cleanup: drop orphan NOT-NULL columns left over from old entities ──
 -- MySQL's ALTER TABLE ... DROP INDEX has no IF EXISTS form, so wrap each ALTER
 -- in a conditional PREPARE that no-ops when the index/column is already gone.
 -- Fresh installs run the no-ops; legacy installs perform the drops.
-
+ 
 SET @sql := IF(
     (SELECT COUNT(*) FROM information_schema.STATISTICS
        WHERE TABLE_SCHEMA = DATABASE()
@@ -326,7 +326,7 @@ SET @sql := IF(
     'ALTER TABLE hospital_audit_logs DROP INDEX idx_audit_clinic',
     'DO 0');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
-
+ 
 SET @sql := IF(
     (SELECT COUNT(*) FROM information_schema.COLUMNS
        WHERE TABLE_SCHEMA = DATABASE()
@@ -335,7 +335,7 @@ SET @sql := IF(
     'ALTER TABLE hospital_audit_logs DROP COLUMN clinic_id',
     'DO 0');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
-
+ 
 -- Make appointments.appointment_type tolerant of inserts that don't set it.
 -- The current entity has no field for this column; it was kept as a NOT NULL
 -- enum from a previous schema. Adding a default lets every API path that
@@ -349,35 +349,15 @@ SET @sql := IF(
     'ALTER TABLE appointments MODIFY appointment_type ENUM(''EMERGENCY'',''ROUTINE'') NOT NULL DEFAULT ''ROUTINE''',
     'DO 0');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
-
+ 
 -- ── Demo accounts: one row per role, all with password Petz@1234 ──
 -- BCrypt hash of "Petz@1234" (cost=10). Re-using the same hash across rows is
 -- intentional and dev-only; production accounts hash unique passwords each.
 SET @petz_pwd = '$2a$10$FRaElkIfKSxPqegRndfQL.MDfm5EZQgb00X0uhym9pyuxzPEn6CWK';
-
--- ── DataSeeder-equivalent: 4 real Indian NGOs ────────────────────────────────
--- Mirrors exactly what DataSeeder.java seeds. Deterministic UUIDs (22220000-…)
--- make every INSERT IGNORE idempotent across restarts. These rows allow NGO_REP
--- users below to reference a valid ngo_id even when DataSeeder is skipped
--- (which happens whenever hospitals/NGOs already exist in the DB).
-INSERT IGNORE INTO ngo (id, name, latitude, longitude, active) VALUES
-  (UUID_TO_BIN('22220000-0000-0000-0000-000000000001'),
-   'Compassion Unlimited Plus Action (CUPA)',                      12.9279, 77.6271, 1),
-  (UUID_TO_BIN('22220000-0000-0000-0000-000000000002'),
-   'Friendicoes SECA',                                             28.5924, 77.2245, 1),
-  (UUID_TO_BIN('22220000-0000-0000-0000-000000000003'),
-   'Bombay Society for Prevention of Cruelty to Animals (BSPCA)', 18.9644, 72.8247, 1),
-  (UUID_TO_BIN('22220000-0000-0000-0000-000000000004'),
-   'People For Animals (PFA) — Hyderabad Chapter',                17.3850, 78.4867, 1);
-
--- ── DataSeeder-equivalent: all 7 core demo users ─────────────────────────────
--- FIX: DataSeeder.run() skips when hospitalRepo.count() > 0 && ngoRepo.count() > 0.
--- Because data.sql already inserts 5 hospitals and 3 NGOs, DataSeeder always
--- skips on a fresh machine — meaning admin@petz.dev and the NGO/adopter accounts
--- are NEVER created, causing 403 (account disabled) or 401 (user not found) on login.
--- This block makes data.sql the single source of truth for all demo accounts.
--- Deterministic UUIDs (bbbb0000-…) keep every INSERT IGNORE idempotent.
--- Password for ALL accounts: Petz@1234  (BCrypt hash defined as @petz_pwd above)
+ 
+-- Upsert two extra demo users so every PETZ role has at least one login. The
+-- ADMIN, NGO_REP, ADOPTER and REPORTER rows are already created by DataSeeder
+-- on a fresh DB; this block only adds VOLUNTEER and VET if missing.
 INSERT IGNORE INTO users (
     id, role, full_name, phone, email, password,
     active, email_verified, phone_verified, is_temporary,
@@ -410,23 +390,9 @@ INSERT IGNORE INTO users (
   (UNHEX(REPLACE('a0000000-0000-0000-0000-000000000002','-','')),
    'VET',       'Dr. Vet Demo',   '+919000010002',  'vet@petz.dev',
    @petz_pwd, 1, 1, 1, 0, 0, NOW());
-
--- ── Link NGO_REP users to their NGOs ─────────────────────────────────────────
--- Only updates rows where ngo_id is still NULL (idempotent — won't overwrite
--- a DataSeeder-assigned ngo_id if DataSeeder happened to run first).
-UPDATE users SET ngo_id = UUID_TO_BIN('22220000-0000-0000-0000-000000000001')
-WHERE email = 'nandita@cupa.org.in'  AND ngo_id IS NULL;
-UPDATE users SET ngo_id = UUID_TO_BIN('22220000-0000-0000-0000-000000000002')
-WHERE email = 'geeta@friendicoes.org' AND ngo_id IS NULL;
-UPDATE users SET ngo_id = UUID_TO_BIN('22220000-0000-0000-0000-000000000003')
-WHERE email = 'rahul@bspca.org.in'   AND ngo_id IS NULL;
-UPDATE users SET ngo_id = UUID_TO_BIN('22220000-0000-0000-0000-000000000004')
-WHERE email = 'priya@pfa.org.in'     AND ngo_id IS NULL;
-
--- Re-assert known-good password + activation flags for ALL demo accounts.
--- Runs on every restart (spring.sql.init.mode=always) so a wrong-password
--- lockout, a manual DB tweak, or a stale active=0 flag can never permanently
--- block a developer from logging in. All accounts listed here use Petz@1234.
+ 
+-- Re-assert known-good password + activation flags for every demo account.
+-- Lets a teammate log in with Petz@1234 even after a wrong-password lockout.
 UPDATE users
 SET password             = @petz_pwd,
     active               = 1,
@@ -449,9 +415,11 @@ WHERE email IN (
     -- legacy / teammate test accounts (kept for backward compatibility)
     'ngo@petz.dev',
     'owner@petz.test',
-    'john@test.com'
+    'john@test.com',
+    'volunteer@petz.dev',
+    'vet@petz.dev'
 );
-
+ 
 -- ── Backfill is_locked on legacy slot rows ──
 -- Appointment.isLocked is a primitive `boolean` in the entity; rows where
 -- is_locked is NULL throw JpaSystemException on read ("Null value was
@@ -459,7 +427,7 @@ WHERE email IN (
 -- original lines plus older migrations) didn't set the column, so any read
 -- of an AVAILABLE slot for those dates 500'd. Idempotent — only touches NULLs.
 UPDATE appointments SET is_locked = 0 WHERE is_locked IS NULL;
-
+ 
 -- ── 4-hour shift slots × 12 days per doctor (96 slots/doctor, 768 total) ──
 -- Each active doctor gets 8 × 30-minute AVAILABLE slots on each of 12
 -- pre-chosen day-offsets in the next 30 days. Half the doctors run a 09:00
@@ -498,3 +466,5 @@ CROSS JOIN (
     UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7
 ) AS slots
 WHERE d.is_active = 1;
+ 
+ 

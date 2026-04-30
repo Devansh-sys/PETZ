@@ -7,9 +7,11 @@ import com.cts.mfrp.petzbackend.adoption.dto.AdoptionApplicationDtos.RejectReque
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionApplicationDtos.Summary;
 import com.cts.mfrp.petzbackend.adoption.dto.KycDocumentDtos.DocumentResponse;
 import com.cts.mfrp.petzbackend.adoption.dto.PageResponse;
+import com.cts.mfrp.petzbackend.adoption.enums.AdoptablePetStatus;
 import com.cts.mfrp.petzbackend.adoption.enums.AdoptionApplicationStatus;
 import com.cts.mfrp.petzbackend.adoption.enums.AuditTargetType;
 import com.cts.mfrp.petzbackend.adoption.model.AdoptionApplication;
+import com.cts.mfrp.petzbackend.adoption.repository.AdoptablePetRepository;
 import com.cts.mfrp.petzbackend.adoption.repository.AdoptionApplicationRepository;
 import com.cts.mfrp.petzbackend.common.exception.ResourceNotFoundException;
 import com.cts.mfrp.petzbackend.common.service.NotificationService;
@@ -53,6 +55,7 @@ public class AdoptionReviewService {
     private static final Logger log = LoggerFactory.getLogger(AdoptionReviewService.class);
 
     private final AdoptionApplicationRepository appRepo;
+    private final AdoptablePetRepository        petRepo;
     private final AdoptionApplicationService    applicationService;  // reuse mappers
     private final KycDocumentService            kycService;
     private final AdoptionAuditService          auditService;
@@ -154,6 +157,12 @@ public class AdoptionReviewService {
         app.setDecidedAt(LocalDateTime.now());
         AdoptionApplication saved = appRepo.save(app);
 
+        // Mark pet as ADOPTED — no further applications accepted.
+        petRepo.findById(saved.getAdoptablePetId()).ifPresent(p -> {
+            p.setStatus(AdoptablePetStatus.ADOPTED);
+            petRepo.save(p);
+        });
+
         auditService.log(AuditTargetType.APPLICATION, saved.getId(), reviewerId,
                 "APPROVED", req.getNotes(), null);
         notifications.notifyAdopterDecision(saved.getAdopterId(), saved.getId(),
@@ -177,6 +186,14 @@ public class AdoptionReviewService {
         app.setDecisionReason(req.getReason());
         app.setDecidedAt(LocalDateTime.now());
         AdoptionApplication saved = appRepo.save(app);
+
+        // Release pet back to LISTED — open for new adopters to apply.
+        petRepo.findById(saved.getAdoptablePetId()).ifPresent(p -> {
+            if (p.getStatus() == AdoptablePetStatus.ON_HOLD) {
+                p.setStatus(AdoptablePetStatus.LISTED);
+                petRepo.save(p);
+            }
+        });
 
         auditService.log(AuditTargetType.APPLICATION, saved.getId(), reviewerId,
                 "REJECTED", req.getReason(), null);

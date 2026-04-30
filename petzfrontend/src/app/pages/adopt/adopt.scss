@@ -68,6 +68,10 @@
   img { width: 100%; height: 100%; object-fit: cover; }
   .pet-placeholder { display: flex; align-items: center; justify-content: center; height: 100%; font-size: 64px; }
   .ready-badge { position: absolute; top: 10px; right: 10px; background: #16a34a; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
+  .status-badge { position: absolute; top: 10px; right: 10px; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px;
+    &.on-hold { background: #fef3c7; color: #92400e; }
+    &.adopted { background: #dcfce7; color: #166534; }
+  }
 }
 .pet-info { padding: 16px; }
 .pet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;

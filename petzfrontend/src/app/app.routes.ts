@@ -52,6 +52,7 @@ export const routes: Routes = [
   { path: 'adopt/:id', loadComponent: () => import('./pages/adopt-detail/adopt-detail').then(m => m.AdoptDetail) },
   { path: 'adopt/:id/apply', loadComponent: () => import('./pages/adopt-apply/adopt-apply').then(m => m.AdoptApply), canActivate: [authGuard] },
   { path: 'my-adoptions', loadComponent: () => import('./pages/my-adoptions/my-adoptions').then(m => m.MyAdoptions), canActivate: [authGuard] },
+  { path: 'my-adoptions/:id', loadComponent: () => import('./pages/adopt-application-view/adopt-application-view').then(m => m.AdoptApplicationView), canActivate: [authGuard] },
 
   // NGO portal
   {
@@ -77,7 +78,9 @@ export const routes: Routes = [
     children: [
       { path: '', loadComponent: () => import('./pages/admin-dashboard/admin-dashboard').then(m => m.AdminDashboard) },
       { path: 'hospitals', loadComponent: () => import('./pages/admin-hospitals/admin-hospitals').then(m => m.AdminHospitals) },
-      { path: 'rescues', loadComponent: () => import('./pages/admin-rescues/admin-rescues').then(m => m.AdminRescues) }
+      { path: 'rescues', loadComponent: () => import('./pages/admin-rescues/admin-rescues').then(m => m.AdminRescues) },
+      { path: 'adoptions', loadComponent: () => import('./pages/admin-adoptions/admin-adoptions').then(m => m.AdminAdoptions) },
+      { path: 'appointments', loadComponent: () => import('./pages/admin-appointments/admin-appointments').then(m => m.AdminAppointments) }
     ]
   },
 
