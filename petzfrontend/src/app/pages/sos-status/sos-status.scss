@@ -121,6 +121,7 @@
       small {
         font-size: 12px; color: var(--muted);
         &.in-progress { color: var(--peach); font-weight: 700; }
+        &.done-label { color: #16a34a; font-weight: 600; }
         &.pending { color: var(--muted); }
       }
     }

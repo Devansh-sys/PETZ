@@ -22,12 +22,13 @@ interface TimelineStep {
   active: boolean;
 }
 
-const STAGE_ORDER: ReportStatus[] = [
-  'REPORTED',
-  'DISPATCHED',
-  'ON_SITE',
-  'TRANSPORTING',
-  'COMPLETE'
+// ASSIGNED = admin created a PENDING assignment (NGO hasn't responded yet)
+// DISPATCHED = NGO accepted the assignment
+const ADMIN_ASSIGNED_STATUSES: ReportStatus[] = [
+  'ASSIGNED', 'DISPATCHED', 'ON_SITE', 'TRANSPORTING', 'COMPLETE', 'MISSION_COMPLETE', 'REJECTED'
+];
+const NGO_ACCEPTED_STATUSES: ReportStatus[] = [
+  'DISPATCHED', 'ON_SITE', 'TRANSPORTING', 'COMPLETE', 'MISSION_COMPLETE'
 ];
 
 @Component({
@@ -54,7 +55,7 @@ export class SosStatus implements OnInit, OnDestroy {
   private pollTimer?: number;
 
   readonly currentStatus = computed<ReportStatus>(() =>
-    this.mission()?.rescueStatus ?? this.report()?.currentStatus ?? 'REPORTED'
+    this.report()?.currentStatus ?? this.mission()?.rescueStatus ?? 'REPORTED'
   );
 
   readonly isClosed = computed(() =>
@@ -63,18 +64,39 @@ export class SosStatus implements OnInit, OnDestroy {
 
   readonly steps = computed<TimelineStep[]>(() => {
     const current = this.currentStatus();
-    const m = this.mission();
     const r = this.report();
-    const currentIdx = STAGE_ORDER.indexOf(current);
-    const effectiveIdx = currentIdx === -1 ? STAGE_ORDER.length : currentIdx;
-    return STAGE_ORDER.map((status, idx) => ({
-      status,
-      label: this.label(status),
-      emoji: this.emoji(status),
-      at: this.timestampFor(status, m, r),
-      done: idx < effectiveIdx,
-      active: idx === effectiveIdx
-    }));
+    const m = this.mission();
+
+    const isRejected    = current === 'REJECTED';
+    const adminAssigned = ADMIN_ASSIGNED_STATUSES.includes(current);
+    const ngoAccepted   = NGO_ACCEPTED_STATUSES.includes(current);
+
+    return [
+      {
+        status: 'REPORTED' as ReportStatus,
+        label:  'SOS Received',
+        emoji:  '📞',
+        at:     r?.reportedAt,
+        done:   true,
+        active: current === 'REPORTED'   // pulse while waiting for admin
+      },
+      {
+        status: 'DISPATCHED' as ReportStatus,
+        label:  'Admin Assigned NGO',
+        emoji:  '🏢',
+        at:     undefined,
+        done:   adminAssigned,
+        active: !adminAssigned
+      },
+      {
+        status: 'COMPLETE' as ReportStatus,
+        label:  isRejected ? 'NGO Rejected' : 'NGO Accepted',
+        emoji:  isRejected ? '❌' : '✅',
+        at:     m?.dispatchedAt,
+        done:   ngoAccepted,
+        active: adminAssigned && !ngoAccepted && !isRejected
+      }
+    ];
   });
 
   ngOnInit(): void {
@@ -139,40 +161,4 @@ export class SosStatus implements OnInit, OnDestroy {
     return t.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   }
 
-  private label(s: ReportStatus): string {
-    switch (s) {
-      case 'REPORTED':     return 'SOS received';
-      case 'DISPATCHED':   return 'Rescuer dispatched';
-      case 'ON_SITE':      return 'Rescuer on site';
-      case 'TRANSPORTING': return 'Transporting to hospital';
-      case 'COMPLETE':     return 'Rescue complete';
-      default:             return s;
-    }
-  }
-
-  private emoji(s: ReportStatus): string {
-    switch (s) {
-      case 'REPORTED':     return '📞';
-      case 'DISPATCHED':   return '🏍️';
-      case 'ON_SITE':      return '📍';
-      case 'TRANSPORTING': return '🚑';
-      case 'COMPLETE':     return '✅';
-      default:             return '•';
-    }
-  }
-
-  private timestampFor(
-    s: ReportStatus,
-    m: RescueMissionResponse | null,
-    r: SosReportResponse | null
-  ): string | undefined {
-    switch (s) {
-      case 'REPORTED':     return r?.reportedAt;
-      case 'DISPATCHED':   return m?.dispatchedAt;
-      case 'ON_SITE':      return m?.onSiteAt;
-      case 'TRANSPORTING': return m?.transportingAt;
-      case 'COMPLETE':     return m?.completedAt;
-      default:             return undefined;
-    }
-  }
 }

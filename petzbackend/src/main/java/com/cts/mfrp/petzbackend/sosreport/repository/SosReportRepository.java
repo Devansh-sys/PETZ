@@ -25,6 +25,9 @@ public interface SosReportRepository extends JpaRepository<SosReport, UUID> {
     /** US-1.8.1 – All non-completed rescues for admin live map. */
     List<SosReport> findByCurrentStatusNot(ReportStatus status);
 
+    /** NGO open-reports feed — all REPORTED (unassigned) rescues, newest first. */
+    List<SosReport> findByCurrentStatusOrderByReportedAtDesc(ReportStatus status);
+
     /** US-1.8.3 – KPI: count completed rescues in a date range. */
     @Query("""
         SELECT COUNT(s) FROM SosReport s

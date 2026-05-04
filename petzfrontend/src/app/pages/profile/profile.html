@@ -51,8 +51,27 @@
           <span>Appointments</span>
         </a>
       </div>
+      <!-- NGO quick links -->
+      <div class="links-grid" *ngIf="role === 'NGO Representative' || role === 'NGO'">
+        <a routerLink="/ngo/dashboard" class="link-card">
+          <span class="lc-icon">🏢</span>
+          <span>NGO Dashboard</span>
+        </a>
+        <a routerLink="/ngo/pets" class="link-card">
+          <span class="lc-icon">🐾</span>
+          <span>Manage Pet Listings</span>
+        </a>
+        <a routerLink="/ngo/adoptions" class="link-card">
+          <span class="lc-icon">📋</span>
+          <span>Review Applications</span>
+        </a>
+        <a routerLink="/my-reports" class="link-card">
+          <span class="lc-icon">🚨</span>
+          <span>Rescue Reports</span>
+        </a>
+      </div>
       <!-- Normal user quick links -->
-      <div class="links-grid" *ngIf="role !== 'Administrator'">
+      <div class="links-grid" *ngIf="role !== 'Administrator' && role !== 'NGO Representative' && role !== 'NGO'">
         <a routerLink="/my-reports" class="link-card">
           <span class="lc-icon">📋</span>
           <span>My Rescue Reports</span>
@@ -64,10 +83,6 @@
         <a routerLink="/my-adoptions" class="link-card">
           <span class="lc-icon">🏠</span>
           <span>My Adoptions</span>
-        </a>
-        <a *ngIf="role === 'NGO Representative' || role === 'NGO'" routerLink="/ngo/dashboard" class="link-card">
-          <span class="lc-icon">🏢</span>
-          <span>NGO Dashboard</span>
         </a>
       </div>
     </div>

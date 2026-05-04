@@ -15,14 +15,16 @@
       <a routerLink="/admin/hospitals" routerLinkActive="active">Hospital Mgmt</a>
       <a routerLink="/admin/adoptions" routerLinkActive="active">Adoptions</a>
       <a routerLink="/admin/appointments" routerLinkActive="active">Appointments</a>
+    } @else if (isNgo()) {
+      <a routerLink="/ngo/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">NGO Dashboard</a>
+      <a routerLink="/ngo/pets" routerLinkActive="active">Pet Listings</a>
+      <a routerLink="/ngo/adoptions" routerLinkActive="active">Applications</a>
+      <a routerLink="/my-reports" routerLinkActive="active">Rescue Reports</a>
     } @else {
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Home</a>
       <a routerLink="/hospitals" routerLinkActive="active">Hospitals</a>
       <a routerLink="/adopt" routerLinkActive="active">Adopt</a>
       <a routerLink="/book" routerLinkActive="active">Book Slot</a>
-      @if (isNgo()) {
-        <a routerLink="/ngo/dashboard" routerLinkActive="active">NGO Portal</a>
-      }
       @if (isAuthenticated()) {
         <div class="dropdown" [class.open]="activityOpen()">
           <button type="button" class="dropdown-trigger" (click)="toggleActivity()" aria-haspopup="menu" [attr.aria-expanded]="activityOpen()">
@@ -74,7 +76,7 @@
       <a routerLink="/login" class="btn btn-ghost btn-compact">Sign In</a>
       <a routerLink="/register" class="btn btn-ghost btn-compact">Register</a>
     }
-    @if (!isAdmin()) {
+    @if (!isAdmin() && !isNgo()) {
       <a routerLink="/sos/auth" class="btn btn-primary sos-cta">🚨 Report SOS</a>
     }
   </div>
@@ -97,6 +99,11 @@
         <a routerLink="/admin/hospitals" routerLinkActive="active" (click)="closeMenu()">🏥 Hospital Mgmt</a>
         <a routerLink="/admin/adoptions" routerLinkActive="active" (click)="closeMenu()">🐾 Adoptions</a>
         <a routerLink="/admin/appointments" routerLinkActive="active" (click)="closeMenu()">📅 Appointments</a>
+      } @else if (isNgo()) {
+        <a routerLink="/ngo/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="closeMenu()">🏢 NGO Dashboard</a>
+        <a routerLink="/ngo/pets" routerLinkActive="active" (click)="closeMenu()">🐾 Pet Listings</a>
+        <a routerLink="/ngo/adoptions" routerLinkActive="active" (click)="closeMenu()">📋 Applications</a>
+        <a routerLink="/my-reports" routerLinkActive="active" (click)="closeMenu()">🚨 Rescue Reports</a>
       } @else {
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="closeMenu()">🏠 Home</a>
         <a routerLink="/hospitals" routerLinkActive="active" (click)="closeMenu()">🏥 Hospitals</a>
@@ -106,9 +113,6 @@
           <a routerLink="/appointments" routerLinkActive="active" (click)="closeMenu()">📋 My Appointments</a>
           <a routerLink="/my-reports" routerLinkActive="active" (click)="closeMenu()">📝 My Reports</a>
           <a routerLink="/my-adoptions" routerLinkActive="active" (click)="closeMenu()">🐾 My Adoptions</a>
-        }
-        @if (isNgo()) {
-          <a routerLink="/ngo/dashboard" routerLinkActive="active" (click)="closeMenu()">🌿 NGO Portal</a>
         }
       }
     </div>
@@ -121,7 +125,7 @@
         <a routerLink="/login" class="btn btn-ghost full" (click)="closeMenu()">Sign In</a>
         <a routerLink="/register" class="btn btn-ghost full" (click)="closeMenu()">Register</a>
       }
-      @if (!isAdmin()) {
+      @if (!isAdmin() && !isNgo()) {
         <a routerLink="/sos/auth" class="btn btn-primary sos-cta full" (click)="closeMenu()">🚨 Report SOS</a>
       }
     </div>

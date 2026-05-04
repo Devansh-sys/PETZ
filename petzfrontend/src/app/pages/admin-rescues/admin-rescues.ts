@@ -149,18 +149,18 @@ export class AdminRescues implements OnInit {
 
   statusClass(s: string): string {
     const m: Record<string, string> = {
-      REPORTED: 'orange', DISPATCHED: 'blue', ON_SITE: 'blue',
-      TRANSPORTING: 'blue', COMPLETE: 'green', MISSION_COMPLETE: 'green',
-      FLAGGED: 'red', CLOSED: 'grey'
+      REPORTED: 'orange', ASSIGNED: 'orange', DISPATCHED: 'blue', REJECTED: 'red',
+      ON_SITE: 'blue', TRANSPORTING: 'blue', COMPLETE: 'green',
+      MISSION_COMPLETE: 'green', FLAGGED: 'red', CLOSED: 'grey'
     };
     return m[s] ?? 'grey';
   }
 
   statusLabel(s: string): string {
     const m: Record<string, string> = {
-      REPORTED: 'Reported', DISPATCHED: 'Dispatched', ON_SITE: 'On Site',
-      TRANSPORTING: 'Transporting', COMPLETE: 'Complete', MISSION_COMPLETE: 'Complete',
-      FLAGGED: 'Flagged', CLOSED: 'Closed'
+      REPORTED: 'Reported', ASSIGNED: 'Pending NGO', DISPATCHED: 'Dispatched', REJECTED: 'Rejected',
+      ON_SITE: 'On Site', TRANSPORTING: 'Transporting', COMPLETE: 'Complete',
+      MISSION_COMPLETE: 'Complete', FLAGGED: 'Flagged', CLOSED: 'Closed'
     };
     return m[s] ?? s;
   }
