@@ -148,72 +148,72 @@ INSERT IGNORE INTO adoptable_pets
    is_adoption_ready, status, created_at, updated_at, version)
 VALUES
 (UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000001'),
- UUID_TO_BIN('11110000-0000-0000-0000-000000000001'),
+ UUID_TO_BIN('f0000000-0000-0000-0000-000000000001'),
  'Buddy','DOG','Labrador','MALE',18,
- 'Mumbai',
+ 'New Delhi',
  'A playful and loving Labrador who gets along well with children and other dogs.',
  'Friendly, energetic, loves fetch',
  'Healthy, fully vaccinated and dewormed',
  'FULLY_VACCINATED', 0, NULL, 1,'LISTED', NOW(), NOW(), 0),
- 
+
 (UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000002'),
- UUID_TO_BIN('11110000-0000-0000-0000-000000000001'),
+ UUID_TO_BIN('f0000000-0000-0000-0000-000000000001'),
  'Luna','CAT','Persian','FEMALE',24,
- 'Mumbai',
+ 'New Delhi',
  'Luna is a calm and affectionate Persian cat who loves cuddles.',
  'Calm, gentle, loves laps',
  'Spayed, vaccinated, healthy',
  'FULLY_VACCINATED', 0, NULL, 1,'LISTED', NOW(), NOW(), 0),
- 
+
 (UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000003'),
- UUID_TO_BIN('11110000-0000-0000-0000-000000000002'),
+ UUID_TO_BIN('f0000000-0000-0000-0000-000000000001'),
  'Rocky','DOG','German Shepherd','MALE',36,
- 'Delhi',
+ 'New Delhi',
  'Rocky is a trained German Shepherd, great for active families.',
  'Alert, loyal, energetic',
  'Fully vaccinated, regular health check-ups',
  'FULLY_VACCINATED', 0, NULL, 1,'LISTED', NOW(), NOW(), 0),
- 
+
 (UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000004'),
- UUID_TO_BIN('11110000-0000-0000-0000-000000000002'),
+ UUID_TO_BIN('f0000000-0000-0000-0000-000000000001'),
  'Milo','DOG','Beagle','MALE',8,
- 'Delhi',
+ 'New Delhi',
  'Milo is a puppy full of energy and love, looking for a forever home.',
  'Playful, curious, loves everyone',
  'First vaccines completed, dewormed',
  'PARTIALLY_VACCINATED', 0, NULL, 0,'LISTED', NOW(), NOW(), 0),
- 
+
 (UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000005'),
- UUID_TO_BIN('11110000-0000-0000-0000-000000000003'),
+ UUID_TO_BIN('f0000000-0000-0000-0000-000000000001'),
  'Whiskers','CAT','Tabby','FEMALE',12,
- 'Bangalore',
+ 'New Delhi',
  'Whiskers is a playful tabby who loves toys and window watching.',
  'Playful, independent, curious',
  'Spayed, vaccinated',
  'FULLY_VACCINATED', 0, NULL, 1,'LISTED', NOW(), NOW(), 0),
- 
+
 (UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000006'),
- UUID_TO_BIN('11110000-0000-0000-0000-000000000003'),
+ UUID_TO_BIN('f0000000-0000-0000-0000-000000000001'),
  'Charlie','DOG','Indie','MALE',30,
- 'Bangalore',
+ 'New Delhi',
  'Charlie is a resilient street dog who has been rescued and rehabilitated.',
  'Adaptable, brave, affectionate',
  'Vaccinated, neutered, healthy',
  'FULLY_VACCINATED', 0, NULL, 1,'LISTED', NOW(), NOW(), 0),
- 
+
 (UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000007'),
- UUID_TO_BIN('11110000-0000-0000-0000-000000000001'),
+ UUID_TO_BIN('f0000000-0000-0000-0000-000000000001'),
  'Bella','DOG','Golden Retriever','FEMALE',15,
- 'Mumbai',
+ 'New Delhi',
  'Bella is a sweet Golden Retriever who loves everyone she meets.',
  'Sweet, gentle, obedient',
  'Fully vaccinated, spayed',
  'FULLY_VACCINATED', 1, 'Requires hypoallergenic diet', 1,'LISTED', NOW(), NOW(), 0),
- 
+
 (UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000008'),
- UUID_TO_BIN('11110000-0000-0000-0000-000000000002'),
+ UUID_TO_BIN('f0000000-0000-0000-0000-000000000001'),
  'Oliver','CAT','Siamese','MALE',20,
- 'Delhi',
+ 'New Delhi',
  'Oliver is a vocal Siamese who loves attention and interactive play.',
  'Vocal, affectionate, smart',
  'Neutered, vaccinated, healthy',
@@ -425,6 +425,21 @@ WHERE email IN (
     'vet@petz.dev'
 );
  
+-- ── Ensure ngo@petz.dev has an NGO linked (Animal Welfare Society) ──
+INSERT IGNORE INTO ngo (id, name, active, latitude, longitude, address, contact_email, contact_phone, description, is_verified, registration_number, created_at)
+VALUES (
+  UNHEX(REPLACE('f0000000-0000-0000-0000-000000000001','-','')),
+  'Animal Welfare Society', 1, 28.6139, 77.2090,
+  'New Delhi, Delhi 110001', 'ngo@petz.dev', '+919000020001',
+  'Demo NGO for development and testing purposes.', 1, 'DL-NGO-DEMO-0001', NOW()
+);
+UPDATE users
+SET ngo_id = UNHEX(REPLACE('f0000000-0000-0000-0000-000000000001','-',''))
+WHERE email = 'ngo@petz.dev' AND ngo_id IS NULL;
+UPDATE ngo
+SET owner_user_id = (SELECT id FROM users WHERE email = 'ngo@petz.dev')
+WHERE id = UNHEX(REPLACE('f0000000-0000-0000-0000-000000000001','-','')) AND owner_user_id IS NULL;
+
 -- ── Backfill is_locked on legacy slot rows ──
 -- Appointment.isLocked is a primitive `boolean` in the entity; rows where
 -- is_locked is NULL throw JpaSystemException on read ("Null value was

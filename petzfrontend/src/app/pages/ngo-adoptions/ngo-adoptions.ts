@@ -25,6 +25,7 @@ export class NgoAdoptions implements OnInit {
 
   load(): void {
     this.loading = true;
+    this.error = '';
     this.adoptionService.ngoListApplications(this.filterStatus || undefined).subscribe({
       next: (apps) => { this.applications = apps; this.loading = false; },
       error: () => { this.error = 'Could not load applications.'; this.loading = false; }

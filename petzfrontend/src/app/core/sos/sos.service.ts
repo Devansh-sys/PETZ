@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import {
+  NgoAssignment,
   RescueHistoryResponse,
   SosReportCreateRequest,
   SosReportResponse
@@ -39,5 +40,52 @@ export class SosService {
     return this.http.get<RescueHistoryResponse[]>(
       `${environment.apiBaseUrl}/users/${userId}/rescue-history`
     );
+  }
+
+  getAllReports(): Observable<SosReportResponse[]> {
+    return this.http.get<ApiEnvelope<SosReportResponse[]>>(this.base)
+      .pipe(map(r => r.data ?? []));
+  }
+
+  getMyReports(reporterId: string): Observable<SosReportResponse[]> {
+    return this.http.get<ApiEnvelope<SosReportResponse[]>>(
+      `${this.base}/my-reports?reporterId=${reporterId}`
+    ).pipe(map(r => r.data ?? []));
+  }
+
+  updateStatus(reportId: string, status: string): Observable<SosReportResponse> {
+    return this.http.patch<ApiEnvelope<SosReportResponse>>(
+      `${this.base}/${reportId}/status`, { status }
+    ).pipe(map(r => r.data));
+  }
+
+  getNgoAssignments(): Observable<NgoAssignment[]> {
+    return this.http.get<ApiEnvelope<NgoAssignment[]>>(
+      `${environment.apiBaseUrl}/ngo/rescue-assignments`
+    ).pipe(map(r => r.data ?? []));
+  }
+
+  getOpenReports(): Observable<NgoAssignment[]> {
+    return this.http.get<ApiEnvelope<NgoAssignment[]>>(
+      `${environment.apiBaseUrl}/ngo/open-reports`
+    ).pipe(map(r => r.data ?? []));
+  }
+
+  claimReport(sosReportId: string): Observable<NgoAssignment> {
+    return this.http.post<ApiEnvelope<NgoAssignment>>(
+      `${environment.apiBaseUrl}/ngo/open-reports/${sosReportId}/claim`, {}
+    ).pipe(map(r => r.data));
+  }
+
+  acceptAssignment(assignmentId: string): Observable<NgoAssignment> {
+    return this.http.post<ApiEnvelope<NgoAssignment>>(
+      `${environment.apiBaseUrl}/ngo/rescue-assignments/${assignmentId}/accept`, {}
+    ).pipe(map(r => r.data));
+  }
+
+  rejectAssignment(assignmentId: string): Observable<NgoAssignment> {
+    return this.http.post<ApiEnvelope<NgoAssignment>>(
+      `${environment.apiBaseUrl}/ngo/rescue-assignments/${assignmentId}/reject`, {}
+    ).pipe(map(r => r.data));
   }
 }

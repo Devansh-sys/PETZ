@@ -186,4 +186,23 @@ public class SosReportService {
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public SosReportResponse updateStatus(UUID reportId, ReportStatus newStatus) {
+        SosReport report = sosReportRepository.findById(reportId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "SOS Report not found with id: " + reportId));
+
+        report.setCurrentStatus(newStatus);
+        SosReport updated = sosReportRepository.save(report);
+
+        rescueMissionRepository.findBySosReportId(reportId).ifPresent(mission -> {
+            mission.setRescueStatus(newStatus);
+            rescueMissionRepository.save(mission);
+        });
+
+        statusLogService.logStatusChange(updated, newStatus.name());
+        log.info("SOS Report {} status updated to {}", reportId, newStatus);
+        return mapToResponse(updated);
+    }
 }

@@ -27,6 +27,9 @@ public interface NgoAssignmentRepository extends JpaRepository<NgoAssignment, UU
     Optional<NgoAssignment> findBySosReport_IdAndAssignmentStatusIn(
             UUID sosReportId, List<AssignmentStatus> statuses);
 
+    List<NgoAssignment> findByNgoIdAndAssignmentStatusNotOrderByAssignedAtDesc(
+            UUID ngoId, AssignmentStatus status);
+
     @Query("SELECT COUNT(n) FROM NgoAssignment n WHERE n.assignedAt BETWEEN :from AND :to")
     long countTotalDispatched(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
 

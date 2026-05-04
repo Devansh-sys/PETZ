@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.cts.mfrp.petzbackend.enums.ReportStatus;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -70,5 +72,16 @@ public class SosReportController {
 
         List<SosReportResponse> reports = sosReportService.getReportsByReporter(reporterId);
         return ResponseEntity.ok(ApiResponse.ok("Reporter's reports fetched", reports));
+    }
+
+    // PATCH /api/v1/sos-reports/{reportId}/status — NGO accepts or rejects a report
+    @PatchMapping("/{reportId}/status")
+    public ResponseEntity<ApiResponse<SosReportResponse>> updateStatus(
+            @PathVariable UUID reportId,
+            @RequestBody Map<String, String> body) {
+
+        ReportStatus status = ReportStatus.valueOf(body.get("status").trim().toUpperCase());
+        SosReportResponse response = sosReportService.updateStatus(reportId, status);
+        return ResponseEntity.ok(ApiResponse.ok("Status updated to " + status, response));
     }
 }
