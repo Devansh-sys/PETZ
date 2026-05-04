@@ -75,9 +75,13 @@ public class AdoptionReviewService {
                                       String sort,
                                       int page,
                                       int size) {
-        requireNgoBinding(callerNgoId);
+        // If the NGO user's ngoId is set, scope to their NGO only.
+        // If not set (e.g. unbound rep or dev mode), show all applications.
         Specification<AdoptionApplication> spec = (root, q, cb) -> {
-            Predicate p = cb.equal(root.get("ngoId"), callerNgoId);
+            Predicate p = cb.conjunction(); // start with TRUE (no restriction)
+            if (callerNgoId != null) {
+                p = cb.and(p, cb.equal(root.get("ngoId"), callerNgoId));
+            }
             if (statusRaw != null && !statusRaw.isBlank()) {
                 p = cb.and(p, cb.equal(root.get("status"), parseStatus(statusRaw)));
             }
@@ -243,10 +247,17 @@ public class AdoptionReviewService {
     // ─── helpers ─────────────────────────────────────────────────────
 
     private AdoptionApplication loadForReviewer(UUID applicationId, UUID callerNgoId) {
-        requireNgoBinding(callerNgoId);
-        return appRepo.findByIdAndNgoId(applicationId, callerNgoId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "AdoptionApplication " + applicationId + " not found for this NGO"));
+        if (callerNgoId != null) {
+            // Scope to this NGO only — cross-NGO access returns 404
+            return appRepo.findByIdAndNgoId(applicationId, callerNgoId)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "AdoptionApplication " + applicationId + " not found for this NGO"));
+        } else {
+            // NGO user not yet bound to an entity — allow platform-wide access (dev / unbound rep)
+            return appRepo.findById(applicationId)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "AdoptionApplication " + applicationId + " not found"));
+        }
     }
 
     private void requireReviewable(AdoptionApplication app) {

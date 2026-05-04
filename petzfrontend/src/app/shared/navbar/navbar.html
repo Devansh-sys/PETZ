@@ -10,74 +10,73 @@
 
   <div class="nav-links">
     @if (isAdmin()) {
-      <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Dashboard</a>
-      <a routerLink="/admin/rescues" routerLinkActive="active">Rescue Ops</a>
-      <a routerLink="/admin/hospitals" routerLinkActive="active">Hospital Mgmt</a>
-      <a routerLink="/admin/adoptions" routerLinkActive="active">Adoptions</a>
-      <a routerLink="/admin/appointments" routerLinkActive="active">Appointments</a>
+    <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Dashboard</a>
+    <a routerLink="/admin/rescues" routerLinkActive="active">Rescue Ops</a>
+    <a routerLink="/admin/hospitals" routerLinkActive="active">Hospital Mgmt</a>
+    <a routerLink="/admin/adoptions" routerLinkActive="active">Adoptions</a>
+    <a routerLink="/admin/appointments" routerLinkActive="active">Appointments</a>
     } @else if (isNgo()) {
-      <a routerLink="/ngo/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">NGO Dashboard</a>
-      <a routerLink="/ngo/pets" routerLinkActive="active">Pet Listings</a>
-      <a routerLink="/ngo/adoptions" routerLinkActive="active">Applications</a>
-      <a routerLink="/my-reports" routerLinkActive="active">Rescue Reports</a>
+    <a routerLink="/ngo/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">NGO Dashboard</a>
+    <a routerLink="/ngo/pets" routerLinkActive="active">Pet Listings</a>
+    <a routerLink="/ngo/adoptions" routerLinkActive="active">Applications</a>
+    <a routerLink="/my-reports" routerLinkActive="active">Rescue Reports</a>
     } @else {
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Home</a>
-      <a routerLink="/hospitals" routerLinkActive="active">Hospitals</a>
-      <a routerLink="/adopt" routerLinkActive="active">Adopt</a>
-      <a routerLink="/book" routerLinkActive="active">Book Slot</a>
-      @if (isAuthenticated()) {
-        <div class="dropdown" [class.open]="activityOpen()">
-          <button type="button" class="dropdown-trigger" (click)="toggleActivity()" aria-haspopup="menu" [attr.aria-expanded]="activityOpen()">
-            My Activity <span class="caret">▾</span>
-          </button>
-          <div class="dropdown-menu" role="menu" *ngIf="activityOpen()">
-            <a routerLink="/appointments" routerLinkActive="active" (click)="closeDropdowns()">📋 My Appointments</a>
-            <a routerLink="/my-reports" routerLinkActive="active" (click)="closeDropdowns()">📝 My Reports</a>
-            <a routerLink="/my-adoptions" routerLinkActive="active" (click)="closeDropdowns()">🐾 My Adoptions</a>
-          </div>
-        </div>
-      }
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Home</a>
+    <a routerLink="/hospitals" routerLinkActive="active">Hospitals</a>
+    <a routerLink="/adopt" routerLinkActive="active">Adopt</a>
+    @if (isAuthenticated()) {
+    <div class="dropdown" [class.open]="activityOpen()">
+      <button type="button" class="dropdown-trigger" (click)="toggleActivity()" aria-haspopup="menu" [attr.aria-expanded]="activityOpen()">
+        My Activity <span class="caret">▾</span>
+      </button>
+      <div class="dropdown-menu" role="menu" *ngIf="activityOpen()">
+        <a routerLink="/appointments" routerLinkActive="active" (click)="closeDropdowns()">📋 My Appointments</a>
+        <a routerLink="/my-reports" routerLinkActive="active" (click)="closeDropdowns()">📝 My Reports</a>
+        <a routerLink="/my-adoptions" routerLinkActive="active" (click)="closeDropdowns()">🐾 My Adoptions</a>
+      </div>
+    </div>
+    }
     }
   </div>
 
   <div class="nav-right">
     @if (isAuthenticated()) {
-      <!-- Notification bell -->
-      <div class="dropdown notif-menu" [class.open]="notifOpen()">
-        <button type="button" class="notif-trigger" (click)="toggleNotif()" aria-label="Notifications">
-          🔔
-          <span class="notif-badge" *ngIf="notifSvc.unreadCount() > 0">{{ notifSvc.unreadCount() > 9 ? '9+' : notifSvc.unreadCount() }}</span>
-        </button>
-        <div class="notif-dropdown" *ngIf="notifOpen()">
-          <div class="notif-header">
-            <span>Notifications</span>
-            <button type="button" class="btn-link-sm" (click)="notifSvc.markAllRead()" *ngIf="notifSvc.unreadCount() > 0">Mark all read</button>
-          </div>
-          <div class="notif-empty" *ngIf="notifSvc.items().length === 0">No notifications yet.</div>
-          <div class="notif-item" *ngFor="let n of notifSvc.items()" [class.unread]="!n.isRead" (click)="notifSvc.markRead(n.id)">
-            <div class="notif-title">{{ n.title }}</div>
-            <div class="notif-body">{{ n.body }}</div>
-          </div>
+    <!-- Notification bell -->
+    <div class="dropdown notif-menu" [class.open]="notifOpen()">
+      <button type="button" class="notif-trigger" (click)="toggleNotif()" aria-label="Notifications">
+        🔔
+        <span class="notif-badge" *ngIf="notifSvc.unreadCount() > 0">{{ notifSvc.unreadCount() > 9 ? '9+' : notifSvc.unreadCount() }}</span>
+      </button>
+      <div class="notif-dropdown" *ngIf="notifOpen()">
+        <div class="notif-header">
+          <span>Notifications</span>
+          <button type="button" class="btn-link-sm" (click)="notifSvc.markAllRead()" *ngIf="notifSvc.unreadCount() > 0">Mark all read</button>
+        </div>
+        <div class="notif-empty" *ngIf="notifSvc.items().length === 0">No notifications yet.</div>
+        <div class="notif-item" *ngFor="let n of notifSvc.items()" [class.unread]="!n.isRead" (click)="notifSvc.markRead(n.id)">
+          <div class="notif-title">{{ n.title }}</div>
+          <div class="notif-body">{{ n.body }}</div>
         </div>
       </div>
+    </div>
 
-      <div class="dropdown user-menu" [class.open]="userOpen()">
-        <button type="button" class="user-trigger" (click)="toggleUser()" aria-haspopup="menu" [attr.aria-expanded]="userOpen()">
-          <span class="user-avatar">{{ userInitial() }}</span>
-          <span class="user-role">{{ roleLabel() }}</span>
-          <span class="caret">▾</span>
-        </button>
-        <div class="dropdown-menu align-right" role="menu" *ngIf="userOpen()">
-          <a routerLink="/profile" (click)="closeDropdowns()">👤 My Profile</a>
-          <button type="button" (click)="signOut()">🚪 Sign Out</button>
-        </div>
+    <div class="dropdown user-menu" [class.open]="userOpen()">
+      <button type="button" class="user-trigger" (click)="toggleUser()" aria-haspopup="menu" [attr.aria-expanded]="userOpen()">
+        <span class="user-avatar">{{ userInitial() }}</span>
+        <span class="user-role">{{ roleLabel() }}</span>
+        <span class="caret">▾</span>
+      </button>
+      <div class="dropdown-menu align-right" role="menu" *ngIf="userOpen()">
+        <a routerLink="/profile" (click)="closeDropdowns()">👤 My Profile</a>
+        <button type="button" (click)="signOut()">🚪 Sign Out</button>
       </div>
+    </div>
     } @else {
-      <a routerLink="/login" class="btn btn-ghost btn-compact">Sign In</a>
-      <a routerLink="/register" class="btn btn-ghost btn-compact">Register</a>
+    <a routerLink="/login" class="btn btn-ghost btn-compact">Sign In</a>
+    <a routerLink="/register" class="btn btn-ghost btn-compact">Register</a>
     }
     @if (!isAdmin() && !isNgo()) {
-      <a routerLink="/sos/auth" class="btn btn-primary sos-cta">🚨 Report SOS</a>
+    <a routerLink="/sos/auth" class="btn btn-primary sos-cta">🚨 Report SOS</a>
     }
   </div>
 
@@ -88,45 +87,44 @@
 
 <!-- Mobile drawer -->
 @if (menuOpen()) {
-  <div class="mobile-overlay" (click)="closeMenu()"></div>
+<div class="mobile-overlay" (click)="closeMenu()"></div>
 }
 <div class="mobile-drawer" [class.open]="menuOpen()">
   <div class="mobile-drawer-inner">
     <div class="mobile-links">
       @if (isAdmin()) {
-        <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="closeMenu()">⚙️ Dashboard</a>
-        <a routerLink="/admin/rescues" routerLinkActive="active" (click)="closeMenu()">🚨 Rescue Ops</a>
-        <a routerLink="/admin/hospitals" routerLinkActive="active" (click)="closeMenu()">🏥 Hospital Mgmt</a>
-        <a routerLink="/admin/adoptions" routerLinkActive="active" (click)="closeMenu()">🐾 Adoptions</a>
-        <a routerLink="/admin/appointments" routerLinkActive="active" (click)="closeMenu()">📅 Appointments</a>
+      <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="closeMenu()">⚙️ Dashboard</a>
+      <a routerLink="/admin/rescues" routerLinkActive="active" (click)="closeMenu()">🚨 Rescue Ops</a>
+      <a routerLink="/admin/hospitals" routerLinkActive="active" (click)="closeMenu()">🏥 Hospital Mgmt</a>
+      <a routerLink="/admin/adoptions" routerLinkActive="active" (click)="closeMenu()">🐾 Adoptions</a>
+      <a routerLink="/admin/appointments" routerLinkActive="active" (click)="closeMenu()">📅 Appointments</a>
       } @else if (isNgo()) {
-        <a routerLink="/ngo/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="closeMenu()">🏢 NGO Dashboard</a>
-        <a routerLink="/ngo/pets" routerLinkActive="active" (click)="closeMenu()">🐾 Pet Listings</a>
-        <a routerLink="/ngo/adoptions" routerLinkActive="active" (click)="closeMenu()">📋 Applications</a>
-        <a routerLink="/my-reports" routerLinkActive="active" (click)="closeMenu()">🚨 Rescue Reports</a>
+      <a routerLink="/ngo/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="closeMenu()">🏢 NGO Dashboard</a>
+      <a routerLink="/ngo/pets" routerLinkActive="active" (click)="closeMenu()">🐾 Pet Listings</a>
+      <a routerLink="/ngo/adoptions" routerLinkActive="active" (click)="closeMenu()">📋 Applications</a>
+      <a routerLink="/my-reports" routerLinkActive="active" (click)="closeMenu()">🚨 Rescue Reports</a>
       } @else {
-        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="closeMenu()">🏠 Home</a>
-        <a routerLink="/hospitals" routerLinkActive="active" (click)="closeMenu()">🏥 Hospitals</a>
-        <a routerLink="/adopt" routerLinkActive="active" (click)="closeMenu()">🐾 Adopt</a>
-        <a routerLink="/book" routerLinkActive="active" (click)="closeMenu()">📅 Book Slot</a>
-        @if (isAuthenticated()) {
-          <a routerLink="/appointments" routerLinkActive="active" (click)="closeMenu()">📋 My Appointments</a>
-          <a routerLink="/my-reports" routerLinkActive="active" (click)="closeMenu()">📝 My Reports</a>
-          <a routerLink="/my-adoptions" routerLinkActive="active" (click)="closeMenu()">🐾 My Adoptions</a>
-        }
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="closeMenu()">🏠 Home</a>
+      <a routerLink="/hospitals" routerLinkActive="active" (click)="closeMenu()">🏥 Hospitals</a>
+      <a routerLink="/adopt" routerLinkActive="active" (click)="closeMenu()">🐾 Adopt</a>
+      @if (isAuthenticated()) {
+      <a routerLink="/appointments" routerLinkActive="active" (click)="closeMenu()">📋 My Appointments</a>
+      <a routerLink="/my-reports" routerLinkActive="active" (click)="closeMenu()">📝 My Reports</a>
+      <a routerLink="/my-adoptions" routerLinkActive="active" (click)="closeMenu()">🐾 My Adoptions</a>
+      }
       }
     </div>
     <div class="mobile-auth">
       @if (isAuthenticated()) {
-        <span class="role-badge">{{ roleLabel() }}</span>
-        <a routerLink="/profile" class="btn btn-ghost full" (click)="closeMenu()">My Profile</a>
-        <button type="button" class="btn btn-ghost full" (click)="signOut()">Sign Out</button>
+      <span class="role-badge">{{ roleLabel() }}</span>
+      <a routerLink="/profile" class="btn btn-ghost full" (click)="closeMenu()">My Profile</a>
+      <button type="button" class="btn btn-ghost full" (click)="signOut()">Sign Out</button>
       } @else {
-        <a routerLink="/login" class="btn btn-ghost full" (click)="closeMenu()">Sign In</a>
-        <a routerLink="/register" class="btn btn-ghost full" (click)="closeMenu()">Register</a>
+      <a routerLink="/login" class="btn btn-ghost full" (click)="closeMenu()">Sign In</a>
+      <a routerLink="/register" class="btn btn-ghost full" (click)="closeMenu()">Register</a>
       }
       @if (!isAdmin() && !isNgo()) {
-        <a routerLink="/sos/auth" class="btn btn-primary sos-cta full" (click)="closeMenu()">🚨 Report SOS</a>
+      <a routerLink="/sos/auth" class="btn btn-primary sos-cta full" (click)="closeMenu()">🚨 Report SOS</a>
       }
     </div>
   </div>
