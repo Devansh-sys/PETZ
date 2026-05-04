@@ -132,6 +132,10 @@ public class AdminRescueService {
 
         NgoAssignment saved = ngoAssignmentRepo.save(newAssignment);
 
+        // Move SOS to ASSIGNED so reporter sees "Admin Assigned NGO" step complete
+        report.setCurrentStatus(ReportStatus.ASSIGNED);
+        sosReportRepo.save(report);
+
         // TODO: fire NotificationService.pushDispatch(req.getNewVolunteerId(), sosReportId)
 
         return ReassignResponse.builder()

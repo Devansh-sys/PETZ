@@ -8,8 +8,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   if (!token) {
     return next(req);
   }
-  const cloned = req.clone({
-    setHeaders: { Authorization: `Bearer ${token}` }
-  });
+  const session = auth.session();
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${token}`
+  };
+  if (session?.userId) {
+    headers['X-User-Id'] = session.userId;
+  }
+  const cloned = req.clone({ setHeaders: headers });
   return next(cloned);
 };

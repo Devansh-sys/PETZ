@@ -66,11 +66,19 @@
 .btn-assign {
   padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
   background: #fff; border: 1.5px solid var(--line); color: var(--ink); transition: all .15s; white-space: nowrap;
-  &:hover { border-color: var(--peach); color: var(--peach); }
+  &:hover:not(:disabled) { border-color: var(--peach); color: var(--peach); }
   &.needs-assign {
     background: var(--peach); border-color: var(--peach); color: #fff;
     animation: pulse-btn 2s infinite;
     &:hover { background: var(--deep); border-color: var(--deep); }
+  }
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background: #f3f4f6;
+    border-color: #e5e7eb;
+    color: #9ca3af;
+    animation: none;
   }
 }
 @keyframes pulse-btn {

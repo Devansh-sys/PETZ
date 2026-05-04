@@ -2,6 +2,8 @@ export type UrgencyLevel = 'CRITICAL' | 'MODERATE' | 'LOW';
 
 export type ReportStatus =
   | 'REPORTED'
+  | 'ASSIGNED'       // Admin has created a PENDING assignment — awaiting NGO response
+  | 'REJECTED'
   | 'DISPATCHED'
   | 'ON_SITE'
   | 'TRANSPORTING'
@@ -127,4 +129,19 @@ export interface RescueHistoryResponse {
   status: ReportStatus;
   description: string;
   outcome: string;
+}
+
+export interface NgoAssignment {
+  assignmentId?: string;
+  sosReportId: string;
+  description?: string;
+  latitude: number;
+  longitude: number;
+  urgencyLevel: UrgencyLevel;
+  sosStatus: ReportStatus;
+  assignmentStatus: 'OPEN' | 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'ARRIVED' | 'REASSIGNED';
+  reporterName?: string;
+  reporterPhone?: string;
+  reportedAt: string;
+  assignedAt?: string;
 }

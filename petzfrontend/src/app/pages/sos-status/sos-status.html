@@ -67,6 +67,8 @@
                 <small>{{ formatTime(step.at) }}</small>
               } @else if (step.active) {
                 <small class="in-progress">In progress…</small>
+              } @else if (step.done) {
+                <small class="done-label">Completed ✓</small>
               } @else {
                 <small class="pending">Pending</small>
               }
