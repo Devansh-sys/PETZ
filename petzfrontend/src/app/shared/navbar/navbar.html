@@ -19,7 +19,6 @@
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Home</a>
       <a routerLink="/hospitals" routerLinkActive="active">Hospitals</a>
       <a routerLink="/adopt" routerLinkActive="active">Adopt</a>
-      <a routerLink="/book" routerLinkActive="active">Book Slot</a>
       @if (isNgo()) {
         <a routerLink="/ngo/dashboard" routerLinkActive="active">NGO Portal</a>
       }
@@ -101,7 +100,6 @@
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="closeMenu()">🏠 Home</a>
         <a routerLink="/hospitals" routerLinkActive="active" (click)="closeMenu()">🏥 Hospitals</a>
         <a routerLink="/adopt" routerLinkActive="active" (click)="closeMenu()">🐾 Adopt</a>
-        <a routerLink="/book" routerLinkActive="active" (click)="closeMenu()">📅 Book Slot</a>
         @if (isAuthenticated()) {
           <a routerLink="/appointments" routerLinkActive="active" (click)="closeMenu()">📋 My Appointments</a>
           <a routerLink="/my-reports" routerLinkActive="active" (click)="closeMenu()">📝 My Reports</a>

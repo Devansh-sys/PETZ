@@ -1,17 +1,18 @@
 export interface PetResponse {
   id: string;
-  ownerId: string;
+  userId: string;
   name: string;
   species: string;
+  gender: string;
   breed: string;
   dateOfBirth: string;
-  active: boolean;
 }
 
 export interface PetCreateRequest {
   ownerId: string;
   name: string;
   species: string;
+  gender?: string;
   breed?: string;
   dateOfBirth?: string;
 }
@@ -94,6 +95,7 @@ export interface BookingState {
   doctorId?: string;
   doctorName?: string;
   doctorSpecialization?: string;
+  doctorAvailability?: string;
   slotId?: string;
   slotDate?: string;
   slotStart?: string;

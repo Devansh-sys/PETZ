@@ -35,13 +35,14 @@ public class SlotManagementController {
     }
 
     // US-3.3.1 — Get slots for a date (user calendar)
-    // GET /api/v1/hospitals/{hospitalId}/slots?date=2026-04-10
+    // GET /api/v1/hospitals/{hospitalId}/slots?date=2026-04-10&doctorId=<uuid>
     @GetMapping("/{hospitalId}/slots")
     public ResponseEntity<ApiResponse<List<SlotResponse>>> getSlots(
             @PathVariable UUID hospitalId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) UUID doctorId) {
         return ResponseEntity.ok(ApiResponse.ok(
-                "Slots fetched.", service.getSlotsForDate(hospitalId, date)));
+                "Slots fetched.", service.getSlotsForDate(hospitalId, date, doctorId)));
     }
 
     // US-3.3.2 — Add blackout date

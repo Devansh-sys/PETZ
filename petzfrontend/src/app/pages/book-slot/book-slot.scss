@@ -1,5 +1,19 @@
 .block-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
 
+.block-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 3px;
+  &.availability {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--deep);
+    font-weight: 500;
+  }
+  .avail-icon { font-size: 13px; }
+}
+
 .slot-grid {
   display: flex;
   flex-wrap: wrap;

@@ -49,7 +49,7 @@ public class Appointment {
     private LocalTime endTime;
 
     @Column(name = "duration_minutes")
-    private int durationMinutes;
+    private Integer durationMinutes;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -90,10 +90,10 @@ public class Appointment {
     private String clinicalNotes;           // Populated on US-3.5.4
 
     @Column(name = "no_show_count")
-    private int noShowCount;                // Incremented on US-3.5.5
+    private Integer noShowCount;                // Incremented on US-3.5.5
 
     @Column(name = "cancellation_policy_hours")
-    private int cancellationPolicyHours;    // Hospital-defined window for US-3.5.1 / US-3.5.2
+    private Integer cancellationPolicyHours;    // Hospital-defined window for US-3.5.1 / US-3.5.2
 
     @Column(name = "attended_at")
     private LocalDateTime attendedAt;       // US-3.5.3
@@ -170,8 +170,8 @@ public class Appointment {
     public LocalTime getEndTime() { return endTime; }
     public void setEndTime(LocalTime endTime) { this.endTime = endTime; }
 
-    public int getDurationMinutes() { return durationMinutes; }
-    public void setDurationMinutes(int durationMinutes) { this.durationMinutes = durationMinutes; }
+    public Integer getDurationMinutes() { return durationMinutes; }
+    public void setDurationMinutes(Integer durationMinutes) { this.durationMinutes = durationMinutes; }
 
     public AppointmentStatus getStatus() { return status; }
     public void setStatus(AppointmentStatus status) { this.status = status; }
@@ -197,11 +197,11 @@ public class Appointment {
     public String getClinicalNotes() { return clinicalNotes; }
     public void setClinicalNotes(String clinicalNotes) { this.clinicalNotes = clinicalNotes; }
 
-    public int getNoShowCount() { return noShowCount; }
-    public void setNoShowCount(int noShowCount) { this.noShowCount = noShowCount; }
+    public Integer getNoShowCount() { return noShowCount; }
+    public void setNoShowCount(Integer noShowCount) { this.noShowCount = noShowCount; }
 
-    public int getCancellationPolicyHours() { return cancellationPolicyHours; }
-    public void setCancellationPolicyHours(int cancellationPolicyHours) { this.cancellationPolicyHours = cancellationPolicyHours; }
+    public Integer getCancellationPolicyHours() { return cancellationPolicyHours; }
+    public void setCancellationPolicyHours(Integer cancellationPolicyHours) { this.cancellationPolicyHours = cancellationPolicyHours; }
 
     public LocalDateTime getAttendedAt() { return attendedAt; }
     public void setAttendedAt(LocalDateTime attendedAt) { this.attendedAt = attendedAt; }

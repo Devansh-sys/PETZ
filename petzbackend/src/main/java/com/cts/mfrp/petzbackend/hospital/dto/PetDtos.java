@@ -22,6 +22,7 @@ public class PetDtos {
         private UUID userId;
         private String name;
         private String species;
+        private String gender;
         private String breed;
         private LocalDate dateOfBirth;
     }
@@ -34,6 +35,7 @@ public class PetDtos {
         @NotBlank(message = "Pet name is required")
         private String name;
         private String species;
+        private String gender;
         private String breed;
         private LocalDate dateOfBirth;
     }

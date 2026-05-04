@@ -87,9 +87,11 @@ public class SlotManagementService {
     }
 
     // US-3.3.1 — Get slots for a date (user calendar view)
-    // Auto-generates and persists slots for any date that has none yet.
+    // Fetches all hospital slots first; auto-generates if none exist; then filters by doctor.
+    // Keeping the hospital-level fetch as the source of truth avoids auto-generation
+    // conflicts when only one doctor has no slots but others do on the same date.
     @Transactional
-    public List<SlotResponse> getSlotsForDate(UUID hospitalId, LocalDate date) {
+    public List<SlotResponse> getSlotsForDate(UUID hospitalId, LocalDate date, UUID doctorId) {
         Hospital hospital = hospitalRepo.findById(hospitalId)
                 .orElseThrow(() -> new NoSuchElementException(
                         "Hospital not found: " + hospitalId));
@@ -100,28 +102,43 @@ public class SlotManagementService {
         List<Appointment> existing = appointmentRepo
                 .findByHospitalIdAndAppointmentDateOrderByAppointmentTimeAsc(hospitalId, date);
 
+        List<SlotResponse> slots;
         if (!existing.isEmpty()) {
-            return existing.stream()
+            slots = existing.stream()
                     .map(a -> toSlotResponse(a, getDoctorName(a.getDoctorId())))
+                    .collect(Collectors.toList());
+        } else {
+            // No slots for this hospital on this date — generate for all active doctors
+            slots = generateAndPersistSlots(hospital, date);
+        }
+
+        // Filter to the requested doctor's slots
+        if (doctorId != null) {
+            final UUID fid = doctorId;
+            slots = slots.stream()
+                    .filter(s -> fid.equals(s.getDoctorId()))
                     .collect(Collectors.toList());
         }
 
-        // No slots exist for this date — generate them from active doctors
-        return generateAndPersistSlots(hospital, date);
+        return slots;
     }
 
-    /** Creates standard morning + afternoon slots for all active doctors on a given date. */
+    /** Auto-generates slots for a date with no pre-seeded data.
+     *  Each doctor gets 4 slots in their assigned shift:
+     *  odd  last UUID byte → morning   09:00–11:00
+     *  even last UUID byte → afternoon 14:00–16:00 */
     private List<SlotResponse> generateAndPersistSlots(Hospital hospital, LocalDate date) {
         List<Doctor> doctors = doctorRepo
                 .findByHospitalIdAndIsActiveOrderByNameAsc(hospital.getId(), true);
         if (doctors.isEmpty()) return List.of();
 
-        List<LocalTime[]> times = List.of(
+        List<LocalTime[]> morningSlots = List.of(
             new LocalTime[]{ LocalTime.of(9,  0), LocalTime.of(9,  30) },
             new LocalTime[]{ LocalTime.of(9, 30), LocalTime.of(10,  0) },
-            new LocalTime[]{ LocalTime.of(10,  0), LocalTime.of(10, 30) },
-            new LocalTime[]{ LocalTime.of(10, 30), LocalTime.of(11,  0) },
-            new LocalTime[]{ LocalTime.of(11,  0), LocalTime.of(11, 30) },
+            new LocalTime[]{ LocalTime.of(10, 0), LocalTime.of(10, 30) },
+            new LocalTime[]{ LocalTime.of(10,30), LocalTime.of(11,  0) }
+        );
+        List<LocalTime[]> afternoonSlots = List.of(
             new LocalTime[]{ LocalTime.of(14,  0), LocalTime.of(14, 30) },
             new LocalTime[]{ LocalTime.of(14, 30), LocalTime.of(15,  0) },
             new LocalTime[]{ LocalTime.of(15,  0), LocalTime.of(15, 30) },
@@ -130,6 +147,9 @@ public class SlotManagementService {
 
         List<Appointment> toSave = new ArrayList<>();
         for (Doctor doctor : doctors) {
+            // Use the least-significant byte of the UUID to assign shift
+            long lsb = doctor.getId().getLeastSignificantBits();
+            List<LocalTime[]> times = (lsb % 2 != 0) ? morningSlots : afternoonSlots;
             for (LocalTime[] t : times) {
                 Appointment a = new Appointment();
                 a.setHospitalId(hospital.getId());

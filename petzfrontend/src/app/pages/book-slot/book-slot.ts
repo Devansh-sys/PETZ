@@ -90,7 +90,7 @@ export class BookSlot implements OnInit {
 
   back(): void { this.router.navigate(['/book/doctor']); }
 
-  get minDate(): string { return this.todayStr(); }
+  get minDate(): string { return this.addDaysStr(1); }
 
   private todayStr(): string {
     return new Date().toISOString().split('T')[0];

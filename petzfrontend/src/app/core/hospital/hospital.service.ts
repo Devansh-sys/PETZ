@@ -55,11 +55,10 @@ export class HospitalService {
   }
 
   listSlots(hospitalId: string, doctorId: string, date: string, serviceId?: string): Observable<DoctorSlotResponse[]> {
-    const params = new HttpParams().set('date', date);
+    let params = new HttpParams().set('date', date).set('doctorId', doctorId);
+    if (serviceId) params = params.set('serviceId', serviceId);
     return this.http
       .get<ApiResponse<DoctorSlotResponse[]>>(`${this.base}/${hospitalId}/slots`, { params })
-      .pipe(map(r => (r.data ?? []).filter(s =>
-        s.doctorId === doctorId && (!serviceId || !s.serviceId || s.serviceId === serviceId)
-      )));
+      .pipe(map(r => r.data ?? []));
   }
 }

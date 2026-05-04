@@ -53,21 +53,19 @@ export class Hospitals implements OnInit, OnDestroy {
 
   load(): void { this.filterChange$.next(); }
 
+  bookHospital(h: HospitalResponse): void {
+    sessionStorage.setItem('petz.booking', JSON.stringify({
+      hospitalId: h.id, hospitalName: h.name,
+      hospitalAddress: h.address, hospitalPhone: h.contactPhone
+    }));
+    this.router.navigate(['/book/service']);
+  }
+
   reset(): void {
     this.filterCity = '';
     this.filterName = '';
     this.filterEmergency = false;
     this.filterOpenNow = false;
     this.load();
-  }
-
-  bookHospital(h: HospitalResponse): void {
-    sessionStorage.setItem('petz.booking', JSON.stringify({
-      hospitalId: h.id,
-      hospitalName: h.name,
-      hospitalAddress: h.address,
-      hospitalPhone: h.contactPhone
-    }));
-    this.router.navigate(['/book/service']);
   }
 }

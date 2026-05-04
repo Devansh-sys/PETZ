@@ -38,7 +38,7 @@ export class BookDoctor implements OnInit {
   }
 
   select(d: DoctorResponse): void {
-    const s = { ...this.state!, doctorId: d.id, doctorName: d.name, doctorSpecialization: d.specialization };
+    const s = { ...this.state!, doctorId: d.id, doctorName: d.name, doctorSpecialization: d.specialization, doctorAvailability: d.availability };
     sessionStorage.setItem(BOOKING_KEY, JSON.stringify(s));
     this.router.navigate(['/book/slot']);
   }

@@ -13,6 +13,10 @@
   <div class="block-head">
     <div class="block-title">Step 4 of 5 — Pick a Slot</div>
     <div *ngIf="state" class="block-sub">{{ state.doctorName }} · {{ state.serviceName }}</div>
+    <div *ngIf="state?.doctorSpecialization" class="block-meta">{{ state!.doctorSpecialization }}</div>
+    <div *ngIf="state?.doctorAvailability" class="block-meta availability">
+      <span class="avail-icon">🕐</span> {{ state!.doctorAvailability }}
+    </div>
   </div>
 
   <div class="block">

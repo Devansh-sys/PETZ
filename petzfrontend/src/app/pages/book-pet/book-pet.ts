@@ -25,6 +25,7 @@ export class BookPet implements OnInit {
   showNewForm = false;
   newName = '';
   newSpecies = '';
+  newGender = '';
   newBreed = '';
   saving = false;
 
@@ -45,7 +46,7 @@ export class BookPet implements OnInit {
     if (!userId) { this.router.navigate(['/sos/auth']); return; }
 
     this.apptService.getPetsByUser(userId).subscribe({
-      next: (list) => { this.pets = list.filter(p => p.active); this.loading = false; },
+      next: (list) => { this.pets = list; this.loading = false; },
       error: () => { this.loading = false; this.showNewForm = true; }
     });
   }
@@ -68,6 +69,7 @@ export class BookPet implements OnInit {
       ownerId: userId,
       name: this.newName.trim(),
       species: this.newSpecies.trim(),
+      gender: this.newGender || 'UNKNOWN',
       breed: this.newBreed.trim() || undefined
     }).subscribe({
       next: (pet) => {
@@ -75,11 +77,16 @@ export class BookPet implements OnInit {
         this.showNewForm = false;
         this.newName = '';
         this.newSpecies = '';
+        this.newGender = '';
         this.newBreed = '';
         this.saving = false;
         this.selectPet(pet);
       },
-      error: () => { this.error = 'Could not add pet. Try again.'; this.saving = false; }
+      error: (err) => {
+        const msg = err?.error?.message || err?.error?.error || err?.message || '';
+        this.error = msg ? `Could not add pet: ${msg}` : 'Could not add pet. Try again.';
+        this.saving = false;
+      }
     });
   }
 

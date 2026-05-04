@@ -1,4 +1,22 @@
 -- ─────────────────────────────────────────────────────────────────────────────
+-- Ensure tables created by JPA entities exist (safe if ddl-auto=none)
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- patient_pets: pets registered during hospital booking (hospital-facing only)
+CREATE TABLE IF NOT EXISTS patient_pets (
+    id            BINARY(16)   NOT NULL,
+    user_id       BINARY(16)   NOT NULL,
+    name          VARCHAR(255) NOT NULL,
+    species       VARCHAR(100),
+    gender        VARCHAR(50)  NOT NULL DEFAULT 'UNKNOWN',
+    breed         VARCHAR(100),
+    date_of_birth DATE,
+    created_at    DATETIME(6),
+    PRIMARY KEY (id),
+    KEY idx_patient_pets_user_id (user_id)
+);
+
+-- ─────────────────────────────────────────────────────────────────────────────
 -- Seed data for local development  (INSERT IGNORE = safe to re-run on restart)
 -- ─────────────────────────────────────────────────────────────────────────────
  
@@ -138,6 +156,7 @@ INSERT IGNORE INTO ngo (id, name, latitude, longitude, active) VALUES
 (UUID_TO_BIN('11110000-0000-0000-0000-000000000001'), 'Happy Paws NGO',        19.0760, 72.8777, 1),
 (UUID_TO_BIN('11110000-0000-0000-0000-000000000002'), 'Animal Care Trust',     28.7041, 77.1025, 1),
 (UUID_TO_BIN('11110000-0000-0000-0000-000000000003'), 'Paws & Love Foundation',12.9716, 77.5946, 1);
+
  
 -- Adoptable Pets  (status=LISTED so they appear in the public catalog)
 INSERT IGNORE INTO adoptable_pets
@@ -353,55 +372,64 @@ PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 -- ── Demo accounts: one row per role, all with password Petz@1234 ──
 -- BCrypt hash of "Petz@1234" (cost=10). Re-using the same hash across rows is
 -- intentional and dev-only; production accounts hash unique passwords each.
-SET @petz_pwd = '$2a$10$FRaElkIfKSxPqegRndfQL.MDfm5EZQgb00X0uhym9pyuxzPEn6CWK';
- 
--- Upsert two extra demo users so every PETZ role has at least one login. The
--- ADMIN, NGO_REP, ADOPTER and REPORTER rows are already created by DataSeeder
--- on a fresh DB; this block only adds VOLUNTEER and VET if missing.
+SET @petz_pwd = '$2b$10$eSzW6YoFvablYt7VMlAjC.oODakv0VAlYZOQalNbELftfuYjeGRxu';
+
+-- Insert all demo accounts if they do not already exist.
+-- This runs before DataSeeder (ApplicationRunner), so on a fresh DB these rows
+-- are created here first; DataSeeder then upserts them (no conflict).
+-- On subsequent restarts INSERT IGNORE is a no-op and the UPDATE below re-asserts state.
 INSERT IGNORE INTO users (
     id, role, full_name, phone, email, password,
     active, email_verified, phone_verified, is_temporary,
     failed_login_attempts, created_at
 ) VALUES
-  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000001','-','')),
-   'ADMIN',   'Platform Admin',   '+91-9000000001', 'admin@petz.dev',
+  (UNHEX(REPLACE('b0000000-0000-0000-0000-000000000001','-','')),
+   'ADMIN',   'Platform Admin',    '+91-9000000001', 'admin@petz.dev',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
-  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000002','-','')),
-   'NGO_REP', 'Nandita Krishnan', '+91-9000000002', 'nandita@cupa.org.in',
+  (UNHEX(REPLACE('b0000000-0000-0000-0000-000000000002','-','')),
+   'NGO_REP', 'Nandita Krishnan',  '+91-9000000002', 'nandita@cupa.org.in',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
-  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000003','-','')),
-   'NGO_REP', 'Geeta Seshamani',  '+91-9000000003', 'geeta@friendicoes.org',
+  (UNHEX(REPLACE('b0000000-0000-0000-0000-000000000003','-','')),
+   'NGO_REP', 'Geeta Seshamani',   '+91-9000000003', 'geeta@friendicoes.org',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
-  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000004','-','')),
-   'NGO_REP', 'Rahul Sinha',      '+91-9000000004', 'rahul@bspca.org.in',
+  (UNHEX(REPLACE('b0000000-0000-0000-0000-000000000004','-','')),
+   'NGO_REP', 'Rahul Sinha',       '+91-9000000004', 'rahul@bspca.org.in',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
-  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000005','-','')),
-   'NGO_REP', 'Priya Menon',      '+91-9000000005', 'priya@pfa.org.in',
+  (UNHEX(REPLACE('b0000000-0000-0000-0000-000000000005','-','')),
+   'NGO_REP', 'Priya Menon',       '+91-9000000005', 'priya@pfa.org.in',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
-  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000006','-','')),
-   'ADOPTER', 'Arjun Verma',      '+91-9000000006', 'arjun.verma@gmail.com',
+  (UNHEX(REPLACE('b0000000-0000-0000-0000-000000000006','-','')),
+   'ADOPTER', 'Arjun Verma',       '+91-9000000006', 'arjun.verma@gmail.com',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
-  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000007','-','')),
-   'ADOPTER', 'Sneha Iyer',       '+91-9000000007', 'sneha.iyer@gmail.com',
+  (UNHEX(REPLACE('b0000000-0000-0000-0000-000000000007','-','')),
+   'ADOPTER', 'Sneha Iyer',        '+91-9000000007', 'sneha.iyer@gmail.com',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
   (UNHEX(REPLACE('a0000000-0000-0000-0000-000000000001','-','')),
-   'VOLUNTEER', 'Volunteer Demo', '+919000010001',  'volunteer@petz.dev',
+   'VOLUNTEER', 'Volunteer Demo',  '+919000010001',  'volunteer@petz.dev',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
   (UNHEX(REPLACE('a0000000-0000-0000-0000-000000000002','-','')),
-   'VET',       'Dr. Vet Demo',   '+919000010002',  'vet@petz.dev',
+   'VET',       'Dr. Vet Demo',    '+919000010002',  'vet@petz.dev',
+   @petz_pwd, 1, 1, 1, 0, 0, NOW()),
+  (UNHEX(REPLACE('c0000000-0000-0000-0000-000000000001','-','')),
+   'NGO_REP',  'NGO Representative', '+919000020001', 'ngo@petz.dev',
+   @petz_pwd, 1, 1, 1, 0, 0, NOW()),
+  (UNHEX(REPLACE('c0000000-0000-0000-0000-000000000002','-','')),
+   'ADOPTER',  'Owner Demo',         '+919000020002', 'owner@petz.test',
+   @petz_pwd, 1, 1, 1, 0, 0, NOW()),
+  (UNHEX(REPLACE('c0000000-0000-0000-0000-000000000003','-','')),
+   'REPORTER', 'John Test',          '+919000020003', 'john@test.com',
    @petz_pwd, 1, 1, 1, 0, 0, NOW());
- 
+
 -- Re-assert known-good password + activation flags for every demo account.
 -- Lets a teammate log in with Petz@1234 even after a wrong-password lockout.
 UPDATE users
-SET password             = @petz_pwd,
-    active               = 1,
-    email_verified       = 1,
-    phone_verified       = 1,
+SET password = @petz_pwd,
+    active = 1,
+    email_verified = 1,
+    phone_verified = 1,
     failed_login_attempts = 0,
-    locked_until         = NULL
+    locked_until = NULL
 WHERE email IN (
-    -- DataSeeder accounts (previously missing from this list — root cause of 403)
     'admin@petz.dev',
     'nandita@cupa.org.in',
     'geeta@friendicoes.org',
@@ -409,10 +437,6 @@ WHERE email IN (
     'priya@pfa.org.in',
     'arjun.verma@gmail.com',
     'sneha.iyer@gmail.com',
-    -- data.sql-only accounts
-    'volunteer@petz.dev',
-    'vet@petz.dev',
-    -- legacy / teammate test accounts (kept for backward compatibility)
     'ngo@petz.dev',
     'owner@petz.test',
     'john@test.com',
@@ -428,43 +452,90 @@ WHERE email IN (
 -- of an AVAILABLE slot for those dates 500'd. Idempotent — only touches NULLs.
 UPDATE appointments SET is_locked = 0 WHERE is_locked IS NULL;
  
--- ── 4-hour shift slots × 12 days per doctor (96 slots/doctor, 768 total) ──
--- Each active doctor gets 8 × 30-minute AVAILABLE slots on each of 12
--- pre-chosen day-offsets in the next 30 days. Half the doctors run a 09:00
--- morning shift (deterministic from the doctor's UUID), the other half
--- a 14:00 afternoon shift — gives the booking-page calendar a varied feel.
--- Slot IDs are derived from MD5(doctor_id || day_offset || slot_idx) so the
--- block is fully idempotent: re-runs INSERT IGNORE the same rows.
+-- ── Clean up stale unbooked future slots before re-seeding ──────────────────
+-- Safe to run on every restart: only removes AVAILABLE future slots that have no
+-- user or pet assigned (i.e. never confirmed as a real booking).
+DELETE FROM appointments
+WHERE slot_status = 'AVAILABLE'
+  AND user_id     IS NULL
+  AND pet_id      IS NULL
+  AND appointment_date > CURDATE();
+
+-- ── Per-doctor shift allocation — every day for 30 days ──────────────────────
+-- Slots are DIVIDED between doctors so each doctor owns a distinct time window:
+--   Odd  last UUID hex digit (1,3,5,7…) → morning   09:00–11:00 (4 × 30 min)
+--   Even last UUID hex digit (0,2,4,6…) → afternoon 14:00–16:00 (4 × 30 min)
+--
+-- Named seeded doctors map to:
+--   Dr. Anita Sharma   (…0001) → morning    Dr. Rajiv Mehta    (…0002) → afternoon
+--   Dr. Priya Nair     (…0003) → morning    Dr. Suresh Kumar   (…0004) → afternoon
+--   Dr. Kavita Reddy   (…0005) → morning    Dr. Arjun Singh    (…0006) → afternoon
+--   Dr. Meera Patel    (…0007) → morning    Dr. Rohan Desai    (…0008) → afternoon
+--
+-- IDs: MD5(doctor_id || shift_tag || day_offset || slot_idx) — fully idempotent.
+
+-- Morning shift (09:00–11:00) — odd-last-digit doctors only
 INSERT IGNORE INTO appointments (
     id, hospital_id, doctor_id, appointment_date, appointment_time, end_time,
     duration_minutes, slot_status, booking_type, version, created_at, updated_at,
     is_locked, no_show_count, cancellation_policy_hours
 )
 SELECT
-    UNHEX(MD5(CONCAT(HEX(d.id), '-', LPAD(days.n, 2, '0'), '-', slots.n))),
+    UNHEX(MD5(CONCAT(HEX(d.id), '-AM-', LPAD(days.n, 2, '0'), '-', slots.n))),
     d.hospital_id,
     d.id,
     DATE_ADD(CURDATE(), INTERVAL days.n DAY),
-    SEC_TO_TIME(
-        IF(MOD(ASCII(SUBSTRING(HEX(d.id), 1, 1)), 2) = 0, 9, 14) * 3600
-        + slots.n * 1800
-    ),
-    SEC_TO_TIME(
-        IF(MOD(ASCII(SUBSTRING(HEX(d.id), 1, 1)), 2) = 0, 9, 14) * 3600
-        + (slots.n + 1) * 1800
-    ),
+    SEC_TO_TIME(9 * 3600 + slots.n * 1800),
+    SEC_TO_TIME(9 * 3600 + (slots.n + 1) * 1800),
     30, 'AVAILABLE', 'ROUTINE', 0, NOW(), NOW(),
     0, 0, 24
 FROM doctors d
 CROSS JOIN (
-    SELECT 1  AS n UNION ALL SELECT 3  UNION ALL SELECT 5  UNION ALL SELECT 7
-    UNION ALL SELECT 9  UNION ALL SELECT 11 UNION ALL SELECT 14 UNION ALL SELECT 17
-    UNION ALL SELECT 20 UNION ALL SELECT 23 UNION ALL SELECT 26 UNION ALL SELECT 29
+    SELECT  1 AS n UNION ALL SELECT  2 UNION ALL SELECT  3 UNION ALL SELECT  4
+    UNION ALL SELECT  5 UNION ALL SELECT  6 UNION ALL SELECT  7 UNION ALL SELECT  8
+    UNION ALL SELECT  9 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12
+    UNION ALL SELECT 13 UNION ALL SELECT 14 UNION ALL SELECT 15 UNION ALL SELECT 16
+    UNION ALL SELECT 17 UNION ALL SELECT 18 UNION ALL SELECT 19 UNION ALL SELECT 20
+    UNION ALL SELECT 21 UNION ALL SELECT 22 UNION ALL SELECT 23 UNION ALL SELECT 24
+    UNION ALL SELECT 25 UNION ALL SELECT 26 UNION ALL SELECT 27 UNION ALL SELECT 28
+    UNION ALL SELECT 29 UNION ALL SELECT 30
 ) AS days
 CROSS JOIN (
     SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3
-    UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7
 ) AS slots
-WHERE d.is_active = 1;
+WHERE d.is_active = 1
+  AND MOD(CONV(SUBSTRING(HEX(d.id), 32, 1), 16, 10), 2) = 1;
+
+-- Afternoon shift (14:00–16:00) — even-last-digit doctors only
+INSERT IGNORE INTO appointments (
+    id, hospital_id, doctor_id, appointment_date, appointment_time, end_time,
+    duration_minutes, slot_status, booking_type, version, created_at, updated_at,
+    is_locked, no_show_count, cancellation_policy_hours
+)
+SELECT
+    UNHEX(MD5(CONCAT(HEX(d.id), '-PM-', LPAD(days.n, 2, '0'), '-', slots.n))),
+    d.hospital_id,
+    d.id,
+    DATE_ADD(CURDATE(), INTERVAL days.n DAY),
+    SEC_TO_TIME(14 * 3600 + slots.n * 1800),
+    SEC_TO_TIME(14 * 3600 + (slots.n + 1) * 1800),
+    30, 'AVAILABLE', 'ROUTINE', 0, NOW(), NOW(),
+    0, 0, 24
+FROM doctors d
+CROSS JOIN (
+    SELECT  1 AS n UNION ALL SELECT  2 UNION ALL SELECT  3 UNION ALL SELECT  4
+    UNION ALL SELECT  5 UNION ALL SELECT  6 UNION ALL SELECT  7 UNION ALL SELECT  8
+    UNION ALL SELECT  9 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12
+    UNION ALL SELECT 13 UNION ALL SELECT 14 UNION ALL SELECT 15 UNION ALL SELECT 16
+    UNION ALL SELECT 17 UNION ALL SELECT 18 UNION ALL SELECT 19 UNION ALL SELECT 20
+    UNION ALL SELECT 21 UNION ALL SELECT 22 UNION ALL SELECT 23 UNION ALL SELECT 24
+    UNION ALL SELECT 25 UNION ALL SELECT 26 UNION ALL SELECT 27 UNION ALL SELECT 28
+    UNION ALL SELECT 29 UNION ALL SELECT 30
+) AS days
+CROSS JOIN (
+    SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3
+) AS slots
+WHERE d.is_active = 1
+  AND MOD(CONV(SUBSTRING(HEX(d.id), 32, 1), 16, 10), 2) = 0;
  
  
