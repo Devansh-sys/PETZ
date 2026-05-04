@@ -7,9 +7,15 @@ import { Navbar } from '../../shared/navbar/navbar';
 import { FirebasePhoneService } from '../../core/auth/firebase-phone.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { environment } from '../../../environments/environment';
+import {
+  PHONE_RE,
+  EMAIL_RE,
+  STRONG_PASSWORD_RE,
+  passwordWeakness,
+  normalizePhone,
+} from '../../core/auth/validation';
 
 type Step = 'PHONE' | 'OTP' | 'PROFILE';
-const PHONE_RE = /^\+?[1-9]\d{7,14}$/;
 
 @Component({
   selector: 'petz-register',
@@ -40,11 +46,34 @@ export class Register {
   togglePasswordVisibility(): void { this.passwordVisible.update(v => !v); }
   toggleConfirmVisibility(): void { this.confirmVisible.update(v => !v); }
 
-  get normalizedPhone(): string {
-    const raw = this.phone().trim();
-    if (raw.startsWith('+')) return raw;
-    if (raw.length === 10) return `+91${raw}`;
-    return raw;
+  get normalizedPhone(): string { return normalizePhone(this.phone()); }
+
+  // ─── Inline validation hints (null = no error) ───
+  get phoneHint(): string | null {
+    if (!this.phone().trim()) return null;
+    return PHONE_RE.test(this.normalizedPhone)
+      ? null
+      : 'Enter a valid 10-digit Indian mobile number (starting with 6–9).';
+  }
+
+  get emailHint(): string | null {
+    const v = this.email().trim();
+    if (!v) return null;
+    return EMAIL_RE.test(v) ? null : 'Enter a valid email like name@example.com.';
+  }
+
+  get nameHint(): string | null {
+    const v = this.fullName().trim();
+    if (!v) return null;
+    return v.length >= 2 ? null : 'Name must be at least 2 characters.';
+  }
+
+  /** Inline guidance for the password field (uses passwordWeakness helper). */
+  get passwordHint(): string | null { return passwordWeakness(this.password()); }
+
+  get confirmHint(): string | null {
+    if (!this.confirmPassword()) return null;
+    return this.passwordsMatch ? null : 'Passwords do not match.';
   }
 
   get canPhone(): boolean { return PHONE_RE.test(this.normalizedPhone); }
@@ -52,8 +81,8 @@ export class Register {
   get passwordsMatch(): boolean { return this.password() === this.confirmPassword(); }
   get canProfile(): boolean {
     return this.fullName().trim().length >= 2
-      && /\S+@\S+\.\S+/.test(this.email())
-      && this.password().length >= 8
+      && EMAIL_RE.test(this.email().trim())
+      && STRONG_PASSWORD_RE.test(this.password())
       && this.passwordsMatch;
   }
 

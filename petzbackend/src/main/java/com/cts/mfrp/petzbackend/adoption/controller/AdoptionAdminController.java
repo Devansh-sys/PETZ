@@ -1,5 +1,8 @@
 package com.cts.mfrp.petzbackend.adoption.controller;
 
+import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.AddNgoRepresentativeRequest;
+import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.ApplicationDecideRequest;
+import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.ApplicationSummary;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.AuditLogResponse;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.MetricsResponse;
 import com.cts.mfrp.petzbackend.adoption.dto.AdoptionAdminDtos.NgoResponse;
@@ -105,6 +108,41 @@ public class AdoptionAdminController {
         return ResponseEntity.ok(ApiResponse.ok(
                 "Audit logs fetched.",
                 auditService.listFiltered(targetType, targetId, actorId, fromDt, toDt, page, size)));
+    }
+
+    // Admin: GET /admin/adoptions/applications — list all applications platform-wide
+    @GetMapping("/applications")
+    public ResponseEntity<ApiResponse<PageResponse<ApplicationSummary>>> listApplications(
+            @RequestParam(defaultValue = "0")  int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(ApiResponse.ok(
+                "Applications fetched.", adminService.listAllApplications(page, size)));
+    }
+
+    // Admin: POST /admin/adoptions/applications/{id}/decide — direct override
+    @PostMapping("/applications/{applicationId}/decide")
+    public ResponseEntity<ApiResponse<ApplicationSummary>> decideApplication(
+            @AuthenticationPrincipal UUID principalUserId,
+            @RequestHeader(value = "X-User-Id", required = false) UUID headerUserId,
+            @PathVariable UUID applicationId,
+            @Valid @RequestBody ApplicationDecideRequest body) {
+        UUID adminId = resolveActor(principalUserId, headerUserId);
+        return ResponseEntity.ok(ApiResponse.ok(
+                "Application " + body.getAction().toLowerCase() + "d.",
+                adminService.adminDecide(adminId, applicationId, body)));
+    }
+
+    // Admin: POST /admin/adoptions/ngos/{ngoId}/representative — add NGO rep user
+    @PostMapping("/ngos/{ngoId}/representative")
+    public ResponseEntity<ApiResponse<NgoResponse>> addNgoRepresentative(
+            @AuthenticationPrincipal UUID principalUserId,
+            @RequestHeader(value = "X-User-Id", required = false) UUID headerUserId,
+            @PathVariable UUID ngoId,
+            @Valid @RequestBody AddNgoRepresentativeRequest body) {
+        UUID adminId = resolveActor(principalUserId, headerUserId);
+        return ResponseEntity.ok(ApiResponse.ok(
+                "NGO representative added.",
+                adminService.addNgoRepresentative(adminId, ngoId, body)));
     }
 
     // ─── helpers ─────────────────────────────────────────────────────

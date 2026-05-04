@@ -1,3 +1,4 @@
+
 <petz-navbar></petz-navbar>
 
 <div class="review-page">
@@ -18,8 +19,8 @@
 
       <div class="alert error" *ngIf="actionError"><span>⚠️</span><span>{{ actionError }}</span></div>
 
-      <div class="action-bar" *ngIf="application.status === 'PENDING' || application.status === 'UNDER_REVIEW'">
-        <button class="btn btn-secondary" *ngIf="application.status === 'PENDING'" (click)="startReview()" [disabled]="busy">
+      <div class="action-bar" *ngIf="application.status === 'SUBMITTED' || application.status === 'UNDER_REVIEW'">
+        <button class="btn btn-secondary" *ngIf="application.status === 'SUBMITTED'" (click)="startReview()" [disabled]="busy">
           {{ busy ? '…' : 'Start Review' }}
         </button>
         <button class="btn btn-primary" *ngIf="application.status === 'UNDER_REVIEW'" (click)="approve()" [disabled]="busy">

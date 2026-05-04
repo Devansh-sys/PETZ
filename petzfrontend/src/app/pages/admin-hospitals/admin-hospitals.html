@@ -6,12 +6,7 @@
       <a routerLink="/admin" class="back-link">← Admin Dashboard</a>
       <h1>🏥 Hospital Management</h1>
     </div>
-  </div>
-
-  <div class="filter-bar">
-    <button class="filter-btn" [class.active]="filterVerified === ''" (click)="filterVerified = ''; load()">All</button>
-    <button class="filter-btn" [class.active]="filterVerified === 'false'" (click)="filterVerified = 'false'; load()">Pending Verification</button>
-    <button class="filter-btn" [class.active]="filterVerified === 'true'" (click)="filterVerified = 'true'; load()">Verified</button>
+    <button class="btn btn-primary" (click)="openAddHospital()">+ Add Hospital</button>
   </div>
 
   <div class="alert error" *ngIf="actionError"><span>⚠️</span><span>{{ actionError }}</span></div>
@@ -19,31 +14,296 @@
   <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
   <div class="error-state" *ngIf="error && !loading"><p>{{ error }}</p><button class="btn btn-primary" (click)="load()">Retry</button></div>
 
-  <div class="empty-state" *ngIf="!loading && !error && hospitals.length === 0">
-    <p>No hospitals found.</p>
-  </div>
-
-  <div class="hospitals-list" *ngIf="!loading && !error && hospitals.length > 0">
-    <div class="hospital-card" *ngFor="let h of hospitals">
-      <div class="hospital-info">
-        <div class="hospital-name">
-          <h3>{{ h.name }}</h3>
-          <span class="verified-badge" *ngIf="h.isVerified">✓ Verified</span>
-          <span class="pending-badge" *ngIf="!h.isVerified">Pending</span>
-        </div>
-        <p class="hospital-address">📍 {{ h.address }}, {{ h.city }}</p>
-        <p class="hospital-meta">📞 {{ h.contactPhone || '—' }} · {{ h.contactEmail || '—' }}</p>
+  <ng-container *ngIf="!loading && !error">
+    <!-- Summary row -->
+    <div class="summary-row">
+      <div class="sum-card orange">
+        <div class="sum-num">{{ pendingHospitals.length }}</div>
+        <div class="sum-label">Pending Verification</div>
       </div>
-      <div class="hospital-actions">
-        <button class="btn btn-primary btn-sm"
-          (click)="verify(h.id)"
-          [disabled]="busy === h.id">
-          {{ busy === h.id ? '…' : 'Verify' }}
+      <div class="sum-card green">
+        <div class="sum-num">{{ activeHospitals.length }}</div>
+        <div class="sum-label">Active & Verified</div>
+      </div>
+      <div class="sum-card grey">
+        <div class="sum-num">{{ disabledHospitals.length }}</div>
+        <div class="sum-label">Disabled</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn" [class.active]="activeTab === 'pending'" (click)="activeTab = 'pending'">
+        Pending Verification
+        <span class="tab-badge orange" *ngIf="pendingHospitals.length > 0">{{ pendingHospitals.length }}</span>
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'active'" (click)="activeTab = 'active'">
+        Active Hospitals
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'disabled'" (click)="activeTab = 'disabled'">
+        Disabled
+        <span class="tab-badge grey" *ngIf="disabledHospitals.length > 0">{{ disabledHospitals.length }}</span>
+      </button>
+    </div>
+
+    <!-- Pending tab -->
+    <section *ngIf="activeTab === 'pending'" class="tab-content">
+      <div class="empty-state" *ngIf="pendingHospitals.length === 0">
+        No hospitals pending verification. 🎉
+      </div>
+      <div class="hospital-list" *ngIf="pendingHospitals.length > 0">
+        <div class="hospital-card" *ngFor="let h of pendingHospitals">
+          <div class="hosp-info">
+            <div class="hosp-name-row">
+              <h3>{{ h.name }}</h3>
+              <span class="badge badge-orange">Pending</span>
+              <span class="badge badge-green" *ngIf="h.emergencyReady">🚨 Emergency Ready</span>
+            </div>
+            <p class="hosp-address">📍 {{ h.address }}, {{ h.city }}</p>
+            <p class="hosp-meta">
+              <span *ngIf="h.contactPhone">📞 {{ h.contactPhone }}</span>
+              <span *ngIf="h.contactEmail">✉️ {{ h.contactEmail }}</span>
+              <span *ngIf="h.operatingHours">🕐 {{ h.operatingHours }}</span>
+            </p>
+          </div>
+          <div class="hosp-actions">
+            <button class="btn btn-primary btn-sm" (click)="openVerify(h)">Review & Verify</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Active tab -->
+    <section *ngIf="activeTab === 'active'" class="tab-content">
+      <div class="empty-state" *ngIf="activeHospitals.length === 0">No active hospitals.</div>
+      <div class="hospital-list" *ngIf="activeHospitals.length > 0">
+        <div class="hospital-card" *ngFor="let h of activeHospitals">
+          <div class="hosp-info">
+            <div class="hosp-name-row">
+              <h3>{{ h.name }}</h3>
+              <span class="badge badge-green">✓ Verified</span>
+              <span class="badge badge-green" *ngIf="h.emergencyReady">🚨 Emergency Ready</span>
+            </div>
+            <p class="hosp-address">📍 {{ h.address }}, {{ h.city }}</p>
+            <p class="hosp-meta">
+              <span *ngIf="h.contactPhone">📞 {{ h.contactPhone }}</span>
+              <span *ngIf="h.contactEmail">✉️ {{ h.contactEmail }}</span>
+            </p>
+          </div>
+          <div class="hosp-actions">
+            <button class="btn btn-ghost btn-sm" (click)="openAddDoctor(h)">+ Add Doctor</button>
+            <button class="btn btn-danger btn-sm" (click)="openDisable(h)" [disabled]="busy === h.id">
+              {{ busy === h.id ? '…' : 'Disable' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Disabled tab -->
+    <section *ngIf="activeTab === 'disabled'" class="tab-content">
+      <div class="empty-state" *ngIf="disabledHospitals.length === 0">No disabled hospitals.</div>
+      <div class="hospital-list" *ngIf="disabledHospitals.length > 0">
+        <div class="hospital-card disabled-card" *ngFor="let h of disabledHospitals">
+          <div class="hosp-info">
+            <div class="hosp-name-row">
+              <h3>{{ h.name }}</h3>
+              <span class="badge badge-grey">Disabled</span>
+            </div>
+            <p class="hosp-address">📍 {{ h.address }}, {{ h.city }}</p>
+            <p class="hosp-meta">
+              <span *ngIf="h.contactPhone">📞 {{ h.contactPhone }}</span>
+              <span *ngIf="h.contactEmail">✉️ {{ h.contactEmail }}</span>
+            </p>
+          </div>
+          <div class="hosp-actions">
+            <button class="btn btn-primary btn-sm" (click)="enableHospital(h.id)" [disabled]="busy === h.id">
+              {{ busy === h.id ? '…' : '✓ Enable' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </ng-container>
+</div>
+
+<!-- ── Verify popup ── -->
+<div class="modal-overlay" *ngIf="verifyHospital" (click)="closeVerify()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Review Hospital</h2>
+      <button type="button" class="modal-close" (click)="closeVerify()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="verify-detail-grid">
+        <div class="vd-row">
+          <span class="vd-key">Hospital Name</span>
+          <span class="vd-val">{{ verifyHospital.name }}</span>
+        </div>
+        <div class="vd-row">
+          <span class="vd-key">Address</span>
+          <span class="vd-val">{{ verifyHospital.address }}, {{ verifyHospital.city }}</span>
+        </div>
+        <div class="vd-row" *ngIf="verifyHospital.contactPhone">
+          <span class="vd-key">Phone</span>
+          <span class="vd-val">{{ verifyHospital.contactPhone }}</span>
+        </div>
+        <div class="vd-row" *ngIf="verifyHospital.contactEmail">
+          <span class="vd-key">Email</span>
+          <span class="vd-val">{{ verifyHospital.contactEmail }}</span>
+        </div>
+        <div class="vd-row" *ngIf="verifyHospital.operatingHours">
+          <span class="vd-key">Operating Hours</span>
+          <span class="vd-val">{{ verifyHospital.operatingHours }}</span>
+        </div>
+        <div class="vd-row" *ngIf="verifyHospital.latitude">
+          <span class="vd-key">Coordinates</span>
+          <span class="vd-val">{{ verifyHospital.latitude | number:'1.4-4' }}, {{ verifyHospital.longitude | number:'1.4-4' }}</span>
+        </div>
+        <div class="vd-row">
+          <span class="vd-key">Emergency Ready</span>
+          <span class="vd-val">{{ verifyHospital.emergencyReady ? '✓ Yes' : 'No' }}</span>
+        </div>
+      </div>
+
+      <div class="alert error mt" *ngIf="verifyError">
+        <span>⚠️</span><span>{{ verifyError }}</span>
+      </div>
+
+      <div class="verify-actions">
+        <button class="btn btn-primary" (click)="confirmVerify('APPROVE')" [disabled]="verifyBusy">
+          {{ verifyBusy ? '…' : '✓ Approve & Verify' }}
         </button>
-        <button class="btn btn-secondary btn-sm"
-          (click)="toggleActive(h.id, true)"
-          [disabled]="busy === h.id">
-          Disable
+        <button class="btn btn-danger" (click)="confirmVerify('REJECT')" [disabled]="verifyBusy">
+          {{ verifyBusy ? '…' : '✗ Reject' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Disable confirm popup ── -->
+<div class="modal-overlay" *ngIf="disablingHospital" (click)="closeDisable()">
+  <div class="modal modal-sm" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Disable Hospital</h2>
+      <button type="button" class="modal-close" (click)="closeDisable()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-desc">You are about to disable <strong>{{ disablingHospital.name }}</strong>. The hospital will no longer appear in patient searches.</p>
+      <div class="form-field">
+        <label>Reason <span class="optional">(optional)</span></label>
+        <textarea class="input" rows="2" [(ngModel)]="disableReason" [disabled]="disableBusy" placeholder="e.g. License expired, safety concerns…"></textarea>
+      </div>
+      <div class="alert error mt" *ngIf="disableError"><span>⚠️</span><span>{{ disableError }}</span></div>
+      <div class="modal-footer-btns">
+        <button class="btn btn-ghost" (click)="closeDisable()" [disabled]="disableBusy">Cancel</button>
+        <button class="btn btn-danger" (click)="confirmDisable()" [disabled]="disableBusy">
+          {{ disableBusy ? 'Disabling…' : 'Confirm Disable' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Add Hospital modal ── -->
+<div class="modal-overlay" *ngIf="showAddHospital" (click)="closeAddHospital()">
+  <div class="modal modal-lg" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Add New Hospital</h2>
+      <button type="button" class="modal-close" (click)="closeAddHospital()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert success" *ngIf="addSuccess"><span>✅</span><span>{{ addSuccess }}</span></div>
+      <div class="alert error" *ngIf="addError"><span>⚠️</span><span>{{ addError }}</span></div>
+
+      <div class="add-form-grid">
+        <div class="form-field full-col">
+          <label>Hospital Name <span class="req">*</span></label>
+          <input type="text" class="input" [(ngModel)]="addForm.name" placeholder="e.g. City Animal Hospital" [disabled]="addBusy"/>
+        </div>
+        <div class="form-field full-col">
+          <label>Address <span class="req">*</span></label>
+          <input type="text" class="input" [(ngModel)]="addForm.address" placeholder="Street address" [disabled]="addBusy"/>
+        </div>
+        <div class="form-field">
+          <label>City <span class="req">*</span></label>
+          <input type="text" class="input" [(ngModel)]="addForm.city" placeholder="City" [disabled]="addBusy"/>
+        </div>
+        <div class="form-field">
+          <label>Contact Phone</label>
+          <input type="tel" class="input" [(ngModel)]="addForm.contactPhone" placeholder="+91 XXXXX XXXXX" [disabled]="addBusy"/>
+        </div>
+        <div class="form-field">
+          <label>Contact Email</label>
+          <input type="email" class="input" [(ngModel)]="addForm.contactEmail" placeholder="hospital@example.com" [disabled]="addBusy"/>
+        </div>
+        <div class="form-field">
+          <label>Operating Hours</label>
+          <input type="text" class="input" [(ngModel)]="addForm.operatingHours" placeholder="e.g. 24/7 or 9am – 9pm" [disabled]="addBusy"/>
+        </div>
+        <div class="form-field">
+          <label>Latitude</label>
+          <input type="number" class="input" [(ngModel)]="addForm.latitude" placeholder="e.g. 28.6139" [disabled]="addBusy"/>
+        </div>
+        <div class="form-field">
+          <label>Longitude</label>
+          <input type="number" class="input" [(ngModel)]="addForm.longitude" placeholder="e.g. 77.2090" [disabled]="addBusy"/>
+        </div>
+        <div class="form-field full-col">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="addForm.emergencyReady" [disabled]="addBusy"/>
+            <span>Emergency Ready (24/7 emergency response)</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-footer-btns mt">
+        <button class="btn btn-ghost" (click)="closeAddHospital()" [disabled]="addBusy">Cancel</button>
+        <button class="btn btn-primary" (click)="submitAddHospital()" [disabled]="addBusy">
+          {{ addBusy ? 'Creating…' : 'Create Hospital' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Add Doctor modal ── -->
+<div class="modal-overlay" *ngIf="doctorHospital" (click)="closeAddDoctor()">
+  <div class="modal modal-sm" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Add Doctor</h2>
+      <button type="button" class="modal-close" (click)="closeAddDoctor()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-desc">Adding doctor to <strong>{{ doctorHospital.name }}</strong></p>
+
+      <div class="alert success" *ngIf="doctorSuccess"><span>✅</span><span>{{ doctorSuccess }}</span></div>
+      <div class="alert error" *ngIf="doctorError"><span>⚠️</span><span>{{ doctorError }}</span></div>
+
+      <div class="form-grid">
+        <div class="form-field full-col">
+          <label>Full Name <span class="req">*</span></label>
+          <input type="text" class="input" [(ngModel)]="doctorForm.name" placeholder="Dr. Full Name" [disabled]="doctorBusy"/>
+        </div>
+        <div class="form-field full-col">
+          <label>Specialization <span class="req">*</span></label>
+          <input type="text" class="input" [(ngModel)]="doctorForm.specialization" placeholder="e.g. Veterinary Surgery" [disabled]="doctorBusy"/>
+        </div>
+        <div class="form-field">
+          <label>Phone</label>
+          <input type="tel" class="input" [(ngModel)]="doctorForm.contactPhone" placeholder="+91 XXXXX XXXXX" [disabled]="doctorBusy"/>
+        </div>
+        <div class="form-field">
+          <label>Availability</label>
+          <input type="text" class="input" [(ngModel)]="doctorForm.availability" placeholder="e.g. Mon–Fri, 9am–5pm" [disabled]="doctorBusy"/>
+        </div>
+      </div>
+
+      <div class="modal-footer-btns mt">
+        <button class="btn btn-ghost" (click)="closeAddDoctor()" [disabled]="doctorBusy">Close</button>
+        <button class="btn btn-primary" (click)="submitAddDoctor()" [disabled]="doctorBusy">
+          {{ doctorBusy ? 'Adding…' : 'Add Doctor' }}
         </button>
       </div>
     </div>

@@ -85,7 +85,8 @@ h1 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
   &:disabled { color: var(--muted); cursor: default; }
 }
 
-.hint { color: var(--muted); font-size: 12px; margin-top: 4px; }
+.hint { color: var(--muted); font-size: 12px; margin-top: 4px; display: block; }
+.hint.mismatch { color: var(--danger); font-weight: 500; }
 
 .auth-footer {
   text-align: center;

@@ -1,0 +1,52 @@
+:host { display: block; }
+.page-wrap { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+.back-link { display: inline-block; color: var(--peach); font-size: 13px; font-weight: 600; text-decoration: none; margin-bottom: 4px; }
+.page-header { margin-bottom: 28px; h1 { font-size: 28px; font-weight: 900; } }
+.section-title { font-size: 18px; font-weight: 800; margin-bottom: 16px; }
+.loading-state { text-align: center; padding: 60px;
+  .spinner { width: 36px; height: 36px; border: 4px solid var(--line); border-top-color: var(--peach); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.error-state { text-align: center; padding: 40px; color: #dc2626; }
+.empty-state { text-align: center; padding: 60px; color: var(--muted); }
+
+.summary-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; margin-bottom: 36px;
+}
+.summary-card {
+  background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 20px;
+  .summary-num { font-size: 32px; font-weight: 900; color: #111; }
+  .summary-label { font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 4px; text-transform: uppercase; letter-spacing: .5px; }
+  &.blue { border-color: #bfdbfe; .summary-num { color: #1d4ed8; } }
+  &.green { border-color: #bbf7d0; .summary-num { color: #16a34a; } }
+  &.orange { border-color: #fed7aa; .summary-num { color: #c2410c; } }
+  &.red { border-color: #fecaca; .summary-num { color: #dc2626; } }
+}
+
+// ── Donut chart
+.donut-section { margin-bottom: 36px; }
+.donut-card { display: inline-flex; align-items: center; gap: 24px; background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 20px 28px; }
+.donut-svg { width: 120px; height: 120px; flex-shrink: 0; }
+.donut-num { font-size: 14px; font-weight: 900; fill: var(--ink); }
+.donut-lbl { font-size: 6px; fill: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .3px; }
+.donut-legend { display: flex; flex-direction: column; gap: 10px; }
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.legend-label { color: var(--muted); flex: 1; min-width: 80px; }
+.legend-val { font-weight: 700; color: var(--ink); }
+
+.metrics-table { }
+.table-wrap { background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: auto; }
+.table-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1.2fr;
+  padding: 14px 20px; align-items: center; border-bottom: 1px solid var(--line); font-size: 14px; min-width: 900px;
+  &:last-child { border-bottom: none; }
+  &.header { background: var(--cream); font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+}
+.hospital-name { font-weight: 600; }
+.bold { font-weight: 700; }
+.green { color: #16a34a; font-weight: 600; }
+.orange { color: #c2410c; font-weight: 600; }
+.red { color: #dc2626; font-weight: 600; }
+.rate { font-weight: 700; color: var(--peach); }

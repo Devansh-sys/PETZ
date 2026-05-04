@@ -28,7 +28,31 @@
 
     <div class="section">
       <h3>Quick Links</h3>
-      <div class="links-grid">
+      <!-- Admin quick links -->
+      <div class="links-grid" *ngIf="role === 'Administrator'">
+        <a routerLink="/admin" class="link-card">
+          <span class="lc-icon">⚙️</span>
+          <span>Dashboard</span>
+        </a>
+        <a routerLink="/admin/rescues" class="link-card">
+          <span class="lc-icon">🚨</span>
+          <span>Rescue Ops</span>
+        </a>
+        <a routerLink="/admin/hospitals" class="link-card">
+          <span class="lc-icon">🏥</span>
+          <span>Hospital Mgmt</span>
+        </a>
+        <a routerLink="/admin/adoptions" class="link-card">
+          <span class="lc-icon">🐾</span>
+          <span>Adoptions</span>
+        </a>
+        <a routerLink="/admin/appointments" class="link-card">
+          <span class="lc-icon">📅</span>
+          <span>Appointments</span>
+        </a>
+      </div>
+      <!-- Normal user quick links -->
+      <div class="links-grid" *ngIf="role !== 'Administrator'">
         <a routerLink="/my-reports" class="link-card">
           <span class="lc-icon">📋</span>
           <span>My Rescue Reports</span>
@@ -37,17 +61,13 @@
           <span class="lc-icon">📅</span>
           <span>My Appointments</span>
         </a>
-        <a routerLink="/adopt/my-applications" class="link-card">
+        <a routerLink="/my-adoptions" class="link-card">
           <span class="lc-icon">🏠</span>
           <span>My Adoptions</span>
         </a>
         <a *ngIf="role === 'NGO Representative' || role === 'NGO'" routerLink="/ngo/dashboard" class="link-card">
           <span class="lc-icon">🏢</span>
           <span>NGO Dashboard</span>
-        </a>
-        <a *ngIf="role === 'Administrator'" routerLink="/admin" class="link-card">
-          <span class="lc-icon">⚙️</span>
-          <span>Admin Dashboard</span>
         </a>
       </div>
     </div>

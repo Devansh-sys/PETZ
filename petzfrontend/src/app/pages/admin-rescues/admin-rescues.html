@@ -8,39 +8,117 @@
     </div>
   </div>
 
+  <!-- Filter bar -->
   <div class="filter-bar">
     <button class="filter-btn" [class.active]="filterStatus === ''" (click)="filterStatus = ''; load()">All</button>
     <button class="filter-btn" [class.active]="filterStatus === 'REPORTED'" (click)="filterStatus = 'REPORTED'; load()">Reported</button>
     <button class="filter-btn" [class.active]="filterStatus === 'DISPATCHED'" (click)="filterStatus = 'DISPATCHED'; load()">Dispatched</button>
     <button class="filter-btn" [class.active]="filterStatus === 'ON_SITE'" (click)="filterStatus = 'ON_SITE'; load()">On Site</button>
     <button class="filter-btn" [class.active]="filterStatus === 'TRANSPORTING'" (click)="filterStatus = 'TRANSPORTING'; load()">Transporting</button>
-    <button class="filter-btn" [class.active]="filterStatus === 'COMPLETE'" (click)="filterStatus = 'COMPLETE'; load()">Complete</button>
     <button class="filter-btn" [class.active]="filterStatus === 'FLAGGED'" (click)="filterStatus = 'FLAGGED'; load()">Flagged</button>
+    <button class="filter-btn" [class.active]="filterStatus === 'COMPLETE'" (click)="filterStatus = 'COMPLETE'; load()">Completed</button>
   </div>
 
   <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
   <div class="error-state" *ngIf="error && !loading"><p>{{ error }}</p><button class="btn btn-primary" (click)="load()">Retry</button></div>
 
-  <div class="empty-state" *ngIf="!loading && !error && reports.length === 0">
-    <p>No rescue reports found for this filter.</p>
-  </div>
+  <ng-container *ngIf="!loading && !error">
 
-  <div class="reports-table" *ngIf="!loading && !error && reports.length > 0">
-    <div class="table-row header">
-      <span>Report ID</span>
-      <span>Reporter</span>
-      <span>Location</span>
-      <span>Animal Type</span>
-      <span>Reported At</span>
-      <span>Status</span>
+    <!-- Active / In-Progress missions summary -->
+    <div class="active-banner" *ngIf="activeReports.length > 0">
+      <span class="active-dot"></span>
+      <strong>{{ activeReports.length }} active mission{{ activeReports.length !== 1 ? 's' : '' }}</strong>
+      <span class="active-sub">in progress right now</span>
     </div>
-    <div class="table-row" *ngFor="let r of reports">
-      <code class="id-cell">{{ r.sosId?.toString()?.slice(0,8) }}…</code>
-      <span>{{ r.reporterPhone || '—' }}</span>
-      <span class="location-cell">{{ r.latitude }}, {{ r.longitude }}</span>
-      <span>{{ r.urgencyLevel || '—' }}</span>
-      <span>{{ r.reportedAt | date:'short' }}</span>
-      <span class="status-badge" [class]="statusClass(r.status)">{{ r.status }}</span>
+
+    <div class="empty-state" *ngIf="reports.length === 0">
+      No rescue reports found for this filter.
+    </div>
+
+    <!-- Reports table -->
+    <div class="reports-wrap" *ngIf="reports.length > 0">
+      <table class="reports-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Reporter</th>
+            <th>Location</th>
+            <th>Urgency</th>
+            <th>Reported At</th>
+            <th>Status</th>
+            <th>Assign</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of reports" [class.row-active]="statusClass(r.status) !== 'grey' && statusClass(r.status) !== 'green'">
+            <td><code class="id-cell">{{ r.sosId?.toString()?.slice(0,8) }}…</code></td>
+            <td>{{ r.reporterPhone || '—' }}</td>
+            <td class="location-cell">
+              <span class="location-name">{{ locationOf(r) }}</span>
+            </td>
+            <td>
+              <span class="urgency-badge" [class.high]="r.urgencyLevel === 'HIGH' || r.urgencyLevel === 'CRITICAL'">
+                {{ r.urgencyLevel || '—' }}
+              </span>
+            </td>
+            <td class="date-cell">{{ r.reportedAt | date:'dd MMM, HH:mm' }}</td>
+            <td>
+              <span class="status-badge" [class]="statusClass(r.status)">{{ statusLabel(r.status) }}</span>
+            </td>
+            <td>
+              <button class="btn btn-assign btn-sm"
+                [class.needs-assign]="r.status === 'REPORTED'"
+                (click)="openAssign(r.sosId)">
+                Assign NGO
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </ng-container>
+</div>
+
+<!-- ── Assign NGO Modal ── -->
+<div class="modal-overlay" *ngIf="assigningId" (click)="closeAssign()">
+  <div class="modal-panel" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Assign NGO to Rescue</h2>
+      <button type="button" class="modal-close" (click)="closeAssign()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-sub">Report ID: <code>{{ assigningId?.toString()?.slice(0,8) }}…</code></p>
+
+      <div class="field">
+        <label>Select NGO <span class="req">*</span></label>
+        <select class="input" [(ngModel)]="assignNgoId" [disabled]="ngosLoading || assignBusy">
+          <option value="">{{ ngosLoading ? 'Loading NGOs…' : ngos.length === 0 ? 'No NGOs with representatives' : '— Choose an NGO —' }}</option>
+          <option *ngFor="let n of ngos" [value]="n.id">
+            {{ n.name }}{{ n.isVerified ? ' ✓' : ' (unverified)' }}
+          </option>
+        </select>
+        <span class="field-hint" *ngIf="!ngosLoading && ngos.length === 0">
+          ⚠ No NGOs have a representative assigned. Add one via Adoption Management → Add NGO Rep.
+        </span>
+      </div>
+
+      <div class="field mt">
+        <label>Reason for assignment <span class="req">*</span></label>
+        <textarea class="input" [(ngModel)]="assignReason" [disabled]="assignBusy" rows="3"
+          placeholder="e.g. Nearest NGO to rescue location, available team…"></textarea>
+      </div>
+
+      <div class="alert error mt" *ngIf="assignError">
+        <span>⚠️</span><span>{{ assignError }}</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" (click)="closeAssign()" [disabled]="assignBusy">Cancel</button>
+      <button class="btn btn-primary" (click)="submitAssign()"
+        [disabled]="assignBusy || !assignNgoId || !assignReason.trim()">
+        {{ assignBusy ? 'Assigning…' : 'Assign NGO' }}
+      </button>
     </div>
   </div>
 </div>

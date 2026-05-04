@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Navbar } from '../../shared/navbar/navbar';
 import { HospitalService } from '../../core/hospital/hospital.service';
 import { HospitalResponse } from '../../core/hospital/hospital.models';
@@ -11,7 +11,7 @@ const BOOKING_KEY = 'petz.booking';
 
 @Component({
   selector: 'petz-book-hospital',
-  imports: [CommonModule, FormsModule, Navbar],
+  imports: [CommonModule, FormsModule, Navbar, RouterLink],
   templateUrl: './book-hospital.html',
   styleUrl: './book-hospital.scss'
 })

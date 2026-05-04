@@ -1,0 +1,361 @@
+<petz-navbar></petz-navbar>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <a routerLink="/admin" class="back-link">← Admin Dashboard</a>
+    <h1>🐾 Adoption Management</h1>
+  </div>
+
+  <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
+  <div class="error-state" *ngIf="error && !loading">
+    <p>{{ error }}</p>
+    <button class="btn btn-primary" (click)="loadAll()">Retry</button>
+  </div>
+
+  <ng-container *ngIf="!loading && !error">
+
+    <!-- Metrics + Donut Row -->
+    <section class="overview-row" *ngIf="metrics">
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-num">{{ metrics.totalApplications ?? 0 }}</div>
+          <div class="metric-label">Total Applications</div>
+        </div>
+        <div class="metric-card green">
+          <div class="metric-num">{{ metrics.approvedCount ?? 0 }}</div>
+          <div class="metric-label">Approved</div>
+        </div>
+        <div class="metric-card blue">
+          <div class="metric-num">{{ metrics.completedAdoptions ?? 0 }}</div>
+          <div class="metric-label">Completed</div>
+        </div>
+        <div class="metric-card red">
+          <div class="metric-num">{{ metrics.rejectedCount ?? 0 }}</div>
+          <div class="metric-label">Rejected</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-num">{{ metrics.conversionRatePercent ?? 0 | number:'1.0-1' }}%</div>
+          <div class="metric-label">Conversion Rate</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-num">{{ metrics.avgReviewTimeHours ?? 0 | number:'1.0-1' }}h</div>
+          <div class="metric-label">Avg Review Time</div>
+        </div>
+      </div>
+
+      <div class="donut-card" *ngIf="donutSegments.length > 0">
+        <h3 class="donut-title">Application Breakdown</h3>
+        <div class="donut-wrap">
+          <svg viewBox="0 0 100 100" class="donut-svg">
+            <path *ngFor="let seg of donutSegments; let i = index"
+              [attr.d]="donutPath(donutSegments, i)"
+              [attr.fill]="seg.color"
+              class="donut-seg">
+              <title>{{ seg.label }}: {{ seg.value }}</title>
+            </path>
+            <circle cx="50" cy="50" r="25" fill="#fff"/>
+            <text x="50" y="48" text-anchor="middle" class="donut-total-num">{{ metrics.totalApplications ?? 0 }}</text>
+            <text x="50" y="57" text-anchor="middle" class="donut-total-label">Total</text>
+          </svg>
+          <div class="donut-legend">
+            <div class="legend-item" *ngFor="let seg of donutSegments">
+              <span class="legend-dot" [style.background]="seg.color"></span>
+              <span class="legend-label">{{ seg.label }}</span>
+              <span class="legend-val">{{ seg.value }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn" [class.active]="activeTab === 'apps'" (click)="activeTab = 'apps'">
+        📋 Applications
+        <span class="tab-count" *ngIf="appTotal > 0">{{ appTotal }}</span>
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'ngos'" (click)="activeTab = 'ngos'">
+        🏢 NGO Management
+        <span class="tab-count">{{ ngos.length }}</span>
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'rep'" (click)="activeTab = 'rep'">
+        👤 Add NGO Rep
+      </button>
+    </div>
+
+    <!-- ── TAB: Applications ── -->
+    <section *ngIf="activeTab === 'apps'" class="tab-content">
+      <!-- Filter bar -->
+      <div class="filter-bar">
+        <label class="filter-label">Filter by status:</label>
+        <select class="filter-select" [(ngModel)]="filterStatus" (change)="loadApplications(0)">
+          <option value="">All Statuses</option>
+          <option value="SUBMITTED">Submitted</option>
+          <option value="UNDER_REVIEW">Under Review</option>
+          <option value="CLARIFICATION_REQUESTED">Clarification Requested</option>
+          <option value="APPROVED">Approved</option>
+          <option value="REJECTED">Rejected</option>
+          <option value="WITHDRAWN">Withdrawn</option>
+          <option value="DRAFT">Draft</option>
+        </select>
+        <span class="filter-total" *ngIf="!loadingApps">{{ appTotal }} result{{ appTotal !== 1 ? 's' : '' }}</span>
+      </div>
+
+      <div class="loading-inline" *ngIf="loadingApps"><div class="spinner-sm"></div> Loading…</div>
+
+      <div class="empty-state" *ngIf="!loadingApps && applications.length === 0">
+        No applications found.
+      </div>
+
+      <div class="apps-table-wrap" *ngIf="!loadingApps && applications.length > 0">
+        <table class="apps-table">
+          <thead>
+            <tr>
+              <th>Applicant</th>
+              <th>NGO</th>
+              <th>City</th>
+              <th>Submitted</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let app of applications">
+              <td>
+                <div class="app-name">{{ app.fullName ?? 'N/A' }}</div>
+                <div class="app-sub">{{ app.phone }}</div>
+              </td>
+              <td>{{ app.ngoName ?? '—' }}</td>
+              <td>{{ app.city ?? '—' }}</td>
+              <td>{{ (app.submittedAt | date:'dd MMM yy') ?? '—' }}</td>
+              <td>
+                <span class="status-pill" [class]="statusClass(app.status)">
+                  {{ statusLabel(app.status) }}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-ghost" (click)="openDetail(app)">View</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" *ngIf="appTotalPages > 1">
+        <button class="page-btn" [disabled]="appPage === 0" (click)="loadApplications(appPage - 1)">‹ Prev</button>
+        <span class="page-info">Page {{ appPage + 1 }} of {{ appTotalPages }}</span>
+        <button class="page-btn" [disabled]="appPage >= appTotalPages - 1" (click)="loadApplications(appPage + 1)">Next ›</button>
+      </div>
+    </section>
+
+    <!-- ── TAB: NGO Management ── -->
+    <section *ngIf="activeTab === 'ngos'" class="tab-content">
+      <div class="alert error" *ngIf="actionError">
+        <span>⚠️</span><span>{{ actionError }}</span>
+      </div>
+
+      <div class="empty-state" *ngIf="ngos.length === 0">No NGOs registered yet.</div>
+
+      <div class="ngo-list" *ngIf="ngos.length > 0">
+        <div class="ngo-card" *ngFor="let n of ngos">
+          <div class="ngo-info">
+            <div class="ngo-name-row">
+              <h3>{{ n.name }}</h3>
+              <span class="badge badge-green" *ngIf="n.isVerified">✓ Verified</span>
+              <span class="badge badge-orange" *ngIf="!n.isVerified">Pending</span>
+              <span class="badge badge-grey" *ngIf="n.active === false">Inactive</span>
+            </div>
+            <div class="ngo-details">
+              <span *ngIf="n.registrationNumber">Reg: {{ n.registrationNumber }}</span>
+              <span *ngIf="n.contactPhone">📞 {{ n.contactPhone }}</span>
+              <span *ngIf="n.contactEmail">✉️ {{ n.contactEmail }}</span>
+              <span *ngIf="n.ownerUserId" class="has-rep">✓ Has Rep</span>
+              <span *ngIf="!n.ownerUserId" class="no-rep">⚠ No Rep</span>
+            </div>
+          </div>
+          <div class="ngo-actions">
+            <button class="btn btn-primary btn-sm"
+              *ngIf="!n.isVerified"
+              (click)="verifyNgo(n.id, 'APPROVE')"
+              [disabled]="busy === n.id + 'APPROVE'">
+              {{ busy === n.id + 'APPROVE' ? '…' : 'Approve' }}
+            </button>
+            <button class="btn btn-ghost btn-sm"
+              *ngIf="!n.isVerified"
+              (click)="verifyNgo(n.id, 'REJECT')"
+              [disabled]="busy === n.id + 'REJECT'">
+              {{ busy === n.id + 'REJECT' ? '…' : 'Reject' }}
+            </button>
+            <button class="btn btn-danger btn-sm"
+              *ngIf="n.isVerified && n.active !== false"
+              (click)="verifyNgo(n.id, 'SUSPEND')"
+              [disabled]="busy === n.id + 'SUSPEND'">
+              {{ busy === n.id + 'SUSPEND' ? '…' : 'Suspend' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── TAB: Add NGO Representative ── -->
+    <section *ngIf="activeTab === 'rep'" class="tab-content">
+      <div class="form-card">
+        <h2 class="form-card-title">Add NGO Representative</h2>
+        <p class="form-card-desc">Create a new user account and assign them as the representative for a verified NGO.</p>
+
+        <div class="alert success" *ngIf="repSuccess">
+          <span>✅</span><span>{{ repSuccess }}</span>
+        </div>
+        <div class="alert error" *ngIf="repError">
+          <span>⚠️</span><span>{{ repError }}</span>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-field">
+            <label>NGO <span class="req">*</span></label>
+            <select [(ngModel)]="repNgoId" class="input" [disabled]="repBusy">
+              <option value="">— Select NGO —</option>
+              <option *ngFor="let n of ngos" [value]="n.id">
+                {{ n.name }}{{ !n.isVerified ? ' (Unverified)' : '' }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label>Full Name <span class="req">*</span></label>
+            <input type="text" class="input" [(ngModel)]="repFullName" placeholder="Representative's full name" [disabled]="repBusy"/>
+          </div>
+
+          <div class="form-field">
+            <label>Phone <span class="req">*</span></label>
+            <input type="tel" class="input" [(ngModel)]="repPhone" placeholder="+91 XXXXX XXXXX" [disabled]="repBusy"/>
+          </div>
+
+          <div class="form-field">
+            <label>Email <span class="optional">(optional)</span></label>
+            <input type="email" class="input" [(ngModel)]="repEmail" placeholder="rep@ngo.org" [disabled]="repBusy"/>
+          </div>
+
+          <div class="form-field full-width">
+            <label>Password <span class="req">*</span></label>
+            <input type="password" class="input" [(ngModel)]="repPassword" placeholder="Set initial password" [disabled]="repBusy"/>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-primary" (click)="submitAddRep()" [disabled]="repBusy">
+            {{ repBusy ? 'Adding…' : 'Add Representative' }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </ng-container>
+</div>
+
+<!-- ── Application Detail Modal ── -->
+<div class="modal-overlay" *ngIf="selectedApp" (click)="closeDetail()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Application Detail</h2>
+      <button type="button" class="modal-close" (click)="closeDetail()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="detail-section">
+        <div class="detail-grid">
+          <div class="detail-row">
+            <span class="detail-key">Applicant</span>
+            <span class="detail-val">{{ selectedApp.fullName ?? 'N/A' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Phone</span>
+            <span class="detail-val">{{ selectedApp.phone ?? '—' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Email</span>
+            <span class="detail-val">{{ selectedApp.email ?? '—' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">City</span>
+            <span class="detail-val">{{ selectedApp.city ?? '—' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Housing</span>
+            <span class="detail-val">{{ selectedApp.housingType ?? '—' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">NGO</span>
+            <span class="detail-val">{{ selectedApp.ngoName ?? '—' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Status</span>
+            <span class="detail-val">
+              <span class="status-pill" [class]="statusClass(selectedApp.status)">{{ statusLabel(selectedApp.status) }}</span>
+            </span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Submitted</span>
+            <span class="detail-val">{{ (selectedApp.submittedAt | date:'dd MMM yyyy, HH:mm') ?? '—' }}</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedApp.decidedAt">
+            <span class="detail-key">Decided At</span>
+            <span class="detail-val">{{ selectedApp.decidedAt | date:'dd MMM yyyy, HH:mm' }}</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedApp.decisionReason">
+            <span class="detail-key">Reason</span>
+            <span class="detail-val">{{ selectedApp.decisionReason }}</span>
+          </div>
+        </div>
+
+        <div class="consent-row">
+          <span class="consent-item" [class.yes]="selectedApp.prevPetOwnership">
+            {{ selectedApp.prevPetOwnership ? '✓' : '✗' }} Previous Pet Owner
+          </span>
+          <span class="consent-item" [class.yes]="selectedApp.consentHomeVisit">
+            {{ selectedApp.consentHomeVisit ? '✓' : '✗' }} Home Visit Consent
+          </span>
+          <span class="consent-item" [class.yes]="selectedApp.consentFollowUp">
+            {{ selectedApp.consentFollowUp ? '✓' : '✗' }} Follow-up Consent
+          </span>
+          <span class="consent-item" [class.yes]="selectedApp.consentBackgroundCheck">
+            {{ selectedApp.consentBackgroundCheck ? '✓' : '✗' }} Background Check
+          </span>
+        </div>
+      </div>
+
+      <!-- Decide panel — only show if not already decided -->
+      <div class="decide-panel"
+        *ngIf="selectedApp.status !== 'APPROVED' && selectedApp.status !== 'REJECTED' && selectedApp.status !== 'WITHDRAWN'">
+        <h3 class="decide-title">Admin Decision</h3>
+
+        <div class="decide-actions">
+          <button class="btn btn-approve" [class.selected]="decideAction === 'APPROVE'" (click)="decideAction = 'APPROVE'">
+            ✓ Approve
+          </button>
+          <button class="btn btn-reject" [class.selected]="decideAction === 'REJECT'" (click)="decideAction = 'REJECT'">
+            ✗ Reject
+          </button>
+        </div>
+
+        <div class="form-field mt" *ngIf="decideAction">
+          <label>Reason <span class="optional">(optional)</span></label>
+          <textarea class="input" rows="3" [(ngModel)]="decideReason" placeholder="Add a note for the applicant…"></textarea>
+        </div>
+
+        <div class="alert error mt" *ngIf="decideError">
+          <span>⚠️</span><span>{{ decideError }}</span>
+        </div>
+
+        <button class="btn btn-primary mt" (click)="submitDecide()" [disabled]="!decideAction || decideBusy">
+          {{ decideBusy ? 'Submitting…' : 'Confirm Decision' }}
+        </button>
+      </div>
+
+      <div class="decided-notice" *ngIf="selectedApp.status === 'APPROVED' || selectedApp.status === 'REJECTED' || selectedApp.status === 'WITHDRAWN'">
+        This application has already been decided.
+      </div>
+    </div>
+  </div>
+</div>

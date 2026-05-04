@@ -10,7 +10,7 @@
 
   <div class="filter-bar">
     <button class="filter-btn" [class.active]="filterStatus === ''" (click)="filterStatus = ''; load()">All</button>
-    <button class="filter-btn" [class.active]="filterStatus === 'PENDING'" (click)="filterStatus = 'PENDING'; load()">Pending</button>
+    <button class="filter-btn" [class.active]="filterStatus === 'SUBMITTED'" (click)="filterStatus = 'SUBMITTED'; load()">Pending</button>
     <button class="filter-btn" [class.active]="filterStatus === 'UNDER_REVIEW'" (click)="filterStatus = 'UNDER_REVIEW'; load()">Under Review</button>
     <button class="filter-btn" [class.active]="filterStatus === 'CLARIFICATION_REQUESTED'" (click)="filterStatus = 'CLARIFICATION_REQUESTED'; load()">Clarification</button>
     <button class="filter-btn" [class.active]="filterStatus === 'APPROVED'" (click)="filterStatus = 'APPROVED'; load()">Approved</button>

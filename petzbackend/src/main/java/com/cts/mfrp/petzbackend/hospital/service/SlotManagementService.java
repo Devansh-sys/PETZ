@@ -87,7 +87,8 @@ public class SlotManagementService {
     }
 
     // US-3.3.1 — Get slots for a date (user calendar view)
-    @Transactional(readOnly = true)
+    // Auto-generates and persists slots for any date that has none yet.
+    @Transactional
     public List<SlotResponse> getSlotsForDate(UUID hospitalId, LocalDate date) {
         Hospital hospital = hospitalRepo.findById(hospitalId)
                 .orElseThrow(() -> new NoSuchElementException(
@@ -96,9 +97,55 @@ public class SlotManagementService {
         if (blackoutRepo.existsByHospitalAndBlackoutDate(hospital, date))
             return List.of();
 
-        return appointmentRepo
-                .findByHospitalIdAndAppointmentDateOrderByAppointmentTimeAsc(hospitalId, date)
-                .stream()
+        List<Appointment> existing = appointmentRepo
+                .findByHospitalIdAndAppointmentDateOrderByAppointmentTimeAsc(hospitalId, date);
+
+        if (!existing.isEmpty()) {
+            return existing.stream()
+                    .map(a -> toSlotResponse(a, getDoctorName(a.getDoctorId())))
+                    .collect(Collectors.toList());
+        }
+
+        // No slots exist for this date — generate them from active doctors
+        return generateAndPersistSlots(hospital, date);
+    }
+
+    /** Creates standard morning + afternoon slots for all active doctors on a given date. */
+    private List<SlotResponse> generateAndPersistSlots(Hospital hospital, LocalDate date) {
+        List<Doctor> doctors = doctorRepo
+                .findByHospitalIdAndIsActiveOrderByNameAsc(hospital.getId(), true);
+        if (doctors.isEmpty()) return List.of();
+
+        List<LocalTime[]> times = List.of(
+            new LocalTime[]{ LocalTime.of(9,  0), LocalTime.of(9,  30) },
+            new LocalTime[]{ LocalTime.of(9, 30), LocalTime.of(10,  0) },
+            new LocalTime[]{ LocalTime.of(10,  0), LocalTime.of(10, 30) },
+            new LocalTime[]{ LocalTime.of(10, 30), LocalTime.of(11,  0) },
+            new LocalTime[]{ LocalTime.of(11,  0), LocalTime.of(11, 30) },
+            new LocalTime[]{ LocalTime.of(14,  0), LocalTime.of(14, 30) },
+            new LocalTime[]{ LocalTime.of(14, 30), LocalTime.of(15,  0) },
+            new LocalTime[]{ LocalTime.of(15,  0), LocalTime.of(15, 30) },
+            new LocalTime[]{ LocalTime.of(15, 30), LocalTime.of(16,  0) }
+        );
+
+        List<Appointment> toSave = new ArrayList<>();
+        for (Doctor doctor : doctors) {
+            for (LocalTime[] t : times) {
+                Appointment a = new Appointment();
+                a.setHospitalId(hospital.getId());
+                a.setDoctorId(doctor.getId());
+                a.setAppointmentDate(date);
+                a.setAppointmentTime(t[0]);
+                a.setEndTime(t[1]);
+                a.setDurationMinutes(30);
+                a.setSlotStatus(SlotStatus.AVAILABLE);
+                a.setBookingType(BookingType.ROUTINE);
+                toSave.add(a);
+            }
+        }
+
+        List<Appointment> saved = appointmentRepo.saveAll(toSave);
+        return saved.stream()
                 .map(a -> toSlotResponse(a, getDoctorName(a.getDoctorId())))
                 .collect(Collectors.toList());
     }

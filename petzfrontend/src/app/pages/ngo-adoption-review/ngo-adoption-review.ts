@@ -4,9 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Navbar } from '../../shared/navbar/navbar';
 import { AdoptionService } from '../../core/adoption/adoption.service';
-import { AdoptionApplication } from '../../core/adoption/adoption.models';
+import { AdoptionApplication, ApplicationStatus } from '../../core/adoption/adoption.models';
 import { AuthService } from '../../core/auth/auth.service';
-
 @Component({
   selector: 'petz-ngo-adoption-review',
   imports: [CommonModule, FormsModule, Navbar, RouterLink],
@@ -72,7 +71,7 @@ export class NgoAdoptionReview implements OnInit {
   }
 
   statusClass(s: string): string {
-    const m: Record<string, string> = { PENDING: 'blue', UNDER_REVIEW: 'blue', CLARIFICATION_REQUESTED: 'orange', APPROVED: 'green', REJECTED: 'red', DRAFT: 'grey', WITHDRAWN: 'grey' };
+    const m: Record<string, string> = { SUBMITTED: 'blue', PENDING: 'blue', UNDER_REVIEW: 'blue', CLARIFICATION_REQUESTED: 'orange', APPROVED: 'green', REJECTED: 'red', DRAFT: 'grey', WITHDRAWN: 'grey' };
     return m[s] ?? 'grey';
   }
 }

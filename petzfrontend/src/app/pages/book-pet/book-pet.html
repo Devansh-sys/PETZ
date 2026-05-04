@@ -1,5 +1,6 @@
 <petz-navbar></petz-navbar>
 
+<div class="report-page">
 <div class="report-card">
   <div class="step-dots">
     <span class="dot done"></span>
@@ -59,9 +60,10 @@
   </div>
 
   <div class="footer-actions">
-    <button class="btn-link" (click)="back()">‹ Back</button>
+    <button class="btn-back" (click)="back()">Back</button>
     <button class="btn btn-primary" [disabled]="!selectedPetId" (click)="proceed()">
       Review Booking ›
     </button>
   </div>
+</div>
 </div>

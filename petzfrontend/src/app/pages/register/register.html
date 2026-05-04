@@ -21,6 +21,8 @@
         <label>Mobile number</label>
         <input type="tel" placeholder="+91 98765 43210" [value]="phone()"
           (input)="phone.set($any($event.target).value)" (keyup.enter)="sendOtp()" autofocus />
+        <small class="hint" *ngIf="!phoneHint">10-digit Indian mobile (6/7/8/9 …)</small>
+        <small class="hint mismatch" *ngIf="phoneHint">{{ phoneHint }}</small>
       </div>
 
       <div *ngIf="error()" class="alert error mt">⚠️ {{ error() }}</div>
@@ -64,17 +66,19 @@
         <label>Full name</label>
         <input type="text" placeholder="Priya Sharma" [value]="fullName()"
           (input)="fullName.set($any($event.target).value)" autofocus />
+        <small class="hint mismatch" *ngIf="nameHint">{{ nameHint }}</small>
       </div>
       <div class="field mt">
         <label>Email address</label>
         <input type="email" placeholder="priya@example.com" [value]="email()"
           (input)="email.set($any($event.target).value)" autocomplete="email" />
+        <small class="hint mismatch" *ngIf="emailHint">{{ emailHint }}</small>
       </div>
       <div class="field mt">
         <label>Password</label>
         <div class="password-wrap">
           <input [type]="passwordVisible() ? 'text' : 'password'"
-            placeholder="At least 8 characters"
+            placeholder="8+ chars · upper · lower · number · special"
             [value]="password()"
             (input)="password.set($any($event.target).value)"
             autocomplete="new-password" />
@@ -85,9 +89,10 @@
             <span *ngIf="passwordVisible()">🙈 Hide</span>
           </button>
         </div>
-        <small class="hint" *ngIf="password().length > 0 && password().length < 8">
-          Password must be at least 8 characters.
+        <small class="hint" *ngIf="!passwordHint">
+          Use 8+ characters with upper, lower, a number and a symbol.
         </small>
+        <small class="hint mismatch" *ngIf="passwordHint">{{ passwordHint }}</small>
       </div>
       <div class="field mt">
         <label>Confirm password</label>
@@ -105,9 +110,7 @@
             <span *ngIf="confirmVisible()">🙈 Hide</span>
           </button>
         </div>
-        <small class="hint mismatch" *ngIf="confirmPassword().length > 0 && !passwordsMatch">
-          Passwords do not match.
-        </small>
+        <small class="hint mismatch" *ngIf="confirmHint">{{ confirmHint }}</small>
       </div>
 
       <div *ngIf="error()" class="alert error mt">⚠️ {{ error() }}</div>

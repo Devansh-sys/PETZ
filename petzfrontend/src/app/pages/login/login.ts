@@ -6,9 +6,15 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Navbar } from '../../shared/navbar/navbar';
 import { FirebasePhoneService } from '../../core/auth/firebase-phone.service';
 import { AuthService } from '../../core/auth/auth.service';
+import {
+  PHONE_RE,
+  LOGIN_PASSWORD_RE,
+  EMAIL_RE,
+  isValidIdentifier,
+  normalizePhone,
+} from '../../core/auth/validation';
 
 type Step = 'PHONE' | 'OTP' | 'PASSWORD';
-const PHONE_RE = /^\+?[1-9]\d{7,14}$/;
 
 @Component({
   selector: 'petz-login',
@@ -35,16 +41,35 @@ export class Login {
 
   private cooldownTimer?: number;
 
-  get normalizedPhone(): string {
-    const raw = this.phone().trim();
-    if (raw.startsWith('+')) return raw;
-    if (raw.length === 10) return `+91${raw}`;
-    return raw;
+  get normalizedPhone(): string { return normalizePhone(this.phone()); }
+
+  // Inline hint for the phone field — null means "no error"
+  get phoneHint(): string | null {
+    if (!this.phone().trim()) return null;
+    return PHONE_RE.test(this.normalizedPhone)
+      ? null
+      : 'Enter a valid 10-digit Indian mobile number (starting with 6–9).';
+  }
+
+  // Inline hint for the password-mode identifier
+  get identifierHint(): string | null {
+    const v = this.identifier().trim();
+    if (!v) return null;
+    return isValidIdentifier(v) ? null : 'Enter a valid email or 10-digit Indian mobile.';
+  }
+
+  get passwordHint(): string | null {
+    const p = this.password();
+    if (!p) return null;
+    return LOGIN_PASSWORD_RE.test(p) ? null : 'Password must be at least 8 characters.';
   }
 
   get canSubmitPhone(): boolean { return PHONE_RE.test(this.normalizedPhone); }
   get canSubmitOtp(): boolean { return /^\d{6}$/.test(this.otp()); }
-  get canSubmitPassword(): boolean { return this.identifier().trim().length > 2 && this.password().length >= 6; }
+  get canSubmitPassword(): boolean {
+    return isValidIdentifier(this.identifier())
+        && LOGIN_PASSWORD_RE.test(this.password());
+  }
 
   switchToPassword(): void {
     this.step.set('PASSWORD');
