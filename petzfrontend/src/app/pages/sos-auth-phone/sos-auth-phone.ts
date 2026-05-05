@@ -23,12 +23,22 @@ export class SosAuthPhone {
   notice = signal<string | null>(null);
 
   constructor() {
+    // If already signed in, skip phone auth entirely — go straight to report
+    if (this.auth.isAuthenticated()) {
+      sessionStorage.removeItem('petz.authNotice');
+      this.router.navigate(['/sos/report']);
+      return;
+    }
+
     const pending = sessionStorage.getItem('petz.pendingPhone');
     if (pending) this.phone.set(pending.replace(/^\+91/, ''));
+
+    // Only show the notice if it's NOT the generic "please sign in" message,
+    // since this page itself handles unauthenticated users by design.
     const msg = sessionStorage.getItem('petz.authNotice');
-    if (msg) {
+    sessionStorage.removeItem('petz.authNotice');
+    if (msg && !msg.toLowerCase().includes('sign in')) {
       this.notice.set(msg);
-      sessionStorage.removeItem('petz.authNotice');
     }
   }
 

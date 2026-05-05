@@ -21,10 +21,10 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "pet_id", nullable = false)
+    @Column(name = "pet_id")
     private UUID petId;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id")
     private UUID userId;
 
     @Column(name = "hospital_id", nullable = false)
@@ -33,7 +33,7 @@ public class Appointment {
     @Column(name = "doctor_id", nullable = false)
     private UUID doctorId;
 
-    @Column(name = "slot_id", nullable = false)
+    @Column(name = "slot_id")
     private UUID slotId;
 
     @Column(name = "service_type")
@@ -52,7 +52,7 @@ public class Appointment {
     private int durationMinutes;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status")
     private AppointmentStatus status;
 
     @Enumerated(EnumType.STRING)

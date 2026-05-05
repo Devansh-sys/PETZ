@@ -17,6 +17,14 @@ public class RescueMissionResponse {
     private UUID sosReportId;
     private UUID assignedNgoUserId;
     private String assignedNgoUserName;
+    private UUID assignedNgoId;
+    private String assignedNgoName;
+    private String ngoContactPhone;
+    private String ngoContactEmail;
+    private String ngoAddress;
+    /** PENDING = request sent, not yet accepted. ACCEPTED/ARRIVED = NGO confirmed. */
+    private String currentAssignmentStatus;
+    private LocalDateTime currentAssignmentAt;
     private ReportStatus rescueStatus;
     private Integer etaMinutes;
     private LocalDateTime dispatchedAt;

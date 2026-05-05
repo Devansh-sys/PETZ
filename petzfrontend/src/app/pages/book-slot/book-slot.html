@@ -23,7 +23,10 @@
 
     <div *ngIf="loading" class="state-msg">Loading available slots...</div>
 
-    <div *ngIf="!loading && error" class="alert error">{{ error }}</div>
+    <div *ngIf="!loading && error" class="alert error">
+      {{ error }}
+      <button class="btn btn-ghost btn-compact" style="margin-top:8px" (click)="loadSlots()">Retry</button>
+    </div>
 
     <div *ngIf="!loading && !error && slots.length === 0" class="empty-slots">
       <p class="state-msg">No available slots on this date.</p>

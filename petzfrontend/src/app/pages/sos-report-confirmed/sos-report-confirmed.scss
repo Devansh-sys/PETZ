@@ -44,6 +44,55 @@ h1 { font-size: 28px; font-weight: 800; letter-spacing: -.6px; margin-bottom: 10
   strong { color: var(--deep); font-weight: 700; letter-spacing: .5px; }
 }
 
+.searching-bar {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: var(--cream); border: 1px solid var(--sunset);
+  border-radius: 12px; padding: 14px 16px; margin-bottom: 16px;
+  font-size: 13px; color: var(--dusk); font-weight: 600;
+  .dot-flash {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--peach); animation: flash 1s infinite;
+  }
+}
+@keyframes flash { 0%,100% { opacity:.3; transform:scale(.8); } 50% { opacity:1; transform:scale(1.1); } }
+
+.ngo-assignment-card {
+  border-radius: 14px;
+  border: 1.5px solid var(--line);
+  padding: 16px;
+  margin-bottom: 16px;
+  text-align: left;
+
+  &.ngo-pending  { background: #fffbeb; border-color: #f59e0b; }
+  &.ngo-accepted { background: #f0fdf4; border-color: #22c55e; }
+
+  .ngo-assign-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+    .ngo-assign-icon { font-size: 26px; }
+    .ngo-assign-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+    .ngo-assign-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 700; }
+    .ngo-assign-name  { font-size: 15px; font-weight: 700; color: var(--ink); }
+  }
+
+  .ngo-assign-pill {
+    font-size: 11px; font-weight: 700; padding: 4px 10px;
+    border-radius: 999px; white-space: nowrap;
+    &.pill-pending { background: #fef3c7; color: #92400e; border: 1px solid #f59e0b; }
+    &.pill-ok      { background: #dcfce7; color: #166534; border: 1px solid #22c55e; }
+  }
+
+  .ngo-assign-contacts {
+    display: flex; flex-direction: column; gap: 6px;
+    .ngo-assign-contact {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: var(--ink); font-weight: 500;
+      text-decoration: none; padding: 7px 10px;
+      background: rgba(255,255,255,.7); border-radius: 8px;
+      &[href]:hover { background: rgba(255,255,255,1); text-decoration: underline; }
+    }
+  }
+}
+
 .summary {
   background: var(--cream);
   border: 1px solid var(--sunset);

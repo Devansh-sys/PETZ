@@ -29,12 +29,12 @@
     <a class="app-card" *ngFor="let app of applications" [routerLink]="['/ngo/adoptions', app.id]">
       <div class="app-main">
         <div class="app-info">
-          <h3>{{ app.adopterName || app.fullName || 'Anonymous Applicant' }}</h3>
+          <h3>{{ app.adopterName || app.personal?.fullName || 'Anonymous Applicant' }}</h3>
           <p class="app-pet">Applying for <strong>{{ app.petName || '—' }}</strong></p>
           <p class="app-date">Submitted {{ formatDate(app.submittedAt || app.lastActivityAt) }}</p>
-          <div class="contact-row" *ngIf="app.email || app.phone">
-            <span *ngIf="app.email">✉ {{ app.email }}</span>
-            <span *ngIf="app.phone">📞 {{ app.phone }}</span>
+          <div class="contact-row" *ngIf="app.adopterEmail || app.adopterPhone">
+            <span *ngIf="app.adopterEmail">✉ {{ app.adopterEmail }}</span>
+            <span *ngIf="app.adopterPhone">📞 {{ app.adopterPhone }}</span>
           </div>
         </div>
         <div class="app-right">
@@ -62,7 +62,7 @@
         <span *ngIf="app.status === 'WITHDRAWN'" class="decided-label grey-label">Withdrawn by applicant</span>
       </div>
 
-    </div>
+    </a>
   </div>
 </div>
 

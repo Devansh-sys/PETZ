@@ -46,6 +46,14 @@ export interface RescueMissionResponse {
   sosReportId: string;
   assignedNgoUserId?: string;
   assignedNgoUserName?: string;
+  assignedNgoId?: string;
+  assignedNgoName?: string;
+  ngoContactPhone?: string;
+  ngoContactEmail?: string;
+  ngoAddress?: string;
+  /** PENDING = request sent, NGO not yet responded. ACCEPTED/ARRIVED = confirmed. */
+  currentAssignmentStatus?: 'PENDING' | 'ACCEPTED' | 'ARRIVED' | 'DECLINED';
+  currentAssignmentAt?: string;
   rescueStatus: ReportStatus;
   etaMinutes?: number;
   dispatchedAt?: string;

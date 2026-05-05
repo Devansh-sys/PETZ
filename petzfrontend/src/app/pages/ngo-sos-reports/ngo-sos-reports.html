@@ -76,6 +76,7 @@
           class="report-card"
           [ngClass]="'level-' + (report.urgencyLevel || 'critical').toLowerCase()"
         >
+          <!-- Header row: urgency badge + status badge + report ID -->
           <div class="report-header">
             <div class="level-badge" [ngClass]="'level-' + (report.urgencyLevel || 'critical').toLowerCase()">
               {{ urgencyLabel(report.urgencyLevel) }}
@@ -83,32 +84,63 @@
             <div class="status-badge" [ngClass]="statusClass(report.currentStatus)">
               {{ statusLabel(report.currentStatus) }}
             </div>
+            <code class="report-id">{{ report.id?.toString()?.slice(0,8) }}…</code>
           </div>
 
-          <div class="report-info">
-            <div class="info-row">
-              <span class="label">Report ID:</span>
-              <span class="value"><code>{{ report.id?.toString()?.slice(0,8) }}…</code></span>
+          <!-- Description — always prominent -->
+          <p class="report-description" *ngIf="report.description">
+            {{ report.description }}
+          </p>
+
+          <!-- Two-column detail grid -->
+          <div class="report-detail-grid">
+            <!-- Reporter -->
+            <div class="detail-block">
+              <div class="detail-title">Reporter</div>
+              <div class="detail-value">{{ report.reporterName || '—' }}</div>
+              <div class="detail-sub" *ngIf="report.reporterPhone">📞 {{ report.reporterPhone }}</div>
             </div>
-            <div class="info-row" *ngIf="report.reporterName">
-              <span class="label">Reporter:</span>
-              <span class="value">{{ report.reporterName }}</span>
+
+            <!-- Location -->
+            <div class="detail-block">
+              <div class="detail-title">Location</div>
+              <div class="detail-value">{{ locationOf(report) }}</div>
+              <a *ngIf="report.latitude && report.longitude"
+                 class="map-link"
+                 [href]="'https://maps.google.com/?q=' + report.latitude + ',' + report.longitude"
+                 target="_blank" rel="noopener">
+                📍 Open in Maps
+              </a>
             </div>
-            <div class="info-row">
-              <span class="label">Location:</span>
-              <span class="value">{{ locationOf(report) }}</span>
+
+            <!-- Reported at -->
+            <div class="detail-block">
+              <div class="detail-title">Reported At</div>
+              <div class="detail-value">{{ formatDate(report.reportedAt) }}</div>
             </div>
-            <div class="info-row" *ngIf="report.description">
-              <span class="label">Description:</span>
-              <span class="value">{{ report.description }}</span>
+
+            <!-- Assigned NGO -->
+            <div class="detail-block">
+              <div class="detail-title">Assigned NGO</div>
+              <div class="detail-value">{{ report.assignedNgoName || report.ngoName || '—' }}</div>
             </div>
-            <div class="info-row">
-              <span class="label">Reported:</span>
-              <span class="value">{{ formatDate(report.reportedAt) }}</span>
+
+            <!-- Media -->
+            <div class="detail-block" *ngIf="report.media && report.media.length > 0">
+              <div class="detail-title">Media</div>
+              <div class="detail-value">{{ report.media.length }} file(s)</div>
             </div>
-            <div class="info-row" *ngIf="report.media && report.media.length > 0">
-              <span class="label">Media:</span>
-              <span class="value">{{ report.media.length }} file(s)</span>
+          </div>
+
+          <!-- Status timeline from statusLogs -->
+          <div class="status-timeline" *ngIf="report.statusLogs && report.statusLogs.length > 0">
+            <div class="timeline-title">Timeline</div>
+            <div class="timeline-steps">
+              <div class="timeline-step" *ngFor="let log of report.statusLogs">
+                <span class="step-dot" [ngClass]="statusClass(log.status)"></span>
+                <span class="step-label">{{ statusLabel(log.status) }}</span>
+                <span class="step-time">{{ formatDate(log.updatedAt) }}</span>
+              </div>
             </div>
           </div>
         </div>

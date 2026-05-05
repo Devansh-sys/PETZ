@@ -2,15 +2,22 @@ package com.cts.mfrp.petzbackend.rescue.service;
 
 import com.cts.mfrp.petzbackend.common.exception.ResourceNotFoundException;
 import com.cts.mfrp.petzbackend.enums.ReportStatus;
+import com.cts.mfrp.petzbackend.ngo.model.Ngo;
+import com.cts.mfrp.petzbackend.ngo.repository.NgoRepository;
 import com.cts.mfrp.petzbackend.rescue.dto.RescueMissionResponse;
 import com.cts.mfrp.petzbackend.rescue.dto.RescueStatusUpdateRequest;
+import com.cts.mfrp.petzbackend.rescue.model.NgoAssignment;
+import com.cts.mfrp.petzbackend.rescue.model.NgoAssignment.AssignmentStatus;
 import com.cts.mfrp.petzbackend.rescue.model.RescueMission;
+import com.cts.mfrp.petzbackend.rescue.repository.NgoAssignmentRepository;
 import com.cts.mfrp.petzbackend.rescue.repository.RescueMissionRepository;
 import com.cts.mfrp.petzbackend.sosreport.model.SosReport;
 import com.cts.mfrp.petzbackend.sosreport.repository.SosReportRepository;
 import com.cts.mfrp.petzbackend.statuslog.service.StatusLogService;
 import com.cts.mfrp.petzbackend.user.model.User;
 import com.cts.mfrp.petzbackend.user.repository.UserRepository;
+
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +36,8 @@ public class RescueTrackingService {
     private final RescueMissionRepository rescueMissionRepository;
     private final SosReportRepository sosReportRepository;
     private final UserRepository userRepository;
+    private final NgoRepository ngoRepository;
+    private final NgoAssignmentRepository ngoAssignmentRepository;
     private final StatusLogService statusLogService;
 
     @Transactional
@@ -134,6 +143,17 @@ public class RescueTrackingService {
     }
 
     private RescueMissionResponse mapToResponse(RescueMission mission) {
+        // Find the current active assignment (PENDING or ACCEPTED or ARRIVED)
+        NgoAssignment activeAssignment = ngoAssignmentRepository
+                .findBySosReport_IdAndAssignmentStatusIn(
+                        mission.getSosReport().getId(),
+                        List.of(AssignmentStatus.PENDING, AssignmentStatus.ACCEPTED, AssignmentStatus.ARRIVED))
+                .orElse(null);
+
+        // Resolve the NGO — prefer from active assignment, fallback to mission's assignedNgoId
+        UUID ngoId = activeAssignment != null ? activeAssignment.getNgoId() : mission.getAssignedNgoId();
+        Ngo ngo = ngoId != null ? ngoRepository.findById(ngoId).orElse(null) : null;
+
         return RescueMissionResponse.builder()
                 .id(mission.getId())
                 .sosReportId(mission.getSosReport().getId())
@@ -141,6 +161,15 @@ public class RescueTrackingService {
                         ? mission.getAssignedNgoUser().getId() : null)
                 .assignedNgoUserName(mission.getAssignedNgoUser() != null
                         ? mission.getAssignedNgoUser().getFullName() : null)
+                .assignedNgoId(ngoId)
+                .assignedNgoName(ngo != null ? ngo.getName() : null)
+                .ngoContactPhone(ngo != null ? ngo.getContactPhone() : null)
+                .ngoContactEmail(ngo != null ? ngo.getContactEmail() : null)
+                .ngoAddress(ngo != null ? ngo.getAddress() : null)
+                .currentAssignmentStatus(activeAssignment != null
+                        ? activeAssignment.getAssignmentStatus().name() : null)
+                .currentAssignmentAt(activeAssignment != null
+                        ? activeAssignment.getAssignedAt() : null)
                 .rescueStatus(mission.getRescueStatus())
                 .etaMinutes(mission.getEtaMinutes())
                 .dispatchedAt(mission.getDispatchedAt())

@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 @Service
@@ -87,7 +88,7 @@ public class SlotManagementService {
     }
 
     // US-3.3.1 — Get slots for a date (user calendar view)
-    // Auto-generates and persists slots for any date that has none yet.
+    // Returns only AVAILABLE slots. Auto-generates if none exist yet for the date.
     @Transactional
     public List<SlotResponse> getSlotsForDate(UUID hospitalId, LocalDate date) {
         Hospital hospital = hospitalRepo.findById(hospitalId)
@@ -97,16 +98,19 @@ public class SlotManagementService {
         if (blackoutRepo.existsByHospitalAndBlackoutDate(hospital, date))
             return List.of();
 
-        List<Appointment> existing = appointmentRepo
-                .findByHospitalIdAndAppointmentDateOrderByAppointmentTimeAsc(hospitalId, date);
+        // Only look at AVAILABLE slots — ignore BOOKED, BLOCKED, LOCKED rows
+        List<Appointment> available = appointmentRepo
+                .findByHospitalIdAndAppointmentDateAndSlotStatus(
+                        hospitalId, date, SlotStatus.AVAILABLE);
 
-        if (!existing.isEmpty()) {
-            return existing.stream()
+        if (!available.isEmpty()) {
+            return available.stream()
+                    .sorted(Comparator.comparing(Appointment::getAppointmentTime))
                     .map(a -> toSlotResponse(a, getDoctorName(a.getDoctorId())))
                     .collect(Collectors.toList());
         }
 
-        // No slots exist for this date — generate them from active doctors
+        // No available slots for this date — auto-generate from active doctors
         return generateAndPersistSlots(hospital, date);
     }
 

@@ -42,9 +42,23 @@ export class BookSlot implements OnInit {
   loadSlots(): void {
     this.loading = true;
     this.error = '';
-    this.hospitalService.listSlots(this.state!.hospitalId!, this.state!.doctorId!, this.selectedDate, this.state!.serviceId).subscribe({
-      next: (list) => { this.slots = list.filter(sl => sl.available); this.loading = false; },
-      error: () => { this.error = 'Could not load slots.'; this.loading = false; }
+    this.slots = [];
+    this.hospitalService.listSlots(
+      this.state!.hospitalId!, this.state!.doctorId!,
+      this.selectedDate, this.state!.serviceId
+    ).subscribe({
+      next: (list) => {
+        this.slots = list.filter(sl => sl.available);
+        this.loading = false;
+      },
+      error: () => {
+        // Treat a load failure the same as "no slots for this date" —
+        // auto-search forward so the user isn't blocked.
+        this.loading = false;
+        this.slots = [];
+        this.error = 'No slots available for this date. Searching for the next available date…';
+        this.findNextAvailable();
+      }
     });
   }
 

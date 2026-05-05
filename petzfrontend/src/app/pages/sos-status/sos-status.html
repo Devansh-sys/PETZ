@@ -27,26 +27,74 @@
     @if (!loading() && !error()) {
       <!-- ASSIGNMENT CARD -->
       @if (mission(); as m) {
-        <div class="assignment">
-          @if (m.assignedNgoUserName) {
-            <div class="avatar">🐾</div>
+        @if (m.assignedNgoName) {
+          <!-- NGO has been contacted — show status pill -->
+          <div class="assignment" [class.assignment-pending]="m.currentAssignmentStatus === 'PENDING'"
+               [class.assignment-accepted]="m.currentAssignmentStatus === 'ACCEPTED' || m.currentAssignmentStatus === 'ARRIVED'">
+            <div class="avatar">🏢</div>
             <div class="who">
-              <small>Assigned rescuer</small>
-              <strong>{{ m.assignedNgoUserName }}</strong>
+              <small>{{ assignmentStateLabel(m.currentAssignmentStatus) }}</small>
+              <strong>{{ m.assignedNgoName }}</strong>
+              @if (m.assignedNgoUserName && m.currentAssignmentStatus !== 'PENDING') {
+                <span class="rescuer-name">Rescuer: {{ m.assignedNgoUserName }}</span>
+              }
             </div>
-            @if (m.etaMinutes != null && !isClosed()) {
-              <div class="eta">
-                <small>ETA</small>
-                <strong>{{ m.etaMinutes }} min</strong>
+            <div class="assignment-status-pill" [class.pill-pending]="m.currentAssignmentStatus === 'PENDING'"
+                 [class.pill-accepted]="m.currentAssignmentStatus === 'ACCEPTED' || m.currentAssignmentStatus === 'ARRIVED'">
+              {{ m.currentAssignmentStatus === 'PENDING' ? 'Awaiting response' :
+                 m.currentAssignmentStatus === 'ACCEPTED' ? 'Accepted ✓' :
+                 m.currentAssignmentStatus === 'ARRIVED'  ? 'On scene ✓' : '' }}
+            </div>
+          </div>
+
+          <!-- NGO CONTACT CARD -->
+          <div class="ngo-card">
+            <div class="ngo-card-header">
+              <span class="ngo-icon">🏢</span>
+              <div>
+                <div class="ngo-card-title">{{ m.assignedNgoName }}</div>
+                <div class="ngo-card-sub">
+                  {{ m.currentAssignmentStatus === 'PENDING' ? 'Request sent — tap to contact directly' :
+                     m.currentAssignmentStatus === 'ACCEPTED' ? 'Help confirmed — rescuer is on the way' :
+                     m.currentAssignmentStatus === 'ARRIVED'  ? 'Rescuer is on scene' : 'Assigned rescue NGO' }}
+                </div>
               </div>
-            }
-          } @else {
+              @if (m.etaMinutes != null && m.currentAssignmentStatus !== 'PENDING' && !isClosed()) {
+                <div class="eta">
+                  <small>ETA</small>
+                  <strong>{{ m.etaMinutes }} min</strong>
+                </div>
+              }
+            </div>
+            <div class="ngo-card-details">
+              @if (m.ngoContactPhone) {
+                <a class="ngo-contact-row" [href]="'tel:' + m.ngoContactPhone">
+                  <span class="contact-icon">📞</span>
+                  <span>{{ m.ngoContactPhone }}</span>
+                </a>
+              }
+              @if (m.ngoContactEmail) {
+                <a class="ngo-contact-row" [href]="'mailto:' + m.ngoContactEmail">
+                  <span class="contact-icon">✉️</span>
+                  <span>{{ m.ngoContactEmail }}</span>
+                </a>
+              }
+              @if (m.ngoAddress) {
+                <div class="ngo-contact-row">
+                  <span class="contact-icon">📍</span>
+                  <span>{{ m.ngoAddress }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="assignment">
             <div class="searching">
               <span class="dot-flash"></span>
               <span>Finding the nearest verified rescuer…</span>
             </div>
-          }
-        </div>
+          </div>
+        }
       } @else {
         <div class="assignment">
           <div class="searching">

@@ -28,10 +28,50 @@
         </svg>
       </div>
 
-      <h1>Rescue dispatched.</h1>
-      <p class="lead">
-        Case <strong>#{{ caseCode() }}</strong> is live. The nearest verified partner is being notified right now.
-      </p>
+      <h1>{{ headingText() }}</h1>
+      <p class="lead" [innerHTML]="subText()"></p>
+
+      <!-- NGO Assignment card — shown as soon as an NGO is contacted -->
+      @if (mission(); as m) {
+        @if (m.assignedNgoName) {
+          <div class="ngo-assignment-card"
+               [class.ngo-pending]="m.currentAssignmentStatus === 'PENDING'"
+               [class.ngo-accepted]="m.currentAssignmentStatus === 'ACCEPTED' || m.currentAssignmentStatus === 'ARRIVED'">
+            <div class="ngo-assign-header">
+              <span class="ngo-assign-icon">🏢</span>
+              <div class="ngo-assign-info">
+                <span class="ngo-assign-label">{{ assignmentStateLabel() }}</span>
+                <strong class="ngo-assign-name">{{ m.assignedNgoName }}</strong>
+              </div>
+              <span class="ngo-assign-pill"
+                    [class.pill-pending]="m.currentAssignmentStatus === 'PENDING'"
+                    [class.pill-ok]="m.currentAssignmentStatus === 'ACCEPTED' || m.currentAssignmentStatus === 'ARRIVED'">
+                {{ m.currentAssignmentStatus === 'PENDING' ? '⏳ Awaiting' : '✓ Confirmed' }}
+              </span>
+            </div>
+            <div class="ngo-assign-contacts">
+              @if (m.ngoContactPhone) {
+                <a class="ngo-assign-contact" [href]="'tel:' + m.ngoContactPhone">
+                  📞 {{ m.ngoContactPhone }}
+                </a>
+              }
+              @if (m.ngoContactEmail) {
+                <a class="ngo-assign-contact" [href]="'mailto:' + m.ngoContactEmail">
+                  ✉️ {{ m.ngoContactEmail }}
+                </a>
+              }
+              @if (m.ngoAddress) {
+                <span class="ngo-assign-contact">📍 {{ m.ngoAddress }}</span>
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="searching-bar">
+            <span class="dot-flash"></span>
+            <span>Finding the nearest verified rescuer…</span>
+          </div>
+        }
+      }
 
       <div class="summary">
         <div class="row">
@@ -63,9 +103,9 @@
       <div class="next">
         <h3>What happens next</h3>
         <ol>
-          <li>A verified rescuer is being dispatched to the location.</li>
-          <li>You'll get an SMS when they're on the way.</li>
-          <li>Stay nearby if it's safe — your live update helps them.</li>
+          <li>The assigned NGO is being contacted. If they don't respond in 10 minutes, the next NGO is automatically notified.</li>
+          <li>Once accepted, you'll see their contact details here and get an SMS update.</li>
+          <li>Stay nearby if it's safe — your live update helps the rescuer.</li>
         </ol>
       </div>
 

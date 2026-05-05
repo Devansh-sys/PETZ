@@ -155,6 +155,15 @@ export class SosStatus implements OnInit, OnDestroy {
     } catch { return ts; }
   }
 
+  assignmentStateLabel(status?: string): string {
+    switch (status) {
+      case 'PENDING':  return 'Request sent — awaiting NGO response';
+      case 'ACCEPTED': return 'NGO confirmed — help is on the way';
+      case 'ARRIVED':  return 'Rescuer on scene';
+      default:         return 'Assigned NGO';
+    }
+  }
+
   formatPolled(): string {
     const t = this.lastPolledAt();
     if (!t) return '';

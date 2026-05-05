@@ -54,7 +54,16 @@
   border: 1px solid var(--sunset);
   border-radius: 14px;
   padding: 16px 18px;
-  margin-bottom: 22px;
+  margin-bottom: 12px;
+
+  &.assignment-pending {
+    background: #fffbeb;
+    border-color: #f59e0b;
+  }
+  &.assignment-accepted {
+    background: #f0fdf4;
+    border-color: #22c55e;
+  }
   .avatar {
     width: 44px; height: 44px; border-radius: 50%;
     background: #fff; border: 1px solid var(--sunset);
@@ -63,9 +72,10 @@
   }
   .who {
     flex: 1;
-    display: flex; flex-direction: column;
+    display: flex; flex-direction: column; gap: 2px;
     small { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; font-weight: 700; }
     strong { font-size: 15px; color: var(--ink); font-weight: 700; }
+    .rescuer-name { font-size: 12px; color: var(--dusk); }
   }
   .eta {
     text-align: right;
@@ -80,6 +90,55 @@
       background: var(--peach);
       animation: flash 1s infinite;
     }
+  }
+}
+
+.assignment-status-pill {
+  flex-shrink: 0;
+  font-size: 11px; font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+
+  &.pill-pending  { background: #fef3c7; color: #92400e; border: 1px solid #f59e0b; }
+  &.pill-accepted { background: #dcfce7; color: #166534; border: 1px solid #22c55e; }
+}
+
+.ngo-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 22px;
+
+  .ngo-card-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px;
+    .ngo-icon { font-size: 28px; }
+    .ngo-card-title { font-size: 15px; font-weight: 700; color: var(--ink); }
+    .ngo-card-sub { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 700; margin-top: 2px; }
+  }
+
+  .ngo-card-details {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+
+  .ngo-contact-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13px; color: var(--ink);
+    text-decoration: none;
+    padding: 8px 12px;
+    background: var(--cream);
+    border-radius: 8px;
+    transition: background .15s;
+
+    &[href] {
+      color: var(--deep); font-weight: 600;
+      &:hover { background: var(--sunset); }
+    }
+
+    .contact-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    span:last-child { line-height: 1.4; }
   }
 }
 @keyframes flash {
