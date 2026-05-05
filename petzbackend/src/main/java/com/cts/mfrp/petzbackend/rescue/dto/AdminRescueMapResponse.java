@@ -17,6 +17,7 @@ public class AdminRescueMapResponse {
     private String reporterPhone;
     private LocalDateTime reportedAt;
     private String assignedNgoId;
+    private String assignedNgoName;
     private String assignedVolunteerId;
 
     private AdminRescueMapResponse() {}
@@ -33,6 +34,7 @@ public class AdminRescueMapResponse {
         public Builder reporterPhone(String v)        { r.reporterPhone = v;       return this; }
         public Builder reportedAt(LocalDateTime v)    { r.reportedAt = v;          return this; }
         public Builder assignedNgoId(String v)        { r.assignedNgoId = v;       return this; }
+        public Builder assignedNgoName(String v)      { r.assignedNgoName = v;     return this; }
         public Builder assignedVolunteerId(String v)  { r.assignedVolunteerId = v; return this; }
         public AdminRescueMapResponse build()         { return r; }
     }
@@ -45,5 +47,6 @@ public class AdminRescueMapResponse {
     public String getReporterPhone()        { return reporterPhone; }
     public LocalDateTime getReportedAt()    { return reportedAt; }
     public String getAssignedNgoId()        { return assignedNgoId; }
+    public String getAssignedNgoName()      { return assignedNgoName; }
     public String getAssignedVolunteerId()  { return assignedVolunteerId; }
 }

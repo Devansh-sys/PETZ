@@ -18,4 +18,7 @@ public interface NgoRepository extends JpaRepository<Ngo, UUID> {
 
     /** US-4.3 / US-2.6.2 — list NGOs pending admin verification. */
     List<Ngo> findByIsVerified(Boolean isVerified);
+
+    /** Auto-queue: active NGOs with a representative, ordered by registration date (first-in = first-to-be-assigned). */
+    List<Ngo> findByActiveTrueAndOwnerUserIdIsNotNullOrderByCreatedAtAsc();
 }

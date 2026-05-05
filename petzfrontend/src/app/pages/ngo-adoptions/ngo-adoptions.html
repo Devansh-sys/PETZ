@@ -8,11 +8,10 @@
     </div>
   </div>
 
+  <!-- Filter bar: All / Pending / Approved / Rejected -->
   <div class="filter-bar">
     <button class="filter-btn" [class.active]="filterStatus === ''" (click)="filterStatus = ''; load()">All</button>
     <button class="filter-btn" [class.active]="filterStatus === 'SUBMITTED'" (click)="filterStatus = 'SUBMITTED'; load()">Pending</button>
-    <button class="filter-btn" [class.active]="filterStatus === 'UNDER_REVIEW'" (click)="filterStatus = 'UNDER_REVIEW'; load()">Under Review</button>
-    <button class="filter-btn" [class.active]="filterStatus === 'CLARIFICATION_REQUESTED'" (click)="filterStatus = 'CLARIFICATION_REQUESTED'; load()">Clarification</button>
     <button class="filter-btn" [class.active]="filterStatus === 'APPROVED'" (click)="filterStatus = 'APPROVED'; load()">Approved</button>
     <button class="filter-btn" [class.active]="filterStatus === 'REJECTED'" (click)="filterStatus = 'REJECTED'; load()">Rejected</button>
   </div>
@@ -20,23 +19,75 @@
   <div class="loading-state" *ngIf="loading"><div class="spinner"></div></div>
   <div class="error-state" *ngIf="error && !loading"><p>{{ error }}</p></div>
 
+  <div class="alert-error" *ngIf="actionError && !loading">{{ actionError }}</div>
+
   <div class="empty-state" *ngIf="!loading && !error && applications.length === 0">
     <p>No applications found for this filter.</p>
   </div>
 
   <div class="apps-list" *ngIf="!loading && !error && applications.length > 0">
-    <a class="app-card" *ngFor="let app of applications" [routerLink]="['/ngo/adoptions', app.id, 'review']">
+    <a class="app-card" *ngFor="let app of applications" [routerLink]="['/ngo/adoptions', app.id]">
       <div class="app-main">
         <div class="app-info">
-          <h3>{{ app.adopterName || 'Anonymous Applicant' }}</h3>
-          <p class="app-pet">Applying for <strong>{{ app.petName }}</strong></p>
-          <p class="app-date">Submitted {{ (app.submittedAt || app.lastActivityAt) | date:'mediumDate' }}</p>
+          <h3>{{ app.adopterName || app.fullName || 'Anonymous Applicant' }}</h3>
+          <p class="app-pet">Applying for <strong>{{ app.petName || '—' }}</strong></p>
+          <p class="app-date">Submitted {{ formatDate(app.submittedAt || app.lastActivityAt) }}</p>
+          <div class="contact-row" *ngIf="app.email || app.phone">
+            <span *ngIf="app.email">✉ {{ app.email }}</span>
+            <span *ngIf="app.phone">📞 {{ app.phone }}</span>
+          </div>
         </div>
         <div class="app-right">
           <span class="status-badge" [class]="statusClass(app.status)">{{ statusLabel(app.status) }}</span>
-          <span class="arrow">→</span>
         </div>
       </div>
-    </a>
+
+      <!-- Action buttons — only for pending applications -->
+      <div class="card-footer" *ngIf="isPending(app)">
+        <button class="btn-approve"
+          (click)="approve(app)"
+          [disabled]="actionInProgress === app.id">
+          {{ actionInProgress === app.id ? 'Approving…' : '✓ Approve' }}
+        </button>
+        <button class="btn-reject"
+          (click)="openReject(app)"
+          [disabled]="actionInProgress === app.id">
+          ✕ Reject
+        </button>
+      </div>
+
+      <div class="card-footer decided" *ngIf="!isPending(app)">
+        <span *ngIf="app.status === 'APPROVED'" class="decided-label approved-label">✓ Approved</span>
+        <span *ngIf="app.status === 'REJECTED'" class="decided-label rejected-label">✕ Rejected</span>
+        <span *ngIf="app.status === 'WITHDRAWN'" class="decided-label grey-label">Withdrawn by applicant</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── Reject Modal ── -->
+<div class="modal-overlay" *ngIf="rejectingId" (click)="closeReject()">
+  <div class="modal-panel" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Reject Application</h2>
+      <button type="button" class="modal-close" (click)="closeReject()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-sub">Please provide a reason so the applicant understands the decision.</p>
+      <div class="field">
+        <label>Reason <span class="req">*</span></label>
+        <textarea class="input" [(ngModel)]="rejectReason" [disabled]="rejectBusy" rows="4"
+          placeholder="e.g. Housing type is not suitable for this pet…"></textarea>
+      </div>
+      <div class="alert-inline" *ngIf="rejectError">⚠️ {{ rejectError }}</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" (click)="closeReject()" [disabled]="rejectBusy">Cancel</button>
+      <button class="btn btn-danger" (click)="submitReject()"
+        [disabled]="rejectBusy || !rejectReason.trim()">
+        {{ rejectBusy ? 'Rejecting…' : 'Confirm Reject' }}
+      </button>
+    </div>
   </div>
 </div>

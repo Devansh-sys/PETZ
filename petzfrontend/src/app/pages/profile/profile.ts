@@ -29,7 +29,7 @@ export class Profile implements OnInit {
     const r = this.session()?.role ?? '';
     const map: Record<string, string> = {
       REPORTER: 'Reporter', NGO_REP: 'NGO Representative',
-      NGO: 'NGO', ADMIN: 'Administrator', VET: 'Veterinarian', ADOPTER: 'Adopter'
+      NGO: 'NGO', ADMIN: 'Administrator', HOSPITAL_REP: 'Hospital Representative'
     };
     return map[r] ?? r;
   }

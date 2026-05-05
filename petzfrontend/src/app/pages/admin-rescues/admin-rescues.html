@@ -12,6 +12,7 @@
   <div class="filter-bar">
     <button class="filter-btn" [class.active]="filterStatus === ''" (click)="filterStatus = ''; load()">All</button>
     <button class="filter-btn" [class.active]="filterStatus === 'REPORTED'" (click)="filterStatus = 'REPORTED'; load()">Reported</button>
+    <button class="filter-btn" [class.active]="filterStatus === 'ASSIGNED'" (click)="filterStatus = 'ASSIGNED'; load()">Pending NGO</button>
     <button class="filter-btn" [class.active]="filterStatus === 'DISPATCHED'" (click)="filterStatus = 'DISPATCHED'; load()">Dispatched</button>
     <button class="filter-btn" [class.active]="filterStatus === 'REJECTED'" (click)="filterStatus = 'REJECTED'; load()">Rejected</button>
   </div>
@@ -25,7 +26,7 @@
     <div class="active-banner" *ngIf="activeReports.length > 0">
       <span class="active-dot"></span>
       <strong>{{ activeReports.length }} active mission{{ activeReports.length !== 1 ? 's' : '' }}</strong>
-      <span class="active-sub">in progress right now</span>
+      <span class="active-sub">in progress right now · NGO assignment is automatic</span>
     </div>
 
     <div class="empty-state" *ngIf="reports.length === 0">
@@ -43,7 +44,7 @@
             <th>Urgency</th>
             <th>Reported At</th>
             <th>Status</th>
-            <th>Assign</th>
+            <th>Assigned NGO</th>
           </tr>
         </thead>
         <tbody>
@@ -62,14 +63,9 @@
             <td>
               <span class="status-badge" [class]="statusClass(r.status)">{{ statusLabel(r.status) }}</span>
             </td>
-            <td>
-              <button class="btn btn-assign btn-sm"
-                [class.needs-assign]="r.status === 'REPORTED' || r.status === 'REJECTED'"
-                [disabled]="r.status === 'ASSIGNED' || r.status === 'DISPATCHED' || r.status === 'CLOSED'"
-                [title]="r.status === 'DISPATCHED' ? 'Already accepted by an NGO' : r.status === 'ASSIGNED' ? 'Awaiting NGO response' : ''"
-                (click)="openAssign(r.sosId)">
-                {{ r.status === 'DISPATCHED' ? 'NGO Active' : r.status === 'ASSIGNED' ? 'Awaiting NGO' : 'Assign NGO' }}
-              </button>
+            <td class="ngo-cell">
+              <span *ngIf="r.assignedNgoName" class="ngo-name">{{ r.assignedNgoName }}</span>
+              <span *ngIf="!r.assignedNgoName" class="ngo-none">—</span>
             </td>
           </tr>
         </tbody>
@@ -77,47 +73,4 @@
     </div>
 
   </ng-container>
-</div>
-
-<!-- ── Assign NGO Modal ── -->
-<div class="modal-overlay" *ngIf="assigningId" (click)="closeAssign()">
-  <div class="modal-panel" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>Assign NGO to Rescue</h2>
-      <button type="button" class="modal-close" (click)="closeAssign()">✕</button>
-    </div>
-    <div class="modal-body">
-      <p class="modal-sub">Report ID: <code>{{ assigningId?.toString()?.slice(0,8) }}…</code></p>
-
-      <div class="field">
-        <label>Select NGO <span class="req">*</span></label>
-        <select class="input" [(ngModel)]="assignNgoId" [disabled]="ngosLoading || assignBusy">
-          <option value="">{{ ngosLoading ? 'Loading NGOs…' : ngos.length === 0 ? 'No NGOs with representatives' : '— Choose an NGO —' }}</option>
-          <option *ngFor="let n of ngos" [value]="n.id">
-            {{ n.name }}{{ n.isVerified ? ' ✓' : ' (unverified)' }}
-          </option>
-        </select>
-        <span class="field-hint" *ngIf="!ngosLoading && ngos.length === 0">
-          ⚠ No NGOs have a representative assigned. Add one via Adoption Management → Add NGO Rep.
-        </span>
-      </div>
-
-      <div class="field mt">
-        <label>Reason for assignment <span class="req">*</span></label>
-        <textarea class="input" [(ngModel)]="assignReason" [disabled]="assignBusy" rows="3"
-          placeholder="e.g. Nearest NGO to rescue location, available team…"></textarea>
-      </div>
-
-      <div class="alert error mt" *ngIf="assignError">
-        <span>⚠️</span><span>{{ assignError }}</span>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" (click)="closeAssign()" [disabled]="assignBusy">Cancel</button>
-      <button class="btn btn-primary" (click)="submitAssign()"
-        [disabled]="assignBusy || !assignNgoId || !assignReason.trim()">
-        {{ assignBusy ? 'Assigning…' : 'Assign NGO' }}
-      </button>
-    </div>
-  </div>
 </div>

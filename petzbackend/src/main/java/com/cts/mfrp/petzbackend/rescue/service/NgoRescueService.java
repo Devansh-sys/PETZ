@@ -26,6 +26,7 @@ public class NgoRescueService {
     private final NgoAssignmentRepository assignmentRepo;
     private final SosReportRepository     sosReportRepo;
     private final UserRepository          userRepo;
+    private final RescueQueueService      rescueQueueService;
 
     // ── All REPORTED (open) rescues any NGO can see ──────────────────────────
 
@@ -116,12 +117,15 @@ public class NgoRescueService {
         }
 
         assignment.setAssignmentStatus(AssignmentStatus.DECLINED);
+        assignmentRepo.save(assignment);
 
         SosReport report = assignment.getSosReport();
-        report.setCurrentStatus(ReportStatus.REJECTED);
-        sosReportRepo.save(report);
 
-        return toResponse(assignmentRepo.save(assignment));
+        // Immediately try the next NGO in queue; if none left, queue service marks REJECTED
+        rescueQueueService.assignToNextNgo(report.getId());
+
+        // Re-fetch saved assignment to return updated state
+        return toResponse(assignmentRepo.findById(assignment.getId()).orElse(assignment));
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

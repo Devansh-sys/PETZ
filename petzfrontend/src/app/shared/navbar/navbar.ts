@@ -27,7 +27,7 @@ export class Navbar implements OnInit {
     const r = this.auth.session()?.role ?? '';
     const map: Record<string, string> = {
       REPORTER: 'Reporter', NGO_REP: 'NGO', NGO: 'NGO',
-      ADMIN: 'Admin', VET: 'Vet', ADOPTER: 'Adopter'
+      ADMIN: 'Admin', HOSPITAL_REP: 'Hospital Rep'
     };
     return map[r] ?? r;
   });

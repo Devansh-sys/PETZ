@@ -25,7 +25,7 @@ public class OnSiteRescueController {
 
 //     US-1.4.1 — Mark Arrival
     @PatchMapping("/arrival")
-    @PreAuthorize("hasRole('VOLUNTEER') or hasRole('NGO_REP')")
+    @PreAuthorize("hasRole('NGO_REP')")
     public ResponseEntity<ApiResponse<Void>> markArrival(
             @PathVariable UUID sosReportId,
             @Valid @RequestBody ArrivalRequest req) {
@@ -35,7 +35,7 @@ public class OnSiteRescueController {
 
     // US-1.4.2 + US-1.4.3 — On-Site Assessment + Decision //it is to record the assessment
     @PostMapping("/assessment")
-    @PreAuthorize("hasRole('VOLUNTEER') or hasRole('NGO_REP')")
+    @PreAuthorize("hasRole('NGO_REP')")
     public ResponseEntity<ApiResponse<OnSiteAssessmentResponse>> submitAssessment(
             @PathVariable UUID sosReportId,
             @Valid @RequestBody OnSiteAssessmentRequest req) {
@@ -46,7 +46,7 @@ public class OnSiteRescueController {
 
     // US-1.5.1 — Get Nearby Emergency Hospitals
     @GetMapping("/hospitals/nearby")
-    @PreAuthorize("hasRole('VOLUNTEER') or hasRole('NGO_REP')")
+    @PreAuthorize("hasRole('NGO_REP')")
     public ResponseEntity<ApiResponse<List<NearbyHospitalResponse>>> getNearbyHospitals(
             @PathVariable UUID sosReportId) {
         return ResponseEntity.ok(
@@ -56,7 +56,7 @@ public class OnSiteRescueController {
 
     // US-1.5.2 — Send Incoming Rescue Alert //alerting hospital that animal is coming
     @PostMapping("/hospitals/{hospitalId}/alert")
-    @PreAuthorize("hasRole('VOLUNTEER') or hasRole('NGO_REP')")
+    @PreAuthorize("hasRole('NGO_REP')")
     public ResponseEntity<ApiResponse<Void>> sendAlert(
             @PathVariable UUID sosReportId,
             @PathVariable UUID hospitalId) {
@@ -66,7 +66,7 @@ public class OnSiteRescueController {
 
     // US-1.5.3 — Book Emergency Slot
     @PostMapping("/booking")
-    @PreAuthorize("hasRole('VOLUNTEER') or hasRole('NGO_REP')")
+    @PreAuthorize("hasRole('NGO_REP')")
     public ResponseEntity<ApiResponse<EmergencyBookingResponse>> bookSlot(
             @PathVariable UUID sosReportId,
             @Valid @RequestBody EmergencyBookingRequest req) {
@@ -77,7 +77,7 @@ public class OnSiteRescueController {
 
     // US-1.5.4 — Record Hospital Handover
     @PostMapping("/handover")
-    @PreAuthorize("hasRole('VET') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('HOSPITAL_REP') or hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<HandoverResponse>> recordHandover(
             @PathVariable UUID sosReportId,
             @Valid @RequestBody HandoverRequest req) {
@@ -88,7 +88,7 @@ public class OnSiteRescueController {
 
     // US-1.5.5 — Confirm Release with Photo
     @PostMapping("/release")
-    @PreAuthorize("hasRole('VOLUNTEER') or hasRole('NGO_REP')")
+    @PreAuthorize("hasRole('NGO_REP')")
     public ResponseEntity<ApiResponse<Void>> confirmRelease(
             @PathVariable UUID sosReportId,
             @Valid @RequestBody ReleaseConfirmationRequest req) {

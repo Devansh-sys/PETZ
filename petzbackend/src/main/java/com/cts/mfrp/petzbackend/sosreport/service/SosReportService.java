@@ -6,6 +6,7 @@ import com.cts.mfrp.petzbackend.enums.ReportStatus;
 import com.cts.mfrp.petzbackend.enums.SosMediaType;
 import com.cts.mfrp.petzbackend.rescue.model.RescueMission;
 import com.cts.mfrp.petzbackend.rescue.repository.RescueMissionRepository;
+import com.cts.mfrp.petzbackend.rescue.service.RescueQueueService;
 import com.cts.mfrp.petzbackend.sosmedia.dto.SosMediaResponse;
 import com.cts.mfrp.petzbackend.sosmedia.model.SosMedia;
 import com.cts.mfrp.petzbackend.sosmedia.repository.SosMediaRepository;
@@ -38,6 +39,7 @@ public class SosReportService {
     private final FileStorageService fileStorageService;
     private final StatusLogService statusLogService;
     private final RescueMissionRepository rescueMissionRepository;
+    private final RescueQueueService rescueQueueService;
 
     @Transactional
     public SosReportResponse createReport(SosReportCreateRequest request) {
@@ -70,6 +72,9 @@ public class SosReportService {
 
         // 4. Audit trail
         statusLogService.logStatusChange(saved, ReportStatus.REPORTED.name());
+
+        // 5. Auto-assign to first NGO in queue
+        rescueQueueService.assignToNextNgo(saved.getId());
 
         log.info("SOS Report created: id={}, urgency={}", saved.getId(), saved.getUrgencyLevel());
 

@@ -15,7 +15,7 @@ import java.util.UUID;
  *
  * Schema columns:
  *   uuid    id          PK
- *   string  role        REPORTER | VOLUNTEER | NGO_REP | VET | ADMIN | ADOPTER
+ *   string  role        REPORTER | NGO_REP | HOSPITAL_REP | ADMIN
  *   string  full_name
  *   string  phone       Verified via OTP/Missed Call
  *   string  email       Unique
@@ -45,7 +45,7 @@ public class User {
     private UUID id;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
     private Role role;
 
     @Column(name = "full_name")
@@ -80,7 +80,7 @@ public class User {
      * Epic 2 (Pet Adoption) — nullable FK to the NGO this user represents.
      * Populated only for role=NGO_REP users so the adoption module can read
      * the caller's ngo from their authenticated principal instead of trusting
-     * a client-supplied value. Remains null for REPORTER / ADOPTER / VET /
+     * a client-supplied value. Remains null for REPORTER / HOSPITAL_REP /
      * ADMIN users. Additive change — existing rows keep working unchanged.
      */
     @Column(name = "ngo_id")
@@ -140,12 +140,10 @@ public class User {
      * Used by Spring Security for RBAC (US-4.1.3).
      */
     public enum Role {
-        REPORTER,    // Public reporter (SOS module)
-        VOLUNTEER,   // Legacy — kept for schema compatibility, not actively used
-        NGO_REP,     // NGO representative (rescue operations)
-        VET,         // Veterinarian / hospital staff
-        ADMIN,       // Platform administrator
-        ADOPTER      // Adoption module user
+        REPORTER,       // Public reporter (SOS module) — default for normal users
+        NGO_REP,        // NGO representative (rescue operations)
+        HOSPITAL_REP,   // Hospital representative (receives appointment notifications)
+        ADMIN           // Platform administrator
     }
 
     // ─── Constructors ────────────────────────────────────────────────────

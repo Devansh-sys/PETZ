@@ -318,7 +318,7 @@ public class AuthService {
      *   4. Immediately fire an OTP so the phone can be verified.
      *
      * Roles:
-     *   - Clients can pick ADOPTER (default) / NGO_REP / VET.
+     *   - Clients can pick REPORTER (default) / NGO_REP / HOSPITAL_REP.
      *   - ADMIN is rejected — admin accounts must be created out-of-band.
      */
     @Transactional
@@ -451,15 +451,15 @@ public class AuthService {
         return userRepo.findByPhone(normalizePhone(identifier));
     }
 
-    /** Parses role string; defaults to ADOPTER; rejects ADMIN. */
+    /** Parses role string; defaults to REPORTER; rejects ADMIN. */
     private User.Role parseRole(String raw) {
-        if (raw == null || raw.isBlank()) return User.Role.ADOPTER;
+        if (raw == null || raw.isBlank()) return User.Role.REPORTER;
         User.Role parsed;
         try {
             parsed = User.Role.valueOf(raw.trim().toUpperCase());
         } catch (IllegalArgumentException ex) {
             throw new IllegalArgumentException(
-                    "Invalid role '" + raw + "'. Allowed: ADOPTER, NGO_REP, VET, REPORTER, VOLUNTEER");
+                    "Invalid role '" + raw + "'. Allowed: REPORTER, NGO_REP, HOSPITAL_REP");
         }
         if (parsed == User.Role.ADMIN) {
             throw new IllegalArgumentException(

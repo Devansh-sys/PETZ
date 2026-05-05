@@ -7,8 +7,7 @@ import { AuthService } from '../../core/auth/auth.service';
 const ROLE_REDIRECTS: Record<string, string> = {
   ADMIN:   '/admin',
   NGO_REP: '/ngo/dashboard',
-  VET:     '/appointments',
-  ADOPTER: '/adopt',
+  HOSPITAL_REP: '/appointments',
 };
 
 @Component({

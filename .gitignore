@@ -58,6 +58,4 @@ log/
 *.log
 
 # Local config with secrets
-petzbackend/src/main/resources/application.properties
 petzbackend/.claude/
-petzbackend/uploads/

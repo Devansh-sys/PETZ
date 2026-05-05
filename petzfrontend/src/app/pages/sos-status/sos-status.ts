@@ -82,7 +82,7 @@ export class SosStatus implements OnInit, OnDestroy {
       },
       {
         status: 'DISPATCHED' as ReportStatus,
-        label:  'Admin Assigned NGO',
+        label:  'NGO Assigned',
         emoji:  '🏢',
         at:     undefined,
         done:   adminAssigned,

@@ -1,6 +1,12 @@
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Seed data for local development  (INSERT IGNORE = safe to re-run on restart)
 -- ─────────────────────────────────────────────────────────────────────────────
+
+-- ── Role migration ──
+-- role column is VARCHAR(20) so old values survive schema updates as plain strings.
+-- These UPDATEs are idempotent — no-ops once all rows are already migrated.
+UPDATE users SET role = 'REPORTER'     WHERE role IN ('ADOPTER', 'VOLUNTEER', '');
+UPDATE users SET role = 'HOSPITAL_REP' WHERE role = 'VET';
  
 -- Hospitals  (is_verified=1 so they appear in discovery; owner_id is a placeholder UUID)
 INSERT IGNORE INTO hospitals
@@ -355,40 +361,30 @@ PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 -- intentional and dev-only; production accounts hash unique passwords each.
 SET @petz_pwd = '$2a$10$FRaElkIfKSxPqegRndfQL.MDfm5EZQgb00X0uhym9pyuxzPEn6CWK';
  
--- Upsert two extra demo users so every PETZ role has at least one login. The
--- ADMIN, NGO_REP, ADOPTER and REPORTER rows are already created by DataSeeder
--- on a fresh DB; this block only adds VOLUNTEER and VET if missing.
+-- Upsert demo users so every PETZ role has at least one login.
+-- ADMIN, NGO_REP rows are also created by DataSeeder on a fresh DB.
 INSERT IGNORE INTO users (
     id, role, full_name, phone, email, password,
     active, email_verified, phone_verified, is_temporary,
     failed_login_attempts, created_at
 ) VALUES
   (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000001','-','')),
-   'ADMIN',   'Platform Admin',   '+91-9000000001', 'admin@petz.dev',
+   'ADMIN',        'Platform Admin',    '+91-9000000001', 'admin@petz.dev',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
   (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000002','-','')),
-   'NGO_REP', 'Nandita Krishnan', '+91-9000000002', 'nandita@cupa.org.in',
+   'NGO_REP',      'Nandita Krishnan',  '+91-9000000002', 'nandita@cupa.org.in',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
   (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000003','-','')),
-   'NGO_REP', 'Geeta Seshamani',  '+91-9000000003', 'geeta@friendicoes.org',
+   'NGO_REP',      'Geeta Seshamani',   '+91-9000000003', 'geeta@friendicoes.org',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
   (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000004','-','')),
-   'NGO_REP', 'Rahul Sinha',      '+91-9000000004', 'rahul@bspca.org.in',
+   'NGO_REP',      'Rahul Sinha',       '+91-9000000004', 'rahul@bspca.org.in',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
   (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000005','-','')),
-   'NGO_REP', 'Priya Menon',      '+91-9000000005', 'priya@pfa.org.in',
+   'NGO_REP',      'Priya Menon',       '+91-9000000005', 'priya@pfa.org.in',
    @petz_pwd, 1, 1, 1, 0, 0, NOW()),
-  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000006','-','')),
-   'ADOPTER', 'Arjun Verma',      '+91-9000000006', 'arjun.verma@gmail.com',
-   @petz_pwd, 1, 1, 1, 0, 0, NOW()),
-  (UNHEX(REPLACE('bbbb0000-0000-0000-0000-000000000007','-','')),
-   'ADOPTER', 'Sneha Iyer',       '+91-9000000007', 'sneha.iyer@gmail.com',
-   @petz_pwd, 1, 1, 1, 0, 0, NOW()),
-  (UNHEX(REPLACE('a0000000-0000-0000-0000-000000000001','-','')),
-   'VOLUNTEER', 'Volunteer Demo', '+919000010001',  'volunteer@petz.dev',
-   @petz_pwd, 1, 1, 1, 0, 0, NOW()),
-  (UNHEX(REPLACE('a0000000-0000-0000-0000-000000000002','-','')),
-   'VET',       'Dr. Vet Demo',   '+919000010002',  'vet@petz.dev',
+  (UNHEX(REPLACE('a0000000-0000-0000-0000-000000000003','-','')),
+   'HOSPITAL_REP', 'Hospital Rep Demo', '+919000010003',  'hospital@petz.dev',
    @petz_pwd, 1, 1, 1, 0, 0, NOW());
  
 -- Re-assert known-good password + activation flags for every demo account.
@@ -401,23 +397,16 @@ SET password             = @petz_pwd,
     failed_login_attempts = 0,
     locked_until         = NULL
 WHERE email IN (
-    -- DataSeeder accounts (previously missing from this list — root cause of 403)
     'admin@petz.dev',
     'nandita@cupa.org.in',
     'geeta@friendicoes.org',
     'rahul@bspca.org.in',
     'priya@pfa.org.in',
-    'arjun.verma@gmail.com',
-    'sneha.iyer@gmail.com',
-    -- data.sql-only accounts
-    'volunteer@petz.dev',
-    'vet@petz.dev',
+    'hospital@petz.dev',
     -- legacy / teammate test accounts (kept for backward compatibility)
     'ngo@petz.dev',
     'owner@petz.test',
-    'john@test.com',
-    'volunteer@petz.dev',
-    'vet@petz.dev'
+    'john@test.com'
 );
  
 -- ── Backfill is_locked on legacy slot rows ──

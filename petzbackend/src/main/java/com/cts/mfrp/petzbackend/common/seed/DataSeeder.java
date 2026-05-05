@@ -33,7 +33,7 @@ import java.util.UUID;
  * Development data seeder — runs once on startup when app.seed-data=true.
  *
  * Seeds:
- *   • 7 demo users  (1 admin, 4 NGO reps, 2 adopters)
+ *   • 6 demo users  (1 admin, 4 NGO reps, 1 hospital rep)
  *   • 4 NGOs        (CUPA, Friendicoes, BSPCA, PFA — real Indian organisations)
  *   • 8 hospitals   (real vet clinic names, authentic Indian addresses & doctors)
  *   • 20 adoptable pets (authentic breed profiles based on real Indian rescue data)
@@ -81,14 +81,12 @@ public class DataSeeder implements ApplicationRunner {
     }
 
     private void ensureDemoUsers() {
-        String hashed = ENCODER.encode(DEFAULT_PASSWORD);
         upsertUser("Platform Admin",   "+91-9000000001", "admin@petz.dev",          User.Role.ADMIN);
         upsertUser("Nandita Krishnan", "+91-9000000002", "nandita@cupa.org.in",     User.Role.NGO_REP);
         upsertUser("Geeta Seshamani",  "+91-9000000003", "geeta@friendicoes.org",   User.Role.NGO_REP);
         upsertUser("Rahul Sinha",      "+91-9000000004", "rahul@bspca.org.in",      User.Role.NGO_REP);
         upsertUser("Priya Menon",      "+91-9000000005", "priya@pfa.org.in",        User.Role.NGO_REP);
-        upsertUser("Arjun Verma",      "+91-9000000006", "arjun.verma@gmail.com",   User.Role.ADOPTER);
-        upsertUser("Sneha Iyer",       "+91-9000000007", "sneha.iyer@gmail.com",    User.Role.ADOPTER);
+        upsertUser("Hospital Rep Demo", "+919000010003",  "hospital@petz.dev",       User.Role.HOSPITAL_REP);
         log.info("[DataSeeder] Demo users ensured. Login password: {}", DEFAULT_PASSWORD);
     }
 
