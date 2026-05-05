@@ -31,6 +31,16 @@ public interface NgoAssignmentRepository extends JpaRepository<NgoAssignment, UU
     List<NgoAssignment> findByNgoIdAndAssignmentStatusNotOrderByAssignedAtDesc(
             UUID ngoId, AssignmentStatus status);
 
+    /** Auto-queue: find PENDING assignments older than a cutoff (timed-out, need escalation). */
+    List<NgoAssignment> findByAssignmentStatusAndAssignedAtBefore(AssignmentStatus status, LocalDateTime before);
+
+    /**
+     * Auto-queue: returns the SOS report IDs for timed-out PENDING assignments.
+     * Uses JPQL to project directly — avoids lazy-loading the sosReport association.
+     */
+    @Query("SELECT a.sosReport.id FROM NgoAssignment a WHERE a.assignmentStatus = :status AND a.assignedAt < :before")
+    List<UUID> findExpiredSosReportIds(@Param("status") AssignmentStatus status, @Param("before") LocalDateTime before);
+
     @Query("SELECT COUNT(n) FROM NgoAssignment n WHERE n.assignedAt BETWEEN :from AND :to")
     long countTotalDispatched(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
 

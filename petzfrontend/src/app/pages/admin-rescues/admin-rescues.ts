@@ -22,23 +22,13 @@ export class AdminRescues implements OnInit {
   error = '';
   filterStatus = '';
 
-  ngos: any[] = [];
-  ngosLoading = false;
-
   // Geocoded names cache: reportId → display string
   locationNames: Record<string, string> = {};
-
-  assigningId: string | null = null;
-  assignNgoId = '';
-  assignReason = '';
-  assignError = '';
-  assignBusy = false;
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
     this.load();
-    this.loadNgos();
   }
 
   load(): void {
@@ -57,18 +47,6 @@ export class AdminRescues implements OnInit {
         this.reports = Array.isArray(data) ? data : (data?.content ?? []);
         this.loading = false;
         this.geocodeReports();
-      });
-  }
-
-  loadNgos(): void {
-    this.ngosLoading = true;
-    this.http.get<any>(`${this.base}/admin/adoptions/ngos`)
-      .pipe(map(r => r.data ?? r), catchError(() => of([])))
-      .subscribe(data => {
-        const all = Array.isArray(data) ? data : (data?.content ?? []);
-        // Only show NGOs that have a representative assigned
-        this.ngos = all.filter((n: any) => !!n.ownerUserId);
-        this.ngosLoading = false;
       });
   }
 
@@ -104,47 +82,6 @@ export class AdminRescues implements OnInit {
 
   get completedReports(): any[] {
     return this.reports.filter(r => ['COMPLETE', 'MISSION_COMPLETE', 'CLOSED'].includes(r.status));
-  }
-
-  openAssign(reportId: string): void {
-    this.assigningId = reportId;
-    this.assignNgoId = '';
-    this.assignReason = '';
-    this.assignError = '';
-  }
-
-  closeAssign(): void {
-    this.assigningId = null;
-    this.assignError = '';
-  }
-
-  submitAssign(): void {
-    if (!this.assignNgoId || !this.assignReason.trim()) {
-      this.assignError = 'Please select an NGO and enter a reason.';
-      return;
-    }
-    const selectedNgo = this.ngos.find(n => n.id === this.assignNgoId);
-    if (!selectedNgo?.ownerUserId) {
-      this.assignError = 'Selected NGO has no assigned representative.';
-      return;
-    }
-    this.assignBusy = true;
-    this.assignError = '';
-    this.http.patch<any>(`${this.base}/admin/rescues/${this.assigningId}/reassign`, {
-      newNgoId: this.assignNgoId,
-      newVolunteerId: selectedNgo.ownerUserId,
-      reason: this.assignReason.trim()
-    }).pipe(catchError(err => {
-      this.assignError = err.error?.message ?? 'Assignment failed. Please try again.';
-      this.assignBusy = false;
-      return of(null);
-    })).subscribe(res => {
-      if (res !== null) {
-        this.assignBusy = false;
-        this.assigningId = null;
-        this.load();
-      }
-    });
   }
 
   statusClass(s: string): string {

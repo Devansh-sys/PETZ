@@ -2,21 +2,20 @@ package com.cts.mfrp.petzbackend.rescue.service;
 
 import com.cts.mfrp.petzbackend.enums.ReportStatus;
 import com.cts.mfrp.petzbackend.enums.UrgencyLevel;
+import com.cts.mfrp.petzbackend.ngo.model.Ngo;
+import com.cts.mfrp.petzbackend.ngo.repository.NgoRepository;
 import com.cts.mfrp.petzbackend.rescue.dto.AdminRescueMapResponse;
-import com.cts.mfrp.petzbackend.rescue.dto.ReassignRequest;
-import com.cts.mfrp.petzbackend.rescue.dto.ReassignResponse;
 import com.cts.mfrp.petzbackend.rescue.model.NgoAssignment;
 import com.cts.mfrp.petzbackend.rescue.model.NgoAssignment.AssignmentStatus;
 import com.cts.mfrp.petzbackend.rescue.repository.NgoAssignmentRepository;
-import com.cts.mfrp.petzbackend.sosreport.repository.SosReportRepository;
 import com.cts.mfrp.petzbackend.sosreport.model.SosReport;
+import com.cts.mfrp.petzbackend.sosreport.repository.SosReportRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -26,14 +25,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AdminRescueService {
 
-    private final SosReportRepository sosReportRepo;
-    private final NgoAssignmentRepository   ngoAssignmentRepo;
+    private final SosReportRepository      sosReportRepo;
+    private final NgoAssignmentRepository  ngoAssignmentRepo;
+    private final NgoRepository            ngoRepo;
 
     // ── US-1.8.1 ─────────────────────────────────────────────────────────────
 
     /**
-     * Returns all non-completed SOS reports enriched with assignment info,
-     * with optional in-memory filtering by status, severity, and NGO.
+     * Returns all non-completed SOS reports enriched with assignment info.
+     * The auto-queue system handles NGO assignment — admin only monitors here.
      */
     @Transactional(readOnly = true)
     public List<AdminRescueMapResponse> getAllActiveRescues(
@@ -43,8 +43,8 @@ public class AdminRescueService {
 
         return sosReportRepo.findByCurrentStatusNot(ReportStatus.COMPLETE)
                 .stream()
-                .filter(r -> statusFilter  == null || r.getCurrentStatus() == statusFilter)
-                .filter(r -> severityFilter == null || r.getUrgencyLevel() == severityFilter)
+                .filter(r -> statusFilter   == null || r.getCurrentStatus() == statusFilter)
+                .filter(r -> severityFilter == null || r.getUrgencyLevel()  == severityFilter)
                 .map(r -> enrichWithAssignment(r, ngoFilter))
                 .filter(r -> r != null)
                 .collect(Collectors.toList());
@@ -53,26 +53,34 @@ public class AdminRescueService {
     private AdminRescueMapResponse enrichWithAssignment(SosReport r, UUID ngoFilter) {
         List<NgoAssignment> assignments = ngoAssignmentRepo.findBySosReport_Id(r.getId());
 
+        // Show ACCEPTED/ARRIVED first (NGO actively working), then PENDING (waiting for response)
         NgoAssignment active = assignments.stream()
                 .filter(a -> a.getAssignmentStatus() == AssignmentStatus.ACCEPTED
-                        || a.getAssignmentStatus() == AssignmentStatus.ARRIVED)
+                          || a.getAssignmentStatus() == AssignmentStatus.ARRIVED)
                 .findFirst()
-                .orElse(null);
+                .orElseGet(() -> assignments.stream()
+                        .filter(a -> a.getAssignmentStatus() == AssignmentStatus.PENDING)
+                        .findFirst()
+                        .orElse(null));
 
-        // If an NGO filter is set, exclude reports not assigned to that NGO
         if (ngoFilter != null) {
             if (active == null || !ngoFilter.equals(active.getNgoId())) return null;
         }
 
-        // Safely resolve reporter phone — proxy may exist but point to a deleted user
+        // Resolve NGO name for display
+        String assignedNgoName = null;
+        if (active != null && active.getNgoId() != null) {
+            assignedNgoName = ngoRepo.findById(active.getNgoId())
+                    .map(Ngo::getName)
+                    .orElse(null);
+        }
+
+        // Safely resolve reporter phone
         String reporterPhone = null;
         try {
-            if (r.getReporter() != null) {
-                reporterPhone = r.getReporter().getPhone();
-            }
+            if (r.getReporter() != null) reporterPhone = r.getReporter().getPhone();
         } catch (EntityNotFoundException e) {
-            log.warn("Reporter not found for SOS report {} — user may have been deleted", r.getId());
-            reporterPhone = null;
+            log.warn("Reporter not found for SOS report {}", r.getId());
         }
 
         return AdminRescueMapResponse.builder()
@@ -83,68 +91,10 @@ public class AdminRescueService {
                 .urgencyLevel(r.getUrgencyLevel())
                 .reporterPhone(reporterPhone)
                 .reportedAt(r.getReportedAt())
-                .assignedNgoId(active != null ? active.getNgoId().toString() : "Unassigned")
+                .assignedNgoId(active != null ? active.getNgoId().toString() : null)
+                .assignedNgoName(assignedNgoName)
                 .assignedVolunteerId(active != null && active.getVolunteerId() != null
-                        ? active.getVolunteerId().toString() : "—")
-                .build();
-    }
-
-    // ── US-1.8.2 ─────────────────────────────────────────────────────────────
-
-    /**
-     * Marks the current active assignment REASSIGNED (with audit trail),
-     * then creates a fresh PENDING assignment for the new NGO rep.
-     */
-    @Transactional
-    public ReassignResponse reassignRescue(UUID sosReportId,
-                                           ReassignRequest req,
-                                           UUID adminId) {
-
-        SosReport report = sosReportRepo.findById(sosReportId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "SOS report not found: " + sosReportId));
-
-        if (report.getCurrentStatus() == ReportStatus.COMPLETE) {
-            throw new IllegalStateException("Cannot reassign a completed rescue.");
-        }
-
-        // Archive existing active assignment
-        ngoAssignmentRepo.findBySosReport_IdAndAssignmentStatusIn(
-                sosReportId,
-                List.of(AssignmentStatus.PENDING,
-                        AssignmentStatus.ACCEPTED,
-                        AssignmentStatus.ARRIVED)
-        ).ifPresent(existing -> {
-            existing.setAssignmentStatus(AssignmentStatus.REASSIGNED);
-            existing.setReassignmentReason(req.getReason());
-            existing.setReassignedBy(adminId);
-            existing.setReassignedAt(LocalDateTime.now());
-            ngoAssignmentRepo.save(existing);
-        });
-
-        // Create new assignment for the selected NGO rep
-        NgoAssignment newAssignment = NgoAssignment.builder()
-                .sosReport(report)
-                .ngoId(req.getNewNgoId())
-                .volunteerId(req.getNewVolunteerId())
-                .assignmentStatus(AssignmentStatus.PENDING)
-                .build();
-
-        NgoAssignment saved = ngoAssignmentRepo.save(newAssignment);
-
-        // Move SOS to ASSIGNED so reporter sees "Admin Assigned NGO" step complete
-        report.setCurrentStatus(ReportStatus.ASSIGNED);
-        sosReportRepo.save(report);
-
-        // TODO: fire NotificationService.pushDispatch(req.getNewVolunteerId(), sosReportId)
-
-        return ReassignResponse.builder()
-                .assignmentId(saved.getId())
-                .sosReportId(sosReportId)
-                .newNgoId(req.getNewNgoId())
-                .newVolunteerId(req.getNewVolunteerId())
-                .reason(req.getReason())
-                .reassignedAt(saved.getReassignedAt())
+                        ? active.getVolunteerId().toString() : null)
                 .build();
     }
 }
