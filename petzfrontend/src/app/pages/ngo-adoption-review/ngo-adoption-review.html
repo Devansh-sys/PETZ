@@ -12,7 +12,7 @@
       <div class="review-header">
         <div>
           <h1>Application Review</h1>
-          <p class="sub">{{ application.petName }} · {{ application.adopterName }}</p>
+          <p class="sub">{{ application.petName }} · {{ application.adopterName || application.personal?.fullName }}</p>
         </div>
         <span class="status-badge" [class]="statusClass(application.status)">{{ application.status }}</span>
       </div>
@@ -36,42 +36,56 @@
 
       <div class="approved-banner" *ngIf="application.status === 'APPROVED'">
         🎉 This application has been approved! {{ application.petName }} has found a home.
+        <p *ngIf="application.decisionReason" class="decision-reason">{{ application.decisionReason }}</p>
+      </div>
+
+      <div class="rejected-banner" *ngIf="application.status === 'REJECTED'">
+        ❌ Application rejected.
+        <p *ngIf="application.decisionReason" class="decision-reason">Reason: {{ application.decisionReason }}</p>
+      </div>
+
+      <div class="clarify-banner" *ngIf="application.status === 'CLARIFICATION_REQUESTED'">
+        ❓ Clarification requested.
+        <p *ngIf="application.clarificationQuestions" class="decision-reason">{{ application.clarificationQuestions }}</p>
       </div>
 
       <div class="review-grid">
         <div class="review-section">
           <h3>Personal Information</h3>
-          <div class="detail-row"><span>Full Name</span><strong>{{ application.fullName || '—' }}</strong></div>
-          <div class="detail-row"><span>Email</span><strong>{{ application.email || '—' }}</strong></div>
-          <div class="detail-row"><span>Phone</span><strong>{{ application.phone || '—' }}</strong></div>
-          <div class="detail-row"><span>Address</span><strong>{{ application.addressLine || '—' }}</strong></div>
-          <div class="detail-row"><span>City</span><strong>{{ application.city || '—' }}</strong></div>
+          <div class="detail-row"><span>Full Name</span><strong>{{ application.personal?.fullName || '—' }}</strong></div>
+          <div class="detail-row"><span>Email</span><strong>{{ application.personal?.email || application.adopterEmail || '—' }}</strong></div>
+          <div class="detail-row"><span>Phone</span><strong>{{ application.personal?.phone || application.adopterPhone || '—' }}</strong></div>
+          <div class="detail-row"><span>Address</span><strong>{{ application.personal?.addressLine || '—' }}</strong></div>
+          <div class="detail-row"><span>City</span><strong>{{ application.personal?.city || '—' }}</strong></div>
+          <div class="detail-row" *ngIf="application.personal?.pincode"><span>Pincode</span><strong>{{ application.personal?.pincode }}</strong></div>
         </div>
 
         <div class="review-section">
           <h3>Living Situation</h3>
-          <div class="detail-row"><span>Housing Type</span><strong>{{ application.housingType || '—' }}</strong></div>
-          <div class="detail-row"><span>Has Yard</span><strong>{{ application.hasYard ? 'Yes' : 'No' }}</strong></div>
-          <div class="detail-row"><span>Other Pets</span><strong>{{ application.otherPetsCount ?? '—' }}</strong></div>
-          <div class="detail-row"><span>Hours Alone/Day</span><strong>{{ application.workScheduleHours ?? '—' }}</strong></div>
+          <div class="detail-row"><span>Housing Type</span><strong>{{ application.lifestyle?.housingType || '—' }}</strong></div>
+          <div class="detail-row"><span>Has Yard</span><strong>{{ application.lifestyle?.hasYard ? 'Yes' : 'No' }}</strong></div>
+          <div class="detail-row"><span>Other Pets</span><strong>{{ application.lifestyle?.otherPetsCount ?? '—' }}</strong></div>
+          <div class="detail-row"><span>Hours Alone/Day</span><strong>{{ application.lifestyle?.workScheduleHours ?? '—' }}</strong></div>
         </div>
 
         <div class="review-section full">
           <h3>Experience & Background</h3>
-          <div class="detail-row"><span>Previously Owned Pets</span><strong>{{ application.prevPetOwnership ? 'Yes' : 'No' }}</strong></div>
-          <div *ngIf="application.prevPetDetails">
+          <div class="detail-row"><span>Previously Owned Pets</span><strong>{{ application.experience?.prevPetOwnership ? 'Yes' : 'No' }}</strong></div>
+          <div *ngIf="application.experience?.prevPetDetails">
             <div class="detail-row"><span>Pet Details</span></div>
-            <p class="detail-text">{{ application.prevPetDetails }}</p>
+            <p class="detail-text">{{ application.experience?.prevPetDetails }}</p>
           </div>
-          <div *ngIf="application.vetSupport">
+          <div *ngIf="application.experience?.vetSupport">
             <div class="detail-row" style="margin-top:12px"><span>Veterinary Support</span></div>
-            <p class="detail-text">{{ application.vetSupport }}</p>
+            <p class="detail-text">{{ application.experience?.vetSupport }}</p>
           </div>
         </div>
 
-        <div class="review-section full" *ngIf="application.ngoComments">
-          <h3>NGO Comments</h3>
-          <p class="detail-text">{{ application.ngoComments }}</p>
+        <div class="review-section full" *ngIf="application.consent">
+          <h3>Consent</h3>
+          <div class="detail-row"><span>Home Visit</span><strong>{{ application.consent?.consentHomeVisit ? '✓ Agreed' : '✗ Not given' }}</strong></div>
+          <div class="detail-row"><span>Follow-up Check</span><strong>{{ application.consent?.consentFollowUp ? '✓ Agreed' : '✗ Not given' }}</strong></div>
+          <div class="detail-row"><span>Background Check</span><strong>{{ application.consent?.consentBackgroundCheck ? '✓ Agreed' : '✗ Not given' }}</strong></div>
         </div>
       </div>
     </ng-container>

@@ -31,112 +31,112 @@
           </div>
         </div>
 
-        <!-- Status notice for non-draft applications -->
+        <!-- Status notices -->
         <div class="status-notice approved" *ngIf="app.status === 'APPROVED'">
           <span>🎉</span>
           <div>
             <strong>Congratulations! Your adoption has been approved.</strong>
-            <p *ngIf="app.ngoComments">{{ app.ngoComments }}</p>
+            <p *ngIf="app.decisionReason">{{ app.decisionReason }}</p>
           </div>
         </div>
         <div class="status-notice rejected" *ngIf="app.status === 'REJECTED'">
           <span>❌</span>
           <div>
             <strong>Application not approved</strong>
-            <p *ngIf="app.ngoComments">{{ app.ngoComments }}</p>
+            <p *ngIf="app.decisionReason">{{ app.decisionReason }}</p>
           </div>
         </div>
         <div class="status-notice clarification" *ngIf="app.status === 'CLARIFICATION_REQUESTED'">
           <span>❓</span>
           <div>
             <strong>Clarification requested by NGO</strong>
-            <p *ngIf="app.ngoComments">{{ app.ngoComments }}</p>
+            <p *ngIf="app.clarificationQuestions">{{ app.clarificationQuestions }}</p>
           </div>
         </div>
 
         <!-- Personal Information -->
-        <div class="section" *ngIf="app.fullName || app.email || app.phone">
+        <div class="section" *ngIf="app.personal?.fullName || app.personal?.email || app.personal?.phone">
           <h3 class="section-title">Personal Information</h3>
           <div class="info-grid">
-            <div class="info-item" *ngIf="app.fullName">
+            <div class="info-item" *ngIf="app.personal?.fullName">
               <span class="info-label">Full Name</span>
-              <span class="info-value">{{ app.fullName }}</span>
+              <span class="info-value">{{ app.personal?.fullName }}</span>
             </div>
-            <div class="info-item" *ngIf="app.email">
+            <div class="info-item" *ngIf="app.personal?.email">
               <span class="info-label">Email</span>
-              <span class="info-value">{{ app.email }}</span>
+              <span class="info-value">{{ app.personal?.email }}</span>
             </div>
-            <div class="info-item" *ngIf="app.phone">
+            <div class="info-item" *ngIf="app.personal?.phone">
               <span class="info-label">Phone</span>
-              <span class="info-value">{{ app.phone }}</span>
+              <span class="info-value">{{ app.personal?.phone }}</span>
             </div>
-            <div class="info-item" *ngIf="app.city">
+            <div class="info-item" *ngIf="app.personal?.city">
               <span class="info-label">City</span>
-              <span class="info-value">{{ app.city }}</span>
+              <span class="info-value">{{ app.personal?.city }}</span>
             </div>
-            <div class="info-item full" *ngIf="app.addressLine">
+            <div class="info-item full" *ngIf="app.personal?.addressLine">
               <span class="info-label">Address</span>
-              <span class="info-value">{{ app.addressLine }}</span>
+              <span class="info-value">{{ app.personal?.addressLine }}</span>
             </div>
           </div>
         </div>
 
         <!-- Lifestyle -->
-        <div class="section" *ngIf="app.housingType || app.otherPetsCount != null">
+        <div class="section" *ngIf="app.lifestyle?.housingType || app.lifestyle?.otherPetsCount != null">
           <h3 class="section-title">Lifestyle</h3>
           <div class="info-grid">
-            <div class="info-item" *ngIf="app.housingType">
+            <div class="info-item" *ngIf="app.lifestyle?.housingType">
               <span class="info-label">Housing Type</span>
-              <span class="info-value">{{ app.housingType }}</span>
+              <span class="info-value">{{ app.lifestyle?.housingType }}</span>
             </div>
-            <div class="info-item" *ngIf="app.hasYard != null">
+            <div class="info-item" *ngIf="app.lifestyle?.hasYard != null">
               <span class="info-label">Has Yard</span>
-              <span class="info-value">{{ app.hasYard ? 'Yes' : 'No' }}</span>
+              <span class="info-value">{{ app.lifestyle?.hasYard ? 'Yes' : 'No' }}</span>
             </div>
-            <div class="info-item" *ngIf="app.otherPetsCount != null">
+            <div class="info-item" *ngIf="app.lifestyle?.otherPetsCount != null">
               <span class="info-label">Other Pets</span>
-              <span class="info-value">{{ app.otherPetsCount }}</span>
+              <span class="info-value">{{ app.lifestyle?.otherPetsCount }}</span>
             </div>
-            <div class="info-item" *ngIf="app.workScheduleHours != null">
+            <div class="info-item" *ngIf="app.lifestyle?.workScheduleHours != null">
               <span class="info-label">Work Hours/Day</span>
-              <span class="info-value">{{ app.workScheduleHours }}h</span>
+              <span class="info-value">{{ app.lifestyle?.workScheduleHours }}h</span>
             </div>
           </div>
         </div>
 
         <!-- Experience -->
-        <div class="section" *ngIf="app.prevPetOwnership != null || app.vetSupport">
+        <div class="section" *ngIf="app.experience?.prevPetOwnership != null || app.experience?.vetSupport">
           <h3 class="section-title">Experience</h3>
           <div class="info-grid">
-            <div class="info-item" *ngIf="app.prevPetOwnership != null">
+            <div class="info-item" *ngIf="app.experience?.prevPetOwnership != null">
               <span class="info-label">Previous Pet Owner</span>
-              <span class="info-value">{{ app.prevPetOwnership ? 'Yes' : 'No' }}</span>
+              <span class="info-value">{{ app.experience?.prevPetOwnership ? 'Yes' : 'No' }}</span>
             </div>
-            <div class="info-item full" *ngIf="app.prevPetDetails">
+            <div class="info-item full" *ngIf="app.experience?.prevPetDetails">
               <span class="info-label">Pet History</span>
-              <span class="info-value">{{ app.prevPetDetails }}</span>
+              <span class="info-value">{{ app.experience?.prevPetDetails }}</span>
             </div>
-            <div class="info-item" *ngIf="app.vetSupport">
+            <div class="info-item" *ngIf="app.experience?.vetSupport">
               <span class="info-label">Vet Support</span>
-              <span class="info-value">{{ app.vetSupport }}</span>
+              <span class="info-value">{{ app.experience?.vetSupport }}</span>
             </div>
           </div>
         </div>
 
         <!-- Consent -->
-        <div class="section">
+        <div class="section" *ngIf="app.consent">
           <h3 class="section-title">Consent</h3>
           <div class="consent-list">
-            <div class="consent-item" [class.granted]="app.consentHomeVisit">
-              <span class="consent-icon">{{ app.consentHomeVisit ? '✓' : '○' }}</span>
+            <div class="consent-item" [class.granted]="app.consent?.consentHomeVisit">
+              <span class="consent-icon">{{ app.consent?.consentHomeVisit ? '✓' : '○' }}</span>
               <span>Home visit consent</span>
             </div>
-            <div class="consent-item" [class.granted]="app.consentFollowUp">
-              <span class="consent-icon">{{ app.consentFollowUp ? '✓' : '○' }}</span>
+            <div class="consent-item" [class.granted]="app.consent?.consentFollowUp">
+              <span class="consent-icon">{{ app.consent?.consentFollowUp ? '✓' : '○' }}</span>
               <span>Follow-up check consent</span>
             </div>
-            <div class="consent-item" [class.granted]="app.consentBackgroundCheck">
-              <span class="consent-icon">{{ app.consentBackgroundCheck ? '✓' : '○' }}</span>
+            <div class="consent-item" [class.granted]="app.consent?.consentBackgroundCheck">
+              <span class="consent-icon">{{ app.consent?.consentBackgroundCheck ? '✓' : '○' }}</span>
               <span>Background check consent</span>
             </div>
           </div>

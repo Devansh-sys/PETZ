@@ -3,6 +3,41 @@ export type ApplicationStatus =
   | 'DRAFT' | 'PENDING' | 'SUBMITTED' | 'UNDER_REVIEW'
   | 'CLARIFICATION_REQUESTED' | 'APPROVED' | 'REJECTED' | 'WITHDRAWN';
 
+export interface PersonalSection {
+  fullName?: string;
+  phone?: string;
+  email?: string;
+  addressLine?: string;
+  city?: string;
+  pincode?: string;
+}
+
+export interface LifestyleSection {
+  housingType?: string;
+  hasYard?: boolean;
+  otherPetsCount?: number;
+  workScheduleHours?: number;
+}
+
+export interface ExperienceSection {
+  prevPetOwnership?: boolean;
+  prevPetDetails?: string;
+  vetSupport?: string;
+}
+
+export interface ConsentSection {
+  consentHomeVisit?: boolean;
+  consentFollowUp?: boolean;
+  consentBackgroundCheck?: boolean;
+}
+
+export interface StatusHistoryEntry {
+  action?: string;
+  reason?: string;
+  actorId?: string;
+  performedAt?: string;
+}
+
 export interface AdoptablePet {
   id: string;
   ngoId: string;
@@ -57,35 +92,28 @@ export interface AdoptionApplication {
   petName?: string;
   adopterId?: string;
   adopterName?: string;
+  adopterPhone?: string;
+  adopterEmail?: string;
   ngoId?: string;
+  ngoName?: string;
   status: ApplicationStatus;
   currentStep?: string;
   submittedAt?: string;
   lastActivityAt?: string;
+  decidedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
   pendingDocCount?: number;
-  // Personal section
-  fullName?: string;
-  email?: string;
-  phone?: string;
-  addressLine?: string;
-  city?: string;
-  pincode?: string;
-  // Lifestyle section
-  housingType?: string;
-  hasYard?: boolean;
-  otherPetsCount?: number;
-  workScheduleHours?: number;
-  // Experience section
-  prevPetOwnership?: boolean;
-  prevPetDetails?: string;
-  vetSupport?: string;
-  // Consent section
-  consentHomeVisit?: boolean;
-  consentFollowUp?: boolean;
-  consentBackgroundCheck?: boolean;
-  // NGO fields
-  ngoComments?: string;
+  // Nested sections (from Detail response)
+  personal?: PersonalSection;
+  lifestyle?: LifestyleSection;
+  experience?: ExperienceSection;
+  consent?: ConsentSection;
+  // NGO communication fields
+  decisionReason?: string;
+  clarificationQuestions?: string;
   documents?: ApplicationDocument[];
+  history?: StatusHistoryEntry[];
 }
 
 export interface ApplicationDocument {

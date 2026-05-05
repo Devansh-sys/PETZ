@@ -25,7 +25,7 @@
   </div>
 
   <div class="apps-list" *ngIf="!loading && !error && applications.length > 0">
-    <a class="app-card" *ngFor="let app of applications" [routerLink]="['/ngo/adoptions', app.id]">
+    <a class="app-card" *ngFor="let app of applications" [routerLink]="['/ngo/adoptions', app.id, 'review']">
       <div class="app-main">
         <div class="app-info">
           <h3>{{ app.adopterName || 'Anonymous Applicant' }}</h3>

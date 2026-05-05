@@ -466,5 +466,107 @@ CROSS JOIN (
     UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7
 ) AS slots
 WHERE d.is_active = 1;
- 
- 
+
+-- ═════════════════════════════════════════════════════════════════════════════
+-- ADOPTION MODULE SEED  (safe to re-run — INSERT IGNORE + deterministic UUIDs)
+-- ═════════════════════════════════════════════════════════════════════════════
+
+-- ── Bind NGO reps to their NGOs ──────────────────────────────────────────────
+-- Without ngo_id set on the user row, the NGO adoption review page always
+-- returns an empty list (every query is scoped to the reviewer's ngo_id).
+-- Maps the data.sql demo NGO_REP accounts to the three data.sql NGOs.
+UPDATE users SET ngo_id = UUID_TO_BIN('11110000-0000-0000-0000-000000000001')
+WHERE email IN ('nandita@cupa.org.in', 'geeta@friendicoes.org');
+
+UPDATE users SET ngo_id = UUID_TO_BIN('11110000-0000-0000-0000-000000000002')
+WHERE email = 'rahul@bspca.org.in';
+
+UPDATE users SET ngo_id = UUID_TO_BIN('11110000-0000-0000-0000-000000000003')
+WHERE email = 'priya@pfa.org.in';
+
+-- ── Sample adoption applications (one per status variant) ───────────────────
+-- version=0 is required — AdoptionApplication uses @Version optimistic locking.
+-- A NULL version causes OptimisticLockException on every approve/clarify/reject.
+INSERT IGNORE INTO adoption_applications
+  (id, adopter_id, adoptable_pet_id, ngo_id,
+   status, current_step,
+   full_name, phone, email, address_line, city, pincode,
+   housing_type, has_yard, other_pets_count, work_schedule_hours,
+   prev_pet_ownership, prev_pet_details, vet_support,
+   consent_home_visit, consent_follow_up, consent_background_check,
+   clarification_questions, decision_reason,
+   created_at, updated_at, last_activity_at, submitted_at, decided_at, version)
+VALUES
+
+-- 1. SUBMITTED — shows in NGO 1 Pending tab (nandita / geeta)
+(UUID_TO_BIN('dd000000-0000-0000-0000-000000000001'),
+ UUID_TO_BIN('bbbb0000-0000-0000-0000-000000000006'),
+ UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000001'),
+ UUID_TO_BIN('11110000-0000-0000-0000-000000000001'),
+ 'SUBMITTED', 'REVIEW',
+ 'Arjun Verma', '+91-9000000006', 'arjun.verma@gmail.com',
+ '12, Park Street', 'Mumbai', '400001',
+ 'APARTMENT', 0, 0, 8,
+ 1, 'Had a Labrador growing up', 1,
+ 1, 1, 1,
+ NULL, NULL,
+ DATE_SUB(NOW(), INTERVAL 3 DAY), NOW(), NOW(), DATE_SUB(NOW(), INTERVAL 3 DAY), NULL, 0),
+
+-- 2. UNDER_REVIEW — shows in NGO 1 Under Review tab
+(UUID_TO_BIN('dd000000-0000-0000-0000-000000000002'),
+ UUID_TO_BIN('bbbb0000-0000-0000-0000-000000000007'),
+ UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000002'),
+ UUID_TO_BIN('11110000-0000-0000-0000-000000000001'),
+ 'UNDER_REVIEW', 'REVIEW',
+ 'Sneha Iyer', '+91-9000000007', 'sneha.iyer@gmail.com',
+ '5, Linking Road', 'Mumbai', '400050',
+ 'HOUSE', 1, 1, 6,
+ 1, 'Owned cats for 5 years', 1,
+ 1, 1, 1,
+ NULL, NULL,
+ DATE_SUB(NOW(), INTERVAL 7 DAY), NOW(), NOW(), DATE_SUB(NOW(), INTERVAL 7 DAY), NULL, 0),
+
+-- 3. CLARIFICATION_REQUESTED — shows in NGO 2 Clarification tab (rahul)
+(UUID_TO_BIN('dd000000-0000-0000-0000-000000000003'),
+ UUID_TO_BIN('bbbb0000-0000-0000-0000-000000000006'),
+ UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000003'),
+ UUID_TO_BIN('11110000-0000-0000-0000-000000000002'),
+ 'CLARIFICATION_REQUESTED', 'REVIEW',
+ 'Arjun Verma', '+91-9000000006', 'arjun.verma@gmail.com',
+ '12, Park Street', 'Delhi', '110001',
+ 'APARTMENT', 0, 0, 8,
+ 1, 'Had a German Shepherd before', 1,
+ 1, 1, 1,
+ 'Please describe your daily schedule and how the dog will be cared for during work hours.', NULL,
+ DATE_SUB(NOW(), INTERVAL 5 DAY), NOW(), NOW(), DATE_SUB(NOW(), INTERVAL 5 DAY), NULL, 0),
+
+-- 4. APPROVED — shows in NGO 1 Approved tab
+(UUID_TO_BIN('dd000000-0000-0000-0000-000000000004'),
+ UUID_TO_BIN('bbbb0000-0000-0000-0000-000000000007'),
+ UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000007'),
+ UUID_TO_BIN('11110000-0000-0000-0000-000000000001'),
+ 'APPROVED', 'REVIEW',
+ 'Sneha Iyer', '+91-9000000007', 'sneha.iyer@gmail.com',
+ '5, Linking Road', 'Mumbai', '400050',
+ 'HOUSE', 1, 0, 7,
+ 1, 'Golden Retriever owner for 3 years', 1,
+ 1, 1, 1,
+ NULL, 'Application approved after home visit. Excellent match for Bella.',
+ DATE_SUB(NOW(), INTERVAL 14 DAY), NOW(), NOW(), DATE_SUB(NOW(), INTERVAL 14 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY), 0),
+
+-- 5. REJECTED — shows in NGO 3 Rejected tab (priya)
+(UUID_TO_BIN('dd000000-0000-0000-0000-000000000005'),
+ UUID_TO_BIN('bbbb0000-0000-0000-0000-000000000006'),
+ UUID_TO_BIN('aaaa0000-0000-0000-0000-000000000005'),
+ UUID_TO_BIN('11110000-0000-0000-0000-000000000003'),
+ 'REJECTED', 'REVIEW',
+ 'Arjun Verma', '+91-9000000006', 'arjun.verma@gmail.com',
+ '12, Park Street', 'Bangalore', '560001',
+ 'APARTMENT', 0, 0, 10,
+ 0, NULL, 0,
+ 1, 1, 1,
+ NULL, 'Applicant works 10+ hours daily with no support for the pet during the day.',
+ DATE_SUB(NOW(), INTERVAL 10 DAY), NOW(), NOW(), DATE_SUB(NOW(), INTERVAL 10 DAY), DATE_SUB(NOW(), INTERVAL 4 DAY), 0);
+
+-- Fix any existing rows that were inserted without version (NULL breaks optimistic locking)
+UPDATE adoption_applications SET version = 0 WHERE version IS NULL;

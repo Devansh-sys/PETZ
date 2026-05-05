@@ -48,7 +48,7 @@ export class NgoAdoptionReview implements OnInit {
 
   approve(): void {
     this.busy = true;
-    this.adoptionService.ngoApprove(this.application!.id, this.application?.ngoComments).subscribe({
+    this.adoptionService.ngoApprove(this.application!.id, this.application?.decisionReason).subscribe({
       next: (app) => { this.application = app; this.busy = false; },
       error: () => { this.actionError = 'Approval failed.'; this.busy = false; }
     });
