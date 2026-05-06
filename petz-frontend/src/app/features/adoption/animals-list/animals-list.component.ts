@@ -12,8 +12,8 @@ import { AdoptableAnimal } from '../../../core/models/adoption.model';
       <div class="page-header">
         <div class="page-header-left" style="display:flex;align-items:center">
           <button mat-icon-button routerLink="/dashboard"
-                  style="background:#fff;border:1px solid #F0E0D6;border-radius:10px;margin-right:12px">
-            <mat-icon style="color:#78716C">arrow_back</mat-icon>
+                  style="background:#fff;border:1px solid #E0EBF2;border-radius:10px;margin-right:12px">
+            <mat-icon style="color:#4A6478">arrow_back</mat-icon>
           </button>
           <div>
             <h1>Find Your Companion</h1>
@@ -22,7 +22,7 @@ import { AdoptableAnimal } from '../../../core/models/adoption.model';
         </div>
         <div class="page-header-actions">
           <button mat-stroked-button routerLink="/adoption/my"
-                  style="border-radius:10px;color:#78716C;border-color:#E5D0C5">
+                  style="border-radius:10px;color:#4A6478;border-color:#C8DCE8">
             <mat-icon>assignment</mat-icon> My Applications
           </button>
         </div>
@@ -129,8 +129,8 @@ import { AdoptableAnimal } from '../../../core/models/adoption.model';
       align-items: center;
       background: #fff;
       border-radius: 16px;
-      border: 1px solid #F0E0D6;
-      box-shadow: 0 4px 16px rgba(28,9,2,0.06);
+      border: 1px solid #E0EBF2;
+      box-shadow: 0 4px 16px rgba(26,53,71,0.06);
       padding: 10px 10px 10px 20px;
       margin-bottom: 24px;
       gap: 0;
@@ -140,22 +140,22 @@ import { AdoptableAnimal } from '../../../core/models/adoption.model';
       align-items: center;
       gap: 8px;
       flex: 1;
-      mat-icon { color: #A8A29E; font-size: 20px; width: 20px; height: 20px; flex-shrink: 0; }
+      mat-icon { color: #8BA3B5; font-size: 20px; width: 20px; height: 20px; flex-shrink: 0; }
       input {
         border: none;
         outline: none;
         font-size: 0.88rem;
-        color: #1C0902;
+        color: #1A3547;
         font-family: 'DM Sans', sans-serif;
         background: transparent;
         width: 100%;
-        &::placeholder { color: #A8A29E; }
+        &::placeholder { color: #8BA3B5; }
       }
     }
     .search-divider {
       width: 1px;
       height: 28px;
-      background: #F0E0D6;
+      background: #E0EBF2;
       margin: 0 14px;
     }
     .search-btn {
@@ -166,7 +166,7 @@ import { AdoptableAnimal } from '../../../core/models/adoption.model';
     .results-count {
       margin-bottom: 18px;
       font-size: 0.82rem;
-      color: #A8A29E;
+      color: #8BA3B5;
       font-weight: 600;
     }
     .animal-grid {
@@ -177,8 +177,8 @@ import { AdoptableAnimal } from '../../../core/models/adoption.model';
     .animal-card {
       background: #fff;
       border-radius: 20px;
-      border: 1px solid #F0E0D6;
-      box-shadow: 0 4px 16px rgba(28,9,2,0.07);
+      border: 1px solid #E0EBF2;
+      box-shadow: 0 4px 16px rgba(26,53,71,0.07);
       overflow: hidden;
       cursor: pointer;
       transition: all 0.22s ease;
@@ -186,7 +186,7 @@ import { AdoptableAnimal } from '../../../core/models/adoption.model';
       flex-direction: column;
       &:hover {
         transform: translateY(-4px);
-        box-shadow: 0 12px 36px rgba(28,9,2,0.12);
+        box-shadow: 0 12px 36px rgba(26,53,71,0.12);
         border-color: #FDBF8A;
       }
     }
@@ -206,7 +206,7 @@ import { AdoptableAnimal } from '../../../core/models/adoption.model';
     .animal-species-tag {
       position: absolute;
       top: 10px; left: 10px;
-      background: rgba(28,9,2,0.75);
+      background: rgba(26,53,71,0.75);
       color: #fff;
       font-size: 0.68rem;
       font-weight: 700;
@@ -233,12 +233,12 @@ import { AdoptableAnimal } from '../../../core/models/adoption.model';
       padding: 14px 16px 10px;
       flex: 1;
     }
-    .animal-name { font-weight: 800; font-size: 1rem; color: #1C0902; margin-bottom: 2px; }
-    .animal-meta { font-size: 0.78rem; color: #A8A29E; margin-bottom: 6px; }
+    .animal-name { font-weight: 800; font-size: 1rem; color: #1A3547; margin-bottom: 2px; }
+    .animal-meta { font-size: 0.78rem; color: #8BA3B5; margin-bottom: 6px; }
     .animal-location {
       display: flex; align-items: center; gap: 3px;
-      font-size: 0.76rem; color: #78716C; margin-bottom: 8px;
-      mat-icon { font-size: 13px; width: 13px; height: 13px; color: #F97316; }
+      font-size: 0.76rem; color: #4A6478; margin-bottom: 8px;
+      mat-icon { font-size: 13px; width: 13px; height: 13px; color: #FF8C42; }
     }
     .animal-tags { display: flex; gap: 5px; flex-wrap: wrap; }
     .tag {

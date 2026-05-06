@@ -12,8 +12,8 @@ import { RescueReport } from '../../../core/models/rescue.model';
       <div class="page-header">
         <div class="page-header-left">
           <button mat-icon-button routerLink="/dashboard"
-                  style="background:#fff;border:1px solid #F0E0D6;border-radius:10px;margin-right:12px">
-            <mat-icon style="color:#78716C">arrow_back</mat-icon>
+                  style="background:#fff;border:1px solid #E0EBF2;border-radius:10px;margin-right:12px">
+            <mat-icon style="color:#4A6478">arrow_back</mat-icon>
           </button>
           <div>
             <h1>Rescue Reports</h1>
@@ -161,11 +161,11 @@ import { RescueReport } from '../../../core/models/rescue.model';
     .filter-btn {
       display: flex; align-items: center; gap: 6px;
       padding: 6px 14px; border-radius: 999px;
-      border: 1px solid #E5D0C5; background: #fff;
-      font-size: 0.8rem; font-weight: 600; color: #78716C;
+      border: 1px solid #C8DCE8; background: #fff;
+      font-size: 0.8rem; font-weight: 600; color: #4A6478;
       cursor: pointer; transition: all 0.15s;
-      &:hover { border-color: #F97316; color: #F97316; }
-      &.active { background: #F97316; color: #fff; border-color: #F97316; }
+      &:hover { border-color: #FF8C42; color: #FF8C42; }
+      &.active { background: #FF8C42; color: #fff; border-color: #FF8C42; }
     }
     .f-count {
       background: rgba(0,0,0,0.12); border-radius: 999px;
@@ -182,12 +182,12 @@ import { RescueReport } from '../../../core/models/rescue.model';
     .rescue-card-item {
       background: #fff;
       border-radius: 20px;
-      border: 1px solid #F0E0D6;
-      box-shadow: 0 4px 16px rgba(28,9,2,0.07);
+      border: 1px solid #E0EBF2;
+      box-shadow: 0 4px 16px rgba(26,53,71,0.07);
       padding: 18px 20px 16px;
       transition: all 0.2s ease;
       display: flex; flex-direction: column; gap: 12px;
-      &:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(28,9,2,0.12); }
+      &:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(26,53,71,0.12); }
     }
     .completed-card { border-color: #A7F3D0; background: #F0FDF4; }
     .cancelled-card { border-color: #E5E7EB; background: #F9FAFB; opacity: 0.8; }
@@ -212,19 +212,19 @@ import { RescueReport } from '../../../core/models/rescue.model';
     }
     .crit-low      { background: #D1FAE5; color: #065F46; }
     .crit-medium   { background: #FEF3C7; color: #92400E; }
-    .crit-high     { background: #FFEDD5; color: #9A3412; }
+    .crit-high     { background: #FFE8D6; color: #9A3412; }
     .crit-critical { background: #FEE2E2; color: #991B1B; }
 
     /* ── Card content ── */
     .rescue-card-content { display: flex; flex-direction: column; gap: 4px; }
-    .rescue-animal-name { font-weight: 800; font-size: 1rem; color: #1C0902; }
+    .rescue-animal-name { font-weight: 800; font-size: 1rem; color: #1A3547; }
     .report-date {
       display: flex; align-items: center; gap: 4px;
-      font-size: 0.74rem; color: #A8A29E;
+      font-size: 0.74rem; color: #8BA3B5;
       mat-icon { font-size: 13px; width: 13px; height: 13px; }
     }
     .rescue-desc {
-      font-size: 0.83rem; color: #78716C; line-height: 1.5; margin: 0;
+      font-size: 0.83rem; color: #4A6478; line-height: 1.5; margin: 0;
       display: -webkit-box; -webkit-line-clamp: 2;
       -webkit-box-orient: vertical; overflow: hidden;
     }
@@ -239,20 +239,20 @@ import { RescueReport } from '../../../core/models/rescue.model';
     }
     .tl-dot {
       width: 20px; height: 20px; border-radius: 50%;
-      border: 2px solid #E5D0C5; background: #fff;
+      border: 2px solid #C8DCE8; background: #fff;
       display: flex; align-items: center; justify-content: center;
       transition: all 0.2s;
       mat-icon { font-size: 12px; width: 12px; height: 12px; color: #fff; }
     }
     .tl-done .tl-dot  { background: #059669; border-color: #059669; }
-    .tl-active .tl-dot { background: #F97316; border-color: #F97316; box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
+    .tl-active .tl-dot { background: #FF8C42; border-color: #FF8C42; box-shadow: 0 0 0 3px rgba(255,140,66,0.2); }
     .tl-label {
-      font-size: 0.62rem; font-weight: 600; color: #A8A29E; text-align: center; white-space: nowrap;
+      font-size: 0.62rem; font-weight: 600; color: #8BA3B5; text-align: center; white-space: nowrap;
       .tl-done &  { color: #059669; }
-      .tl-active & { color: #F97316; font-weight: 700; }
+      .tl-active & { color: #FF8C42; font-weight: 700; }
     }
     .tl-line {
-      flex: 1; height: 2px; background: #F0E0D6; margin-bottom: 18px; transition: all 0.2s;
+      flex: 1; height: 2px; background: #E0EBF2; margin-bottom: 18px; transition: all 0.2s;
     }
     .tl-line-done { background: #059669; }
 
@@ -263,7 +263,7 @@ import { RescueReport } from '../../../core/models/rescue.model';
       font-size: 0.78rem; line-height: 1.4;
       mat-icon { font-size: 16px; width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
     }
-    .hint-pending     { background: #FFF7ED; color: #9A3412; mat-icon { color: #F97316; } }
+    .hint-pending     { background: #FFF3EC; color: #9A3412; mat-icon { color: #FF8C42; } }
     .hint-assigned    { background: #EFF6FF; color: #1E40AF; mat-icon { color: #3B82F6; } }
     .hint-in_progress { background: #FDF4FF; color: #7E22CE; mat-icon { color: #9333EA; } }
     .hint-completed   { background: #F0FDF4; color: #15803D; mat-icon { color: #22C55E; } }
@@ -280,7 +280,7 @@ import { RescueReport } from '../../../core/models/rescue.model';
     /* ── Location ── */
     .rescue-location {
       display: flex; align-items: center; gap: 4px;
-      font-size: 0.76rem; color: #A8A29E;
+      font-size: 0.76rem; color: #8BA3B5;
       mat-icon { font-size: 14px; width: 14px; height: 14px; flex-shrink: 0; }
       span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     }

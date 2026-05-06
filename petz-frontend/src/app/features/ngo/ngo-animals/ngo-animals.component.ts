@@ -31,21 +31,21 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       <!-- Add Animal form -->
       @if (showForm) {
         <div class="card" style="padding:28px;margin-bottom:24px">
-          <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#A8A29E;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #F0E0D6">
+          <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#8BA3B5;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #E0EBF2">
             New Animal Details
           </div>
           <div class="form-row">
             <div class="field-group">
               <label class="field-label">Animal Name *</label>
               <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">badge</mat-icon>
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">badge</mat-icon>
                 <input matInput [(ngModel)]="newAnimal.name" placeholder="e.g. Milo">
               </mat-form-field>
             </div>
             <div class="field-group">
               <label class="field-label">Species</label>
               <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">pets</mat-icon>
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">pets</mat-icon>
                 <input matInput [(ngModel)]="newAnimal.species" placeholder="Dog, Cat, Bird...">
               </mat-form-field>
             </div>
@@ -60,7 +60,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
             <div class="field-group">
               <label class="field-label">City</label>
               <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">place</mat-icon>
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">place</mat-icon>
                 <input matInput [(ngModel)]="newAnimal.city">
               </mat-form-field>
             </div>
@@ -77,7 +77,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
               <mat-icon>save</mat-icon> Save Animal
             </button>
             <button mat-stroked-button (click)="showForm = false"
-                    style="border-radius:12px;height:42px;color:#78716C;border-color:#E5D0C5">
+                    style="border-radius:12px;height:42px;color:#4A6478;border-color:#C8DCE8">
               Cancel
             </button>
           </div>
@@ -98,20 +98,20 @@ import { MatSnackBar } from '@angular/material/snack-bar';
             <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef>Animal</th>
               <td mat-cell *matCellDef="let a" style="padding:14px 18px">
-                <div style="font-weight:700;font-size:0.88rem;color:#1C0902">{{ a.name }}</div>
-                <div style="font-size:0.74rem;color:#A8A29E">{{ a.species || 'Unknown' }}</div>
+                <div style="font-weight:700;font-size:0.88rem;color:#1A3547">{{ a.name }}</div>
+                <div style="font-size:0.74rem;color:#8BA3B5">{{ a.species || 'Unknown' }}</div>
               </td>
             </ng-container>
             <ng-container matColumnDef="breed">
               <th mat-header-cell *matHeaderCellDef>Breed / Age</th>
-              <td mat-cell *matCellDef="let a" style="font-size:0.82rem;color:#78716C">
+              <td mat-cell *matCellDef="let a" style="font-size:0.82rem;color:#4A6478">
                 {{ a.breed || 'Mixed' }}
                 @if (a.ageMonths) { · {{ a.ageMonths }} mo }
               </td>
             </ng-container>
             <ng-container matColumnDef="city">
               <th mat-header-cell *matHeaderCellDef>Location</th>
-              <td mat-cell *matCellDef="let a" style="font-size:0.82rem;color:#78716C">{{ a.city || '—' }}</td>
+              <td mat-cell *matCellDef="let a" style="font-size:0.82rem;color:#4A6478">{{ a.city || '—' }}</td>
             </ng-container>
             <ng-container matColumnDef="status">
               <th mat-header-cell *matHeaderCellDef>Status</th>
@@ -131,12 +131,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     .back-btn {
       width: 38px !important; height: 38px !important;
       border-radius: 10px !important; background: #fff !important;
-      border: 1px solid #F0E0D6 !important; color: #78716C !important; flex-shrink: 0;
-      &:hover { border-color: #F97316 !important; color: #F97316 !important; }
+      border: 1px solid #E0EBF2 !important; color: #4A6478 !important; flex-shrink: 0;
+      &:hover { border-color: #FF8C42 !important; color: #FF8C42 !important; }
     }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
     .field-group { margin-bottom: 4px; }
-    .field-label { display: block; font-size: 0.78rem; font-weight: 700; color: #1C0902; margin-bottom: 6px; }
+    .field-label { display: block; font-size: 0.78rem; font-weight: 700; color: #1A3547; margin-bottom: 6px; }
     @media (max-width: 560px) { .form-row { grid-template-columns: 1fr; } }
   `]
 })

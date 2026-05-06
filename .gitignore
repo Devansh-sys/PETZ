@@ -1,0 +1,13 @@
+# ── Backend secrets ──────────────────────────────────────
+petz-backend/src/main/resources/application-local.properties
+petz-backend/.env
+
+# ── Frontend ─────────────────────────────────────────────
+petz-frontend/node_modules/
+petz-frontend/.angular/cache/
+petz-frontend/dist/
+
+# ── General ──────────────────────────────────────────────
+.env
+*.env
+*.log

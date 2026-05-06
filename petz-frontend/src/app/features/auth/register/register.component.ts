@@ -12,7 +12,17 @@ import { AuthService } from '../../../core/services/auth.service';
 
       <!-- Left panel -->
       <div class="auth-left">
-        <a class="brand" routerLink="/">🐾 PETZ</a>
+        <a class="brand" routerLink="/">
+          <svg width="30" height="30" viewBox="0 0 40 40" fill="none" style="flex-shrink:0">
+            <rect width="40" height="40" rx="12" fill="#FF8C42"/>
+            <ellipse cx="13" cy="11" rx="3.8" ry="4.6" fill="white" opacity="0.9"/>
+            <ellipse cx="27" cy="11" rx="3.8" ry="4.6" fill="white" opacity="0.9"/>
+            <ellipse cx="7.5" cy="20" rx="3.2" ry="4" fill="white" opacity="0.9"/>
+            <ellipse cx="32.5" cy="20" rx="3.2" ry="4" fill="white" opacity="0.9"/>
+            <path d="M20 15.5C14.5 15.5 10 20.2 10 25.5C10 29.5 12.5 32.5 16 33.5H24C27.5 32.5 30 29.5 30 25.5C30 20.2 25.5 15.5 20 15.5Z" fill="white"/>
+          </svg>
+          PETZ
+        </a>
         <h1>Join the<br>PETZ Community</h1>
         <p>Create your free account and start making a difference for animals in need.</p>
         <div class="features">
@@ -68,13 +78,13 @@ import { AuthService } from '../../../core/services/auth.service';
             <div class="field-group">
               <label>Password</label>
               <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">lock_outline</mat-icon>
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">lock_outline</mat-icon>
                 <input matInput [type]="showPassword ? 'text' : 'password'"
                        formControlName="password" placeholder="min. 6 characters">
                 <button mat-icon-button matSuffix type="button"
                         (click)="showPassword = !showPassword"
                         [title]="showPassword ? 'Hide password' : 'Show password'"
-                        style="color:#A8A29E">
+                        style="color:#8BA3B5">
                   <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
                 </button>
               </mat-form-field>
@@ -111,26 +121,26 @@ import { AuthService } from '../../../core/services/auth.service';
 
     .auth-left {
       width: 40%;
-      background: linear-gradient(160deg, #1C0902 0%, #3D1505 60%, #7C2D12 100%);
+      background: linear-gradient(160deg, #1A3547 0%, #2D5D7B 60%, #3D7EA6 100%);
       padding: 60px 48px;
       display: flex; flex-direction: column; justify-content: center; color: #fff;
       @media (max-width: 768px) { display: none; }
-      .brand { font-size: 1.4rem; font-weight: 900; color: #F97316; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 48px; text-decoration: none; display: inline-block; transition: opacity 0.2s; &:hover { opacity: 0.8; } }
-      h1 { font-size: 2.2rem; font-weight: 900; line-height: 1.2; margin: 0 0 20px; }
+      .brand { font-family: 'Quicksand', system-ui, sans-serif; font-size: 1.3rem; font-weight: 700; color: #fff; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 48px; text-decoration: none; display: flex; align-items: center; gap: 10px; transition: opacity 0.2s; &:hover { opacity: 0.8; } }
+      h1 { font-family: 'Quicksand', system-ui, sans-serif; font-size: 2.2rem; font-weight: 700; line-height: 1.2; margin: 0 0 20px; }
       p  { color: rgba(255,255,255,0.65); font-size: 0.95rem; line-height: 1.7; margin: 0 0 36px; }
     }
 
     .features { display: flex; flex-direction: column; gap: 14px; }
     .feature-item { display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.85); font-weight: 500; font-size: 0.9rem; }
     .f-icon {
-      width: 36px; height: 36px; border-radius: 10px;
-      background: rgba(249,115,22,0.2);
+      width: 36px; height: 36px; border-radius: 12px;
+      background: rgba(255,140,66,0.18);
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-      mat-icon { color: #F97316; font-size: 18px; width: 18px; height: 18px; }
+      mat-icon { color: #FF8C42; font-size: 18px; width: 18px; height: 18px; }
     }
 
     .auth-right {
-      flex: 1; background: #FFF8F4;
+      flex: 1; background: #F9FBFB;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       padding: 40px 24px; overflow-y: auto;
     }
@@ -144,37 +154,37 @@ import { AuthService } from '../../../core/services/auth.service';
       margin-bottom: 14px;
       font-size: 0.84rem;
       font-weight: 600;
-      color: #78716C;
+      color: #4A6478;
       text-decoration: none;
       cursor: pointer;
       transition: color 0.2s;
       mat-icon { font-size: 16px; width: 16px; height: 16px; }
-      &:hover { color: #F97316; }
+      &:hover { color: #FF8C42; }
     }
 
     .auth-card {
       width: 100%; max-width: 460px;
       background: #fff; border-radius: 24px;
-      padding: 40px; box-shadow: 0 8px 40px rgba(0,0,0,0.08);
-      border: 1px solid #F0E0D6;
+      padding: 40px; box-shadow: 0 8px 40px rgba(26,53,71,0.09);
+      border: 1px solid #E0EBF2;
     }
 
     .auth-header {
       margin-bottom: 28px;
-      h2 { font-size: 1.7rem; font-weight: 900; color: #1C0902; margin: 0 0 6px; }
-      p  { color: #A8A29E; margin: 0; font-size: 0.88rem; }
+      h2 { font-family: 'Quicksand', system-ui, sans-serif; font-size: 1.7rem; font-weight: 700; color: #1A3547; margin: 0 0 6px; }
+      p  { color: #8BA3B5; margin: 0; font-size: 0.88rem; }
     }
 
     .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
 
     .field-group {
       margin-bottom: 14px;
-      label { display: block; font-size: 0.8rem; font-weight: 700; color: #1C0902; margin-bottom: 5px; }
+      label { display: block; font-size: 0.8rem; font-weight: 700; color: #1A3547; margin-bottom: 5px; }
     }
 
     .auth-footer {
-      text-align: center; margin: 20px 0 0; color: #A8A29E; font-size: 0.88rem;
-      a { color: #F97316; font-weight: 700; text-decoration: none; }
+      text-align: center; margin: 20px 0 0; color: #8BA3B5; font-size: 0.88rem;
+      a { color: #FF8C42; font-weight: 700; text-decoration: none; }
       a:hover { text-decoration: underline; }
     }
   `]

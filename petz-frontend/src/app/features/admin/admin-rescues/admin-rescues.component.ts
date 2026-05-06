@@ -65,8 +65,8 @@ import { ApiService } from '../../../core/services/api.service';
                       <mat-icon>pets</mat-icon>
                     </div>
                     <div>
-                      <div style="font-weight:700;font-size:0.88rem;color:#1C0902">{{ r.animalType || 'Unknown' }}</div>
-                      <div style="font-size:0.74rem;color:#A8A29E">ID #{{ r.id }}</div>
+                      <div style="font-weight:700;font-size:0.88rem;color:#1A3547">{{ r.animalType || 'Unknown' }}</div>
+                      <div style="font-size:0.74rem;color:#8BA3B5">ID #{{ r.id }}</div>
                     </div>
                   </div>
                 </td>
@@ -79,7 +79,7 @@ import { ApiService } from '../../../core/services/api.service';
               </ng-container>
               <ng-container matColumnDef="address">
                 <th mat-header-cell *matHeaderCellDef>Location</th>
-                <td mat-cell *matCellDef="let r" style="font-size:0.82rem;color:#78716C;max-width:200px">
+                <td mat-cell *matCellDef="let r" style="font-size:0.82rem;color:#4A6478;max-width:200px">
                   {{ r.address || '—' }}
                 </td>
               </ng-container>
@@ -102,8 +102,8 @@ import { ApiService } from '../../../core/services/api.service';
     .back-btn {
       width: 38px !important; height: 38px !important;
       border-radius: 10px !important; background: #fff !important;
-      border: 1px solid #F0E0D6 !important; color: #78716C !important; flex-shrink: 0;
-      &:hover { border-color: #F97316 !important; color: #F97316 !important; }
+      border: 1px solid #E0EBF2 !important; color: #4A6478 !important; flex-shrink: 0;
+      &:hover { border-color: #FF8C42 !important; color: #FF8C42 !important; }
     }
     .rescue-stats { display: flex; gap: 10px; }
     .r-stat {
@@ -121,15 +121,15 @@ import { ApiService } from '../../../core/services/api.service';
     .filter-chip {
       padding: 6px 16px;
       border-radius: 999px;
-      border: 1px solid #F0E0D6;
+      border: 1px solid #E0EBF2;
       background: #fff;
-      color: #78716C;
+      color: #4A6478;
       font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
       font-family: 'DM Sans', sans-serif;
       transition: all 0.15s;
-      &.active, &:hover { background: #F97316; color: #fff; border-color: #F97316; }
+      &.active, &:hover { background: #FF8C42; color: #fff; border-color: #FF8C42; }
     }
     .rescue-icon-sm {
       width: 34px; height: 34px; border-radius: 10px;

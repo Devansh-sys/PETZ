@@ -14,8 +14,8 @@ import { ApiService } from '../../../core/services/api.service';
       <div class="page-header" style="margin-bottom:24px">
         <div class="page-header-left">
           <button mat-icon-button routerLink="/dashboard"
-                  style="background:#fff;border:1px solid #F0E0D6;border-radius:10px;margin-right:12px">
-            <mat-icon style="color:#78716C">arrow_back</mat-icon>
+                  style="background:#fff;border:1px solid #E0EBF2;border-radius:10px;margin-right:12px">
+            <mat-icon style="color:#4A6478">arrow_back</mat-icon>
           </button>
           <div>
             <h1>Book Appointment</h1>
@@ -23,7 +23,7 @@ import { ApiService } from '../../../core/services/api.service';
           </div>
         </div>
         <button mat-stroked-button routerLink="/appointments"
-                style="border-radius:10px;color:#78716C;border-color:#E5D0C5">
+                style="border-radius:10px;color:#4A6478;border-color:#C8DCE8">
           My Appointments
         </button>
       </div>
@@ -37,7 +37,7 @@ import { ApiService } from '../../../core/services/api.service';
           <div class="field-group">
             <label class="field-label">Hospital</label>
             <mat-form-field appearance="outline">
-              <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">local_hospital</mat-icon>
+              <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">local_hospital</mat-icon>
               <mat-select formControlName="hospitalId"
                           placeholder="Select a hospital"
                           (selectionChange)="onHospitalChange($event.value)">
@@ -51,7 +51,7 @@ import { ApiService } from '../../../core/services/api.service';
           <div class="field-group">
             <label class="field-label">Doctor</label>
             <mat-form-field appearance="outline">
-              <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">person</mat-icon>
+              <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">person</mat-icon>
               <mat-select formControlName="doctorId"
                           placeholder="Select a doctor"
                           [disabled]="!form.get('hospitalId')?.value">
@@ -73,7 +73,7 @@ import { ApiService } from '../../../core/services/api.service';
             <div class="field-group">
               <label class="field-label">Appointment Date</label>
               <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">calendar_today</mat-icon>
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">calendar_today</mat-icon>
                 <input matInput [matDatepicker]="picker"
                        formControlName="apptDate"
                        placeholder="Pick a date"
@@ -88,7 +88,7 @@ import { ApiService } from '../../../core/services/api.service';
             <div class="field-group">
               <label class="field-label">Preferred Time</label>
               <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">schedule</mat-icon>
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">schedule</mat-icon>
                 <mat-select formControlName="apptTime" placeholder="Select time">
                   @for (slot of timeSlots; track slot.value) {
                     <mat-option [value]="slot.value">{{ slot.label }}</mat-option>
@@ -126,7 +126,7 @@ import { ApiService } from '../../../core/services/api.service';
               {{ loading ? 'Booking...' : 'Confirm Booking' }}
             </button>
             <button mat-stroked-button type="button" routerLink="/appointments"
-                    style="height:48px;border-radius:12px;color:#78716C;border-color:#E5D0C5">
+                    style="height:48px;border-radius:12px;color:#4A6478;border-color:#C8DCE8">
               Cancel
             </button>
           </div>
@@ -143,10 +143,10 @@ import { ApiService } from '../../../core/services/api.service';
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: #A8A29E;
+      color: #8BA3B5;
       margin-bottom: 14px;
       padding-bottom: 8px;
-      border-bottom: 1px solid #F0E0D6;
+      border-bottom: 1px solid #E0EBF2;
     }
     .form-row {
       display: grid;
@@ -158,7 +158,7 @@ import { ApiService } from '../../../core/services/api.service';
       display: block;
       font-size: 0.78rem;
       font-weight: 700;
-      color: #1C0902;
+      color: #1A3547;
       margin-bottom: 6px;
     }
     .booking-notice {
@@ -171,7 +171,7 @@ import { ApiService } from '../../../core/services/api.service';
       padding: 12px 16px;
       font-size: 0.82rem;
       color: #9A3412;
-      mat-icon { font-size: 18px; width: 18px; height: 18px; flex-shrink: 0; color: #F97316; }
+      mat-icon { font-size: 18px; width: 18px; height: 18px; flex-shrink: 0; color: #FF8C42; }
     }
     @media (max-width: 560px) {
       .form-row { grid-template-columns: 1fr; }

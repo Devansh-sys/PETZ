@@ -17,6 +17,11 @@ public class JwtUtil {
     @Value("${petz.jwt.secret}")
     private String secret;
 
+    // Kept for verifying tokens signed before the secret was rotated.
+    // Remove once all tokens issued with the old secret have expired.
+    @Value("${petz.jwt.legacy-secret:}")
+    private String legacySecret;
+
     @Value("${petz.jwt.expiration}")
     private long expiration;
 
@@ -36,11 +41,24 @@ public class JwtUtil {
     }
 
     public Claims extractClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        // Try the current secret first
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(getKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (JwtException e) {
+            // Fall back to the legacy secret for tokens issued before rotation
+            if (legacySecret != null && !legacySecret.isEmpty()) {
+                return Jwts.parserBuilder()
+                        .setSigningKey(Keys.hmacShaKeyFor(legacySecret.getBytes()))
+                        .build()
+                        .parseClaimsJws(token)
+                        .getBody();
+            }
+            throw e;
+        }
     }
 
     public String extractEmail(String token) {

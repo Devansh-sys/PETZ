@@ -134,7 +134,7 @@ import { AuthService } from '../../../core/services/auth.service';
               <div class="field-group">
                 <label class="field-label">Why do you want to adopt {{ animal.name }}? *</label>
                 <mat-form-field appearance="outline">
-                  <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">edit_note</mat-icon>
+                  <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">edit_note</mat-icon>
                   <textarea matInput rows="3" formControlName="reason"
                             placeholder="Share your motivation and what a day with {{ animal.name }} would look like..."></textarea>
                 </mat-form-field>
@@ -142,7 +142,7 @@ import { AuthService } from '../../../core/services/auth.service';
               <div class="field-group">
                 <label class="field-label">Previous pet ownership experience</label>
                 <mat-form-field appearance="outline">
-                  <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">history</mat-icon>
+                  <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">history</mat-icon>
                   <textarea matInput rows="2" formControlName="experience"
                             placeholder="Do you currently have or have previously cared for pets?"></textarea>
                 </mat-form-field>
@@ -151,7 +151,7 @@ import { AuthService } from '../../../core/services/auth.service';
               <div class="field-group">
                 <label class="field-label">Housing type</label>
                 <mat-form-field appearance="outline">
-                  <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">home</mat-icon>
+                  <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">home</mat-icon>
                   <mat-select formControlName="housingType">
                     <mat-option value="HOUSE">🏠 Independent House</mat-option>
                     <mat-option value="APARTMENT">🏢 Apartment</mat-option>
@@ -169,7 +169,7 @@ import { AuthService } from '../../../core/services/auth.service';
                   {{ applying ? 'Submitting...' : 'Submit Application' }}
                 </button>
                 <button mat-stroked-button type="button" routerLink="/adoption/animals"
-                        style="height:48px;border-radius:12px;color:#78716C;border-color:#E5D0C5">
+                        style="height:48px;border-radius:12px;color:#4A6478;border-color:#C8DCE8">
                   Cancel
                 </button>
               </div>
@@ -185,7 +185,7 @@ import { AuthService } from '../../../core/services/auth.service';
               <p>Create an account or log in to submit your adoption application.</p>
             </div>
             <button mat-raised-button routerLink="/auth/login"
-                    style="background:#F97316;color:#fff;border-radius:12px;height:42px;flex-shrink:0">
+                    style="background:#FF8C42;color:#fff;border-radius:12px;height:42px;flex-shrink:0">
               Login / Register
             </button>
           </div>
@@ -209,23 +209,23 @@ import { AuthService } from '../../../core/services/auth.service';
   `,
   styles: [`
     .back-btn {
-      color: #78716C !important;
+      color: #4A6478 !important;
       border-radius: 10px !important;
       margin-bottom: 20px !important;
       padding: 0 12px !important;
       height: 38px !important;
       mat-icon { font-size: 18px; width: 18px; height: 18px; margin-right: 4px; }
-      &:hover { background: #FFF7ED !important; color: #F97316 !important; }
+      &:hover { background: #FFF7ED !important; color: #FF8C42 !important; }
     }
     .hero-card {
       display: grid;
       grid-template-columns: 320px 1fr;
       gap: 28px;
       background: #fff;
-      border: 1px solid #F0E0D6;
+      border: 1px solid #E0EBF2;
       border-radius: 24px;
       overflow: hidden;
-      box-shadow: 0 4px 24px rgba(28,9,2,0.08);
+      box-shadow: 0 4px 24px rgba(26,53,71,0.08);
       margin-bottom: 24px;
     }
     .hero-img-wrap {
@@ -236,7 +236,7 @@ import { AuthService } from '../../../core/services/auth.service';
     }
     .species-overlay {
       position: absolute; top: 12px; left: 12px;
-      background: rgba(28,9,2,0.72); color: #fff;
+      background: rgba(26,53,71,0.72); color: #fff;
       font-size: 0.68rem; font-weight: 700; padding: 3px 12px;
       border-radius: 999px; text-transform: uppercase; letter-spacing: 0.07em;
       backdrop-filter: blur(6px);
@@ -250,8 +250,8 @@ import { AuthService } from '../../../core/services/auth.service';
       mat-icon { font-size: 14px; width: 14px; height: 14px; }
     }
     .hero-info { padding: 28px 28px 28px 0; display: flex; flex-direction: column; }
-    .animal-name { font-weight: 900; font-size: 1.7rem; color: #1C0902; margin-bottom: 4px; }
-    .animal-subtitle { font-size: 0.9rem; color: #A8A29E; margin-bottom: 14px; }
+    .animal-name { font-weight: 900; font-size: 1.7rem; color: #1A3547; margin-bottom: 4px; }
+    .animal-subtitle { font-size: 0.9rem; color: #8BA3B5; margin-bottom: 14px; }
     .tags-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 12px; }
     .ptag {
       font-size: 0.72rem; font-weight: 700;
@@ -263,8 +263,8 @@ import { AuthService } from '../../../core/services/auth.service';
     .ptag-grey   { background: #F1F5F9; color: #475569; }
     .location-row {
       display: flex; align-items: center; gap: 4px;
-      font-size: 0.82rem; color: #78716C; margin-bottom: 14px;
-      mat-icon { font-size: 15px; width: 15px; height: 15px; color: #F97316; }
+      font-size: 0.82rem; color: #4A6478; margin-bottom: 14px;
+      mat-icon { font-size: 15px; width: 15px; height: 15px; color: #FF8C42; }
     }
     .animal-desc {
       font-size: 0.85rem; line-height: 1.65; color: #57534E;
@@ -276,18 +276,18 @@ import { AuthService } from '../../../core/services/auth.service';
     }
     .vital-item {
       display: flex; align-items: center; gap: 8px;
-      background: #FFF8F4; border: 1px solid #F0E0D6;
+      background: #F9FBFB; border: 1px solid #E0EBF2;
       border-radius: 12px; padding: 10px 12px;
-      mat-icon { font-size: 18px; width: 18px; height: 18px; color: #F97316; flex-shrink: 0; }
+      mat-icon { font-size: 18px; width: 18px; height: 18px; color: #FF8C42; flex-shrink: 0; }
     }
-    .vital-value { font-weight: 800; font-size: 0.8rem; color: #1C0902; }
-    .vital-label { font-size: 0.65rem; color: #A8A29E; text-transform: uppercase; letter-spacing: 0.05em; }
+    .vital-value { font-weight: 800; font-size: 0.8rem; color: #1A3547; }
+    .vital-label { font-size: 0.65rem; color: #8BA3B5; text-transform: uppercase; letter-spacing: 0.05em; }
 
     /* Apply card */
     .apply-card {
-      background: #fff; border: 1px solid #F0E0D6;
+      background: #fff; border: 1px solid #E0EBF2;
       border-radius: 24px; padding: 28px 32px;
-      box-shadow: 0 4px 20px rgba(28,9,2,0.07);
+      box-shadow: 0 4px 20px rgba(26,53,71,0.07);
       margin-bottom: 24px;
     }
     .apply-header {
@@ -296,31 +296,31 @@ import { AuthService } from '../../../core/services/auth.service';
     }
     .apply-icon {
       width: 50px; height: 50px; border-radius: 14px;
-      background: linear-gradient(135deg, #FF9748, #F97316);
+      background: linear-gradient(135deg, #FF9F5A, #FF8C42);
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 14px rgba(249,115,22,0.35);
+      box-shadow: 0 4px 14px rgba(255,140,66,0.35);
       mat-icon { color: #fff; font-size: 24px; }
     }
-    .apply-title { font-weight: 800; font-size: 1rem; color: #1C0902; }
-    .apply-sub { font-size: 0.8rem; color: #A8A29E; margin-top: 2px; }
+    .apply-title { font-weight: 800; font-size: 1rem; color: #1A3547; }
+    .apply-sub { font-size: 0.8rem; color: #8BA3B5; margin-top: 2px; }
     .form-section-title {
       font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
-      letter-spacing: 0.1em; color: #A8A29E;
-      margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #F0E0D6;
+      letter-spacing: 0.1em; color: #8BA3B5;
+      margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #E0EBF2;
     }
     .field-group { margin-bottom: 4px; }
-    .field-label { display: block; font-size: 0.78rem; font-weight: 700; color: #1C0902; margin-bottom: 6px; }
+    .field-label { display: block; font-size: 0.78rem; font-weight: 700; color: #1A3547; margin-bottom: 6px; }
     .apply-submit-btn {
       height: 48px !important;
       min-width: 180px !important;
       border-radius: 14px !important;
-      background: linear-gradient(135deg, #FF9748, #F97316) !important;
+      background: linear-gradient(135deg, #FF9F5A, #FF8C42) !important;
       color: #fff !important;
       font-weight: 700 !important;
-      box-shadow: 0 4px 14px rgba(249,115,22,0.35) !important;
+      box-shadow: 0 4px 14px rgba(255,140,66,0.35) !important;
       display: flex !important; align-items: center !important; gap: 6px !important;
-      &:not(:disabled):hover { box-shadow: 0 6px 20px rgba(249,115,22,0.5) !important; }
-      &:disabled { background: #E5D0C5 !important; box-shadow: none !important; }
+      &:not(:disabled):hover { box-shadow: 0 6px 20px rgba(255,140,66,0.5) !important; }
+      &:disabled { background: #C8DCE8 !important; box-shadow: none !important; }
     }
 
     /* Login nudge */
@@ -329,9 +329,9 @@ import { AuthService } from '../../../core/services/auth.service';
       background: #FFF7ED; border: 1px solid #FFEDD5;
       border-radius: 18px; padding: 20px 24px;
       margin-bottom: 24px;
-      mat-icon { font-size: 28px; color: #F97316; flex-shrink: 0; }
-      strong { font-size: 0.9rem; color: #1C0902; display: block; margin-bottom: 2px; }
-      p { margin: 0; font-size: 0.8rem; color: #78716C; }
+      mat-icon { font-size: 28px; color: #FF8C42; flex-shrink: 0; }
+      strong { font-size: 0.9rem; color: #1A3547; display: block; margin-bottom: 2px; }
+      p { margin: 0; font-size: 0.8rem; color: #4A6478; }
       div { flex: 1; }
     }
 

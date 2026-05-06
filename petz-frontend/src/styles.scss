@@ -1,46 +1,50 @@
 // ═══════════════════════════════════════════════════════════
-//  PETZ — Premium Design System v2
-//  Palette: Warm Orange #F97316 · Deep Mahogany #1C0902 · Cream #FFF8F4
+//  PETZ — Premium Design System v3  "Nurturing Professionalism"
+//  Primary   : #FF8C42  Deep Sunset Orange
+//  Secondary : #2D5D7B  Slate Blue
+//  Background: #F9FBFB  Soft Mint White
+//  Accent    : #FFE8D6  Pale Peach
 // ═══════════════════════════════════════════════════════════
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 // ── Design tokens ─────────────────────────────────────────
-$primary:        #F97316;
-$primary-dark:   #C2410C;
-$primary-hover:  #EA6C0A;
-$primary-light:  #FFEDD5;
-$primary-pale:   #FFF7ED;
-$sidebar-bg:     #1C0902;
-$sidebar-sect:   #2A0E03;
-$sidebar-hover:  rgba(249,115,22,0.14);
-$sidebar-border: rgba(255,255,255,0.06);
-$page-bg:        #FFF8F4;
+$primary:        #FF8C42;       // Deep Sunset Orange — action, CTAs
+$primary-dark:   #2D5D7B;       // Slate Blue — trust, headers
+$primary-hover:  #E87530;       // Darker orange for hover
+$primary-light:  #FFE8D6;       // Pale Peach — chip/card accent
+$primary-pale:   #FFF3EC;       // Very light peach — hover bg
+$sidebar-bg:     #1A3547;       // Deep Navy
+$sidebar-sect:   #22435C;
+$sidebar-hover:  rgba(255,140,66,0.14);
+$sidebar-border: rgba(255,255,255,0.08);
+$page-bg:        #F9FBFB;       // Soft Mint White
 $surface:        #FFFFFF;
-$surface-2:      #FFF4EE;
-$border:         #F0E0D6;
-$border-2:       #E5D0C5;
-$text-1:         #1C0902;
-$text-2:         #78716C;
-$text-3:         #A8A29E;
+$surface-2:      #F2F7FA;       // Light blue-grey surface
+$border:         #E0EBF2;       // Cool blue border
+$border-2:       #C8DCE8;
+$text-1:         #1A3547;       // Deep slate — primary text
+$text-2:         #4A6478;       // Blue-grey — secondary text
+$text-3:         #8BA3B5;       // Muted blue-grey — captions
 $nav-width:      260px;
-$font:           'DM Sans', system-ui, -apple-system, sans-serif;
+$font:           'Inter', system-ui, -apple-system, sans-serif;
+$font-heading:   'Quicksand', system-ui, sans-serif;
 
 // ── Gradients ─────────────────────────────────────────────
-$grad-orange:    linear-gradient(135deg, #FF9748 0%, #F97316 100%);
+$grad-orange:    linear-gradient(135deg, #FF9F5A 0%, #FF8C42 100%);
 $grad-purple:    linear-gradient(135deg, #B97AFB 0%, #7C3AED 100%);
 $grad-pink:      linear-gradient(135deg, #F472B6 0%, #DB2777 100%);
 $grad-green:     linear-gradient(135deg, #34D399 0%, #059669 100%);
-$grad-blue:      linear-gradient(135deg, #60A5FA 0%, #2563EB 100%);
+$grad-blue:      linear-gradient(135deg, #3D7EA6 0%, #2D5D7B 100%);
 $grad-red:       linear-gradient(135deg, #F87171 0%, #DC2626 100%);
-$grad-sidebar:   linear-gradient(160deg, #1C0902 0%, #3D1505 60%, #7C2D12 100%);
+$grad-sidebar:   linear-gradient(160deg, #1A3547 0%, #2D5D7B 60%, #3D7EA6 100%);
 
-// ── Shadows ───────────────────────────────────────────────
-$shadow-sm:  0 1px 4px rgba(28,9,2,0.06);
-$shadow-md:  0 4px 16px rgba(28,9,2,0.08);
-$shadow-lg:  0 8px 32px rgba(28,9,2,0.10);
-$shadow-xl:  0 16px 48px rgba(28,9,2,0.12);
-$shadow-btn: 0 4px 14px rgba(249,115,22,0.35);
+// ── Shadows (soft, cool-toned) ────────────────────────────
+$shadow-sm:  0 2px 8px  rgba(26,53,71,0.05);
+$shadow-md:  0 4px 20px rgba(26,53,71,0.08);
+$shadow-lg:  0 8px 32px rgba(26,53,71,0.10);
+$shadow-xl:  0 16px 48px rgba(26,53,71,0.12);
+$shadow-btn: 0 6px 20px rgba(255,140,66,0.35);
 
 // ── Animations ────────────────────────────────────────────
 @keyframes fadeIn   { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
@@ -63,11 +67,18 @@ html, body {
 }
 a { text-decoration: none; color: inherit; }
 
+// Headings use Quicksand (bold, rounded, approachable)
+h1, h2, h3, h4 {
+  font-family: $font-heading;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+}
+
 // Custom scrollbar
 ::-webkit-scrollbar { width:5px; height:5px; }
 ::-webkit-scrollbar-track { background:transparent; }
-::-webkit-scrollbar-thumb { background:#E7D5CC; border-radius:99px; }
-::-webkit-scrollbar-thumb:hover { background:#D6C4BB; }
+::-webkit-scrollbar-thumb { background:$border-2; border-radius:99px; }
+::-webkit-scrollbar-thumb:hover { background:#A8C4D4; }
 
 // ═══════════════════════════════════════════════════════════
 //  Angular Material 20 MDC overrides
@@ -82,8 +93,8 @@ a { text-decoration: none; color: inherit; }
   background: $grad-orange !important;
   color: #fff !important;
   box-shadow: $shadow-btn !important;
-  &:hover { box-shadow: 0 6px 20px rgba(249,115,22,0.5) !important; }
-  &:disabled { background: #E5D0C5 !important; box-shadow: none !important; }
+  &:hover { box-shadow: 0 8px 24px rgba(255,140,66,0.5) !important; }
+  &:disabled { background: $border !important; box-shadow: none !important; color: $text-3 !important; }
 }
 
 .mat-mdc-outlined-button.mat-primary {
@@ -101,7 +112,7 @@ a { text-decoration: none; color: inherit; }
 .mat-mdc-outlined-button,
 .mat-mdc-button {
   font-family: $font !important;
-  border-radius: 12px !important;
+  border-radius: 14px !important;
   font-weight: 600 !important;
   letter-spacing: 0 !important;
   transition: all 0.2s ease !important;
@@ -113,12 +124,12 @@ a { text-decoration: none; color: inherit; }
 // ── Toolbar ───────────────────────────────────────────────
 mat-toolbar, .mat-toolbar {
   font-family: $font !important;
-  background: rgba(255,255,255,0.96) !important;
+  background: rgba(255,255,255,0.95) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   color: $text-1 !important;
   border-bottom: 1px solid $border !important;
-  box-shadow: 0 1px 0 rgba(240,224,214,0.5) !important;
+  box-shadow: 0 1px 0 rgba(224,235,242,0.8) !important;
   height: 64px !important;
 }
 
@@ -128,7 +139,6 @@ mat-toolbar, .mat-toolbar {
   font-family: $font !important;
 }
 
-// Outline color on focus
 .mat-mdc-form-field.mat-focused {
   .mdc-notched-outline__leading,
   .mdc-notched-outline__notch,
@@ -144,11 +154,12 @@ mat-toolbar, .mat-toolbar {
   .mdc-notched-outline__notch,
   .mdc-notched-outline__trailing {
     border-color: $border-2 !important;
+    border-radius: 14px !important;
   }
   &:hover {
     .mdc-notched-outline__leading,
     .mdc-notched-outline__notch,
-    .mdc-notched-outline__trailing { border-color: #D0B8AD !important; }
+    .mdc-notched-outline__trailing { border-color: #A8C4D4 !important; }
   }
 }
 
@@ -169,7 +180,7 @@ mat-toolbar, .mat-toolbar {
 // ── Snack bar ─────────────────────────────────────────────
 .mat-mdc-snack-bar-container {
   --mdc-snackbar-container-color: #{$text-1};
-  border-radius: 12px !important;
+  border-radius: 14px !important;
   font-family: $font !important;
 }
 
@@ -184,7 +195,7 @@ mat-toolbar, .mat-toolbar {
 
 // ── Cards ─────────────────────────────────────────────────
 mat-card, .mat-mdc-card {
-  border-radius: 20px !important;
+  border-radius: 24px !important;
   box-shadow: $shadow-md !important;
   border: 1px solid $border !important;
   font-family: $font !important;
@@ -195,7 +206,7 @@ mat-card, .mat-mdc-card {
 // ── Tables ────────────────────────────────────────────────
 .mat-mdc-table {
   font-family: $font !important;
-  border-radius: 16px !important;
+  border-radius: 20px !important;
   overflow: hidden !important;
   border: 1px solid $border !important;
   width: 100% !important;
@@ -210,7 +221,12 @@ mat-card, .mat-mdc-card {
   border-bottom: 1px solid $border !important;
   font-family: $font !important;
 }
-.mat-mdc-cell { font-family: $font !important; border-bottom: 1px solid #FAF0EB !important; color: $text-1 !important; font-size: 0.88rem !important; }
+.mat-mdc-cell {
+  font-family: $font !important;
+  border-bottom: 1px solid #EEF4F8 !important;
+  color: $text-1 !important;
+  font-size: 0.88rem !important;
+}
 .mat-mdc-row {
   transition: background 0.15s !important;
   &:hover { background: $primary-pale !important; }
@@ -219,7 +235,7 @@ mat-card, .mat-mdc-card {
 
 // ── Menus ─────────────────────────────────────────────────
 .mat-mdc-menu-panel {
-  border-radius: 16px !important;
+  border-radius: 18px !important;
   box-shadow: $shadow-xl !important;
   border: 1px solid $border !important;
   overflow: hidden !important;
@@ -241,13 +257,21 @@ mat-card, .mat-mdc-card {
 
 // ── Dialog ────────────────────────────────────────────────
 .mat-mdc-dialog-container .mdc-dialog__surface {
-  border-radius: 20px !important;
+  border-radius: 24px !important;
   font-family: $font !important;
 }
-.mat-mdc-dialog-title { font-family: $font !important; font-weight: 800 !important; color: $text-1 !important; }
+.mat-mdc-dialog-title {
+  font-family: $font-heading !important;
+  font-weight: 700 !important;
+  color: $text-1 !important;
+}
 
 // ── Chips ─────────────────────────────────────────────────
-.mat-mdc-chip { font-family: $font !important; border-radius: 8px !important; }
+.mat-mdc-chip { font-family: $font !important; border-radius: 10px !important; }
+
+// ── Datepicker ────────────────────────────────────────────
+.mat-calendar-body-selected { background-color: $primary !important; }
+.mat-datepicker-toggle-active { color: $primary !important; }
 
 // ═══════════════════════════════════════════════════════════
 //  Layout
@@ -266,7 +290,7 @@ mat-card, .mat-mdc-card {
   line-height: 1.6;
 }
 
-// Page header with subtle gradient banner
+// Page header
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -276,8 +300,9 @@ mat-card, .mat-mdc-card {
 
   .page-header-left {
     h1 {
+      font-family: $font-heading;
       font-size: 1.75rem;
-      font-weight: 900;
+      font-weight: 700;
       color: $text-1;
       margin: 0 0 4px;
       letter-spacing: -0.02em;
@@ -302,8 +327,9 @@ mat-card, .mat-mdc-card {
 
   h2 {
     margin: 0;
+    font-family: $font-heading;
     font-size: 1.1rem;
-    font-weight: 800;
+    font-weight: 700;
     color: $text-1;
   }
 }
@@ -311,17 +337,19 @@ mat-card, .mat-mdc-card {
 // ── Content card ──────────────────────────────────────────
 .card {
   background: $surface;
-  border-radius: 20px;
+  border-radius: 24px;
   box-shadow: $shadow-md;
   border: 1px solid $border;
   padding: 24px;
   margin-bottom: 20px;
   animation: fadeIn 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  &:hover { box-shadow: $shadow-lg; }
 }
 
 .card-flat {
   background: $surface;
-  border-radius: 20px;
+  border-radius: 24px;
   border: 1px solid $border;
   overflow: hidden;
 }
@@ -335,13 +363,13 @@ mat-card, .mat-mdc-card {
 }
 
 .stat-card {
-  border-radius: 20px !important;
+  border-radius: 24px !important;
   border: none !important;
   overflow: hidden !important;
   position: relative;
   cursor: default;
-  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-  &:hover { transform: translateY(-3px) !important; box-shadow: $shadow-xl !important; }
+  transition: transform 0.22s ease, box-shadow 0.22s ease !important;
+  &:hover { transform: translateY(-4px) scale(1.01) !important; box-shadow: $shadow-xl !important; }
 
   mat-card-content { padding: 22px 20px !important; }
 
@@ -355,8 +383,9 @@ mat-card, .mat-mdc-card {
   }
 
   .stat-value {
+    font-family: $font-heading;
     font-size: 2rem;
-    font-weight: 900;
+    font-weight: 700;
     color: #fff;
     line-height: 1;
     margin: 0 0 6px;
@@ -365,18 +394,18 @@ mat-card, .mat-mdc-card {
 
   .stat-label {
     font-size: 0.8rem;
-    color: rgba(255,255,255,0.75);
+    color: rgba(255,255,255,0.78);
     font-weight: 500;
     margin: 0;
     letter-spacing: 0.01em;
   }
 
-  &.orange { background: $grad-orange !important; box-shadow: 0 8px 24px rgba(249,115,22,0.3) !important; }
-  &.purple { background: $grad-purple !important; box-shadow: 0 8px 24px rgba(124,58,237,0.3) !important; }
-  &.pink   { background: $grad-pink   !important; box-shadow: 0 8px 24px rgba(219,39,119,0.3) !important; }
-  &.green  { background: $grad-green  !important; box-shadow: 0 8px 24px rgba(5,150,105,0.3)  !important; }
-  &.blue   { background: $grad-blue   !important; box-shadow: 0 8px 24px rgba(37,99,235,0.3)  !important; }
-  &.red    { background: $grad-red    !important; box-shadow: 0 8px 24px rgba(220,38,38,0.3)  !important; }
+  &.orange { background: $grad-orange !important; box-shadow: 0 8px 24px rgba(255,140,66,0.30) !important; }
+  &.purple { background: $grad-purple !important; box-shadow: 0 8px 24px rgba(124,58,237,0.30) !important; }
+  &.pink   { background: $grad-pink   !important; box-shadow: 0 8px 24px rgba(219,39,119,0.30) !important; }
+  &.green  { background: $grad-green  !important; box-shadow: 0 8px 24px rgba(5,150,105,0.30)  !important; }
+  &.blue   { background: $grad-blue   !important; box-shadow: 0 8px 24px rgba(45,93,123,0.30)  !important; }
+  &.red    { background: $grad-red    !important; box-shadow: 0 8px 24px rgba(220,38,38,0.30)  !important; }
 }
 
 // ── Sidebar ───────────────────────────────────────────────
@@ -398,8 +427,9 @@ mat-card, .mat-mdc-card {
 
     .logo-svg { width: 36px; height: 36px; flex-shrink: 0; }
     .logo-text {
+      font-family: $font-heading;
       font-size: 1.1rem;
-      font-weight: 900;
+      font-weight: 700;
       color: #fff;
       letter-spacing: 2px;
       text-transform: uppercase;
@@ -418,7 +448,7 @@ mat-card, .mat-mdc-card {
 
   a[mat-list-item], .mat-mdc-list-item {
     color: rgba(255,255,255,0.6) !important;
-    border-radius: 12px !important;
+    border-radius: 14px !important;
     margin: 1px 12px !important;
     height: 46px !important;
     transition: all 0.18s ease !important;
@@ -446,7 +476,7 @@ mat-card, .mat-mdc-card {
     }
 
     &.active {
-      background: rgba(249,115,22,0.2) !important;
+      background: rgba(255,140,66,0.18) !important;
       color: $primary !important;
       border-left: 3px solid $primary;
       margin-left: 9px !important;
@@ -467,7 +497,7 @@ mat-card, .mat-mdc-card {
       align-items: center;
       gap: 10px;
       padding: 10px 12px;
-      border-radius: 12px;
+      border-radius: 14px;
       cursor: pointer;
       transition: background 0.18s;
       &:hover { background: $sidebar-hover; }
@@ -477,16 +507,16 @@ mat-card, .mat-mdc-card {
         border-radius: 10px;
         background: $grad-orange;
         display: flex; align-items: center; justify-content: center;
-        font-weight: 800;
+        font-weight: 700;
         font-size: 0.9rem;
         color: #fff;
         flex-shrink: 0;
-        box-shadow: 0 2px 8px rgba(249,115,22,0.4);
+        box-shadow: 0 2px 8px rgba(255,140,66,0.4);
       }
 
       .nav-user-info {
         min-width: 0;
-        p { margin: 0; font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        p { margin: 0; font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         span { font-size: 0.7rem; color: rgba(255,255,255,0.4); }
       }
     }
@@ -512,12 +542,12 @@ mat-card, .mat-mdc-card {
   &.cancelled      { background: #FEE2E2; color: #991B1B; }
   &.approved       { background: #D1FAE5; color: #065F46; }
   &.rejected       { background: #FEE2E2; color: #991B1B; }
-  &.available      { background: #FFEDD5; color: #9A3412; }
+  &.available      { background: #FFE8D6; color: #9A3412; }
   &.assigned       { background: #EDE9FE; color: #5B21B6; }
   &.in_progress    { background: #DBEAFE; color: #1E40AF; }
   &.low            { background: #D1FAE5; color: #065F46; }
   &.medium         { background: #FEF3C7; color: #92400E; }
-  &.high           { background: #FFEDD5; color: #9A3412; }
+  &.high           { background: #FFE8D6; color: #9A3412; }
   &.critical       { background: #FEE2E2; color: #991B1B; }
   &.active         { background: #D1FAE5; color: #065F46; }
   &.inactive       { background: #F1F5F9; color: #475569; }
@@ -578,17 +608,17 @@ mat-card, .mat-mdc-card {
   gap: 16px;
   background: $surface;
   border: 1px solid $border;
-  border-radius: 18px;
+  border-radius: 20px;
   padding: 18px 20px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.22s ease;
   text-decoration: none;
   color: inherit;
 
   &:hover {
-    transform: translateY(-2px);
+    transform: translateY(-2px) scale(1.01);
     box-shadow: $shadow-lg;
-    border-color: #FDBF8A;
+    border-color: $border-2;
   }
 
   .action-icon {
@@ -640,7 +670,7 @@ mat-card, .mat-mdc-card {
     svg { width: 40px; height: 40px; }
   }
 
-  h3 { margin: 0; font-size: 1rem; font-weight: 800; color: $text-1; }
+  h3 { margin: 0; font-family: $font-heading; font-size: 1rem; font-weight: 700; color: $text-1; }
   p  { margin: 0; font-size: 0.85rem; color: $text-3; max-width: 280px; line-height: 1.6; }
 }
 
@@ -657,9 +687,8 @@ mat-card, .mat-mdc-card {
 }
 
 // ── Typography ───────────────────────────────────────────
-h1, h2, h3, h4 { font-family: $font; letter-spacing: -0.01em; }
-h1 { font-size: 1.75rem; font-weight: 900; }
-h2 { font-size: 1.25rem; font-weight: 800; }
+h1 { font-size: 1.75rem; font-weight: 700; }
+h2 { font-size: 1.25rem; font-weight: 700; }
 h3 { font-size: 1rem;    font-weight: 700; }
 
 // ── Button utility ────────────────────────────────────────
@@ -668,7 +697,7 @@ h3 { font-size: 1rem;    font-weight: 700; }
   align-items: center;
   gap: 8px;
   padding: 10px 22px;
-  border-radius: 12px;
+  border-radius: 14px;
   font-weight: 700;
   font-size: 0.88rem;
   cursor: pointer;
@@ -676,9 +705,9 @@ h3 { font-size: 1rem;    font-weight: 700; }
   background: $grad-orange;
   color: #fff;
   box-shadow: $shadow-btn;
-  transition: all 0.2s;
+  transition: all 0.22s;
   font-family: $font;
-  &:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(249,115,22,0.5); }
+  &:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(255,140,66,0.5); }
   mat-icon { font-size: 18px; width: 18px; height: 18px; }
 }
 
@@ -687,7 +716,7 @@ h3 { font-size: 1rem;    font-weight: 700; }
   align-items: center;
   gap: 8px;
   padding: 10px 22px;
-  border-radius: 12px;
+  border-radius: 14px;
   font-weight: 600;
   font-size: 0.88rem;
   cursor: pointer;
@@ -720,17 +749,17 @@ h3 { font-size: 1rem;    font-weight: 700; }
 }
 
 .pet-card {
-  border-radius: 20px !important;
+  border-radius: 24px !important;
   overflow: hidden !important;
   border: 1px solid $border !important;
   box-shadow: $shadow-md !important;
-  transition: all 0.2s ease !important;
+  transition: all 0.22s ease !important;
   cursor: pointer;
 
   &:hover {
-    transform: translateY(-4px) !important;
+    transform: translateY(-4px) scale(1.01) !important;
     box-shadow: $shadow-xl !important;
-    border-color: $primary-light !important;
+    border-color: $border-2 !important;
   }
 
   .pet-img {
@@ -742,8 +771,7 @@ h3 { font-size: 1rem;    font-weight: 700; }
 
   .pet-body {
     padding: 16px;
-
-    .pet-name { font-weight: 800; font-size: 1rem; color: $text-1; margin: 0 0 4px; }
+    .pet-name { font-family: $font-heading; font-weight: 700; font-size: 1rem; color: $text-1; margin: 0 0 4px; }
     .pet-meta { font-size: 0.8rem; color: $text-3; margin: 0 0 12px; }
   }
 
@@ -757,14 +785,14 @@ h3 { font-size: 1rem;    font-weight: 700; }
 
 // ── Rescue card ───────────────────────────────────────────
 .rescue-card {
-  border-radius: 20px;
+  border-radius: 24px;
   background: $surface;
   border: 1px solid $border;
   box-shadow: $shadow-md;
   overflow: hidden;
-  transition: all 0.2s ease;
+  transition: all 0.22s ease;
 
-  &:hover { transform: translateY(-3px); box-shadow: $shadow-xl; }
+  &:hover { transform: translateY(-3px) scale(1.01); box-shadow: $shadow-xl; }
 
   .rescue-card-header {
     padding: 16px 20px 12px;
@@ -773,8 +801,7 @@ h3 { font-size: 1rem;    font-weight: 700; }
     justify-content: space-between;
     gap: 12px;
     border-bottom: 1px solid $border;
-
-    .rescue-animal { font-weight: 800; font-size: 0.95rem; color: $text-1; margin: 0 0 6px; }
+    .rescue-animal { font-family: $font-heading; font-weight: 700; font-size: 0.95rem; color: $text-1; margin: 0 0 6px; }
   }
 
   .rescue-card-body {
@@ -794,7 +821,7 @@ h3 { font-size: 1rem;    font-weight: 700; }
   align-items: center;
   gap: 16px;
   padding: 16px 20px;
-  border-bottom: 1px solid #FAF0EB;
+  border-bottom: 1px solid #EEF4F8;
   transition: background 0.15s;
   &:last-child { border-bottom: none; }
   &:hover { background: $primary-pale; }
@@ -803,14 +830,14 @@ h3 { font-size: 1rem;    font-weight: 700; }
     min-width: 52px;
     text-align: center;
     background: $primary-light;
-    border-radius: 12px;
+    border-radius: 14px;
     padding: 8px 6px;
-    .appt-day   { font-size: 1.3rem; font-weight: 900; color: $primary; line-height: 1; }
+    .appt-day   { font-family: $font-heading; font-size: 1.3rem; font-weight: 700; color: $primary; line-height: 1; }
     .appt-month { font-size: 0.65rem; font-weight: 700; color: $text-2; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
   }
 
   .appt-body { flex: 1; }
-  .appt-title { font-weight: 700; font-size: 0.9rem; color: $text-1; margin: 0 0 3px; }
+  .appt-title { font-family: $font-heading; font-weight: 700; font-size: 0.9rem; color: $text-1; margin: 0 0 3px; }
   .appt-sub   { font-size: 0.78rem; color: $text-3; margin: 0; }
   .appt-time  { display: flex; align-items: center; gap: 4px; font-size: 0.78rem; color: $text-2; font-weight: 600; margin-top: 4px; mat-icon { font-size: 14px; width: 14px; height: 14px; } }
 }
@@ -818,7 +845,7 @@ h3 { font-size: 1rem;    font-weight: 700; }
 // ── Table wrapper card ────────────────────────────────────
 .table-card {
   background: $surface;
-  border-radius: 20px;
+  border-radius: 24px;
   border: 1px solid $border;
   overflow: hidden;
   box-shadow: $shadow-md;

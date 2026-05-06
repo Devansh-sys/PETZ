@@ -1,10 +1,10 @@
 mat-sidenav-container {
   height: 100vh;
-  background: #FFF8F4;
+  background: #F9FBFB;
 }
 
 mat-sidenav-content {
-  background: #FFF8F4;
+  background: #F9FBFB;
   display: flex;
   flex-direction: column;
 }
@@ -22,8 +22,9 @@ mat-sidenav-content {
   gap: 8px;
   font-size: 0.9rem;
   font-weight: 700;
-  color: #1C0902;
+  color: #1A3547;
   letter-spacing: -0.01em;
+  font-family: 'Quicksand', system-ui, sans-serif;
 }
 
 // ── User avatar circle ────────────────────────────────────
@@ -31,14 +32,14 @@ mat-sidenav-content {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #FF9748, #F97316);
+  background: linear-gradient(135deg, #FF9F5A, #FF8C42);
   color: #fff;
-  font-weight: 800;
+  font-weight: 700;
   font-size: 0.9rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(249,115,22,0.4);
+  box-shadow: 0 2px 8px rgba(255,140,66,0.4);
   letter-spacing: 0;
 }
 
@@ -52,7 +53,7 @@ mat-toolbar {
 
 // ── Sidenav ───────────────────────────────────────────────
 mat-sidenav {
-  box-shadow: 6px 0 32px rgba(0,0,0,0.2) !important;
+  box-shadow: 4px 0 24px rgba(26,53,71,0.15) !important;
   display: flex;
   flex-direction: column;
 }

@@ -56,7 +56,7 @@ const CHENNAI_AREAS: ChennaiArea[] = [
           <p>Help an animal in distress — our NGO partners will respond</p>
         </div>
         <button mat-stroked-button routerLink="/rescue"
-                style="border-radius:10px;color:#78716C;border-color:#E5D0C5">
+                style="border-radius:10px;color:#4A6478;border-color:#C8DCE8">
           <mat-icon>arrow_back</mat-icon> Back
         </button>
       </div>
@@ -80,7 +80,7 @@ const CHENNAI_AREAS: ChennaiArea[] = [
             <div class="field-group">
               <label class="field-label">Type of animal *</label>
               <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">pets</mat-icon>
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">pets</mat-icon>
                 <mat-select formControlName="animalType" placeholder="Select animal type">
                   <mat-option value="DOG">🐕 Dog</mat-option>
                   <mat-option value="CAT">🐈 Cat</mat-option>
@@ -96,7 +96,7 @@ const CHENNAI_AREAS: ChennaiArea[] = [
             <div class="field-group">
               <label class="field-label">Urgency level</label>
               <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">warning_amber</mat-icon>
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">warning_amber</mat-icon>
                 <mat-select formControlName="criticality">
                   <mat-option value="LOW">🟢 Low — Stray, not injured</mat-option>
                   <mat-option value="MEDIUM">🟡 Medium — Mild distress</mat-option>
@@ -133,7 +133,7 @@ const CHENNAI_AREAS: ChennaiArea[] = [
           <div class="field-group" style="margin-top:12px">
             <label class="field-label">Select Chennai area *</label>
             <mat-form-field appearance="outline">
-              <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">location_city</mat-icon>
+              <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">location_city</mat-icon>
               <mat-select formControlName="area" placeholder="Choose your area in Chennai"
                           (selectionChange)="onAreaSelect($event.value)">
                 @for (area of areas; track area.name) {
@@ -148,7 +148,7 @@ const CHENNAI_AREAS: ChennaiArea[] = [
           <div class="field-group">
             <label class="field-label">Landmark / Street description *</label>
             <mat-form-field appearance="outline">
-              <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">place</mat-icon>
+              <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">place</mat-icon>
               <input matInput formControlName="landmark"
                      placeholder="e.g. Near petrol bunk, behind bus stop, 3rd cross street...">
               <mat-error>Please describe the exact spot</mat-error>
@@ -188,7 +188,7 @@ const CHENNAI_AREAS: ChennaiArea[] = [
               {{ loading ? 'Submitting...' : 'Submit Report' }}
             </button>
             <button mat-stroked-button type="button" routerLink="/rescue"
-                    style="height:48px;border-radius:12px;color:#78716C;border-color:#E5D0C5">
+                    style="height:48px;border-radius:12px;color:#4A6478;border-color:#C8DCE8">
               Cancel
             </button>
           </div>
@@ -221,12 +221,12 @@ const CHENNAI_AREAS: ChennaiArea[] = [
 
     .form-section-title {
       font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
-      letter-spacing: 0.1em; color: #A8A29E;
-      margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #F0E0D6;
+      letter-spacing: 0.1em; color: #8BA3B5;
+      margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #E0EBF2;
     }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
     .field-group { margin-bottom: 4px; }
-    .field-label { display: block; font-size: 0.78rem; font-weight: 700; color: #1C0902; margin-bottom: 6px; }
+    .field-label { display: block; font-size: 0.78rem; font-weight: 700; color: #1A3547; margin-bottom: 6px; }
 
     .location-detect-row {
       display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
@@ -234,8 +234,8 @@ const CHENNAI_AREAS: ChennaiArea[] = [
     }
     .gps-btn {
       border-radius: 12px !important;
-      border-color: #E5D0C5 !important;
-      color: #F97316 !important;
+      border-color: #C8DCE8 !important;
+      color: #FF8C42 !important;
       font-weight: 600 !important;
       font-size: 0.85rem !important;
       height: 40px !important;
@@ -243,7 +243,7 @@ const CHENNAI_AREAS: ChennaiArea[] = [
       align-items: center !important;
       gap: 6px !important;
       mat-icon { font-size: 18px; width: 18px; height: 18px; }
-      &:hover { background: #FFF7ED !important; border-color: #F97316 !important; }
+      &:hover { background: #FFF7ED !important; border-color: #FF8C42 !important; }
     }
     .gps-confirmed {
       display: flex; align-items: center; gap: 5px;
@@ -257,7 +257,7 @@ const CHENNAI_AREAS: ChennaiArea[] = [
       border-radius: 10px; padding: 10px 14px;
       font-size: 0.82rem; color: #9A3412; font-weight: 600;
       margin-bottom: 4px;
-      mat-icon { font-size: 16px; width: 16px; height: 16px; color: #F97316; flex-shrink: 0; }
+      mat-icon { font-size: 16px; width: 16px; height: 16px; color: #FF8C42; flex-shrink: 0; }
       span { white-space: normal; }
     }
     .submit-btn {
@@ -270,7 +270,7 @@ const CHENNAI_AREAS: ChennaiArea[] = [
       box-shadow: 0 4px 14px rgba(220,38,38,0.35) !important;
       display: flex !important; align-items: center !important; gap: 6px !important;
       &:not(:disabled):hover { box-shadow: 0 6px 20px rgba(220,38,38,0.5) !important; }
-      &:disabled { background: #E5D0C5 !important; box-shadow: none !important; }
+      &:disabled { background: #C8DCE8 !important; box-shadow: none !important; }
     }
     .location-warn {
       display: flex; align-items: center; gap: 6px;

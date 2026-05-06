@@ -52,13 +52,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
                       <span class="d">{{ getDay(a.apptDate) }}</span>
                       <span class="m">{{ getMonth(a.apptDate) }}</span>
                     </div>
-                    <div style="font-size:0.8rem;color:#78716C;font-weight:600">{{ a.apptTime }}</div>
+                    <div style="font-size:0.8rem;color:#4A6478;font-weight:600">{{ a.apptTime }}</div>
                   </div>
                 </td>
               </ng-container>
               <ng-container matColumnDef="reason">
                 <th mat-header-cell *matHeaderCellDef>Reason</th>
-                <td mat-cell *matCellDef="let a" style="font-size:0.85rem;color:#1C0902;font-weight:500">
+                <td mat-cell *matCellDef="let a" style="font-size:0.85rem;color:#1A3547;font-weight:500">
                   {{ a.reason || 'General Checkup' }}
                 </td>
               </ng-container>
@@ -98,8 +98,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     .back-btn {
       width: 38px !important; height: 38px !important;
       border-radius: 10px !important; background: #fff !important;
-      border: 1px solid #F0E0D6 !important; color: #78716C !important; flex-shrink: 0;
-      &:hover { border-color: #F97316 !important; color: #F97316 !important; }
+      border: 1px solid #E0EBF2 !important; color: #4A6478 !important; flex-shrink: 0;
+      &:hover { border-color: #FF8C42 !important; color: #FF8C42 !important; }
     }
     .appt-count-badge {
       display: flex; align-items: center; gap: 6px;
@@ -113,8 +113,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       display: flex; flex-direction: column; align-items: center;
       background: #FFEDD5; border-radius: 10px;
       padding: 5px 8px; min-width: 42px;
-      .d { font-size: 1.1rem; font-weight: 900; color: #F97316; line-height: 1; }
-      .m { font-size: 0.6rem; font-weight: 700; color: #A8A29E; text-transform: uppercase; letter-spacing: 0.06em; }
+      .d { font-size: 1.1rem; font-weight: 900; color: #FF8C42; line-height: 1; }
+      .m { font-size: 0.6rem; font-weight: 700; color: #8BA3B5; text-transform: uppercase; letter-spacing: 0.06em; }
     }
     .confirm-btn {
       border-color: #A7F3D0 !important; color: #059669 !important;

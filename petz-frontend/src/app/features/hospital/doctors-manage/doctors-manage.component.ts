@@ -30,21 +30,21 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       <!-- Add Doctor form -->
       @if (showForm) {
         <div class="card" style="padding:28px;margin-bottom:24px">
-          <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#A8A29E;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #F0E0D6">
+          <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#8BA3B5;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #E0EBF2">
             New Doctor Details
           </div>
           <div class="form-row">
             <div class="field-group">
               <label class="field-label">Full Name *</label>
               <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">person</mat-icon>
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">person</mat-icon>
                 <input matInput [(ngModel)]="newDoc.name" placeholder="Dr. Jane Smith">
               </mat-form-field>
             </div>
             <div class="field-group">
               <label class="field-label">Specialization</label>
               <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">medical_services</mat-icon>
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">medical_services</mat-icon>
                 <input matInput [(ngModel)]="newDoc.specialization" placeholder="e.g. Surgery, Dermatology">
               </mat-form-field>
             </div>
@@ -53,14 +53,14 @@ import { MatSnackBar } from '@angular/material/snack-bar';
             <div class="field-group">
               <label class="field-label">Schedule Start</label>
               <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">schedule</mat-icon>
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">schedule</mat-icon>
                 <input matInput type="time" [(ngModel)]="newDoc.scheduleStart">
               </mat-form-field>
             </div>
             <div class="field-group">
               <label class="field-label">Schedule End</label>
               <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">schedule</mat-icon>
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">schedule</mat-icon>
                 <input matInput type="time" [(ngModel)]="newDoc.scheduleEnd">
               </mat-form-field>
             </div>
@@ -77,7 +77,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
               <mat-icon>save</mat-icon> Save Doctor
             </button>
             <button mat-stroked-button (click)="showForm = false"
-                    style="border-radius:12px;height:42px;color:#78716C;border-color:#E5D0C5">
+                    style="border-radius:12px;height:42px;color:#4A6478;border-color:#C8DCE8">
               Cancel
             </button>
           </div>
@@ -101,21 +101,21 @@ import { MatSnackBar } from '@angular/material/snack-bar';
                 <div style="display:flex;align-items:center;gap:10px">
                   <div class="doc-avatar">{{ d.name?.charAt(0) || 'D' }}</div>
                   <div>
-                    <div style="font-weight:700;font-size:0.88rem;color:#1C0902">Dr. {{ d.name }}</div>
-                    <div style="font-size:0.74rem;color:#A8A29E">{{ d.specialization || 'General' }}</div>
+                    <div style="font-weight:700;font-size:0.88rem;color:#1A3547">Dr. {{ d.name }}</div>
+                    <div style="font-size:0.74rem;color:#8BA3B5">{{ d.specialization || 'General' }}</div>
                   </div>
                 </div>
               </td>
             </ng-container>
             <ng-container matColumnDef="schedule">
               <th mat-header-cell *matHeaderCellDef>Hours</th>
-              <td mat-cell *matCellDef="let d" style="font-size:0.82rem;color:#78716C;font-weight:600">
+              <td mat-cell *matCellDef="let d" style="font-size:0.82rem;color:#4A6478;font-weight:600">
                 {{ d.scheduleStart || '—' }} – {{ d.scheduleEnd || '—' }}
               </td>
             </ng-container>
             <ng-container matColumnDef="slot">
               <th mat-header-cell *matHeaderCellDef>Slot</th>
-              <td mat-cell *matCellDef="let d" style="font-size:0.82rem;color:#78716C">
+              <td mat-cell *matCellDef="let d" style="font-size:0.82rem;color:#4A6478">
                 {{ d.slotDuration || '—' }} min
               </td>
             </ng-container>
@@ -139,12 +139,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     .back-btn {
       width: 38px !important; height: 38px !important;
       border-radius: 10px !important; background: #fff !important;
-      border: 1px solid #F0E0D6 !important; color: #78716C !important; flex-shrink: 0;
-      &:hover { border-color: #F97316 !important; color: #F97316 !important; }
+      border: 1px solid #E0EBF2 !important; color: #4A6478 !important; flex-shrink: 0;
+      &:hover { border-color: #FF8C42 !important; color: #FF8C42 !important; }
     }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
     .field-group { margin-bottom: 4px; }
-    .field-label { display: block; font-size: 0.78rem; font-weight: 700; color: #1C0902; margin-bottom: 6px; }
+    .field-label { display: block; font-size: 0.78rem; font-weight: 700; color: #1A3547; margin-bottom: 6px; }
     .doc-avatar {
       width: 34px; height: 34px; border-radius: 10px;
       background: linear-gradient(135deg, #34D399, #059669);
@@ -154,7 +154,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     }
     .del-btn {
       width: 34px !important; height: 34px !important; border-radius: 9px !important;
-      color: #A8A29E !important;
+      color: #8BA3B5 !important;
       &:hover { color: #DC2626 !important; background: #FEE2E2 !important; }
       mat-icon { font-size: 17px; }
     }

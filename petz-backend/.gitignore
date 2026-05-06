@@ -1,0 +1,20 @@
+# Maven build output
+target/
+*.class
+
+# Local secrets — NEVER commit these
+src/main/resources/application-local.properties
+.env
+*.env
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# Logs
+*.log
+logs/
+
+# Uploads directory
+uploads/

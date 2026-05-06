@@ -13,7 +13,7 @@ import { AuthService } from '../../core/services/auth.service';
       <nav class="landing-nav" [class.scrolled]="scrolled">
         <a class="nav-logo-area" routerLink="/">
           <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-            <rect width="40" height="40" rx="12" fill="#F97316"/>
+            <rect width="40" height="40" rx="12" fill="#FF8C42"/>
             <ellipse cx="13" cy="11" rx="3.8" ry="4.6" fill="white" opacity="0.9"/>
             <ellipse cx="27" cy="11" rx="3.8" ry="4.6" fill="white" opacity="0.9"/>
             <ellipse cx="7.5" cy="20" rx="3.2" ry="4" fill="white" opacity="0.9"/>
@@ -88,7 +88,7 @@ import { AuthService } from '../../core/services/auth.service';
             <!-- Main pet card -->
             <div class="art-card art-main">
               <div class="art-card-top">
-                <div class="art-icon-box" style="background:linear-gradient(135deg,#FF9748,#F97316)">
+                <div class="art-icon-box" style="background:linear-gradient(135deg,#FF9F5A,#FF8C42)">
                   <mat-icon>pets</mat-icon>
                 </div>
                 <span class="art-pill green">Ready to Adopt</span>
@@ -172,7 +172,7 @@ import { AuthService } from '../../core/services/auth.service';
 
           <!-- Card 1 — Manage Pets (wide) -->
           <div class="bento-card bento-wide bento-animate" style="animation-delay:0ms">
-            <div class="bento-icon-box" style="background:linear-gradient(135deg,#FF9748,#F97316)">
+            <div class="bento-icon-box" style="background:linear-gradient(135deg,#FF9F5A,#FF8C42)">
               <mat-icon>pets</mat-icon>
             </div>
             <h3 class="bento-title">Manage Your Pets</h3>
@@ -180,7 +180,7 @@ import { AuthService } from '../../core/services/auth.service';
               Keep all pet records, vaccinations, medical history, and appointment schedules
               in one beautiful, easy-to-navigate dashboard.
             </p>
-            <span class="bento-tag" style="background:#FFEDD5;color:#9A3412">For Pet Owners</span>
+            <span class="bento-tag" style="background:#FFE8D6;color:#9A3412">For Pet Owners</span>
           </div>
 
           <!-- Card 2 — Rescue (tall) -->
@@ -343,7 +343,7 @@ import { AuthService } from '../../core/services/auth.service';
         <div class="footer-inner">
           <div class="footer-brand">
             <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
-              <rect width="40" height="40" rx="12" fill="#F97316"/>
+              <rect width="40" height="40" rx="12" fill="#FF8C42"/>
               <ellipse cx="13" cy="11" rx="3.8" ry="4.6" fill="white" opacity="0.9"/>
               <ellipse cx="27" cy="11" rx="3.8" ry="4.6" fill="white" opacity="0.9"/>
               <ellipse cx="7.5" cy="20" rx="3.2" ry="4" fill="white" opacity="0.9"/>
@@ -371,9 +371,9 @@ import { AuthService } from '../../core/services/auth.service';
 
     .landing-root {
       min-height: 100vh;
-      font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       overflow-x: hidden;
-      background: #FFF8F4;
+      background: #F9FBFB;
     }
 
     /* ══════════ NAVBAR ══════════ */
@@ -393,7 +393,7 @@ import { AuthService } from '../../core/services/auth.service';
     }
     .landing-nav.scrolled {
       background: rgba(255,248,244,0.98);
-      box-shadow: 0 2px 24px rgba(28,9,2,0.08);
+      box-shadow: 0 2px 24px rgba(26,53,71,0.08);
     }
 
     .nav-logo-area {
@@ -406,10 +406,10 @@ import { AuthService } from '../../core/services/auth.service';
     .nav-logo-text {
       font-size: 1.1rem;
       font-weight: 900;
-      color: #1C0902;
+      color: #1A3547;
       letter-spacing: 2px;
       text-transform: uppercase;
-      span { color: #F97316; }
+      span { color: #FF8C42; }
     }
 
     .nav-links {
@@ -420,10 +420,10 @@ import { AuthService } from '../../core/services/auth.service';
       a {
         font-size: 0.88rem;
         font-weight: 600;
-        color: #78716C;
+        color: #4A6478;
         cursor: pointer;
         transition: color 0.2s;
-        &:hover { color: #F97316; }
+        &:hover { color: #FF8C42; }
       }
     }
 
@@ -437,30 +437,30 @@ import { AuthService } from '../../core/services/auth.service';
     .btn-nav-ghost {
       padding: 8px 20px;
       border-radius: 12px;
-      border: 1px solid #E5D0C5;
+      border: 1px solid #C8DCE8;
       background: transparent;
-      color: #1C0902;
+      color: #1A3547;
       font-size: 0.86rem;
       font-weight: 600;
       cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       transition: all 0.2s;
-      &:hover { background: #FFF7ED; border-color: #F97316; color: #F97316; }
+      &:hover { background: #FFF3EC; border-color: #FF8C42; color: #FF8C42; }
     }
 
     .btn-nav-primary {
       padding: 8px 20px;
       border-radius: 12px;
       border: none;
-      background: linear-gradient(135deg, #FF9748, #F97316);
+      background: linear-gradient(135deg, #FF9F5A, #FF8C42);
       color: #fff;
       font-size: 0.86rem;
       font-weight: 700;
       cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      box-shadow: 0 4px 14px rgba(249,115,22,0.35);
+      font-family: 'Inter', system-ui, sans-serif;
+      box-shadow: 0 4px 14px rgba(255,140,66,0.35);
       transition: all 0.2s;
-      &:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(249,115,22,0.5); }
+      &:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,140,66,0.5); }
     }
 
     /* ══════════ HERO ══════════ */
@@ -469,7 +469,7 @@ import { AuthService } from '../../core/services/auth.service';
       padding: 68px 6% 0;
       display: flex;
       align-items: center;
-      background: linear-gradient(160deg, #FFF8F4 55%, #FFEDD5 100%);
+      background: linear-gradient(160deg, #F9FBFB 55%, #FFE8D6 100%);
       position: relative;
       overflow: hidden;
     }
@@ -478,13 +478,13 @@ import { AuthService } from '../../core/services/auth.service';
       position: absolute;
       width: 600px; height: 600px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(249,115,22,0.09) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(255,140,66,0.09) 0%, transparent 70%);
       top: -100px; right: -100px;
       pointer-events: none;
     }
     .hero-bg-blob.b2 {
       width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(249,115,22,0.06) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(255,140,66,0.06) 0%, transparent 70%);
       bottom: -80px; left: -80px;
       top: auto; right: auto;
     }
@@ -531,13 +531,13 @@ import { AuthService } from '../../core/services/auth.service';
     .hero-headline {
       font-size: 4rem;
       font-weight: 900;
-      color: #1C0902;
+      color: #1A3547;
       line-height: 1.08;
       letter-spacing: -0.04em;
       margin: 0 0 22px;
     }
     .text-grad {
-      background: linear-gradient(135deg, #FF9748, #F97316);
+      background: linear-gradient(135deg, #FF9F5A, #FF8C42);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -545,7 +545,7 @@ import { AuthService } from '../../core/services/auth.service';
 
     .hero-sub {
       font-size: 1.05rem;
-      color: #78716C;
+      color: #4A6478;
       line-height: 1.75;
       margin: 0 0 36px;
       max-width: 480px;
@@ -565,17 +565,17 @@ import { AuthService } from '../../core/services/auth.service';
       gap: 8px;
       padding: 14px 28px;
       border-radius: 14px;
-      background: linear-gradient(135deg, #FF9748, #F97316);
+      background: linear-gradient(135deg, #FF9F5A, #FF8C42);
       color: #fff;
       font-size: 0.95rem;
       font-weight: 700;
       cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      box-shadow: 0 6px 24px rgba(249,115,22,0.4);
+      font-family: 'Inter', system-ui, sans-serif;
+      box-shadow: 0 6px 24px rgba(255,140,66,0.4);
       transition: all 0.22s;
       text-decoration: none;
       border: none;
-      &:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(249,115,22,0.52); }
+      &:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(255,140,66,0.52); }
     }
 
     .btn-hero-ghost {
@@ -584,16 +584,16 @@ import { AuthService } from '../../core/services/auth.service';
       gap: 8px;
       padding: 14px 24px;
       border-radius: 14px;
-      border: 1.5px solid #E5D0C5;
+      border: 1.5px solid #C8DCE8;
       background: #fff;
-      color: #1C0902;
+      color: #1A3547;
       font-size: 0.95rem;
       font-weight: 600;
       cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       transition: all 0.2s;
       text-decoration: none;
-      &:hover { background: #FFF7ED; border-color: #F97316; color: #F97316; }
+      &:hover { background: #FFF3EC; border-color: #FF8C42; color: #FF8C42; }
     }
 
     .hero-trust {
@@ -607,7 +607,7 @@ import { AuthService } from '../../core/services/auth.service';
       gap: 5px;
       font-size: 0.78rem;
       font-weight: 600;
-      color: #A8A29E;
+      color: #8BA3B5;
       mat-icon { font-size: 15px; width: 15px; height: 15px; color: #22C55E; }
     }
 
@@ -623,8 +623,8 @@ import { AuthService } from '../../core/services/auth.service';
     .art-card {
       background: #fff;
       border-radius: 22px;
-      border: 1px solid #F0E0D6;
-      box-shadow: 0 12px 48px rgba(28,9,2,0.11);
+      border: 1px solid #E0EBF2;
+      box-shadow: 0 12px 48px rgba(26,53,71,0.11);
       padding: 20px;
       position: absolute;
     }
@@ -662,17 +662,17 @@ import { AuthService } from '../../core/services/auth.service';
     .art-name {
       font-weight: 800;
       font-size: 1rem;
-      color: #1C0902;
+      color: #1A3547;
       margin: 0 0 3px;
     }
     .art-breed {
       font-size: 0.76rem;
-      color: #A8A29E;
+      color: #8BA3B5;
       margin: 0 0 14px;
     }
     .art-bar {
       height: 4px;
-      background: #F0E0D6;
+      background: #E0EBF2;
       border-radius: 99px;
       margin-bottom: 14px;
       position: relative;
@@ -681,13 +681,13 @@ import { AuthService } from '../../core/services/auth.service';
         position: absolute;
         left: 0; top: 0; bottom: 0;
         width: 70%;
-        background: linear-gradient(90deg, #FF9748, #F97316);
+        background: linear-gradient(90deg, #FF9F5A, #FF8C42);
         border-radius: 99px;
       }
     }
     .art-progress {
       height: 4px;
-      background: #F0E0D6;
+      background: #E0EBF2;
       border-radius: 99px;
       margin-top: 8px;
     }
@@ -703,12 +703,12 @@ import { AuthService } from '../../core/services/auth.service';
       padding: 9px;
       border-radius: 11px;
       border: none;
-      background: linear-gradient(135deg, #FF9748, #F97316);
+      background: linear-gradient(135deg, #FF9F5A, #FF8C42);
       color: #fff;
       font-size: 0.8rem;
       font-weight: 700;
       cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       text-align: center;
     }
 
@@ -765,7 +765,7 @@ import { AuthService } from '../../core/services/auth.service';
 
     /* ══════════ STATS STRIP ══════════ */
     .stats-section {
-      background: linear-gradient(160deg, #1C0902 0%, #3D1505 60%, #7C2D12 100%);
+      background: linear-gradient(160deg, #1A3547 0%, #2D5D7B 60%, #3D7EA6 100%);
       padding: 60px 6%;
     }
     .stats-inner {
@@ -781,7 +781,7 @@ import { AuthService } from '../../core/services/auth.service';
       .stat-num {
         font-size: 3rem;
         font-weight: 900;
-        color: #F97316;
+        color: #FF8C42;
         line-height: 1;
         margin: 0 0 8px;
         letter-spacing: -0.03em;
@@ -803,7 +803,7 @@ import { AuthService } from '../../core/services/auth.service';
     /* ══════════ FEATURES ══════════ */
     .features-section {
       padding: 100px 6%;
-      background: #FFF8F4;
+      background: #F9FBFB;
     }
 
     .section-label {
@@ -812,21 +812,21 @@ import { AuthService } from '../../core/services/auth.service';
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.16em;
-      color: #F97316;
+      color: #FF8C42;
       margin: 0 0 12px;
     }
     .section-title {
       text-align: center;
       font-size: 2.5rem;
       font-weight: 900;
-      color: #1C0902;
+      color: #1A3547;
       margin: 0 0 14px;
       letter-spacing: -0.03em;
     }
     .section-sub {
       text-align: center;
       font-size: 1rem;
-      color: #78716C;
+      color: #4A6478;
       max-width: 540px;
       margin: 0 auto 56px;
       line-height: 1.75;
@@ -843,16 +843,16 @@ import { AuthService } from '../../core/services/auth.service';
 
     .bento-card {
       border-radius: 24px;
-      border: 1.5px solid #F0E0D6;
+      border: 1.5px solid #E0EBF2;
       background: #fff;
       padding: 32px;
-      box-shadow: 0 4px 24px rgba(28,9,2,0.06);
+      box-shadow: 0 4px 24px rgba(26,53,71,0.06);
       transition: all 0.25s ease;
       cursor: default;
       &:hover {
         transform: translateY(-5px);
-        box-shadow: 0 20px 56px rgba(28,9,2,0.11);
-        border-color: #FDBF8A;
+        box-shadow: 0 20px 56px rgba(26,53,71,0.11);
+        border-color: #A8C4D4;
       }
     }
     .bento-wide { grid-column: span 2; }
@@ -870,13 +870,13 @@ import { AuthService } from '../../core/services/auth.service';
     .bento-title {
       font-size: 1.1rem;
       font-weight: 800;
-      color: #1C0902;
+      color: #1A3547;
       margin: 0 0 10px;
       letter-spacing: -0.01em;
     }
     .bento-desc {
       font-size: 0.88rem;
-      color: #78716C;
+      color: #4A6478;
       line-height: 1.75;
       margin: 0;
     }
@@ -904,7 +904,7 @@ import { AuthService } from '../../core/services/auth.service';
     /* ══════════ HOW IT WORKS ══════════ */
     .how-section {
       padding: 100px 6%;
-      background: linear-gradient(160deg, #FFF7ED 0%, #FFF8F4 60%);
+      background: linear-gradient(160deg, #FFF3EC 0%, #F9FBFB 60%);
     }
     .how-inner { max-width: 1040px; margin: 0 auto; }
 
@@ -919,17 +919,17 @@ import { AuthService } from '../../core/services/auth.service';
     .step-card {
       background: #fff;
       border-radius: 24px;
-      border: 1.5px solid #F0E0D6;
+      border: 1.5px solid #E0EBF2;
       padding: 32px 28px;
-      box-shadow: 0 4px 20px rgba(28,9,2,0.06);
+      box-shadow: 0 4px 20px rgba(26,53,71,0.06);
       transition: all 0.22s;
-      &:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(28,9,2,0.1); border-color: #FDBF8A; }
+      &:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(26,53,71,0.1); border-color: #A8C4D4; }
     }
     .step-num {
       font-size: 0.7rem;
       font-weight: 800;
       letter-spacing: 0.12em;
-      color: #F97316;
+      color: #FF8C42;
       text-transform: uppercase;
       margin-bottom: 16px;
     }
@@ -943,12 +943,12 @@ import { AuthService } from '../../core/services/auth.service';
     .step-title {
       font-size: 1rem;
       font-weight: 800;
-      color: #1C0902;
+      color: #1A3547;
       margin: 0 0 10px;
     }
     .step-desc {
       font-size: 0.85rem;
-      color: #78716C;
+      color: #4A6478;
       line-height: 1.75;
       margin: 0;
     }
@@ -963,11 +963,11 @@ import { AuthService } from '../../core/services/auth.service';
     }
     .connector-line {
       width: 32px; height: 2px;
-      background: linear-gradient(90deg, #F0E0D6, #FDBF8A);
+      background: linear-gradient(90deg, #E0EBF2, #A8C4D4);
       border-radius: 99px;
     }
     .connector-arrow {
-      color: #F97316 !important;
+      color: #FF8C42 !important;
       font-size: 20px !important;
       width: 20px !important;
       height: 20px !important;
@@ -977,7 +977,7 @@ import { AuthService } from '../../core/services/auth.service';
     /* ══════════ CITIES ══════════ */
     .cities-section {
       padding: 80px 6%;
-      background: #FFF8F4;
+      background: #F9FBFB;
     }
 
     .cities-grid {
@@ -990,15 +990,15 @@ import { AuthService } from '../../core/services/auth.service';
 
     .city-card {
       border-radius: 18px;
-      border: 1.5px solid #F0E0D6;
+      border: 1.5px solid #E0EBF2;
       background: #fff;
       padding: 20px;
       display: flex;
       align-items: center;
       gap: 12px;
-      box-shadow: 0 2px 12px rgba(28,9,2,0.05);
+      box-shadow: 0 2px 12px rgba(26,53,71,0.05);
       transition: all 0.2s;
-      &:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(28,9,2,0.08); }
+      &:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(26,53,71,0.08); }
       &.city-active { border-color: #A7F3D0; background: #F0FDF4; }
     }
 
@@ -1007,15 +1007,15 @@ import { AuthService } from '../../core/services/auth.service';
       border-radius: 50%;
       flex-shrink: 0;
       &.active { background: #22C55E; animation: pulseDot 2s infinite; }
-      &.soon   { background: #E5D0C5; }
+      &.soon   { background: #C8DCE8; }
     }
     .city-info {
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 2px;
-      .city-name { font-weight: 700; font-size: 0.9rem; color: #1C0902; }
-      .city-status { font-size: 0.72rem; color: #A8A29E; }
+      .city-name { font-weight: 700; font-size: 0.9rem; color: #1A3547; }
+      .city-status { font-size: 0.72rem; color: #8BA3B5; }
     }
     .active-badge-chip {
       padding: 2px 8px;
@@ -1030,7 +1030,7 @@ import { AuthService } from '../../core/services/auth.service';
     /* ══════════ CTA BANNER ══════════ */
     .cta-section {
       padding: 80px 6%;
-      background: linear-gradient(135deg, #FF9748 0%, #F97316 50%, #C2410C 100%);
+      background: linear-gradient(135deg, #FF9F5A 0%, #FF8C42 50%, #E87530 100%);
       position: relative;
       overflow: hidden;
       &::before {
@@ -1080,7 +1080,7 @@ import { AuthService } from '../../core/services/auth.service';
       padding: 14px 30px;
       border-radius: 14px;
       background: #fff;
-      color: #F97316;
+      color: #FF8C42;
       font-size: 0.95rem;
       font-weight: 800;
       text-decoration: none;
@@ -1105,7 +1105,7 @@ import { AuthService } from '../../core/services/auth.service';
 
     /* ══════════ FOOTER ══════════ */
     .landing-footer {
-      background: #1C0902;
+      background: #1A3547;
       padding: 48px 6%;
     }
     .footer-inner {
@@ -1127,7 +1127,7 @@ import { AuthService } from '../../core/services/auth.service';
       color: #fff;
       letter-spacing: 2px;
       text-transform: uppercase;
-      span { color: #F97316; }
+      span { color: #FF8C42; }
     }
     .footer-tagline {
       font-size: 0.85rem;
@@ -1146,7 +1146,7 @@ import { AuthService } from '../../core/services/auth.service';
         cursor: pointer;
         transition: color 0.2s;
         text-decoration: none;
-        &:hover { color: #F97316; }
+        &:hover { color: #FF8C42; }
       }
     }
     .footer-copy {

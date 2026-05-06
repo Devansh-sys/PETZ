@@ -13,7 +13,7 @@ import { Appointment } from '../../../core/models/appointment.model';
         <div class="page-header-left" style="display:flex;align-items:center">
           <button mat-icon-button routerLink="/dashboard"
                   style="background:#fff;border:1px solid #F0E0D6;border-radius:10px;margin-right:12px">
-            <mat-icon style="color:#78716C">arrow_back</mat-icon>
+            <mat-icon style="color:#4A6478">arrow_back</mat-icon>
           </button>
           <div>
             <h1>My Appointments</h1>
@@ -105,16 +105,16 @@ import { Appointment } from '../../../core/models/appointment.model';
       border-radius: 14px;
       padding: 8px 6px;
     }
-    .appt-day   { font-size: 1.4rem; font-weight: 900; color: #F97316; line-height: 1; }
-    .appt-month { font-size: 0.62rem; font-weight: 700; color: #A8A29E; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+    .appt-day   { font-size: 1.4rem; font-weight: 900; color: #FF8C42; line-height: 1; }
+    .appt-month { font-size: 0.62rem; font-weight: 700; color: #8BA3B5; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
     .appt-details {
       flex: 1;
       min-width: 0;
     }
-    .appt-title { font-weight: 700; font-size: 0.9rem; color: #1C0902; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .appt-title { font-weight: 700; font-size: 0.9rem; color: #1A3547; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .appt-sub {
       display: flex; align-items: center; gap: 3px;
-      font-size: 0.77rem; color: #A8A29E; font-weight: 500;
+      font-size: 0.77rem; color: #8BA3B5; font-weight: 500;
       mat-icon { font-size: 13px; width: 13px; height: 13px; }
     }
     .appt-right {
@@ -122,7 +122,7 @@ import { Appointment } from '../../../core/models/appointment.model';
     }
     .cancel-btn {
       width: 32px !important; height: 32px !important; border-radius: 8px !important;
-      color: #A8A29E !important;
+      color: #8BA3B5 !important;
       &:hover { color: #DC2626 !important; background: #FEE2E2 !important; }
       mat-icon { font-size: 16px; }
     }

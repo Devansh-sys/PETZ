@@ -58,8 +58,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
                       <mat-icon>local_hospital</mat-icon>
                     </div>
                     <div>
-                      <div style="font-weight:700;font-size:0.88rem;color:#1C0902">{{ h.name }}</div>
-                      <div style="font-size:0.74rem;color:#A8A29E">{{ h.city || '—' }}</div>
+                      <div style="font-weight:700;font-size:0.88rem;color:#1A3547">{{ h.name }}</div>
+                      <div style="font-size:0.74rem;color:#8BA3B5">{{ h.city || '—' }}</div>
                     </div>
                   </div>
                 </td>
@@ -68,7 +68,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
               <!-- Contact column -->
               <ng-container matColumnDef="contact">
                 <th mat-header-cell *matHeaderCellDef>Contact</th>
-                <td mat-cell *matCellDef="let h" style="font-size:0.83rem;color:#78716C">
+                <td mat-cell *matCellDef="let h" style="font-size:0.83rem;color:#4A6478">
                   {{ h.phone || h.email || '—' }}
                 </td>
               </ng-container>
@@ -115,8 +115,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     .back-btn {
       width: 38px !important; height: 38px !important;
       border-radius: 10px !important; background: #fff !important;
-      border: 1px solid #F0E0D6 !important; color: #78716C !important; flex-shrink: 0;
-      &:hover { border-color: #F97316 !important; color: #F97316 !important; }
+      border: 1px solid #E0EBF2 !important; color: #4A6478 !important; flex-shrink: 0;
+      &:hover { border-color: #FF8C42 !important; color: #FF8C42 !important; }
     }
     .hosp-row { display: flex; align-items: center; gap: 10px; }
     .hosp-avatar-sm {

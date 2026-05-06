@@ -84,10 +84,10 @@ import { ApiService } from '../../../core/services/api.service';
       align-items: center;
       gap: 18px;
       background: #fff;
-      border: 1px solid #F0E0D6;
+      border: 1px solid #E0EBF2;
       border-radius: 20px;
       padding: 20px 24px;
-      box-shadow: 0 4px 16px rgba(28,9,2,0.07);
+      box-shadow: 0 4px 16px rgba(26,53,71,0.07);
       margin-bottom: 28px;
     }
     .hospital-logo {
@@ -102,10 +102,10 @@ import { ApiService } from '../../../core/services/api.service';
       mat-icon { color: #fff; font-size: 30px; width: 30px; height: 30px; }
     }
     .hospital-info { flex: 1; }
-    .hospital-name { font-weight: 900; font-size: 1.1rem; color: #1C0902; margin-bottom: 6px; }
+    .hospital-name { font-weight: 900; font-size: 1.1rem; color: #1A3547; margin-bottom: 6px; }
     .hospital-meta {
       display: flex; gap: 16px; flex-wrap: wrap;
-      span { display: flex; align-items: center; gap: 3px; font-size: 0.8rem; color: #78716C; }
+      span { display: flex; align-items: center; gap: 3px; font-size: 0.8rem; color: #4A6478; }
       mat-icon { font-size: 14px; width: 14px; height: 14px; color: #059669; }
     }
     .chip mat-icon { font-size: 13px; width: 13px; height: 13px; vertical-align: middle; margin-right: 2px; }

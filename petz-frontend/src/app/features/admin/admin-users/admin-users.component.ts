@@ -53,8 +53,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
               <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef>User</th>
                 <td mat-cell *matCellDef="let u">
-                  <div style="font-weight:700;font-size:0.88rem;color:#1C0902">{{ u.name }}</div>
-                  <div style="font-size:0.75rem;color:#A8A29E">{{ u.email }}</div>
+                  <div style="font-weight:700;font-size:0.88rem;color:#1A3547">{{ u.name }}</div>
+                  <div style="font-size:0.75rem;color:#8BA3B5">{{ u.email }}</div>
                 </td>
               </ng-container>
               <ng-container matColumnDef="role">
@@ -94,10 +94,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       width: 38px !important; height: 38px !important;
       border-radius: 10px !important;
       background: #fff !important;
-      border: 1px solid #F0E0D6 !important;
-      color: #78716C !important;
+      border: 1px solid #E0EBF2 !important;
+      color: #4A6478 !important;
       flex-shrink: 0;
-      &:hover { border-color: #F97316 !important; color: #F97316 !important; }
+      &:hover { border-color: #FF8C42 !important; color: #FF8C42 !important; }
     }
     .user-count-badge {
       display: flex; align-items: center; gap: 6px;
@@ -109,7 +109,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     .user-avatar-sm {
       width: 34px; height: 34px;
       border-radius: 10px;
-      background: linear-gradient(135deg, #FF9748, #F97316);
+      background: linear-gradient(135deg, #FF9F5A, #FF8C42);
       color: #fff;
       font-weight: 800;
       font-size: 0.85rem;

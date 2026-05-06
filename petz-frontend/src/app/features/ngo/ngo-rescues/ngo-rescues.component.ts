@@ -97,8 +97,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     .back-btn {
       width: 38px !important; height: 38px !important;
       border-radius: 10px !important; background: #fff !important;
-      border: 1px solid #F0E0D6 !important; color: #78716C !important; flex-shrink: 0;
-      &:hover { border-color: #F97316 !important; color: #F97316 !important; }
+      border: 1px solid #E0EBF2 !important; color: #4A6478 !important; flex-shrink: 0;
+      &:hover { border-color: #FF8C42 !important; color: #FF8C42 !important; }
     }
     .rescue-count-badge {
       display: flex; align-items: center; gap: 6px;
@@ -109,11 +109,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     }
     .rescue-queue-card {
       display: flex; align-items: flex-start; gap: 16px;
-      background: #fff; border: 1px solid #F0E0D6;
+      background: #fff; border: 1px solid #E0EBF2;
       border-radius: 18px; padding: 18px 20px;
-      box-shadow: 0 4px 14px rgba(28,9,2,0.06);
+      box-shadow: 0 4px 14px rgba(26,53,71,0.06);
       transition: all 0.2s;
-      &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(28,9,2,0.1); }
+      &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,53,71,0.1); }
     }
     .rq-left { display: flex; gap: 14px; flex: 1; min-width: 0; }
     .rq-icon {
@@ -124,9 +124,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     }
     .rq-icon.critical-icon { background: linear-gradient(135deg, #F87171, #DC2626); }
     .rq-info { flex: 1; min-width: 0; }
-    .rq-title { font-weight: 800; font-size: 0.95rem; color: #1C0902; margin-bottom: 4px; }
-    .rq-address { display: flex; align-items: center; gap: 3px; font-size: 0.78rem; color: #78716C; margin-bottom: 4px; mat-icon { font-size: 13px; width: 13px; height: 13px; color: #F97316; } }
-    .rq-desc { font-size: 0.8rem; color: #A8A29E; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .rq-title { font-weight: 800; font-size: 0.95rem; color: #1A3547; margin-bottom: 4px; }
+    .rq-address { display: flex; align-items: center; gap: 3px; font-size: 0.78rem; color: #4A6478; margin-bottom: 4px; mat-icon { font-size: 13px; width: 13px; height: 13px; color: #FF8C42; } }
+    .rq-desc { font-size: 0.8rem; color: #8BA3B5; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .rq-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
     .rq-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     .crit-pill {

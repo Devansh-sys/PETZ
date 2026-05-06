@@ -69,12 +69,12 @@ import { ApiService } from '../../../core/services/api.service';
     }
     .admin-card {
       display: flex; align-items: center; gap: 16px;
-      background: #fff; border: 1px solid #F0E0D6;
+      background: #fff; border: 1px solid #E0EBF2;
       border-radius: 18px; padding: 20px 22px;
       cursor: pointer; transition: all 0.2s ease;
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(28,9,2,0.1);
+        box-shadow: 0 8px 24px rgba(26,53,71,0.1);
         border-color: #FDBF8A;
       }
     }
@@ -82,16 +82,16 @@ import { ApiService } from '../../../core/services/api.service';
       width: 52px; height: 52px; border-radius: 16px;
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
       mat-icon { font-size: 24px; width: 24px; height: 24px; color: #fff; }
-      &.orange { background: linear-gradient(135deg,#FF9748,#F97316); }
+      &.orange { background: linear-gradient(135deg,#FF9F5A,#FF8C42); }
       &.red    { background: linear-gradient(135deg,#F87171,#DC2626); }
       &.purple { background: linear-gradient(135deg,#B97AFB,#7C3AED); }
       &.green  { background: linear-gradient(135deg,#34D399,#059669); }
       &.blue   { background: linear-gradient(135deg,#60A5FA,#2563EB); }
     }
     .admin-card-body { flex: 1; }
-    .admin-card-title { font-weight: 800; font-size: 0.92rem; color: #1C0902; margin-bottom: 3px; }
-    .admin-card-desc  { font-size: 0.78rem; color: #A8A29E; }
-    .admin-card-arrow { color: #E5D0C5 !important; font-size: 22px !important; }
+    .admin-card-title { font-weight: 800; font-size: 0.92rem; color: #1A3547; margin-bottom: 3px; }
+    .admin-card-desc  { font-size: 0.78rem; color: #8BA3B5; }
+    .admin-card-arrow { color: #C8DCE8 !important; font-size: 22px !important; }
   `]
 })
 export class AdminDashboardComponent implements OnInit {

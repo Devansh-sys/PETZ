@@ -35,11 +35,11 @@ import { Pet } from '../../../core/models/pet.model';
           <div class="empty-state">
             <div class="empty-icon">
               <svg viewBox="0 0 40 40" fill="none">
-                <ellipse cx="13" cy="9" rx="4.5" ry="5.5" fill="#F97316" opacity="0.6"/>
-                <ellipse cx="27" cy="9" rx="4.5" ry="5.5" fill="#F97316" opacity="0.6"/>
-                <ellipse cx="7" cy="19" rx="3.5" ry="4.5" fill="#F97316" opacity="0.6"/>
-                <ellipse cx="33" cy="19" rx="3.5" ry="4.5" fill="#F97316" opacity="0.6"/>
-                <path d="M20 14C13.5 14 8 19.5 8 26C8 30.5 11 34 15 35.5H25C29 34 32 30.5 32 26C32 19.5 26.5 14 20 14Z" fill="#F97316"/>
+                <ellipse cx="13" cy="9" rx="4.5" ry="5.5" fill="#FF8C42" opacity="0.6"/>
+                <ellipse cx="27" cy="9" rx="4.5" ry="5.5" fill="#FF8C42" opacity="0.6"/>
+                <ellipse cx="7" cy="19" rx="3.5" ry="4.5" fill="#FF8C42" opacity="0.6"/>
+                <ellipse cx="33" cy="19" rx="3.5" ry="4.5" fill="#FF8C42" opacity="0.6"/>
+                <path d="M20 14C13.5 14 8 19.5 8 26C8 30.5 11 34 15 35.5H25C29 34 32 30.5 32 26C32 19.5 26.5 14 20 14Z" fill="#FF8C42"/>
               </svg>
             </div>
             <h3>No pets yet</h3>
@@ -90,13 +90,13 @@ import { Pet } from '../../../core/models/pet.model';
     .pet-card-custom {
       background: #fff;
       border-radius: 20px;
-      border: 1px solid #F0E0D6;
-      box-shadow: 0 4px 16px rgba(28,9,2,0.07);
+      border: 1px solid #E0EBF2;
+      box-shadow: 0 4px 16px rgba(26,53,71,0.07);
       overflow: hidden;
       transition: all 0.22s ease;
       &:hover {
         transform: translateY(-4px);
-        box-shadow: 0 12px 36px rgba(28,9,2,0.12);
+        box-shadow: 0 12px 36px rgba(26,53,71,0.12);
         border-color: #FDBF8A;
       }
     }
@@ -114,7 +114,7 @@ import { Pet } from '../../../core/models/pet.model';
     .pet-species-badge {
       position: absolute;
       top: 10px; right: 10px;
-      background: rgba(249,115,22,0.9);
+      background: rgba(255,140,66,0.9);
       color: #fff;
       font-size: 0.68rem;
       font-weight: 700;
@@ -133,13 +133,13 @@ import { Pet } from '../../../core/models/pet.model';
     .pet-name {
       font-weight: 800;
       font-size: 1rem;
-      color: #1C0902;
+      color: #1A3547;
       margin-bottom: 3px;
       letter-spacing: -0.01em;
     }
     .pet-meta {
       font-size: 0.78rem;
-      color: #A8A29E;
+      color: #8BA3B5;
       .dot { margin: 0 4px; }
     }
     .pet-card-actions {
@@ -150,19 +150,19 @@ import { Pet } from '../../../core/models/pet.model';
     .edit-btn {
       flex: 1;
       border-radius: 10px !important;
-      border-color: #F0E0D6 !important;
-      color: #78716C !important;
+      border-color: #E0EBF2 !important;
+      color: #4A6478 !important;
       font-size: 0.82rem !important;
       font-weight: 600 !important;
       height: 36px !important;
-      &:hover { border-color: #F97316 !important; color: #F97316 !important; background: #FFF7ED !important; }
+      &:hover { border-color: #FF8C42 !important; color: #FF8C42 !important; background: #FFF7ED !important; }
       mat-icon { font-size: 16px; width: 16px; height: 16px; margin-right: 4px; }
     }
     .del-btn {
       width: 36px !important;
       height: 36px !important;
       border-radius: 10px !important;
-      color: #A8A29E !important;
+      color: #8BA3B5 !important;
       &:hover { color: #DC2626 !important; background: #FEE2E2 !important; }
       mat-icon { font-size: 18px; }
     }

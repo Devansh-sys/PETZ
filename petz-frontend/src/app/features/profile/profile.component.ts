@@ -12,8 +12,8 @@ import { ApiService } from '../../core/services/api.service';
       <div class="page-header" style="margin-bottom:28px">
         <div class="page-header-left" style="display:flex;align-items:center">
           <button mat-icon-button [routerLink]="dashboardRoute"
-                  style="background:#fff;border:1px solid #F0E0D6;border-radius:10px;margin-right:12px">
-            <mat-icon style="color:#78716C">arrow_back</mat-icon>
+                  style="background:#fff;border:1px solid #E0EBF2;border-radius:10px;margin-right:12px">
+            <mat-icon style="color:#4A6478">arrow_back</mat-icon>
           </button>
           <div>
             <h1>My Profile</h1>
@@ -219,11 +219,11 @@ import { ApiService } from '../../core/services/api.service';
         <!-- ── ADMIN profile card ─────────────────────────── -->
         @if (role === 'ADMIN') {
           <div class="card info-card admin-notice">
-            <mat-icon style="font-size:40px;width:40px;height:40px;color:#F97316;margin-bottom:12px">
+            <mat-icon style="font-size:40px;width:40px;height:40px;color:#FF8C42;margin-bottom:12px">
               admin_panel_settings
             </mat-icon>
-            <p style="font-weight:700;color:#1C0902;margin:0 0 4px">Platform Administrator</p>
-            <p style="color:#A8A29E;font-size:0.85rem;margin:0">
+            <p style="font-weight:700;color:#1A3547;margin:0 0 4px">Platform Administrator</p>
+            <p style="color:#8BA3B5;font-size:0.85rem;margin:0">
               You have full access to manage users, NGOs, hospitals, and rescue operations.
             </p>
           </div>
@@ -235,7 +235,7 @@ import { ApiService } from '../../core/services/api.service';
           <div style="display:flex;gap:10px;flex-wrap:wrap">
             @for (link of quickLinks; track link.route) {
               <button mat-stroked-button [routerLink]="link.route"
-                      style="border-radius:12px;color:#78716C;border-color:#E5D0C5;height:40px">
+                      style="border-radius:12px;color:#4A6478;border-color:#C8DCE8;height:40px">
                 <mat-icon>{{ link.icon }}</mat-icon>
                 {{ link.label }}
               </button>
@@ -258,18 +258,18 @@ import { ApiService } from '../../core/services/api.service';
     .profile-avatar {
       width: 72px; height: 72px;
       border-radius: 20px;
-      background: linear-gradient(135deg, #FF9748, #F97316);
+      background: linear-gradient(135deg, #FF9F5A, #FF8C42);
       color: #fff;
       font-size: 2rem;
       font-weight: 900;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
-      box-shadow: 0 8px 24px rgba(249,115,22,0.3);
+      box-shadow: 0 8px 24px rgba(255,140,66,0.3);
     }
     .profile-name {
       font-size: 1.4rem;
       font-weight: 900;
-      color: #1C0902;
+      color: #1A3547;
       margin-bottom: 8px;
     }
     .role-badge {
@@ -298,10 +298,10 @@ import { ApiService } from '../../core/services/api.service';
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: #A8A29E;
+      color: #8BA3B5;
       margin-bottom: 18px;
       padding-bottom: 10px;
-      border-bottom: 1px solid #F0E0D6;
+      border-bottom: 1px solid #E0EBF2;
     }
     .info-grid { display: flex; flex-direction: column; gap: 14px; }
     .info-row {
@@ -316,14 +316,14 @@ import { ApiService } from '../../core/services/api.service';
       flex-shrink: 0;
       mat-icon { font-size: 18px; width: 18px; height: 18px; color: #fff; }
     }
-    .info-icon-wrap.orange { background: linear-gradient(135deg,#FF9748,#F97316); }
+    .info-icon-wrap.orange { background: linear-gradient(135deg,#FF9F5A,#FF8C42); }
     .info-icon-wrap.purple { background: linear-gradient(135deg,#B97AFB,#7C3AED); }
     .info-icon-wrap.green  { background: linear-gradient(135deg,#34D399,#059669); }
     .info-icon-wrap.red    { background: linear-gradient(135deg,#F87171,#DC2626); }
 
     .info-content { display: flex; flex-direction: column; padding-top: 2px; }
-    .info-label { font-size: 0.72rem; font-weight: 700; color: #A8A29E; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
-    .info-value { font-size: 0.9rem; font-weight: 600; color: #1C0902; }
+    .info-label { font-size: 0.72rem; font-weight: 700; color: #8BA3B5; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+    .info-value { font-size: 0.9rem; font-weight: 600; color: #1A3547; }
 
     .status-active   { color: #15803D; font-weight: 700; }
     .status-inactive { color: #DC2626; font-weight: 700; }

@@ -54,8 +54,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
                   <div class="ngo-row">
                     <div class="ngo-avatar-sm">{{ n.name?.charAt(0) || 'N' }}</div>
                     <div>
-                      <div style="font-weight:700;font-size:0.88rem;color:#1C0902">{{ n.name }}</div>
-                      <div style="font-size:0.74rem;color:#A8A29E">{{ n.city || '—' }}</div>
+                      <div style="font-weight:700;font-size:0.88rem;color:#1A3547">{{ n.name }}</div>
+                      <div style="font-size:0.74rem;color:#8BA3B5">{{ n.city || '—' }}</div>
                     </div>
                   </div>
                 </td>
@@ -63,7 +63,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
               <ng-container matColumnDef="contact">
                 <th mat-header-cell *matHeaderCellDef>Contact</th>
-                <td mat-cell *matCellDef="let n" style="font-size:0.83rem;color:#78716C">
+                <td mat-cell *matCellDef="let n" style="font-size:0.83rem;color:#4A6478">
                   {{ n.phone || n.email || '—' }}
                 </td>
               </ng-container>
@@ -127,10 +127,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       width: 38px !important; height: 38px !important;
       border-radius: 10px !important;
       background: #fff !important;
-      border: 1px solid #F0E0D6 !important;
-      color: #78716C !important;
+      border: 1px solid #E0EBF2 !important;
+      color: #4A6478 !important;
       flex-shrink: 0;
-      &:hover { border-color: #F97316 !important; color: #F97316 !important; }
+      &:hover { border-color: #FF8C42 !important; color: #FF8C42 !important; }
     }
     .ngo-row { display: flex; align-items: center; gap: 10px; }
     .ngo-avatar-sm {

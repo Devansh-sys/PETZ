@@ -99,31 +99,31 @@ import { ApiService } from '../../../core/services/api.service';
       align-items: center;
       gap: 18px;
       background: #fff;
-      border: 1px solid #F0E0D6;
+      border: 1px solid #E0EBF2;
       border-radius: 20px;
       padding: 20px 24px;
-      box-shadow: 0 4px 16px rgba(28,9,2,0.07);
+      box-shadow: 0 4px 16px rgba(26,53,71,0.07);
       margin-bottom: 28px;
     }
     .ngo-avatar {
       width: 60px; height: 60px;
       border-radius: 16px;
-      background: linear-gradient(135deg, #FF9748, #F97316);
+      background: linear-gradient(135deg, #FF9F5A, #FF8C42);
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
       overflow: hidden;
-      box-shadow: 0 4px 12px rgba(249,115,22,0.3);
+      box-shadow: 0 4px 12px rgba(255,140,66,0.3);
       img { width: 100%; height: 100%; object-fit: cover; }
       mat-icon { color: #fff; font-size: 28px; width: 28px; height: 28px; }
     }
     .ngo-info { flex: 1; }
-    .ngo-name { font-weight: 900; font-size: 1.1rem; color: #1C0902; margin-bottom: 6px; }
+    .ngo-name { font-weight: 900; font-size: 1.1rem; color: #1A3547; margin-bottom: 6px; }
     .ngo-meta {
       display: flex; gap: 16px; flex-wrap: wrap;
       span {
         display: flex; align-items: center; gap: 3px;
-        font-size: 0.8rem; color: #78716C;
-        mat-icon { font-size: 14px; width: 14px; height: 14px; color: #F97316; }
+        font-size: 0.8rem; color: #4A6478;
+        mat-icon { font-size: 14px; width: 14px; height: 14px; color: #FF8C42; }
       }
     }
     .ngo-verify { flex-shrink: 0; }

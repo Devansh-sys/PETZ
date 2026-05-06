@@ -82,8 +82,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     .back-btn {
       width: 38px !important; height: 38px !important;
       border-radius: 10px !important; background: #fff !important;
-      border: 1px solid #F0E0D6 !important; color: #78716C !important; flex-shrink: 0;
-      &:hover { border-color: #F97316 !important; color: #F97316 !important; }
+      border: 1px solid #E0EBF2 !important; color: #4A6478 !important; flex-shrink: 0;
+      &:hover { border-color: #FF8C42 !important; color: #FF8C42 !important; }
     }
     .app-count-badge {
       display: flex; align-items: center; gap: 6px;
@@ -94,11 +94,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     }
     .app-card {
       display: flex; align-items: center; gap: 16px;
-      background: #fff; border: 1px solid #F0E0D6;
+      background: #fff; border: 1px solid #E0EBF2;
       border-radius: 18px; padding: 18px 22px;
-      box-shadow: 0 4px 14px rgba(28,9,2,0.06);
+      box-shadow: 0 4px 14px rgba(26,53,71,0.06);
       transition: all 0.2s;
-      &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(28,9,2,0.1); }
+      &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,53,71,0.1); }
     }
     .app-card-left { display: flex; gap: 14px; flex: 1; min-width: 0; align-items: flex-start; }
     .app-num {
@@ -110,9 +110,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       flex-shrink: 0;
     }
     .app-info { flex: 1; min-width: 0; }
-    .app-title { font-weight: 700; font-size: 0.9rem; color: #1C0902; margin-bottom: 3px; }
-    .app-meta { font-size: 0.76rem; color: #A8A29E; margin-bottom: 4px; }
-    .app-reason { font-size: 0.8rem; color: #78716C; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .app-title { font-weight: 700; font-size: 0.9rem; color: #1A3547; margin-bottom: 3px; }
+    .app-meta { font-size: 0.76rem; color: #8BA3B5; margin-bottom: 4px; }
+    .app-reason { font-size: 0.8rem; color: #4A6478; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .app-card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
     .app-actions { display: flex; gap: 8px; }
     .app-actions button mat-icon { font-size: 15px; width: 15px; height: 15px; margin-right: 4px; }

@@ -15,7 +15,7 @@ import { ApiService } from '../../core/services/api.service';
           <p class="page-subtitle">Here's today's overview of the platform.</p>
         </div>
         <div class="date-badge">
-          <mat-icon style="font-size:16px;width:16px;height:16px;color:#F97316">calendar_today</mat-icon>
+          <mat-icon style="font-size:16px;width:16px;height:16px;color:#FF8C42">calendar_today</mat-icon>
           <span>{{ today }}</span>
         </div>
       </div>
@@ -112,7 +112,7 @@ import { ApiService } from '../../core/services/api.service';
     .greeting-text {
       font-size: 1.9rem;
       font-weight: 900;
-      color: #F97316;
+      color: #FF8C42;
       margin: 0 0 4px;
     }
     .date-badge {
@@ -120,12 +120,12 @@ import { ApiService } from '../../core/services/api.service';
       align-items: center;
       gap: 6px;
       background: #fff;
-      border: 1px solid #F0E0D6;
+      border: 1px solid #E0EBF2;
       border-radius: 10px;
       padding: 8px 14px;
       font-size: 0.82rem;
       font-weight: 600;
-      color: #78716C;
+      color: #4A6478;
       white-space: nowrap;
     }
     .stats-grid {
@@ -138,7 +138,7 @@ import { ApiService } from '../../core/services/api.service';
       display: flex;
       align-items: center;
       margin-bottom: 16px;
-      h2 { margin: 0; color: #1C0902; }
+      h2 { margin: 0; color: #1A3547; }
     }
     .actions-grid {
       display: grid;
@@ -150,7 +150,7 @@ import { ApiService } from '../../core/services/api.service';
       align-items: center;
       gap: 16px;
       background: #fff;
-      border: 1px solid #F0E0D6;
+      border: 1px solid #E0EBF2;
       border-radius: 16px;
       padding: 18px 20px;
       cursor: pointer;
@@ -168,7 +168,7 @@ import { ApiService } from '../../core/services/api.service';
       flex-shrink: 0;
       mat-icon { font-size: 22px; width: 22px; height: 22px; color: #fff; }
       &.red    { background: linear-gradient(135deg,#F87171,#DC2626); }
-      &.orange { background: linear-gradient(135deg,#FF9748,#F97316); }
+      &.orange { background: linear-gradient(135deg,#FF9F5A,#FF8C42); }
       &.purple { background: linear-gradient(135deg,#B97AFB,#7C3AED); }
       &.green  { background: linear-gradient(135deg,#34D399,#059669); }
     }
@@ -176,12 +176,12 @@ import { ApiService } from '../../core/services/api.service';
       margin: 0 0 3px;
       font-weight: 700;
       font-size: 0.92rem;
-      color: #1C0902;
+      color: #1A3547;
     }
     .action-desc {
       margin: 0;
       font-size: 0.78rem;
-      color: #A8A29E;
+      color: #8BA3B5;
     }
     .action-arrow {
       margin-left: auto;

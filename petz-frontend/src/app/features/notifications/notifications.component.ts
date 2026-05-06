@@ -13,8 +13,8 @@ import { Notification } from '../../core/models/notification.model';
       <div class="page-header" style="margin-bottom:24px">
         <div class="page-header-left" style="display:flex;align-items:center">
           <button mat-icon-button [routerLink]="dashboardRoute"
-                  style="background:#fff;border:1px solid #F0E0D6;border-radius:10px;margin-right:12px">
-            <mat-icon style="color:#78716C">arrow_back</mat-icon>
+                  style="background:#fff;border:1px solid #E0EBF2;border-radius:10px;margin-right:12px">
+            <mat-icon style="color:#4A6478">arrow_back</mat-icon>
           </button>
           <div>
             <h1>Notifications</h1>
@@ -23,7 +23,7 @@ import { Notification } from '../../core/models/notification.model';
         </div>
         @if (notifications.length > 0) {
           <button mat-stroked-button (click)="markAllRead()"
-                  style="border-radius:10px;color:#78716C;border-color:#E5D0C5;height:40px">
+                  style="border-radius:10px;color:#4A6478;border-color:#C8DCE8;height:40px">
             <mat-icon>done_all</mat-icon> Mark all read
           </button>
         }
@@ -84,7 +84,7 @@ import { Notification } from '../../core/models/notification.model';
       align-items: flex-start;
       gap: 14px;
       background: #fff;
-      border: 1px solid #F0E0D6;
+      border: 1px solid #E0EBF2;
       border-radius: 16px;
       padding: 16px 18px;
       cursor: pointer;
@@ -92,8 +92,8 @@ import { Notification } from '../../core/models/notification.model';
       position: relative;
       &:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.07); transform: translateY(-1px); }
       &.unread {
-        background: #FFF8F4;
-        border-color: #FDBF8A;
+        background: #F9FBFB;
+        border-color: #A8C4D4;
       }
     }
 
@@ -108,31 +108,31 @@ import { Notification } from '../../core/models/notification.model';
     .type-adopt     { background: linear-gradient(135deg,#34D399,#059669); }
     .type-appt      { background: linear-gradient(135deg,#B97AFB,#7C3AED); }
     .type-alert     { background: linear-gradient(135deg,#FBBF24,#D97706); }
-    .type-default   { background: linear-gradient(135deg,#FF9748,#F97316); }
+    .type-default   { background: linear-gradient(135deg,#FF9F5A,#FF8C42); }
 
     .notif-body { flex: 1; min-width: 0; }
     .notif-title {
       margin: 0 0 4px;
       font-weight: 700;
       font-size: 0.88rem;
-      color: #1C0902;
+      color: #1A3547;
     }
     .notif-msg {
       margin: 0 0 5px;
       font-size: 0.82rem;
-      color: #78716C;
+      color: #4A6478;
       line-height: 1.5;
     }
     .notif-time {
       margin: 0;
       font-size: 0.72rem;
-      color: #A8A29E;
+      color: #8BA3B5;
     }
 
     .unread-dot {
       width: 9px; height: 9px;
       border-radius: 50%;
-      background: #F97316;
+      background: #FF8C42;
       flex-shrink: 0;
       margin-top: 6px;
     }

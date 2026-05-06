@@ -31,7 +31,7 @@ import { ApiService } from '../../../core/services/api.service';
             <div class="field-group">
               <label class="field-label">Pet Name *</label>
               <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">badge</mat-icon>
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">badge</mat-icon>
                 <input matInput formControlName="name" placeholder="e.g. Buddy">
                 <mat-error>Name is required</mat-error>
               </mat-form-field>
@@ -39,7 +39,7 @@ import { ApiService } from '../../../core/services/api.service';
             <div class="field-group">
               <label class="field-label">Species</label>
               <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">category</mat-icon>
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">category</mat-icon>
                 <mat-select formControlName="species" placeholder="Select species">
                   <mat-option value="DOG">🐕 Dog</mat-option>
                   <mat-option value="CAT">🐈 Cat</mat-option>
@@ -56,7 +56,7 @@ import { ApiService } from '../../../core/services/api.service';
             <div class="field-group">
               <label class="field-label">Breed</label>
               <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">style</mat-icon>
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">style</mat-icon>
                 <input matInput formControlName="breed" placeholder="e.g. Golden Retriever">
               </mat-form-field>
             </div>
@@ -78,14 +78,14 @@ import { ApiService } from '../../../core/services/api.service';
             <div class="field-group">
               <label class="field-label">Age (years)</label>
               <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">cake</mat-icon>
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">cake</mat-icon>
                 <input matInput type="number" formControlName="ageYears" placeholder="e.g. 3">
               </mat-form-field>
             </div>
             <div class="field-group">
               <label class="field-label">Weight (kg)</label>
               <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">monitor_weight</mat-icon>
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">monitor_weight</mat-icon>
                 <input matInput type="number" step="0.1" formControlName="weightKg" placeholder="e.g. 12.5">
               </mat-form-field>
             </div>
@@ -113,7 +113,7 @@ import { ApiService } from '../../../core/services/api.service';
               {{ loading ? 'Saving...' : (isEdit ? 'Update Pet' : 'Add Pet') }}
             </button>
             <button mat-stroked-button type="button" routerLink="/pets"
-                    style="height:46px;border-radius:12px;color:#78716C;border-color:#E5D0C5">
+                    style="height:46px;border-radius:12px;color:#4A6478;border-color:#C8DCE8">
               Cancel
             </button>
           </div>
@@ -129,10 +129,10 @@ import { ApiService } from '../../../core/services/api.service';
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: #A8A29E;
+      color: #8BA3B5;
       margin-bottom: 14px;
       padding-bottom: 8px;
-      border-bottom: 1px solid #F0E0D6;
+      border-bottom: 1px solid #E0EBF2;
     }
     .form-row {
       display: grid;
@@ -144,7 +144,7 @@ import { ApiService } from '../../../core/services/api.service';
       display: block;
       font-size: 0.78rem;
       font-weight: 700;
-      color: #1C0902;
+      color: #1A3547;
       margin-bottom: 6px;
     }
     @media (max-width: 560px) {

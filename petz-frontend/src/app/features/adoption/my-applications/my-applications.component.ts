@@ -12,8 +12,8 @@ import { AdoptionApplication } from '../../../core/models/adoption.model';
       <div class="page-header">
         <div class="page-header-left" style="display:flex;align-items:center">
           <button mat-icon-button routerLink="/dashboard"
-                  style="background:#fff;border:1px solid #F0E0D6;border-radius:10px;margin-right:12px">
-            <mat-icon style="color:#78716C">arrow_back</mat-icon>
+                  style="background:#fff;border:1px solid #E0EBF2;border-radius:10px;margin-right:12px">
+            <mat-icon style="color:#4A6478">arrow_back</mat-icon>
           </button>
           <div>
             <h1>My Applications</h1>
@@ -21,7 +21,7 @@ import { AdoptionApplication } from '../../../core/models/adoption.model';
           </div>
         </div>
         <button mat-stroked-button routerLink="/adoption/animals"
-                style="border-radius:10px;color:#78716C;border-color:#E5D0C5;height:40px">
+                style="border-radius:10px;color:#4A6478;border-color:#C8DCE8;height:40px">
           <mat-icon>pets</mat-icon> Browse Animals
         </button>
       </div>
@@ -44,7 +44,7 @@ import { AdoptionApplication } from '../../../core/models/adoption.model';
               <h3>No applications yet</h3>
               <p>Find your perfect companion and submit an adoption application.</p>
               <button mat-raised-button routerLink="/adoption/animals"
-                      style="margin-top:12px;border-radius:12px;background:#F97316;color:#fff;height:42px">
+                      style="margin-top:12px;border-radius:12px;background:#FF8C42;color:#fff;height:42px">
                 <mat-icon>pets</mat-icon> Browse Animals
               </button>
             </div>
@@ -118,35 +118,35 @@ import { AdoptionApplication } from '../../../core/models/adoption.model';
       align-items: flex-start;
       gap: 16px;
       background: #fff;
-      border: 1px solid #F0E0D6;
+      border: 1px solid #E0EBF2;
       border-radius: 18px;
       padding: 18px 22px;
-      box-shadow: 0 4px 14px rgba(28,9,2,0.06);
+      box-shadow: 0 4px 14px rgba(26,53,71,0.06);
       transition: all 0.2s;
-      &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(28,9,2,0.1); }
+      &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,53,71,0.1); }
     }
     .app-left { display: flex; align-items: flex-start; gap: 14px; flex: 1; min-width: 0; }
     .app-num-badge {
       min-width: 46px; height: 46px;
       border-radius: 14px;
-      background: linear-gradient(135deg, #FF9748, #F97316);
+      background: linear-gradient(135deg, #FF9F5A, #FF8C42);
       display: flex; align-items: center; justify-content: center;
       font-weight: 900; font-size: 0.8rem; color: #fff;
       flex-shrink: 0;
-      box-shadow: 0 4px 10px rgba(249,115,22,0.3);
+      box-shadow: 0 4px 10px rgba(255,140,66,0.3);
     }
     .app-detail { flex: 1; min-width: 0; }
-    .app-title { font-weight: 800; font-size: 0.92rem; color: #1C0902; margin-bottom: 5px; }
+    .app-title { font-weight: 800; font-size: 0.92rem; color: #1A3547; margin-bottom: 5px; }
     .app-meta {
       display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 6px;
-      span { display: flex; align-items: center; gap: 3px; font-size: 0.76rem; color: #A8A29E; }
+      span { display: flex; align-items: center; gap: 3px; font-size: 0.76rem; color: #8BA3B5; }
       mat-icon { font-size: 13px; width: 13px; height: 13px; }
     }
     .app-note {
       display: flex; align-items: flex-start; gap: 5px;
-      font-size: 0.78rem; color: #78716C; font-style: italic;
-      background: #FFF8F4; border-radius: 8px; padding: 6px 10px;
-      mat-icon { font-size: 14px; width: 14px; height: 14px; color: #F97316; flex-shrink: 0; margin-top: 1px; }
+      font-size: 0.78rem; color: #4A6478; font-style: italic;
+      background: #F9FBFB; border-radius: 8px; padding: 6px 10px;
+      mat-icon { font-size: 14px; width: 14px; height: 14px; color: #FF8C42; flex-shrink: 0; margin-top: 1px; }
       span { line-height: 1.5; }
     }
     .app-right {
@@ -168,11 +168,11 @@ import { AdoptionApplication } from '../../../core/models/adoption.model';
     }
     .sum-pill {
       display: flex; align-items: center; gap: 6px;
-      background: #FFF8F4; border: 1px solid #F0E0D6;
+      background: #F9FBFB; border: 1px solid #E0EBF2;
       border-radius: 999px; padding: 5px 14px;
-      font-size: 0.76rem; font-weight: 600; color: #78716C;
+      font-size: 0.76rem; font-weight: 600; color: #4A6478;
     }
-    .sum-num { font-weight: 900; font-size: 0.9rem; color: #1C0902; }
+    .sum-num { font-weight: 900; font-size: 0.9rem; color: #1A3547; }
     .pending-pill  { background: #FEF3C7; border-color: #FDE68A; color: #92400E; .sum-num { color: #92400E; } }
     .approved-pill { background: #D1FAE5; border-color: #A7F3D0; color: #065F46; .sum-num { color: #065F46; } }
   `]
