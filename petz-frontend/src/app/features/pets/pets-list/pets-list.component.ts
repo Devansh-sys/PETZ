@@ -10,9 +10,15 @@ import { Pet } from '../../../core/models/pet.model';
 
       <!-- Header -->
       <div class="page-header">
-        <div class="page-header-left">
-          <h1>My Pets</h1>
-          <p>Manage and monitor all your registered companions</p>
+        <div class="page-header-left" style="display:flex;align-items:center">
+          <button mat-icon-button routerLink="/dashboard"
+                  style="background:#fff;border:1px solid #E0EBF2;border-radius:10px;margin-right:12px">
+            <mat-icon style="color:#4A6478">arrow_back</mat-icon>
+          </button>
+          <div>
+            <h1>My Pets</h1>
+            <p>Manage and monitor all your registered companions</p>
+          </div>
         </div>
         <div class="page-header-actions">
           <button mat-raised-button color="primary" routerLink="/pets/new">

@@ -1,13 +1,19 @@
 package com.petz.service;
 
 import com.petz.dto.request.AppointmentRequest;
+import com.petz.dto.response.AppointmentResponse;
 import com.petz.dto.response.SlotResponse;
 import com.petz.entity.Appointment;
 import com.petz.entity.Doctor;
+import com.petz.entity.Hospital;
+import com.petz.entity.Pet;
 import com.petz.enums.AppointmentStatus;
 import com.petz.exception.BadRequestException;
 import com.petz.exception.ResourceNotFoundException;
 import com.petz.repository.AppointmentRepository;
+import com.petz.repository.DoctorRepository;
+import com.petz.repository.HospitalRepository;
+import com.petz.repository.PetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +28,9 @@ public class AppointmentService {
 
     private final AppointmentRepository appointmentRepo;
     private final DoctorService doctorService;
+    private final DoctorRepository doctorRepo;
+    private final HospitalRepository hospitalRepo;
+    private final PetRepository petRepo;
     private final NotificationService notificationService;
 
     public Appointment book(Long userId, AppointmentRequest req) {
@@ -69,8 +78,10 @@ public class AppointmentService {
         return a;
     }
 
-    public List<Appointment> getByUser(Long userId) {
-        return appointmentRepo.findByUserId(userId);
+    public List<AppointmentResponse> getByUser(Long userId) {
+        return appointmentRepo.findByUserId(userId).stream()
+                .map(this::enrich)
+                .toList();
     }
 
     public List<Appointment> getByHospital(Long hospitalId) {
@@ -114,5 +125,15 @@ public class AppointmentService {
         }
 
         return slots;
+    }
+
+    private AppointmentResponse enrich(Appointment a) {
+        Hospital h = a.getHospitalId() != null
+                ? hospitalRepo.findById(a.getHospitalId()).orElse(null) : null;
+        Doctor d = a.getDoctorId() != null
+                ? doctorRepo.findById(a.getDoctorId()).orElse(null) : null;
+        Pet p = a.getPetId() != null
+                ? petRepo.findById(a.getPetId()).orElse(null) : null;
+        return AppointmentResponse.from(a, h, d, p);
     }
 }

@@ -28,4 +28,20 @@ export interface AdoptionApplication {
   status: string;
   adminNotes?: string;
   appliedAt?: string;
+  updatedAt?: string;
+  // Enriched animal fields
+  animalName?: string;
+  animalSpecies?: string;
+  animalBreed?: string;
+  animalAgeMonths?: number;
+  animalGender?: string;
+  animalPhotoUrl?: string;
+  animalIsVaccinated?: boolean;
+  animalIsNeutered?: boolean;
+  animalCity?: string;
+  // Enriched NGO fields
+  ngoName?: string;
+  ngoPhone?: string;
+  ngoEmail?: string;
+  ngoCity?: string;
 }

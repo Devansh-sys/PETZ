@@ -56,7 +56,7 @@ import { Appointment } from '../../../core/models/appointment.model';
         @if (appointments.length > 0) {
           <div class="card-flat">
             @for (a of appointments; track a.id) {
-              <div class="appt-row">
+              <div class="appt-row" (click)="selected = a" style="cursor:pointer">
                 <div class="appt-date-badge">
                   <div class="appt-day">{{ getDay(a.apptDate) }}</div>
                   <div class="appt-month">{{ getMonth(a.apptDate) }}</div>
@@ -74,7 +74,7 @@ import { Appointment } from '../../../core/models/appointment.model';
                   <span class="chip" [ngClass]="a.status.toLowerCase()">{{ a.status }}</span>
                   @if (a.status === 'PENDING' || a.status === 'CONFIRMED') {
                     <button mat-icon-button class="cancel-btn"
-                            (click)="cancel(a.id)" title="Cancel appointment">
+                            (click)="cancel(a.id); $event.stopPropagation()" title="Cancel appointment">
                       <mat-icon>cancel</mat-icon>
                     </button>
                   }
@@ -86,6 +86,129 @@ import { Appointment } from '../../../core/models/appointment.model';
       }
 
     </div>
+
+    <!-- Detail Modal -->
+    @if (selected) {
+      <div class="modal-backdrop" (click)="selected = null">
+        <div class="modal-card" (click)="$event.stopPropagation()">
+
+          <div class="modal-header">
+            <div>
+              <div class="modal-title">Appointment Details</div>
+              <div class="modal-sub">{{ formatFullDate(selected.apptDate) }}</div>
+            </div>
+            <button mat-icon-button (click)="selected = null">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <div class="modal-body">
+
+            <div class="detail-row">
+              <mat-icon class="detail-icon">event</mat-icon>
+              <div>
+                <div class="detail-label">Date</div>
+                <div class="detail-value">{{ formatFullDate(selected.apptDate) }}</div>
+              </div>
+            </div>
+
+            <div class="detail-row">
+              <mat-icon class="detail-icon">schedule</mat-icon>
+              <div>
+                <div class="detail-label">Time</div>
+                <div class="detail-value">{{ formatTime(selected.apptTime) }}</div>
+              </div>
+            </div>
+
+            <div class="detail-row">
+              <mat-icon class="detail-icon">info</mat-icon>
+              <div>
+                <div class="detail-label">Status</div>
+                <span class="chip" [ngClass]="selected.status.toLowerCase()">{{ selected.status }}</span>
+              </div>
+            </div>
+
+            @if (selected.hospitalName) {
+              <div class="detail-row">
+                <mat-icon class="detail-icon">local_hospital</mat-icon>
+                <div>
+                  <div class="detail-label">Hospital</div>
+                  <div class="detail-value">{{ selected.hospitalName }}</div>
+                  @if (selected.hospitalCity || selected.hospitalAddress) {
+                    <div class="detail-meta">{{ selected.hospitalAddress }}{{ selected.hospitalCity ? ', ' + selected.hospitalCity : '' }}</div>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (selected.doctorName) {
+              <div class="detail-row">
+                <mat-icon class="detail-icon">person</mat-icon>
+                <div>
+                  <div class="detail-label">Doctor</div>
+                  <div class="detail-value">Dr. {{ selected.doctorName }}</div>
+                  @if (selected.doctorSpecialization) {
+                    <div class="detail-meta">{{ selected.doctorSpecialization }}</div>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (selected.petName) {
+              <div class="detail-row">
+                <mat-icon class="detail-icon">pets</mat-icon>
+                <div>
+                  <div class="detail-label">Pet</div>
+                  <div class="detail-value">{{ selected.petName }}</div>
+                  @if (selected.petBreed || selected.petSpecies) {
+                    <div class="detail-meta">{{ selected.petBreed || selected.petSpecies }}</div>
+                  }
+                </div>
+              </div>
+            }
+
+            <div class="detail-row">
+              <mat-icon class="detail-icon">medical_services</mat-icon>
+              <div>
+                <div class="detail-label">Reason for Visit</div>
+                <div class="detail-value">{{ selected.reason || 'General Checkup' }}</div>
+              </div>
+            </div>
+
+            @if (selected.notes) {
+              <div class="detail-row">
+                <mat-icon class="detail-icon">notes</mat-icon>
+                <div>
+                  <div class="detail-label">Notes</div>
+                  <div class="detail-value">{{ selected.notes }}</div>
+                </div>
+              </div>
+            }
+
+            @if (selected.createdAt) {
+              <div class="detail-row">
+                <mat-icon class="detail-icon">history</mat-icon>
+                <div>
+                  <div class="detail-label">Booked On</div>
+                  <div class="detail-value">{{ formatFullDate(selected.createdAt) }}</div>
+                </div>
+              </div>
+            }
+
+          </div>
+
+          @if (selected.status === 'PENDING' || selected.status === 'CONFIRMED') {
+            <div class="modal-footer">
+              <button mat-stroked-button class="cancel-appt-btn"
+                      (click)="cancel(selected.id); selected = null">
+                <mat-icon>cancel</mat-icon> Cancel Appointment
+              </button>
+            </div>
+          }
+
+        </div>
+      </div>
+    }
   `,
   styles: [`
     .appt-row {
@@ -126,12 +249,60 @@ import { Appointment } from '../../../core/models/appointment.model';
       &:hover { color: #DC2626 !important; background: #FEE2E2 !important; }
       mat-icon { font-size: 16px; }
     }
+
+    /* ── Modal ── */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; padding: 16px;
+    }
+    .modal-card {
+      background: #fff; border-radius: 20px;
+      width: 100%; max-width: 460px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+      overflow: hidden;
+      animation: slideUp 0.2s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(24px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    .modal-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding: 22px 22px 16px;
+      border-bottom: 1px solid #FAF0EB;
+      background: linear-gradient(135deg, #FFF7ED 0%, #fff 100%);
+    }
+    .modal-title { font-size: 1.1rem; font-weight: 800; color: #1A3547; }
+    .modal-sub   { font-size: 0.78rem; color: #8BA3B5; margin-top: 2px; }
+
+    .modal-body { padding: 18px 22px; display: flex; flex-direction: column; gap: 16px; }
+
+    .detail-row {
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .detail-icon {
+      color: #FF8C42; font-size: 20px; width: 20px; height: 20px; margin-top: 2px; flex-shrink: 0;
+    }
+    .detail-label { font-size: 0.72rem; font-weight: 600; color: #8BA3B5; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+    .detail-value { font-size: 0.92rem; font-weight: 600; color: #1A3547; }
+    .detail-meta  { font-size: 0.78rem; color: #8BA3B5; margin-top: 2px; }
+
+    .modal-footer {
+      padding: 14px 22px 20px;
+      border-top: 1px solid #FAF0EB;
+    }
+    .cancel-appt-btn {
+      width: 100%; border-color: #DC2626 !important; color: #DC2626 !important; border-radius: 10px !important;
+      &:hover { background: #FEE2E2 !important; }
+    }
   `]
 })
 export class AppointmentsListComponent implements OnInit {
   appointments: Appointment[] = [];
   loading = true;
   cols = ['date', 'time', 'reason', 'status', 'actions'];
+  selected: Appointment | null = null;
 
   constructor(private api: ApiService) {}
 
@@ -158,5 +329,18 @@ export class AppointmentsListComponent implements OnInit {
       const a = this.appointments.find(x => x.id === id);
       if (a) a.status = 'CANCELLED';
     });
+  }
+
+  formatFullDate(dateStr: string): string {
+    if (!dateStr) return '—';
+    return new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  formatTime(timeStr: string): string {
+    if (!timeStr) return '—';
+    const [h, m] = timeStr.split(':').map(Number);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const hour = h % 12 || 12;
+    return `${hour}:${String(m).padStart(2, '0')} ${ampm}`;
   }
 }

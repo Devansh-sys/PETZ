@@ -2,6 +2,7 @@ package com.petz.controller;
 
 import com.petz.dto.request.AdoptionApplicationRequest;
 import com.petz.dto.request.AnimalRequest;
+import com.petz.dto.response.AdoptionApplicationResponse;
 import com.petz.entity.AdoptableAnimal;
 import com.petz.entity.AdoptionApplication;
 import com.petz.service.AdoptionService;
@@ -81,7 +82,7 @@ public class AdoptionController {
     }
 
     @GetMapping("/my-applications")
-    public ResponseEntity<ApiResponse<List<AdoptionApplication>>> myApplications() {
+    public ResponseEntity<ApiResponse<List<AdoptionApplicationResponse>>> myApplications() {
         Long userId = securityUtil.getCurrentUserId();
         return ResponseEntity.ok(ApiResponse.ok(adoptionService.getApplicationsByUser(userId)));
     }

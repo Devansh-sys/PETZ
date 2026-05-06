@@ -1,6 +1,7 @@
 package com.petz.service;
 
 import com.petz.dto.request.RescueRequest;
+import com.petz.dto.response.RescueReportResponse;
 import com.petz.entity.Ngo;
 import com.petz.entity.RescueQueue;
 import com.petz.entity.RescueReport;
@@ -130,8 +131,14 @@ public class RescueService {
         return r;
     }
 
-    public List<RescueReport> getByReporter(Long reporterId) {
-        return rescueRepo.findByReporterId(reporterId);
+    public List<RescueReportResponse> getByReporter(Long reporterId) {
+        return rescueRepo.findByReporterId(reporterId).stream()
+                .map(r -> {
+                    Ngo ngo = r.getAssignedNgo() != null
+                            ? ngoRepo.findById(r.getAssignedNgo()).orElse(null) : null;
+                    return RescueReportResponse.from(r, ngo);
+                })
+                .toList();
     }
 
     public List<RescueReport> getByNgo(Long ngoUserId) {

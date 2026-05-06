@@ -55,15 +55,23 @@ import { AdoptionApplication } from '../../../core/models/adoption.model';
         @if (applications.length > 0) {
           <div style="display:flex;flex-direction:column;gap:14px">
             @for (app of applications; track app.id) {
-              <div class="app-card">
+              <div class="app-card" (click)="selected = app" style="cursor:pointer">
 
                 <!-- Left: number + info -->
                 <div class="app-left">
-                  <div class="app-num-badge">#{{ app.id }}</div>
+                  <div class="app-num-badge">
+                    @if (app.animalPhotoUrl) {
+                      <img [src]="app.animalPhotoUrl" style="width:100%;height:100%;object-fit:cover;border-radius:14px" />
+                    } @else {
+                      <mat-icon style="color:#fff;font-size:20px">pets</mat-icon>
+                    }
+                  </div>
                   <div class="app-detail">
-                    <div class="app-title">Adoption Application</div>
+                    <div class="app-title">{{ app.animalName || 'Adoption Application' }}</div>
                     <div class="app-meta">
-                      <span><mat-icon>pets</mat-icon>Animal #{{ app.animalId }}</span>
+                      @if (app.animalSpecies) {
+                        <span><mat-icon>cruelty_free</mat-icon>{{ app.animalSpecies }}{{ app.animalBreed ? ' · ' + app.animalBreed : '' }}</span>
+                      }
                       @if (app.appliedAt) {
                         <span><mat-icon>schedule</mat-icon>{{ app.appliedAt | date:'mediumDate' }}</span>
                       }
@@ -77,10 +85,10 @@ import { AdoptionApplication } from '../../../core/models/adoption.model';
                   </div>
                 </div>
 
-                <!-- Right: status + timeline -->
+                <!-- Right: status -->
                 <div class="app-right">
                   <span class="chip" [ngClass]="statusClass(app.status)">
-                    {{ app.status }}
+                    {{ statusLabel(app.status) }}
                   </span>
                   <div class="status-hint" [ngClass]="'hint-' + statusClass(app.status)">
                     {{ statusHint(app.status) }}
@@ -111,32 +119,177 @@ import { AdoptionApplication } from '../../../core/models/adoption.model';
       }
 
     </div>
+
+    <!-- ── Detail Modal ── -->
+    @if (selected) {
+      <div class="modal-backdrop" (click)="selected = null">
+        <div class="modal-card" (click)="$event.stopPropagation()">
+
+          <!-- Header -->
+          <div class="modal-header">
+            <div style="display:flex;align-items:center;gap:14px">
+              <div class="modal-animal-icon">
+                @if (selected.animalPhotoUrl) {
+                  <img [src]="selected.animalPhotoUrl" style="width:100%;height:100%;object-fit:cover;border-radius:14px" />
+                } @else {
+                  <mat-icon>pets</mat-icon>
+                }
+              </div>
+              <div>
+                <div class="modal-title">{{ selected.animalName || 'Adoption Application' }}</div>
+                <div class="modal-sub">
+                  @if (selected.animalSpecies) {
+                    <span>{{ selected.animalSpecies }}{{ selected.animalBreed ? ' · ' + selected.animalBreed : '' }}</span>
+                  }
+                </div>
+              </div>
+            </div>
+            <button mat-icon-button (click)="selected = null">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <div class="modal-body">
+
+            <!-- Status -->
+            <div class="detail-row">
+              <mat-icon class="detail-icon">info</mat-icon>
+              <div>
+                <div class="detail-label">Application Status</div>
+                <span class="chip" [ngClass]="statusClass(selected.status)">{{ statusLabel(selected.status) }}</span>
+                <div class="detail-meta" style="margin-top:4px">{{ statusHint(selected.status) }}</div>
+              </div>
+            </div>
+
+            <!-- Animal details -->
+            <div class="section-divider">Animal Details</div>
+
+            <div class="detail-grid">
+              @if (selected.animalAgeMonths) {
+                <div class="detail-item">
+                  <div class="detail-label">Age</div>
+                  <div class="detail-value">{{ ageDisplay(selected.animalAgeMonths) }}</div>
+                </div>
+              }
+              @if (selected.animalGender) {
+                <div class="detail-item">
+                  <div class="detail-label">Gender</div>
+                  <div class="detail-value">{{ selected.animalGender }}</div>
+                </div>
+              }
+              @if (selected.animalCity) {
+                <div class="detail-item">
+                  <div class="detail-label">Location</div>
+                  <div class="detail-value">{{ selected.animalCity }}</div>
+                </div>
+              }
+              <div class="detail-item">
+                <div class="detail-label">Vaccinated</div>
+                <div class="detail-value">{{ selected.animalIsVaccinated ? '✅ Yes' : '❌ No' }}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">Neutered</div>
+                <div class="detail-value">{{ selected.animalIsNeutered ? '✅ Yes' : '❌ No' }}</div>
+              </div>
+            </div>
+
+            <!-- Your application -->
+            <div class="section-divider">Your Application</div>
+
+            @if (selected.reason) {
+              <div class="detail-row">
+                <mat-icon class="detail-icon">favorite</mat-icon>
+                <div>
+                  <div class="detail-label">Why do you want to adopt?</div>
+                  <div class="detail-value" style="font-weight:500;line-height:1.5">{{ selected.reason }}</div>
+                </div>
+              </div>
+            }
+
+            @if (selected.experience) {
+              <div class="detail-row">
+                <mat-icon class="detail-icon">workspace_premium</mat-icon>
+                <div>
+                  <div class="detail-label">Pet Experience</div>
+                  <div class="detail-value" style="font-weight:500;line-height:1.5">{{ selected.experience }}</div>
+                </div>
+              </div>
+            }
+
+            <div class="detail-grid">
+              @if (selected.housingType) {
+                <div class="detail-item">
+                  <div class="detail-label">Housing Type</div>
+                  <div class="detail-value">{{ selected.housingType }}</div>
+                </div>
+              }
+              <div class="detail-item">
+                <div class="detail-label">Other Pets</div>
+                <div class="detail-value">{{ selected.hasOtherPets ? 'Yes' : 'No' }}</div>
+              </div>
+              @if (selected.appliedAt) {
+                <div class="detail-item">
+                  <div class="detail-label">Applied On</div>
+                  <div class="detail-value">{{ selected.appliedAt | date:'mediumDate' }}</div>
+                </div>
+              }
+            </div>
+
+            <!-- Admin notes -->
+            @if (selected.adminNotes) {
+              <div class="admin-notes-box">
+                <div class="detail-label" style="margin-bottom:6px">NGO Feedback</div>
+                <div style="font-size:0.88rem;color:#1A3547;line-height:1.5">{{ selected.adminNotes }}</div>
+              </div>
+            }
+
+            <!-- NGO info -->
+            @if (selected.ngoName) {
+              <div class="ngo-section">
+                <div class="ngo-section-title"><mat-icon>groups</mat-icon> Managing NGO</div>
+                <div class="ngo-name">{{ selected.ngoName }}</div>
+                @if (selected.ngoCity) {
+                  <div class="ngo-meta">{{ selected.ngoCity }}</div>
+                }
+                <div class="ngo-contacts">
+                  @if (selected.ngoPhone) {
+                    <a class="ngo-contact-chip" [href]="'tel:' + selected.ngoPhone">
+                      <mat-icon>call</mat-icon> {{ selected.ngoPhone }}
+                    </a>
+                  }
+                  @if (selected.ngoEmail) {
+                    <a class="ngo-contact-chip" [href]="'mailto:' + selected.ngoEmail">
+                      <mat-icon>email</mat-icon> {{ selected.ngoEmail }}
+                    </a>
+                  }
+                </div>
+              </div>
+            }
+
+          </div>
+        </div>
+      </div>
+    }
   `,
   styles: [`
     .app-card {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      background: #fff;
-      border: 1px solid #E0EBF2;
-      border-radius: 18px;
-      padding: 18px 22px;
+      display: flex; align-items: flex-start; gap: 16px;
+      background: #fff; border: 1px solid #E0EBF2;
+      border-radius: 18px; padding: 18px 22px;
       box-shadow: 0 4px 14px rgba(26,53,71,0.06);
       transition: all 0.2s;
       &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,53,71,0.1); }
     }
     .app-left { display: flex; align-items: flex-start; gap: 14px; flex: 1; min-width: 0; }
     .app-num-badge {
-      min-width: 46px; height: 46px;
-      border-radius: 14px;
+      min-width: 46px; height: 46px; border-radius: 14px;
       background: linear-gradient(135deg, #FF9F5A, #FF8C42);
       display: flex; align-items: center; justify-content: center;
-      font-weight: 900; font-size: 0.8rem; color: #fff;
-      flex-shrink: 0;
+      flex-shrink: 0; overflow: hidden;
       box-shadow: 0 4px 10px rgba(255,140,66,0.3);
     }
     .app-detail { flex: 1; min-width: 0; }
-    .app-title { font-weight: 800; font-size: 0.92rem; color: #1A3547; margin-bottom: 5px; }
+    .app-title { font-weight: 800; font-size: 0.95rem; color: #1A3547; margin-bottom: 5px; }
     .app-meta {
       display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 6px;
       span { display: flex; align-items: center; gap: 3px; font-size: 0.76rem; color: #8BA3B5; }
@@ -147,25 +300,16 @@ import { AdoptionApplication } from '../../../core/models/adoption.model';
       font-size: 0.78rem; color: #4A6478; font-style: italic;
       background: #F9FBFB; border-radius: 8px; padding: 6px 10px;
       mat-icon { font-size: 14px; width: 14px; height: 14px; color: #FF8C42; flex-shrink: 0; margin-top: 1px; }
-      span { line-height: 1.5; }
     }
-    .app-right {
-      display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;
-    }
-    .status-hint {
-      font-size: 0.68rem; font-weight: 600; text-align: right;
-      max-width: 110px; line-height: 1.3;
-    }
-    .hint-pending    { color: #92400E; }
-    .hint-approved   { color: #065F46; }
-    .hint-rejected   { color: #991B1B; }
-    .hint-completed  { color: #1E40AF; }
+    .app-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+    .status-hint { font-size: 0.68rem; font-weight: 600; text-align: right; max-width: 110px; line-height: 1.3; }
+    .hint-pending      { color: #92400E; }
+    .hint-under_review { color: #1E40AF; }
+    .hint-approved     { color: #065F46; }
+    .hint-cancelled    { color: #991B1B; }
+    .hint-confirmed    { color: #1E40AF; }
 
-    /* Summary row */
-    .summary-row {
-      display: flex; gap: 10px; flex-wrap: wrap;
-      margin-top: 20px;
-    }
+    .summary-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
     .sum-pill {
       display: flex; align-items: center; gap: 6px;
       background: #F9FBFB; border: 1px solid #E0EBF2;
@@ -175,11 +319,93 @@ import { AdoptionApplication } from '../../../core/models/adoption.model';
     .sum-num { font-weight: 900; font-size: 0.9rem; color: #1A3547; }
     .pending-pill  { background: #FEF3C7; border-color: #FDE68A; color: #92400E; .sum-num { color: #92400E; } }
     .approved-pill { background: #D1FAE5; border-color: #A7F3D0; color: #065F46; .sum-num { color: #065F46; } }
+
+    /* ── Modal ── */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; padding: 16px;
+    }
+    .modal-card {
+      background: #fff; border-radius: 20px;
+      width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.2);
+      animation: slideUp 0.2s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 22px 16px; border-bottom: 1px solid #F0F4F8;
+      background: linear-gradient(135deg, #FFF7ED 0%, #fff 100%);
+      position: sticky; top: 0; z-index: 1;
+    }
+    .modal-animal-icon {
+      width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0; overflow: hidden;
+      background: linear-gradient(135deg, #FF9F5A, #FF8C42);
+      display: flex; align-items: center; justify-content: center;
+      mat-icon { color: #fff; font-size: 24px; }
+    }
+    .modal-title { font-size: 1.05rem; font-weight: 800; color: #1A3547; }
+    .modal-sub   { font-size: 0.78rem; color: #8BA3B5; margin-top: 2px; }
+
+    .modal-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 16px; }
+
+    .section-divider {
+      font-size: 0.72rem; font-weight: 700; color: #8BA3B5;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      border-bottom: 1px solid #F0F4F8; padding-bottom: 6px; margin-top: 4px;
+    }
+
+    .detail-row { display: flex; align-items: flex-start; gap: 12px; }
+    .detail-icon { color: #FF8C42; font-size: 20px; width: 20px; height: 20px; margin-top: 2px; flex-shrink: 0; }
+    .detail-label { font-size: 0.7rem; font-weight: 700; color: #8BA3B5; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+    .detail-value { font-size: 0.9rem; font-weight: 600; color: #1A3547; }
+    .detail-meta  { font-size: 0.78rem; color: #8BA3B5; }
+
+    .detail-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px;
+    }
+    .detail-item {
+      background: #F8FAFC; border-radius: 12px; padding: 10px 12px;
+    }
+
+    .admin-notes-box {
+      background: #FEF3C7; border: 1px solid #FDE68A;
+      border-radius: 12px; padding: 12px 14px;
+    }
+
+    /* NGO section */
+    .ngo-section {
+      background: #EFF6FF; border: 1px solid #BFDBFE;
+      border-radius: 14px; padding: 14px 16px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .ngo-section-title {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.72rem; font-weight: 700; color: #1E40AF;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      mat-icon { font-size: 15px; width: 15px; height: 15px; }
+    }
+    .ngo-name { font-size: 1rem; font-weight: 800; color: #1A3547; }
+    .ngo-meta { font-size: 0.78rem; color: #4A6478; }
+    .ngo-contacts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .ngo-contact-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #fff; border: 1px solid #BFDBFE; border-radius: 999px;
+      padding: 5px 12px; font-size: 0.78rem; font-weight: 600; color: #1D4ED8;
+      text-decoration: none; transition: all 0.15s;
+      mat-icon { font-size: 14px; width: 14px; height: 14px; }
+      &:hover { background: #DBEAFE; }
+    }
   `]
 })
 export class MyApplicationsComponent implements OnInit {
   applications: AdoptionApplication[] = [];
   loading = true;
+  selected: AdoptionApplication | null = null;
 
   get pendingCount(): number  { return this.applications.filter(a => a.status === 'PENDING').length; }
   get approvedCount(): number { return this.applications.filter(a => a.status === 'APPROVED').length; }
@@ -193,23 +419,44 @@ export class MyApplicationsComponent implements OnInit {
     });
   }
 
+  statusLabel(status: string): string {
+    const map: Record<string, string> = {
+      'PENDING':      'Pending',
+      'UNDER_REVIEW': 'Under Review',
+      'APPROVED':     'Approved',
+      'REJECTED':     'Rejected',
+      'WITHDRAWN':    'Withdrawn'
+    };
+    return map[status] ?? status;
+  }
+
   statusClass(status: string): string {
     const map: Record<string, string> = {
-      'PENDING':   'pending',
-      'APPROVED':  'approved',
-      'REJECTED':  'cancelled',
-      'COMPLETED': 'confirmed'
+      'PENDING':      'pending',
+      'UNDER_REVIEW': 'under_review',
+      'APPROVED':     'approved',
+      'REJECTED':     'cancelled',
+      'WITHDRAWN':    'cancelled'
     };
     return map[status] ?? status?.toLowerCase() ?? '';
   }
 
   statusHint(status: string): string {
     const map: Record<string, string> = {
-      'PENDING':   'Under review',
-      'APPROVED':  'Congratulations!',
-      'REJECTED':  'Not approved',
-      'COMPLETED': 'Adoption done'
+      'PENDING':      'Awaiting NGO review',
+      'UNDER_REVIEW': 'NGO is reviewing',
+      'APPROVED':     'Congratulations!',
+      'REJECTED':     'Not approved',
+      'WITHDRAWN':    'Withdrawn'
     };
     return map[status] ?? '';
+  }
+
+  ageDisplay(months: number): string {
+    if (!months) return '—';
+    if (months < 12) return `${months} month${months > 1 ? 's' : ''}`;
+    const y = Math.floor(months / 12);
+    const m = months % 12;
+    return m > 0 ? `${y}y ${m}m` : `${y} year${y > 1 ? 's' : ''}`;
   }
 }

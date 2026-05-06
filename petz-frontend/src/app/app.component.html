@@ -2,24 +2,29 @@
   <mat-sidenav-container>
 
     <!-- ══════════════════ Sidebar ══════════════════ -->
-    <mat-sidenav mode="side" opened class="sidenav">
+    <mat-sidenav
+      class="sidenav"
+      [mode]="isMobile ? 'over' : 'side'"
+      [(opened)]="sidenavOpen">
 
-      <!-- Logo -->
+      <!-- Logo + collapse toggle -->
       <div class="nav-logo">
         <svg class="logo-svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="40" height="40" rx="12" fill="#FF8C42"/>
-          <!-- Paw pads top-left -->
           <ellipse cx="13" cy="11" rx="3.8" ry="4.6" fill="white" opacity="0.9"/>
-          <!-- Paw pads top-right -->
           <ellipse cx="27" cy="11" rx="3.8" ry="4.6" fill="white" opacity="0.9"/>
-          <!-- Paw pads bottom-left -->
           <ellipse cx="7.5" cy="20" rx="3.2" ry="4" fill="white" opacity="0.9"/>
-          <!-- Paw pads bottom-right -->
           <ellipse cx="32.5" cy="20" rx="3.2" ry="4" fill="white" opacity="0.9"/>
-          <!-- Main central pad -->
           <path d="M20 15.5C14.5 15.5 10 20.2 10 25.5C10 29.5 12.5 32.5 16 33.5H24C27.5 32.5 30 29.5 30 25.5C30 20.2 25.5 15.5 20 15.5Z" fill="white"/>
         </svg>
         <div class="logo-text">PET<span>Z</span></div>
+
+        <!-- Desktop close arrow -->
+        @if (!isMobile) {
+          <button class="nav-collapse-btn" (click)="sidenavOpen = false" title="Collapse sidebar">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+        }
       </div>
 
       <!-- Nav links -->
@@ -27,7 +32,8 @@
         @for (item of visibleNav(); track item.route) {
           <a mat-list-item
              [routerLink]="item.route"
-             routerLinkActive="active">
+             routerLinkActive="active"
+             (click)="onNavClick()">
             <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
             <span matListItemTitle>{{ item.label }}</span>
           </a>
@@ -65,7 +71,14 @@
 
       <!-- Top bar -->
       <mat-toolbar>
-        <!-- Current section title -->
+
+        <!-- Hamburger toggle -->
+        <button mat-icon-button class="menu-toggle" (click)="sidenavOpen = !sidenavOpen"
+                [title]="sidenavOpen ? 'Close menu' : 'Open menu'">
+          <mat-icon>{{ sidenavOpen && !isMobile ? 'menu_open' : 'menu' }}</mat-icon>
+        </button>
+
+        <!-- Brand -->
         <div class="toolbar-brand">
           <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"
                style="width:18px;height:18px;flex-shrink:0">
@@ -93,7 +106,7 @@
           </mat-icon>
         </button>
 
-        <!-- User avatar (desktop) -->
+        <!-- User avatar -->
         <button mat-icon-button [matMenuTriggerFor]="userMenu"
                 style="padding:0;overflow:hidden;border-radius:50%">
           <div class="user-avatar">{{ userName.charAt(0).toUpperCase() }}</div>
@@ -112,6 +125,7 @@
             <mat-icon style="color:#DC2626">logout</mat-icon> Sign out
           </button>
         </mat-menu>
+
       </mat-toolbar>
 
       <!-- Page content -->

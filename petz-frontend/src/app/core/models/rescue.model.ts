@@ -12,6 +12,13 @@ export interface RescueReport {
   criticality: string;
   resolutionNotes?: string;
   reportedAt?: string;
+  updatedAt?: string;
+  // Enriched NGO fields
+  ngoName?: string;
+  ngoPhone?: string;
+  ngoEmail?: string;
+  ngoCity?: string;
+  ngoAddress?: string;
 }
 
 export interface RescueRequest {

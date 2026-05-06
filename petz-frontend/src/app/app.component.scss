@@ -15,6 +15,39 @@ mat-sidenav-content {
   padding: 0;
 }
 
+// ── Sidenav ───────────────────────────────────────────────
+mat-sidenav {
+  width: 240px;
+  box-shadow: 4px 0 24px rgba(26,53,71,0.15) !important;
+  display: flex;
+  flex-direction: column;
+
+  // On mobile, take 80% of screen width but no more than 280px
+  @media (max-width: 900px) {
+    width: min(280px, 82vw);
+  }
+}
+
+// ── Toolbar ───────────────────────────────────────────────
+mat-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0 12px 0 4px !important;
+  gap: 4px;
+}
+
+// ── Hamburger toggle button ───────────────────────────────
+.menu-toggle {
+  flex-shrink: 0;
+  color: #4A6478 !important;
+  transition: color 0.15s;
+
+  &:hover {
+    color: #FF8C42 !important;
+  }
+}
+
 // ── Toolbar brand ─────────────────────────────────────────
 .toolbar-brand {
   display: flex;
@@ -25,6 +58,11 @@ mat-sidenav-content {
   color: #1A3547;
   letter-spacing: -0.01em;
   font-family: 'Quicksand', system-ui, sans-serif;
+
+  // Hide text on very small screens, keep logo
+  @media (max-width: 400px) {
+    span { display: none; }
+  }
 }
 
 // ── User avatar circle ────────────────────────────────────
@@ -43,17 +81,49 @@ mat-sidenav-content {
   letter-spacing: 0;
 }
 
-// ── Toolbar ───────────────────────────────────────────────
-mat-toolbar {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  padding: 0 20px !important;
+// ── Sidenav logo row ──────────────────────────────────────
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 16px 16px;
+  position: relative;
 }
 
-// ── Sidenav ───────────────────────────────────────────────
-mat-sidenav {
-  box-shadow: 4px 0 24px rgba(26,53,71,0.15) !important;
+.logo-text {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.02em;
+  font-family: 'Quicksand', system-ui, sans-serif;
+
+  span { color: #FF8C42; }
+}
+
+// Desktop collapse arrow button (inside sidenav)
+.nav-collapse-btn {
+  margin-left: auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.6);
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+  }
 }

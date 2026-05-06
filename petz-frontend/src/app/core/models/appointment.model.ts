@@ -10,6 +10,16 @@ export interface Appointment {
   status: string;
   notes?: string;
   createdAt?: string;
+  // Enriched fields from backend DTO
+  hospitalName?: string;
+  hospitalCity?: string;
+  hospitalAddress?: string;
+  hospitalPhone?: string;
+  doctorName?: string;
+  doctorSpecialization?: string;
+  petName?: string;
+  petSpecies?: string;
+  petBreed?: string;
 }
 
 export interface AppointmentRequest {

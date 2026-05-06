@@ -1,6 +1,7 @@
 package com.petz.controller;
 
 import com.petz.dto.request.RescueRequest;
+import com.petz.dto.response.RescueReportResponse;
 import com.petz.entity.RescueReport;
 import com.petz.service.RescueService;
 import com.petz.util.ApiResponse;
@@ -32,7 +33,7 @@ public class RescueController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<ApiResponse<List<RescueReport>>> myReports() {
+    public ResponseEntity<ApiResponse<List<RescueReportResponse>>> myReports() {
         Long userId = securityUtil.getCurrentUserId();
         return ResponseEntity.ok(ApiResponse.ok(rescueService.getByReporter(userId)));
     }

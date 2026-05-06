@@ -21,8 +21,9 @@ import { RescueReport } from '../../../core/models/rescue.model';
           </div>
         </div>
         <div class="page-header-actions">
-          <button mat-raised-button color="primary" routerLink="/rescue/report">
-            <mat-icon>add_alert</mat-icon> Report Animal
+          <button class="report-btn" routerLink="/rescue/report">
+            <mat-icon>crisis_alert</mat-icon>
+            <span>Report Animal</span>
           </button>
         </div>
       </div>
@@ -73,7 +74,8 @@ import { RescueReport } from '../../../core/models/rescue.model';
           <div class="rescue-grid">
             @for (r of filtered(); track r.id) {
               <div class="rescue-card-item" [class.completed-card]="r.status === 'COMPLETED'"
-                                            [class.cancelled-card]="r.status === 'CANCELLED'">
+                                            [class.cancelled-card]="r.status === 'CANCELLED'"
+                                            (click)="selected = r" style="cursor:pointer">
 
                 <!-- Top row: icon + status chips -->
                 <div class="rescue-card-top">
@@ -149,9 +151,149 @@ import { RescueReport } from '../../../core/models/rescue.model';
       }
 
     </div>
+
+    <!-- ── Detail Modal ── -->
+    @if (selected) {
+      <div class="modal-backdrop" (click)="selected = null">
+        <div class="modal-card" (click)="$event.stopPropagation()">
+
+          <div class="modal-header" [class.header-completed]="selected.status === 'COMPLETED'"
+                                    [class.header-cancelled]="selected.status === 'CANCELLED'">
+            <div>
+              <div class="modal-title">{{ selected.animalType || 'Unknown Animal' }} — Report Details</div>
+              <div class="modal-sub">
+                <span class="chip" [ngClass]="selected.status.toLowerCase()">{{ statusLabel(selected.status) }}</span>
+                <span class="crit-badge" [ngClass]="critClass(selected.criticality)" style="margin-left:6px">{{ selected.criticality }}</span>
+              </div>
+            </div>
+            <button mat-icon-button (click)="selected = null">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <div class="modal-body">
+
+            <!-- Status timeline -->
+            @if (selected.status !== 'CANCELLED') {
+              <div class="modal-timeline">
+                @for (step of steps; track step.key; let i = $index) {
+                  <div class="tl-step" [class.tl-done]="stepIndex(selected.status) >= i"
+                                       [class.tl-active]="stepIndex(selected.status) === i">
+                    <div class="tl-dot">
+                      @if (stepIndex(selected.status) > i) {
+                        <mat-icon>check</mat-icon>
+                      }
+                    </div>
+                    <span class="tl-label">{{ step.label }}</span>
+                  </div>
+                  @if (i < steps.length - 1) {
+                    <div class="tl-line" [class.tl-line-done]="stepIndex(selected.status) > i"></div>
+                  }
+                }
+              </div>
+            }
+
+            <!-- Reported on -->
+            <div class="detail-row">
+              <mat-icon class="detail-icon">schedule</mat-icon>
+              <div>
+                <div class="detail-label">Reported On</div>
+                <div class="detail-value">{{ selected.reportedAt | date:'EEEE, d MMMM y, h:mm a' }}</div>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="detail-row">
+              <mat-icon class="detail-icon">description</mat-icon>
+              <div>
+                <div class="detail-label">Description</div>
+                <div class="detail-value" style="font-weight:500;line-height:1.5">{{ selected.description || 'No description provided.' }}</div>
+              </div>
+            </div>
+
+            <!-- Location -->
+            @if (selected.address) {
+              <div class="detail-row">
+                <mat-icon class="detail-icon">place</mat-icon>
+                <div>
+                  <div class="detail-label">Location</div>
+                  <div class="detail-value" style="font-weight:500">{{ selected.address }}</div>
+                </div>
+              </div>
+            }
+
+            <!-- NGO Section -->
+            @if (selected.ngoName) {
+              <div class="ngo-section">
+                <div class="ngo-section-title">
+                  <mat-icon>groups</mat-icon> Assigned NGO
+                </div>
+                <div class="ngo-name">{{ selected.ngoName }}</div>
+                @if (selected.ngoCity) {
+                  <div class="ngo-meta">{{ selected.ngoAddress ? selected.ngoAddress + ', ' : '' }}{{ selected.ngoCity }}</div>
+                }
+                <div class="ngo-contacts">
+                  @if (selected.ngoPhone) {
+                    <a class="ngo-contact-chip" [href]="'tel:' + selected.ngoPhone">
+                      <mat-icon>call</mat-icon> {{ selected.ngoPhone }}
+                    </a>
+                  }
+                  @if (selected.ngoEmail) {
+                    <a class="ngo-contact-chip" [href]="'mailto:' + selected.ngoEmail">
+                      <mat-icon>email</mat-icon> {{ selected.ngoEmail }}
+                    </a>
+                  }
+                </div>
+              </div>
+            } @else if (selected.status === 'PENDING') {
+              <div class="ngo-pending-box">
+                <mat-icon>hourglass_empty</mat-icon>
+                <span>Awaiting NGO assignment. You'll be notified once one is assigned.</span>
+              </div>
+            } @else if (selected.status === 'ASSIGNED' || selected.status === 'IN_PROGRESS') {
+              <div class="ngo-pending-box" style="background:#EFF6FF;border-color:#BFDBFE;color:#1E40AF">
+                <mat-icon style="color:#3B82F6">groups</mat-icon>
+                <span>An NGO is assigned. Contact details will appear after refreshing.</span>
+              </div>
+            }
+
+            <!-- Resolution notes -->
+            @if (selected.resolutionNotes) {
+              <div class="resolution-notes">
+                <mat-icon>check_circle</mat-icon>
+                <div>
+                  <div class="detail-label">Resolution</div>
+                  <span>{{ selected.resolutionNotes }}</span>
+                </div>
+              </div>
+            }
+
+          </div>
+
+        </div>
+      </div>
+    }
   `,
   styles: [`
     .page-header-left { display: flex; align-items: center; }
+
+    /* ── Red report button ── */
+    .report-btn {
+      display: flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, #EF4444 0%, #B91C1C 100%);
+      color: #fff; border: none; border-radius: 14px;
+      padding: 10px 20px; font-size: 0.88rem; font-weight: 800;
+      cursor: pointer; letter-spacing: 0.01em;
+      box-shadow: 0 4px 16px rgba(185,28,28,0.4);
+      transition: transform 0.18s, box-shadow 0.18s;
+      font-family: 'Quicksand', system-ui, sans-serif;
+      mat-icon { font-size: 20px; width: 20px; height: 20px; }
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(185,28,28,0.5);
+      }
+      &:active { transform: translateY(0); }
+    }
 
     /* ── Filter bar ── */
     .filter-bar {
@@ -284,12 +426,88 @@ import { RescueReport } from '../../../core/models/rescue.model';
       mat-icon { font-size: 14px; width: 14px; height: 14px; flex-shrink: 0; }
       span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     }
+
+    /* ── Modal ── */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; padding: 16px;
+    }
+    .modal-card {
+      background: #fff; border-radius: 20px;
+      width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.2);
+      animation: slideUp 0.2s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    .modal-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding: 22px 22px 16px; border-bottom: 1px solid #F0F4F8;
+      background: linear-gradient(135deg, #FFF3EC 0%, #fff 100%);
+      position: sticky; top: 0; z-index: 1;
+    }
+    .header-completed { background: linear-gradient(135deg, #F0FDF4 0%, #fff 100%) !important; }
+    .header-cancelled { background: linear-gradient(135deg, #F9FAFB 0%, #fff 100%) !important; }
+    .modal-title { font-size: 1.05rem; font-weight: 800; color: #1A3547; margin-bottom: 6px; }
+    .modal-sub   { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+
+    .modal-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 18px; }
+
+    .modal-timeline {
+      display: flex; align-items: center;
+      background: #F8FAFC; border-radius: 14px; padding: 14px 16px;
+    }
+
+    .detail-row { display: flex; align-items: flex-start; gap: 14px; }
+    .detail-icon { color: #FF8C42; font-size: 20px; width: 20px; height: 20px; margin-top: 2px; flex-shrink: 0; }
+    .detail-label { font-size: 0.7rem; font-weight: 700; color: #8BA3B5; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+    .detail-value { font-size: 0.9rem; font-weight: 600; color: #1A3547; }
+
+    /* ── NGO section ── */
+    .ngo-section {
+      background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 14px;
+      padding: 14px 16px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .ngo-section-title {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.72rem; font-weight: 700; color: #1E40AF; text-transform: uppercase; letter-spacing: 0.06em;
+      mat-icon { font-size: 15px; width: 15px; height: 15px; }
+    }
+    .ngo-name { font-size: 1rem; font-weight: 800; color: #1A3547; }
+    .ngo-meta { font-size: 0.78rem; color: #4A6478; }
+    .ngo-contacts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .ngo-contact-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #fff; border: 1px solid #BFDBFE; border-radius: 999px;
+      padding: 5px 12px; font-size: 0.78rem; font-weight: 600; color: #1D4ED8;
+      text-decoration: none; transition: all 0.15s;
+      mat-icon { font-size: 14px; width: 14px; height: 14px; }
+      &:hover { background: #DBEAFE; }
+    }
+
+    .ngo-pending-box {
+      display: flex; align-items: center; gap: 10px;
+      background: #FFF3EC; border: 1px solid #FDBF8A; border-radius: 12px;
+      padding: 12px 14px; font-size: 0.82rem; color: #9A3412;
+      mat-icon { color: #FF8C42; font-size: 18px; flex-shrink: 0; }
+    }
+
+    .resolution-notes {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: #F0FDF4; border: 1px solid #A7F3D0; border-radius: 12px;
+      padding: 12px 14px; font-size: 0.82rem; color: #15803D; line-height: 1.5;
+      mat-icon { font-size: 18px; width: 18px; height: 18px; color: #22C55E; flex-shrink: 0; margin-top: 2px; }
+    }
   `]
 })
 export class RescueListComponent implements OnInit {
   rescues: RescueReport[] = [];
   loading = true;
   activeFilter = 'ALL';
+  selected: RescueReport | null = null;
 
   readonly steps = [
     { key: 'PENDING',     label: 'Reported'    },

@@ -1,6 +1,7 @@
 package com.petz.controller;
 
 import com.petz.dto.request.AppointmentRequest;
+import com.petz.dto.response.AppointmentResponse;
 import com.petz.dto.response.SlotResponse;
 import com.petz.entity.Appointment;
 import com.petz.service.AppointmentService;
@@ -34,7 +35,7 @@ public class AppointmentController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<ApiResponse<List<Appointment>>> myAppointments() {
+    public ResponseEntity<ApiResponse<List<AppointmentResponse>>> myAppointments() {
         Long userId = securityUtil.getCurrentUserId();
         return ResponseEntity.ok(ApiResponse.ok(appointmentService.getByUser(userId)));
     }

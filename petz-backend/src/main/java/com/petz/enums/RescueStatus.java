@@ -5,5 +5,6 @@ public enum RescueStatus {
     ASSIGNED,
     IN_PROGRESS,
     COMPLETED,
+    RESOLVED,
     CANCELLED
 }

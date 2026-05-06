@@ -2,6 +2,7 @@ package com.petz.service;
 
 import com.petz.dto.request.AdoptionApplicationRequest;
 import com.petz.dto.request.AnimalRequest;
+import com.petz.dto.response.AdoptionApplicationResponse;
 import com.petz.entity.AdoptableAnimal;
 import com.petz.entity.AdoptionApplication;
 import com.petz.entity.Ngo;
@@ -155,8 +156,16 @@ public class AdoptionService {
         return app;
     }
 
-    public List<AdoptionApplication> getApplicationsByUser(Long userId) {
-        return applicationRepo.findByApplicantId(userId);
+    public List<AdoptionApplicationResponse> getApplicationsByUser(Long userId) {
+        return applicationRepo.findByApplicantId(userId).stream()
+                .map(app -> {
+                    AdoptableAnimal animal = app.getAnimalId() != null
+                            ? animalRepo.findById(app.getAnimalId()).orElse(null) : null;
+                    Ngo ngo = app.getNgoId() != null
+                            ? ngoRepo.findById(app.getNgoId()).orElse(null) : null;
+                    return AdoptionApplicationResponse.from(app, animal, ngo);
+                })
+                .toList();
     }
 
     public List<AdoptionApplication> getApplicationsByNgo(Long ngoUserId) {
