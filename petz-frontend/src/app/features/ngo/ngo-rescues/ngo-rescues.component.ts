@@ -7,46 +7,137 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   selector: 'app-ngo-rescues',
   template: `
     <div class="page-container">
-      <h1>Rescue Queue</h1>
+
+      <!-- Header -->
+      <div class="page-header">
+        <div class="page-header-left" style="display:flex;align-items:center;gap:12px">
+          <button mat-icon-button routerLink="/ngo" class="back-btn" title="Back to NGO Dashboard">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+          <div>
+            <h1>Rescue Queue</h1>
+            <p>Rescue assignments waiting for your response</p>
+          </div>
+        </div>
+        <div class="rescue-count-badge">
+          <mat-icon>emergency</mat-icon>
+          <span>{{ rescues.length }} reports</span>
+        </div>
+      </div>
 
       @if (loading) {
-        <mat-spinner diameter="40" style="margin:40px auto"></mat-spinner>
+        <div class="loading-state">
+          <mat-spinner diameter="32"></mat-spinner>
+          <span>Loading rescue queue...</span>
+        </div>
       }
 
       @if (!loading) {
-        @for (r of rescues; track r.id) {
-          <mat-card style="margin-bottom:12px">
-            <mat-card-content style="padding:16px">
-              <div style="display:flex;justify-content:space-between;align-items:flex-start">
-                <div>
-                  <h3 style="margin:0">{{ r.animalType || 'Unknown' }} — {{ r.criticality }}</h3>
-                  <p style="color:#64748B;margin:4px 0">{{ r.address }}</p>
-                  <p style="color:#475569;margin:0">{{ r.description }}</p>
-                </div>
-                <span class="chip" [ngClass]="r.status.toLowerCase()">{{ r.status }}</span>
-              </div>
-              @if (r.status === 'ASSIGNED') {
-                <div style="margin-top:12px;display:flex;gap:8px">
-                  <button mat-raised-button color="primary" (click)="respond(r.id, 'ACCEPT')">Accept</button>
-                  <button mat-raised-button color="warn"    (click)="respond(r.id, 'DECLINE')">Decline</button>
-                </div>
-              }
-              @if (r.status === 'IN_PROGRESS') {
-                <div style="margin-top:12px">
-                  <button mat-raised-button (click)="complete(r.id)">Mark Complete</button>
-                </div>
-              }
-            </mat-card-content>
-          </mat-card>
-        }
         @if (rescues.length === 0) {
-          <p style="text-align:center;padding:32px;color:#64748B">
-            No rescue assignments.
-          </p>
+          <div class="card">
+            <div class="empty-state">
+              <div class="empty-icon"><mat-icon>emergency</mat-icon></div>
+              <h3>No rescue assignments</h3>
+              <p>Your queue is clear. New assignments will appear here.</p>
+            </div>
+          </div>
         }
+
+        <div style="display:flex;flex-direction:column;gap:14px">
+          @for (r of rescues; track r.id) {
+            <div class="rescue-queue-card">
+              <div class="rq-left">
+                <div class="rq-icon" [class.critical-icon]="r.criticality === 'CRITICAL' || r.criticality === 'HIGH'">
+                  <mat-icon>pets</mat-icon>
+                </div>
+                <div class="rq-info">
+                  <div class="rq-title">{{ r.animalType || 'Unknown Animal' }}</div>
+                  @if (r.address) {
+                    <div class="rq-address">
+                      <mat-icon>place</mat-icon> {{ r.address }}
+                    </div>
+                  }
+                  @if (r.description) {
+                    <div class="rq-desc">{{ r.description }}</div>
+                  }
+                </div>
+              </div>
+              <div class="rq-right">
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+                  <span class="chip" [ngClass]="r.status.toLowerCase()">{{ r.status }}</span>
+                  <span class="crit-pill crit-{{ r.criticality?.toLowerCase() }}">{{ r.criticality }}</span>
+                </div>
+                <div class="rq-actions">
+                  @if (r.status === 'ASSIGNED') {
+                    <button mat-raised-button color="primary" (click)="respond(r.id, 'ACCEPT')"
+                            style="height:36px;font-size:0.82rem;border-radius:10px">
+                      <mat-icon>check</mat-icon> Accept
+                    </button>
+                    <button mat-stroked-button (click)="respond(r.id, 'DECLINE')"
+                            style="height:36px;font-size:0.82rem;border-radius:10px;color:#DC2626;border-color:#FECACA">
+                      Decline
+                    </button>
+                  }
+                  @if (r.status === 'IN_PROGRESS') {
+                    <button mat-raised-button (click)="complete(r.id)"
+                            style="height:36px;font-size:0.82rem;border-radius:10px;background:#059669;color:#fff">
+                      <mat-icon>done_all</mat-icon> Complete
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
       }
+
     </div>
-  `
+  `,
+  styles: [`
+    .back-btn {
+      width: 38px !important; height: 38px !important;
+      border-radius: 10px !important; background: #fff !important;
+      border: 1px solid #F0E0D6 !important; color: #78716C !important; flex-shrink: 0;
+      &:hover { border-color: #F97316 !important; color: #F97316 !important; }
+    }
+    .rescue-count-badge {
+      display: flex; align-items: center; gap: 6px;
+      background: #FEE2E2; color: #991B1B;
+      border-radius: 999px; padding: 6px 14px;
+      font-size: 0.78rem; font-weight: 700;
+      mat-icon { font-size: 16px; width: 16px; height: 16px; }
+    }
+    .rescue-queue-card {
+      display: flex; align-items: flex-start; gap: 16px;
+      background: #fff; border: 1px solid #F0E0D6;
+      border-radius: 18px; padding: 18px 20px;
+      box-shadow: 0 4px 14px rgba(28,9,2,0.06);
+      transition: all 0.2s;
+      &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(28,9,2,0.1); }
+    }
+    .rq-left { display: flex; gap: 14px; flex: 1; min-width: 0; }
+    .rq-icon {
+      width: 44px; height: 44px; border-radius: 14px; flex-shrink: 0;
+      background: linear-gradient(135deg, #34D399, #059669);
+      display: flex; align-items: center; justify-content: center;
+      mat-icon { color: #fff; font-size: 22px; }
+    }
+    .rq-icon.critical-icon { background: linear-gradient(135deg, #F87171, #DC2626); }
+    .rq-info { flex: 1; min-width: 0; }
+    .rq-title { font-weight: 800; font-size: 0.95rem; color: #1C0902; margin-bottom: 4px; }
+    .rq-address { display: flex; align-items: center; gap: 3px; font-size: 0.78rem; color: #78716C; margin-bottom: 4px; mat-icon { font-size: 13px; width: 13px; height: 13px; color: #F97316; } }
+    .rq-desc { font-size: 0.8rem; color: #A8A29E; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .rq-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
+    .rq-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .crit-pill {
+      font-size: 0.68rem; font-weight: 700; padding: 2px 8px;
+      border-radius: 999px; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .crit-low { background: #D1FAE5; color: #065F46; }
+    .crit-medium { background: #FEF3C7; color: #92400E; }
+    .crit-high { background: #FFEDD5; color: #9A3412; }
+    .crit-critical { background: #FEE2E2; color: #991B1B; }
+  `]
 })
 export class NgoRescuesComponent implements OnInit {
   rescues: any[] = [];
@@ -73,11 +164,11 @@ export class NgoRescuesComponent implements OnInit {
   }
 
   complete(id: number): void {
-    this.api.post<any>(`/rescue/${id}/complete`, { notes: 'Rescue completed successfully.' }).subscribe({
+    this.api.post<any>(`/rescue/${id}/complete`, { notes: 'Rescue completed.' }).subscribe({
       next: () => {
         const r = this.rescues.find(x => x.id === id);
         if (r) r.status = 'COMPLETED';
-        this.snack.open('Rescue marked complete!', '', { duration: 2000 });
+        this.snack.open('Rescue marked as complete! ✓', '', { duration: 2000 });
       }
     });
   }

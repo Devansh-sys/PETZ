@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../core/services/auth.service';
+import { ApiService } from '../../core/services/api.service';
 
 @Component({
   standalone: false,
@@ -89,11 +90,11 @@ import { AuthService } from '../../core/services/auth.service';
           <mat-icon class="action-arrow">chevron_right</mat-icon>
         </div>
 
-        <div class="action-card" routerLink="/pets">
-          <div class="action-icon green"><mat-icon>pets</mat-icon></div>
+        <div class="action-card" routerLink="/adoption/my">
+          <div class="action-icon green"><mat-icon>favorite</mat-icon></div>
           <div>
-            <p class="action-title">My Pets</p>
-            <p class="action-desc">Manage your registered pets</p>
+            <p class="action-title">My Adoptions</p>
+            <p class="action-desc">Track your adoption applications</p>
           </div>
           <mat-icon class="action-arrow">chevron_right</mat-icon>
         </div>
@@ -201,7 +202,7 @@ export class DashboardComponent implements OnInit {
     { value: '—', label: 'Adoptions' }
   ];
 
-  constructor(private auth: AuthService) {}
+  constructor(private auth: AuthService, private api: ApiService) {}
 
   ngOnInit(): void {
     const user = this.auth.currentUser$.value;
@@ -210,6 +211,29 @@ export class DashboardComponent implements OnInit {
     this.greeting = this.getGreeting();
     this.today = new Date().toLocaleDateString('en-US', {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+    this.loadStats();
+  }
+
+  private loadStats(): void {
+    this.api.get<any>('/pets/my').subscribe({
+      next: res => { this.stats[0].value = (res.data?.length ?? 0).toString(); },
+      error: () => { this.stats[0].value = '0'; }
+    });
+
+    this.api.get<any>('/appointments/my').subscribe({
+      next: res => { this.stats[1].value = (res.data?.length ?? 0).toString(); },
+      error: () => { this.stats[1].value = '0'; }
+    });
+
+    this.api.get<any>('/rescue/my').subscribe({
+      next: res => { this.stats[2].value = (res.data?.length ?? 0).toString(); },
+      error: () => { this.stats[2].value = '0'; }
+    });
+
+    this.api.get<any>('/adoption/my-applications').subscribe({
+      next: res => { this.stats[3].value = (res.data?.length ?? 0).toString(); },
+      error: () => { this.stats[3].value = '0'; }
     });
   }
 

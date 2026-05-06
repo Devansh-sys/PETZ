@@ -254,29 +254,30 @@ CREATE TABLE IF NOT EXISTS file_uploads (
 -- ----------------------------------------------------------
 
 -- Default ADMIN user (password: admin@petz123)
+-- Hash generated: BCrypt cost 10 for "admin@petz123"
 INSERT INTO users (name, email, password_hash, phone, role)
 VALUES ('Admin User', 'admin@petz.com',
-        '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LPVdBKOdm.y',
+        '$2b$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG',
         '9999999999', 'ADMIN')
-ON DUPLICATE KEY UPDATE id = id;
+ON DUPLICATE KEY UPDATE password_hash = '$2b$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG';
 
--- Sample NGO owner
+-- Sample NGO owner (password: admin@petz123)
 INSERT INTO users (name, email, password_hash, phone, role)
 VALUES ('NGO Owner', 'ngo@petz.com',
-        '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LPVdBKOdm.y',
+        '$2b$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG',
         '9888888888', 'NGO')
-ON DUPLICATE KEY UPDATE id = id;
+ON DUPLICATE KEY UPDATE password_hash = '$2b$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG';
 
--- Sample hospital owner
+-- Sample hospital owner (password: admin@petz123)
 INSERT INTO users (name, email, password_hash, phone, role)
 VALUES ('Hospital Owner', 'hospital@petz.com',
-        '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LPVdBKOdm.y',
+        '$2b$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG',
         '9777777777', 'HOSPITAL')
-ON DUPLICATE KEY UPDATE id = id;
+ON DUPLICATE KEY UPDATE password_hash = '$2b$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG';
 
--- Sample regular user
+-- Sample regular user (password: admin@petz123)
 INSERT INTO users (name, email, password_hash, phone, role)
 VALUES ('John Doe', 'user@petz.com',
-        '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LPVdBKOdm.y',
+        '$2b$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG',
         '9666666666', 'USER')
-ON DUPLICATE KEY UPDATE id = id;
+ON DUPLICATE KEY UPDATE password_hash = '$2b$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG';

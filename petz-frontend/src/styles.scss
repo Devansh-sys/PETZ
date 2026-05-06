@@ -1,255 +1,425 @@
-// ═══════════════════════════════════════════════════════
-//  PETZ — Design System
-//  Inspired by: warm orange palette, dark sidebar, card-first layout
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+//  PETZ — Premium Design System v2
+//  Palette: Warm Orange #F97316 · Deep Mahogany #1C0902 · Cream #FFF8F4
+// ═══════════════════════════════════════════════════════════
 
-// ── Tokens ──────────────────────────────────────────────
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,400&display=swap');
+
+// ── Design tokens ─────────────────────────────────────────
 $primary:        #F97316;
 $primary-dark:   #C2410C;
+$primary-hover:  #EA6C0A;
 $primary-light:  #FFEDD5;
+$primary-pale:   #FFF7ED;
 $sidebar-bg:     #1C0902;
+$sidebar-sect:   #2A0E03;
 $sidebar-hover:  rgba(249,115,22,0.14);
-$sidebar-active: #F97316;
+$sidebar-border: rgba(255,255,255,0.06);
 $page-bg:        #FFF8F4;
 $surface:        #FFFFFF;
+$surface-2:      #FFF4EE;
 $border:         #F0E0D6;
+$border-2:       #E5D0C5;
 $text-1:         #1C0902;
 $text-2:         #78716C;
 $text-3:         #A8A29E;
-$nav-width:      255px;
-$font:           'DM Sans', sans-serif;
+$nav-width:      260px;
+$font:           'DM Sans', system-ui, -apple-system, sans-serif;
 
-// ── Reset ────────────────────────────────────────────────
+// ── Gradients ─────────────────────────────────────────────
+$grad-orange:    linear-gradient(135deg, #FF9748 0%, #F97316 100%);
+$grad-purple:    linear-gradient(135deg, #B97AFB 0%, #7C3AED 100%);
+$grad-pink:      linear-gradient(135deg, #F472B6 0%, #DB2777 100%);
+$grad-green:     linear-gradient(135deg, #34D399 0%, #059669 100%);
+$grad-blue:      linear-gradient(135deg, #60A5FA 0%, #2563EB 100%);
+$grad-red:       linear-gradient(135deg, #F87171 0%, #DC2626 100%);
+$grad-sidebar:   linear-gradient(160deg, #1C0902 0%, #3D1505 60%, #7C2D12 100%);
+
+// ── Shadows ───────────────────────────────────────────────
+$shadow-sm:  0 1px 4px rgba(28,9,2,0.06);
+$shadow-md:  0 4px 16px rgba(28,9,2,0.08);
+$shadow-lg:  0 8px 32px rgba(28,9,2,0.10);
+$shadow-xl:  0 16px 48px rgba(28,9,2,0.12);
+$shadow-btn: 0 4px 14px rgba(249,115,22,0.35);
+
+// ── Animations ────────────────────────────────────────────
+@keyframes fadeIn   { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+@keyframes slideIn  { from { opacity:0; transform:translateX(-12px); } to { opacity:1; transform:translateX(0); } }
+@keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:.5} }
+@keyframes spin     { to { transform:rotate(360deg); } }
+@keyframes shimmer  { 0%{background-position:-200%} 100%{background-position:200%} }
+
+// ═══════════════════════════════════════════════════════════
+//  Base reset
+// ═══════════════════════════════════════════════════════════
 *, *::before, *::after { box-sizing: border-box; }
 html, body {
-  height: 100%; margin: 0;
+  height:100%; margin:0;
   font-family: $font;
   background: $page-bg;
   color: $text-1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+a { text-decoration: none; color: inherit; }
 
-// ═══════════════════════════════════════════════════════
-//  Angular Material overrides  (Angular Material 20 MDC)
-// ═══════════════════════════════════════════════════════
+// Custom scrollbar
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:#E7D5CC; border-radius:99px; }
+::-webkit-scrollbar-thumb:hover { background:#D6C4BB; }
 
-// — Buttons ───────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+//  Angular Material 20 MDC overrides
+// ═══════════════════════════════════════════════════════════
+
+// ── Buttons ───────────────────────────────────────────────
 .mat-mdc-raised-button.mat-primary,
-.mat-mdc-flat-button.mat-primary,
-.mdc-button--raised.mat-primary {
+.mat-mdc-flat-button.mat-primary {
   --mdc-filled-button-container-color: #{$primary} !important;
   --mdc-filled-button-label-text-color: #fff !important;
   --mdc-protected-button-container-color: #{$primary} !important;
-  background-color: $primary !important;
+  background: $grad-orange !important;
   color: #fff !important;
-  box-shadow: 0 4px 14px rgba(249,115,22,0.35) !important;
+  box-shadow: $shadow-btn !important;
+  &:hover { box-shadow: 0 6px 20px rgba(249,115,22,0.5) !important; }
+  &:disabled { background: #E5D0C5 !important; box-shadow: none !important; }
 }
 
-.mat-mdc-outlined-button.mat-primary,
-.mat-mdc-button.mat-primary {
+.mat-mdc-outlined-button.mat-primary {
+  --mdc-outlined-button-label-text-color: #{$primary} !important;
+  --mdc-outlined-button-outline-color: #{$border-2} !important;
   color: $primary !important;
+  border-color: $border-2 !important;
+  &:hover { background: $primary-pale !important; }
 }
+
+.mat-mdc-button.mat-primary { color: $primary !important; }
 
 .mat-mdc-raised-button,
 .mat-mdc-flat-button,
 .mat-mdc-outlined-button,
 .mat-mdc-button {
   font-family: $font !important;
-  border-radius: 10px !important;
+  border-radius: 12px !important;
   font-weight: 600 !important;
   letter-spacing: 0 !important;
+  transition: all 0.2s ease !important;
 }
 
-.mat-mdc-icon-button.mat-primary { color: $primary !important; }
+.mat-mdc-icon-button { color: $text-2 !important; transition: color 0.2s !important; }
+.mat-mdc-icon-button:hover { color: $primary !important; background: $primary-pale !important; }
 
-// — Toolbar ───────────────────────────────────────────
+// ── Toolbar ───────────────────────────────────────────────
 mat-toolbar, .mat-toolbar {
   font-family: $font !important;
-  background: $surface !important;
+  background: rgba(255,255,255,0.96) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
   color: $text-1 !important;
   border-bottom: 1px solid $border !important;
-  box-shadow: none !important;
+  box-shadow: 0 1px 0 rgba(240,224,214,0.5) !important;
   height: 64px !important;
 }
 
-// — Form fields ───────────────────────────────────────
+// ── Form fields ───────────────────────────────────────────
 .mat-mdc-form-field {
   width: 100%;
   font-family: $font !important;
 }
+
+// Outline color on focus
 .mat-mdc-form-field.mat-focused {
   .mdc-notched-outline__leading,
   .mdc-notched-outline__notch,
   .mdc-notched-outline__trailing {
     border-color: $primary !important;
+    border-width: 2px !important;
   }
   .mat-mdc-floating-label, label { color: $primary !important; }
 }
+
+.mdc-text-field--outlined:not(.mdc-text-field--disabled) {
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing {
+    border-color: $border-2 !important;
+  }
+  &:hover {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing { border-color: #D0B8AD !important; }
+  }
+}
+
 .mdc-text-field--focused .mdc-floating-label { color: $primary !important; }
-.mat-mdc-select-value { color: $text-1 !important; }
+.mat-mdc-select-value { color: $text-1 !important; font-family: $font !important; }
+.mat-mdc-option { font-family: $font !important; }
 .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
   background: $primary-light !important;
   span { color: $primary !important; }
 }
+.mat-mdc-form-field-subscript-wrapper { margin-top: 2px !important; }
 
-// — Spinner ───────────────────────────────────────────
+// ── Spinner / progress ────────────────────────────────────
 .mat-mdc-progress-spinner circle,
-.mdc-circular-progress__indeterminate-circle-graphic {
-  stroke: $primary !important;
-}
+.mdc-circular-progress__indeterminate-circle-graphic { stroke: $primary !important; }
+.mat-mdc-progress-bar .mdc-linear-progress__bar-inner { border-color: $primary !important; }
 
-// — Snack bar ─────────────────────────────────────────
+// ── Snack bar ─────────────────────────────────────────────
 .mat-mdc-snack-bar-container {
   --mdc-snackbar-container-color: #{$text-1};
-  border-radius: 10px !important;
+  border-radius: 12px !important;
+  font-family: $font !important;
 }
 
-// — Slide toggle ──────────────────────────────────────
+// ── Slide toggle ──────────────────────────────────────────
 .mat-mdc-slide-toggle.mat-primary {
   --mdc-switch-selected-track-color: #{$primary};
   --mdc-switch-selected-handle-color: #{$primary};
+  --mdc-switch-selected-focus-track-color: #{$primary};
+  --mdc-switch-selected-hover-track-color: #{$primary};
+  --mdc-switch-selected-pressed-track-color: #{$primary};
 }
 
-// — Cards ─────────────────────────────────────────────
+// ── Cards ─────────────────────────────────────────────────
 mat-card, .mat-mdc-card {
-  border-radius: 16px !important;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06) !important;
+  border-radius: 20px !important;
+  box-shadow: $shadow-md !important;
   border: 1px solid $border !important;
   font-family: $font !important;
+  background: $surface !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
 }
 
-// — Table ─────────────────────────────────────────────
+// ── Tables ────────────────────────────────────────────────
 .mat-mdc-table {
   font-family: $font !important;
-  border-radius: 12px !important;
+  border-radius: 16px !important;
   overflow: hidden !important;
+  border: 1px solid $border !important;
+  width: 100% !important;
 }
-.mat-mdc-header-row { background: #FFF4EE !important; }
+.mat-mdc-header-row { background: $surface-2 !important; }
 .mat-mdc-header-cell {
   color: $text-2 !important;
   font-weight: 700 !important;
-  font-size: 0.78rem !important;
+  font-size: 0.75rem !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
+  letter-spacing: 0.06em !important;
+  border-bottom: 1px solid $border !important;
+  font-family: $font !important;
 }
-.mat-mdc-row:hover { background: #FFF8F4 !important; }
+.mat-mdc-cell { font-family: $font !important; border-bottom: 1px solid #FAF0EB !important; color: $text-1 !important; font-size: 0.88rem !important; }
+.mat-mdc-row {
+  transition: background 0.15s !important;
+  &:hover { background: $primary-pale !important; }
+  &:last-child td { border-bottom: none !important; }
+}
 
-// — Menu ──────────────────────────────────────────────
+// ── Menus ─────────────────────────────────────────────────
 .mat-mdc-menu-panel {
-  border-radius: 14px !important;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.12) !important;
+  border-radius: 16px !important;
+  box-shadow: $shadow-xl !important;
   border: 1px solid $border !important;
+  overflow: hidden !important;
 }
-.mat-mdc-menu-item { font-family: $font !important; }
-
-// — Badge ─────────────────────────────────────────────
-.mat-badge-content {
-  background: $primary !important;
-  color: #fff !important;
+.mat-mdc-menu-item {
+  font-family: $font !important;
+  font-size: 0.88rem !important;
+  &:hover { background: $primary-pale !important; }
 }
 
-// ═══════════════════════════════════════════════════════
+// ── Badge ─────────────────────────────────────────────────
+.mat-badge-content { background: $primary !important; color: #fff !important; font-family: $font !important; }
+
+// ── Tabs ──────────────────────────────────────────────────
+.mat-mdc-tab-label-container { border-bottom: 1px solid $border !important; }
+.mat-mdc-tab.mdc-tab--active .mdc-tab__text-label { color: $primary !important; }
+.mat-mdc-tab-header .mat-mdc-tab-label-container .mat-mdc-tab { font-family: $font !important; }
+.mdc-tab-indicator__content--underline { border-color: $primary !important; }
+
+// ── Dialog ────────────────────────────────────────────────
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  border-radius: 20px !important;
+  font-family: $font !important;
+}
+.mat-mdc-dialog-title { font-family: $font !important; font-weight: 800 !important; color: $text-1 !important; }
+
+// ── Chips ─────────────────────────────────────────────────
+.mat-mdc-chip { font-family: $font !important; border-radius: 8px !important; }
+
+// ═══════════════════════════════════════════════════════════
 //  Layout
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 .page-container {
   padding: 28px 32px;
-  max-width: 1280px;
+  max-width: 1340px;
   margin: 0 auto;
-
-  > h1:first-child {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: $text-1;
-    margin: 0 0 6px;
-  }
+  animation: fadeIn 0.3s ease;
 }
 
 .page-subtitle {
   color: $text-2;
   margin: 0 0 24px;
   font-size: 0.9rem;
+  line-height: 1.6;
 }
 
-// ── Card utilities ────────────────────────────────────
+// Page header with subtle gradient banner
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 28px;
+  gap: 16px;
+
+  .page-header-left {
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 900;
+      color: $text-1;
+      margin: 0 0 4px;
+      letter-spacing: -0.02em;
+    }
+    p { color: $text-2; font-size: 0.88rem; margin: 0; }
+  }
+
+  .page-header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+}
+
+// ── Section header ────────────────────────────────────────
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+
+  h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: $text-1;
+  }
+}
+
+// ── Content card ──────────────────────────────────────────
 .card {
   background: $surface;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border-radius: 20px;
+  box-shadow: $shadow-md;
   border: 1px solid $border;
-  padding: 20px 24px;
-  margin-bottom: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  animation: fadeIn 0.3s ease;
 }
 
-// ── Stat cards (colorful) ─────────────────────────────
+.card-flat {
+  background: $surface;
+  border-radius: 20px;
+  border: 1px solid $border;
+  overflow: hidden;
+}
+
+// ── Stat cards ────────────────────────────────────────────
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
 .stat-card {
   border-radius: 20px !important;
   border: none !important;
   overflow: hidden !important;
   position: relative;
+  cursor: default;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  &:hover { transform: translateY(-3px) !important; box-shadow: $shadow-xl !important; }
 
   mat-card-content { padding: 22px 20px !important; }
 
   .stat-icon {
-    width: 48px; height: 48px;
+    width: 46px; height: 46px;
     border-radius: 14px;
     display: flex; align-items: center; justify-content: center;
     margin-bottom: 14px;
-    background: rgba(255,255,255,0.25);
-    mat-icon { font-size: 26px; width: 26px; height: 26px; color: #fff; }
+    background: rgba(255,255,255,0.2);
+    mat-icon { font-size: 24px; width: 24px; height: 24px; color: #fff; }
   }
 
   .stat-value {
     font-size: 2rem;
-    font-weight: 800;
+    font-weight: 900;
     color: #fff;
     line-height: 1;
     margin: 0 0 6px;
+    letter-spacing: -0.03em;
   }
 
   .stat-label {
-    font-size: 0.82rem;
-    color: rgba(255,255,255,0.8);
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.75);
     font-weight: 500;
     margin: 0;
+    letter-spacing: 0.01em;
   }
 
-  &.orange  { background: linear-gradient(135deg, #FF9748 0%, #F97316 100%) !important; }
-  &.purple  { background: linear-gradient(135deg, #B97AFB 0%, #7C3AED 100%) !important; }
-  &.pink    { background: linear-gradient(135deg, #F472B6 0%, #DB2777 100%) !important; }
-  &.green   { background: linear-gradient(135deg, #34D399 0%, #059669 100%) !important; }
+  &.orange { background: $grad-orange !important; box-shadow: 0 8px 24px rgba(249,115,22,0.3) !important; }
+  &.purple { background: $grad-purple !important; box-shadow: 0 8px 24px rgba(124,58,237,0.3) !important; }
+  &.pink   { background: $grad-pink   !important; box-shadow: 0 8px 24px rgba(219,39,119,0.3) !important; }
+  &.green  { background: $grad-green  !important; box-shadow: 0 8px 24px rgba(5,150,105,0.3)  !important; }
+  &.blue   { background: $grad-blue   !important; box-shadow: 0 8px 24px rgba(37,99,235,0.3)  !important; }
+  &.red    { background: $grad-red    !important; box-shadow: 0 8px 24px rgba(220,38,38,0.3)  !important; }
 }
 
-// ── Sidebar nav items ─────────────────────────────────
+// ── Sidebar ───────────────────────────────────────────────
 .sidenav {
   width: $nav-width !important;
-  background: $sidebar-bg !important;
+  background: $grad-sidebar !important;
   border-right: none !important;
+  display: flex !important;
+  flex-direction: column !important;
 
   .nav-logo {
-    padding: 28px 20px 20px;
-    font-size: 1.25rem;
-    font-weight: 900;
-    color: $primary;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
+    padding: 24px 20px 18px;
     display: flex;
     align-items: center;
     gap: 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    margin-bottom: 8px;
+    border-bottom: 1px solid $sidebar-border;
+    margin-bottom: 10px;
+    flex-shrink: 0;
 
-    .logo-icon {
-      width: 36px; height: 36px;
-      background: $primary;
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.2rem;
+    .logo-svg { width: 36px; height: 36px; flex-shrink: 0; }
+    .logo-text {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      span { color: $primary; }
     }
   }
 
+  .nav-section-label {
+    padding: 12px 20px 4px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.25);
+  }
+
   a[mat-list-item], .mat-mdc-list-item {
-    color: #A8A29E !important;
+    color: rgba(255,255,255,0.6) !important;
     border-radius: 12px !important;
-    margin: 2px 12px !important;
+    margin: 1px 12px !important;
     height: 46px !important;
     transition: all 0.18s ease !important;
 
@@ -260,83 +430,414 @@ mat-card, .mat-mdc-card {
       gap: 12px !important;
     }
 
-    mat-icon { color: #78716C !important; font-size: 20px; transition: color 0.18s; }
-    span { font-weight: 500; font-size: 0.9rem; }
+    mat-icon {
+      color: rgba(255,255,255,0.4) !important;
+      font-size: 20px !important;
+      width: 20px !important;
+      height: 20px !important;
+      transition: color 0.18s !important;
+    }
+    span { font-weight: 500; font-size: 0.88rem; transition: color 0.18s; }
 
     &:hover {
       background: $sidebar-hover !important;
-      color: $primary !important;
+      color: #fff !important;
       mat-icon { color: $primary !important; }
     }
 
     &.active {
-      background: $primary !important;
-      color: #fff !important;
-      box-shadow: 0 4px 12px rgba(249,115,22,0.4) !important;
-      mat-icon { color: #fff !important; }
-      span { color: #fff !important; }
+      background: rgba(249,115,22,0.2) !important;
+      color: $primary !important;
+      border-left: 3px solid $primary;
+      margin-left: 9px !important;
+      mat-icon { color: $primary !important; }
+      span { color: $primary !important; font-weight: 700 !important; }
+    }
+  }
+
+  .nav-spacer { flex: 1; }
+
+  .nav-bottom {
+    padding: 16px;
+    border-top: 1px solid $sidebar-border;
+    flex-shrink: 0;
+
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.18s;
+      &:hover { background: $sidebar-hover; }
+
+      .nav-user-avatar {
+        width: 34px; height: 34px;
+        border-radius: 10px;
+        background: $grad-orange;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800;
+        font-size: 0.9rem;
+        color: #fff;
+        flex-shrink: 0;
+        box-shadow: 0 2px 8px rgba(249,115,22,0.4);
+      }
+
+      .nav-user-info {
+        min-width: 0;
+        p { margin: 0; font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        span { font-size: 0.7rem; color: rgba(255,255,255,0.4); }
+      }
     }
   }
 }
 
-// ── Status chips ─────────────────────────────────────
+// ── Status chips ──────────────────────────────────────────
 .chip {
   display: inline-flex;
   align-items: center;
-  padding: 3px 12px;
+  gap: 4px;
+  padding: 3px 10px;
   border-radius: 999px;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
 
-  &.pending      { background: #FEF3C7; color: #92400E; }
-  &.confirmed    { background: #D1FAE5; color: #065F46; }
-  &.completed    { background: #DBEAFE; color: #1E40AF; }
-  &.cancelled    { background: #FEE2E2; color: #991B1B; }
-  &.approved     { background: #D1FAE5; color: #065F46; }
-  &.rejected     { background: #FEE2E2; color: #991B1B; }
-  &.available    { background: #FFEDD5; color: #9A3412; }
-  &.assigned     { background: #EDE9FE; color: #5B21B6; }
-  &.in_progress  { background: #DBEAFE; color: #1E40AF; }
-  &.in progress  { background: #DBEAFE; color: #1E40AF; }
+  &.pending        { background: #FEF3C7; color: #92400E; }
+  &.confirmed      { background: #D1FAE5; color: #065F46; }
+  &.completed      { background: #DBEAFE; color: #1E40AF; }
+  &.cancelled      { background: #FEE2E2; color: #991B1B; }
+  &.approved       { background: #D1FAE5; color: #065F46; }
+  &.rejected       { background: #FEE2E2; color: #991B1B; }
+  &.available      { background: #FFEDD5; color: #9A3412; }
+  &.assigned       { background: #EDE9FE; color: #5B21B6; }
+  &.in_progress    { background: #DBEAFE; color: #1E40AF; }
+  &.low            { background: #D1FAE5; color: #065F46; }
+  &.medium         { background: #FEF3C7; color: #92400E; }
+  &.high           { background: #FFEDD5; color: #9A3412; }
+  &.critical       { background: #FEE2E2; color: #991B1B; }
+  &.active         { background: #D1FAE5; color: #065F46; }
+  &.inactive       { background: #F1F5F9; color: #475569; }
+  &.listed         { background: #DBEAFE; color: #1E40AF; }
+  &.adopted        { background: #D1FAE5; color: #065F46; }
 }
 
-// ── Forms ────────────────────────────────────────────
+// ── Forms ─────────────────────────────────────────────────
+.form-section {
+  margin-bottom: 28px;
+
+  .form-section-title {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $text-3;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid $border;
+  }
+}
+
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 0 16px;
 }
 
-// ── Typography ───────────────────────────────────────
-h1, h2, h3 { font-family: $font; }
-h1 { font-size: 1.7rem; font-weight: 800; }
-h2 { font-size: 1.35rem; font-weight: 700; }
-h3 { font-size: 1.1rem;  font-weight: 600; }
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
 
-// ── Quick action buttons ──────────────────────────────
-.action-btn {
+.field-group {
+  margin-bottom: 16px;
+  label.field-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: $text-1;
+    margin-bottom: 6px;
+    letter-spacing: 0.01em;
+  }
+}
+
+// ── Action cards (quick-link cards) ──────────────────────
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.action-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 18px;
+  padding: 18px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-lg;
+    border-color: #FDBF8A;
+  }
+
+  .action-icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    mat-icon { font-size: 22px; width: 22px; height: 22px; color: #fff; }
+    &.red    { background: $grad-red; }
+    &.orange { background: $grad-orange; }
+    &.purple { background: $grad-purple; }
+    &.green  { background: $grad-green; }
+    &.blue   { background: $grad-blue; }
+    &.pink   { background: $grad-pink; }
+  }
+
+  .action-body {
+    flex: 1;
+    min-width: 0;
+    p { margin: 0; }
+    .action-title { font-weight: 700; font-size: 0.9rem; color: $text-1; margin-bottom: 2px !important; }
+    .action-desc  { font-size: 0.77rem; color: $text-3; }
+  }
+
+  .action-arrow {
+    color: $border-2 !important;
+    font-size: 20px !important;
+    flex-shrink: 0;
+  }
+}
+
+// ── Empty states ──────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 24px;
+  text-align: center;
+  gap: 12px;
+
+  .empty-icon {
+    width: 80px; height: 80px;
+    border-radius: 24px;
+    background: $primary-light;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 4px;
+    mat-icon { font-size: 36px; width: 36px; height: 36px; color: $primary; }
+    svg { width: 40px; height: 40px; }
+  }
+
+  h3 { margin: 0; font-size: 1rem; font-weight: 800; color: $text-1; }
+  p  { margin: 0; font-size: 0.85rem; color: $text-3; max-width: 280px; line-height: 1.6; }
+}
+
+// ── Loading ───────────────────────────────────────────────
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px 24px;
+  color: $text-3;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+// ── Typography ───────────────────────────────────────────
+h1, h2, h3, h4 { font-family: $font; letter-spacing: -0.01em; }
+h1 { font-size: 1.75rem; font-weight: 900; }
+h2 { font-size: 1.25rem; font-weight: 800; }
+h3 { font-size: 1rem;    font-weight: 700; }
+
+// ── Button utility ────────────────────────────────────────
+.btn-primary {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
+  padding: 10px 22px;
   border-radius: 12px;
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-weight: 700;
+  font-size: 0.88rem;
   cursor: pointer;
   border: none;
-  transition: all 0.18s;
-
-  &.orange { background: $primary; color: #fff; box-shadow: 0 4px 14px rgba(249,115,22,0.3); }
-  &.ghost  { background: $primary-light; color: $primary; }
-  &.dark   { background: $text-1; color: #fff; }
-
-  &:hover { transform: translateY(-1px); filter: brightness(1.05); }
+  background: $grad-orange;
+  color: #fff;
+  box-shadow: $shadow-btn;
+  transition: all 0.2s;
+  font-family: $font;
+  &:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(249,115,22,0.5); }
   mat-icon { font-size: 18px; width: 18px; height: 18px; }
 }
 
-// ── Scrollbar ─────────────────────────────────────────
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #E7D5CC; border-radius: 99px; }
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  border: 1px solid $border-2;
+  background: $surface;
+  color: $text-2;
+  transition: all 0.2s;
+  font-family: $font;
+  &:hover { background: $primary-pale; color: $primary; border-color: $primary-light; }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}
+
+// ── Info rows (label: value pairs) ────────────────────────
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.info-item {
+  .info-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: $text-3; margin-bottom: 4px; }
+  .info-value { font-size: 0.9rem; font-weight: 600; color: $text-1; }
+}
+
+// ── Pet card grid ─────────────────────────────────────────
+.pet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.pet-card {
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  border: 1px solid $border !important;
+  box-shadow: $shadow-md !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: $shadow-xl !important;
+    border-color: $primary-light !important;
+  }
+
+  .pet-img {
+    height: 170px;
+    object-fit: cover;
+    width: 100%;
+    background: $surface-2;
+  }
+
+  .pet-body {
+    padding: 16px;
+
+    .pet-name { font-weight: 800; font-size: 1rem; color: $text-1; margin: 0 0 4px; }
+    .pet-meta { font-size: 0.8rem; color: $text-3; margin: 0 0 12px; }
+  }
+
+  .pet-actions {
+    display: flex;
+    gap: 8px;
+    padding: 0 16px 16px;
+    button { flex: 1; }
+  }
+}
+
+// ── Rescue card ───────────────────────────────────────────
+.rescue-card {
+  border-radius: 20px;
+  background: $surface;
+  border: 1px solid $border;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+  transition: all 0.2s ease;
+
+  &:hover { transform: translateY(-3px); box-shadow: $shadow-xl; }
+
+  .rescue-card-header {
+    padding: 16px 20px 12px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid $border;
+
+    .rescue-animal { font-weight: 800; font-size: 0.95rem; color: $text-1; margin: 0 0 6px; }
+  }
+
+  .rescue-card-body {
+    padding: 14px 20px;
+    p { margin: 0 0 6px; font-size: 0.85rem; color: $text-2; line-height: 1.5; }
+    .rescue-location {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 0.78rem; color: $text-3;
+      mat-icon { font-size: 14px; width: 14px; height: 14px; }
+    }
+  }
+}
+
+// ── Appointment list item ─────────────────────────────────
+.appt-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #FAF0EB;
+  transition: background 0.15s;
+  &:last-child { border-bottom: none; }
+  &:hover { background: $primary-pale; }
+
+  .appt-date-badge {
+    min-width: 52px;
+    text-align: center;
+    background: $primary-light;
+    border-radius: 12px;
+    padding: 8px 6px;
+    .appt-day   { font-size: 1.3rem; font-weight: 900; color: $primary; line-height: 1; }
+    .appt-month { font-size: 0.65rem; font-weight: 700; color: $text-2; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+  }
+
+  .appt-body { flex: 1; }
+  .appt-title { font-weight: 700; font-size: 0.9rem; color: $text-1; margin: 0 0 3px; }
+  .appt-sub   { font-size: 0.78rem; color: $text-3; margin: 0; }
+  .appt-time  { display: flex; align-items: center; gap: 4px; font-size: 0.78rem; color: $text-2; font-weight: 600; margin-top: 4px; mat-icon { font-size: 14px; width: 14px; height: 14px; } }
+}
+
+// ── Table wrapper card ────────────────────────────────────
+.table-card {
+  background: $surface;
+  border-radius: 20px;
+  border: 1px solid $border;
+  overflow: hidden;
+  box-shadow: $shadow-md;
+}
+
+// ── Divider ───────────────────────────────────────────────
+.divider {
+  height: 1px;
+  background: $border;
+  margin: 20px 0;
+}
+
+// ── Grid utilities ────────────────────────────────────────
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+
+@media (max-width: 768px) {
+  .grid-2, .grid-3, .grid-auto { grid-template-columns: 1fr; }
+  .page-container { padding: 16px; }
+  .form-row { grid-template-columns: 1fr; }
+}

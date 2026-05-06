@@ -12,7 +12,7 @@ import { AuthService } from '../../../core/services/auth.service';
 
       <!-- Left panel -->
       <div class="auth-left">
-        <div class="brand">🐾 PETZ</div>
+        <a class="brand" routerLink="/">🐾 PETZ</a>
         <h1>Join the<br>PETZ Community</h1>
         <p>Create your free account and start making a difference for animals in need.</p>
         <div class="features">
@@ -33,6 +33,9 @@ import { AuthService } from '../../../core/services/auth.service';
 
       <!-- Right panel -->
       <div class="auth-right">
+        <a class="back-home" routerLink="/">
+          <mat-icon>arrow_back</mat-icon> Back to home
+        </a>
         <div class="auth-card">
           <div class="auth-header">
             <h2>Create account</h2>
@@ -65,7 +68,15 @@ import { AuthService } from '../../../core/services/auth.service';
             <div class="field-group">
               <label>Password</label>
               <mat-form-field appearance="outline">
-                <input matInput type="password" formControlName="password" placeholder="min. 6 characters">
+                <mat-icon matPrefix style="color:#A8A29E;margin-right:6px">lock_outline</mat-icon>
+                <input matInput [type]="showPassword ? 'text' : 'password'"
+                       formControlName="password" placeholder="min. 6 characters">
+                <button mat-icon-button matSuffix type="button"
+                        (click)="showPassword = !showPassword"
+                        [title]="showPassword ? 'Hide password' : 'Show password'"
+                        style="color:#A8A29E">
+                  <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
               </mat-form-field>
             </div>
 
@@ -104,7 +115,7 @@ import { AuthService } from '../../../core/services/auth.service';
       padding: 60px 48px;
       display: flex; flex-direction: column; justify-content: center; color: #fff;
       @media (max-width: 768px) { display: none; }
-      .brand { font-size: 1.4rem; font-weight: 900; color: #F97316; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 48px; }
+      .brand { font-size: 1.4rem; font-weight: 900; color: #F97316; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 48px; text-decoration: none; display: inline-block; transition: opacity 0.2s; &:hover { opacity: 0.8; } }
       h1 { font-size: 2.2rem; font-weight: 900; line-height: 1.2; margin: 0 0 20px; }
       p  { color: rgba(255,255,255,0.65); font-size: 0.95rem; line-height: 1.7; margin: 0 0 36px; }
     }
@@ -120,8 +131,25 @@ import { AuthService } from '../../../core/services/auth.service';
 
     .auth-right {
       flex: 1; background: #FFF8F4;
-      display: flex; align-items: center; justify-content: center; padding: 40px 24px;
-      overflow-y: auto;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 40px 24px; overflow-y: auto;
+    }
+
+    .back-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      max-width: 460px;
+      margin-bottom: 14px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #78716C;
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.2s;
+      mat-icon { font-size: 16px; width: 16px; height: 16px; }
+      &:hover { color: #F97316; }
     }
 
     .auth-card {
@@ -154,6 +182,7 @@ import { AuthService } from '../../../core/services/auth.service';
 export class RegisterComponent {
   form: FormGroup;
   loading = false;
+  showPassword = false;
 
   constructor(private fb: FormBuilder, private auth: AuthService,
               private router: Router, private snack: MatSnackBar) {
@@ -171,8 +200,16 @@ export class RegisterComponent {
     this.loading = true;
     this.auth.register(this.form.value).subscribe({
       next: (res) => {
-        if (res.success) this.router.navigate(['/dashboard']);
-        else this.snack.open(res.message, 'Close', { duration: 3000 });
+        if (res.success) {
+          const role = res.data?.role;
+          const dest = role === 'ADMIN' ? '/admin'
+                     : role === 'NGO'      ? '/ngo'
+                     : role === 'HOSPITAL' ? '/hospital'
+                     : '/dashboard';
+          this.router.navigate([dest]);
+        } else {
+          this.snack.open(res.message, 'Close', { duration: 3000 });
+        }
         this.loading = false;
       },
       error: (err) => {

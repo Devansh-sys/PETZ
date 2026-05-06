@@ -5,16 +5,24 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
 import { AdminUsersComponent } from './admin-users/admin-users.component';
 import { AdminNgosComponent } from './admin-ngos/admin-ngos.component';
 import { AdminRescuesComponent } from './admin-rescues/admin-rescues.component';
+import { AdminHospitalsComponent } from './admin-hospitals/admin-hospitals.component';
 
 @NgModule({
-  declarations: [AdminDashboardComponent, AdminUsersComponent, AdminNgosComponent, AdminRescuesComponent],
+  declarations: [
+    AdminDashboardComponent,
+    AdminUsersComponent,
+    AdminNgosComponent,
+    AdminRescuesComponent,
+    AdminHospitalsComponent
+  ],
   imports: [
     SharedModule,
     RouterModule.forChild([
-      { path: '',       component: AdminDashboardComponent },
-      { path: 'users',  component: AdminUsersComponent },
-      { path: 'ngos',   component: AdminNgosComponent },
-      { path: 'rescues', component: AdminRescuesComponent }
+      { path: '',           component: AdminDashboardComponent },
+      { path: 'users',      component: AdminUsersComponent     },
+      { path: 'ngos',       component: AdminNgosComponent      },
+      { path: 'rescues',    component: AdminRescuesComponent   },
+      { path: 'hospitals',  component: AdminHospitalsComponent }
     ])
   ]
 })

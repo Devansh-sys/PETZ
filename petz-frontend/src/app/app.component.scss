@@ -15,7 +15,18 @@ mat-sidenav-content {
   padding: 0;
 }
 
-// ── User avatar circle ────────────────────────────────
+// ── Toolbar brand ─────────────────────────────────────────
+.toolbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1C0902;
+  letter-spacing: -0.01em;
+}
+
+// ── User avatar circle ────────────────────────────────────
 .user-avatar {
   width: 36px;
   height: 36px;
@@ -23,22 +34,25 @@ mat-sidenav-content {
   background: linear-gradient(135deg, #FF9748, #F97316);
   color: #fff;
   font-weight: 800;
-  font-size: 1rem;
+  font-size: 0.9rem;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(249,115,22,0.4);
+  letter-spacing: 0;
 }
 
-// ── Toolbar ───────────────────────────────────────────
+// ── Toolbar ───────────────────────────────────────────────
 mat-toolbar {
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: 0 24px !important;
+  padding: 0 20px !important;
 }
 
-// ── Sidenav panel ────────────────────────────────────
+// ── Sidenav ───────────────────────────────────────────────
 mat-sidenav {
-  box-shadow: 4px 0 24px rgba(0,0,0,0.15) !important;
+  box-shadow: 6px 0 32px rgba(0,0,0,0.2) !important;
+  display: flex;
+  flex-direction: column;
 }

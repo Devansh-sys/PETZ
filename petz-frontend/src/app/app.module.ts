@@ -6,6 +6,7 @@ import {
   provideHttpClient,
   withInterceptorsFromDi
 } from '@angular/common/http';
+import { AsyncPipe } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 // Angular Material
@@ -42,7 +43,8 @@ import { SharedModule } from './shared/shared.module';
     MatButtonModule,
     MatMenuModule,
     MatBadgeModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    AsyncPipe
   ],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),

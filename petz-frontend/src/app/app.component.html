@@ -1,17 +1,29 @@
 @if (isLoggedIn) {
   <mat-sidenav-container>
 
-    <!-- ── Sidebar ───────────────────────────────── -->
+    <!-- ══════════════════ Sidebar ══════════════════ -->
     <mat-sidenav mode="side" opened class="sidenav">
 
       <!-- Logo -->
       <div class="nav-logo">
-        <div class="logo-icon">🐾</div>
-        <span>PETZ</span>
+        <svg class="logo-svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="40" height="40" rx="12" fill="#F97316"/>
+          <!-- Paw pads top-left -->
+          <ellipse cx="13" cy="11" rx="3.8" ry="4.6" fill="white" opacity="0.9"/>
+          <!-- Paw pads top-right -->
+          <ellipse cx="27" cy="11" rx="3.8" ry="4.6" fill="white" opacity="0.9"/>
+          <!-- Paw pads bottom-left -->
+          <ellipse cx="7.5" cy="20" rx="3.2" ry="4" fill="white" opacity="0.9"/>
+          <!-- Paw pads bottom-right -->
+          <ellipse cx="32.5" cy="20" rx="3.2" ry="4" fill="white" opacity="0.9"/>
+          <!-- Main central pad -->
+          <path d="M20 15.5C14.5 15.5 10 20.2 10 25.5C10 29.5 12.5 32.5 16 33.5H24C27.5 32.5 30 29.5 30 25.5C30 20.2 25.5 15.5 20 15.5Z" fill="white"/>
+        </svg>
+        <div class="logo-text">PET<span>Z</span></div>
       </div>
 
       <!-- Nav links -->
-      <mat-nav-list style="padding-top:4px">
+      <mat-nav-list style="padding-top:4px; flex:1">
         @for (item of visibleNav(); track item.route) {
           <a mat-list-item
              [routerLink]="item.route"
@@ -22,42 +34,82 @@
         }
       </mat-nav-list>
 
+      <!-- Bottom user info -->
+      <div class="nav-spacer"></div>
+      <div class="nav-bottom">
+        <div class="nav-user" [matMenuTriggerFor]="sideUserMenu">
+          <div class="nav-user-avatar">{{ userName.charAt(0).toUpperCase() }}</div>
+          <div class="nav-user-info">
+            <p>{{ userName }}</p>
+            <span>{{ role }}</span>
+          </div>
+          <mat-icon style="color:rgba(255,255,255,0.3);font-size:16px;width:16px;height:16px;margin-left:auto">
+            more_horiz
+          </mat-icon>
+        </div>
+      </div>
+
+      <mat-menu #sideUserMenu="matMenu" xPosition="after" yPosition="above">
+        <button mat-menu-item [routerLink]="'/profile'">
+          <mat-icon>person_outline</mat-icon> My Profile
+        </button>
+        <button mat-menu-item (click)="logout()" style="color:#DC2626">
+          <mat-icon style="color:#DC2626">logout</mat-icon> Sign out
+        </button>
+      </mat-menu>
+
     </mat-sidenav>
 
-    <!-- ── Main area ──────────────────────────────── -->
+    <!-- ══════════════════ Main area ══════════════════ -->
     <mat-sidenav-content>
 
       <!-- Top bar -->
       <mat-toolbar>
-        <!-- Page title area (left) -->
-        <span style="font-size:1rem;font-weight:700;color:#1C0902">
-          🐾 &nbsp;Animal Welfare Platform
-        </span>
+        <!-- Current section title -->
+        <div class="toolbar-brand">
+          <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"
+               style="width:18px;height:18px;flex-shrink:0">
+            <rect width="20" height="20" rx="6" fill="#F97316"/>
+            <ellipse cx="6.5" cy="5.5" rx="1.9" ry="2.3" fill="white" opacity="0.9"/>
+            <ellipse cx="13.5" cy="5.5" rx="1.9" ry="2.3" fill="white" opacity="0.9"/>
+            <ellipse cx="3.8" cy="10" rx="1.6" ry="2" fill="white" opacity="0.9"/>
+            <ellipse cx="16.2" cy="10" rx="1.6" ry="2" fill="white" opacity="0.9"/>
+            <path d="M10 7.8C7.2 7.8 5 10.1 5 12.8C5 14.7 6.2 16.2 8 16.8H12C13.8 16.2 15 14.7 15 12.8C15 10.1 12.8 7.8 10 7.8Z" fill="white"/>
+          </svg>
+          <span>Animal Welfare Platform</span>
+        </div>
 
         <span style="flex:1"></span>
 
         <!-- Notification bell -->
         <button mat-icon-button [routerLink]="'/notifications'"
-                style="color:#78716C;margin-right:4px" title="Notifications">
-          <mat-icon>notifications_none</mat-icon>
+                title="Notifications" style="margin-right:4px;position:relative">
+          <mat-icon
+            [matBadge]="(unreadCount$ | async) || null"
+            matBadgeColor="warn"
+            matBadgeSize="small"
+            [matBadgeHidden]="((unreadCount$ | async) ?? 0) === 0">
+            notifications_none
+          </mat-icon>
         </button>
 
-        <!-- User menu -->
+        <!-- User avatar (desktop) -->
         <button mat-icon-button [matMenuTriggerFor]="userMenu"
                 style="padding:0;overflow:hidden;border-radius:50%">
           <div class="user-avatar">{{ userName.charAt(0).toUpperCase() }}</div>
         </button>
 
         <mat-menu #userMenu="matMenu">
-          <div style="padding:12px 16px 8px;border-bottom:1px solid #F0E0D6;margin-bottom:4px">
-            <p style="margin:0;font-weight:700;font-size:0.9rem;color:#1C0902">{{ userName }}</p>
-            <p style="margin:2px 0 0;font-size:0.78rem;color:#78716C">{{ role }}</p>
+          <div style="padding:14px 18px 10px;border-bottom:1px solid #F0E0D6;margin-bottom:4px">
+            <p style="margin:0;font-weight:800;font-size:0.9rem;color:#1C0902">{{ userName }}</p>
+            <p style="margin:3px 0 0;font-size:0.75rem;color:#A8A29E">{{ role }}</p>
           </div>
-          <button mat-menu-item [routerLink]="'/users/profile'">
+          <button mat-menu-item [routerLink]="'/profile'">
             <mat-icon>person_outline</mat-icon> My Profile
           </button>
+          <mat-divider></mat-divider>
           <button mat-menu-item (click)="logout()" style="color:#DC2626">
-            <mat-icon style="color:#DC2626">logout</mat-icon> Logout
+            <mat-icon style="color:#DC2626">logout</mat-icon> Sign out
           </button>
         </mat-menu>
       </mat-toolbar>

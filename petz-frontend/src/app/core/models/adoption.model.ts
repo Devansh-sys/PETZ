@@ -11,6 +11,7 @@ export interface AdoptableAnimal {
   city?: string;
   isVaccinated: boolean;
   isNeutered: boolean;
+  isAdoptionReady?: boolean;
   status: string;
   createdAt?: string;
 }

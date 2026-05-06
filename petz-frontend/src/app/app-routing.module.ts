@@ -3,7 +3,10 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  {
+    path: '',
+    loadChildren: () => import('./features/landing/landing.module').then(m => m.LandingModule)
+  },
   {
     path: 'auth',
     loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
@@ -31,6 +34,16 @@ const routes: Routes = [
   {
     path: 'adoption',
     loadChildren: () => import('./features/adoption/adoption.module').then(m => m.AdoptionModule)
+  },
+  {
+    path: 'profile',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./features/profile/profile.module').then(m => m.ProfileModule)
+  },
+  {
+    path: 'notifications',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./features/notifications/notifications.module').then(m => m.NotificationsModule)
   },
   {
     path: 'ngo',
