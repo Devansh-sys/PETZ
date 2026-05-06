@@ -1,0 +1,12 @@
+package com.petz.enums;
+
+public enum NotificationType {
+    RESCUE_ASSIGNED,
+    RESCUE_ACCEPTED,
+    RESCUE_COMPLETED,
+    APPOINTMENT_CONFIRMED,
+    APPOINTMENT_CANCELLED,
+    ADOPTION_UPDATE,
+    SYSTEM,
+    GENERAL
+}

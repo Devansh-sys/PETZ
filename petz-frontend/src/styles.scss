@@ -1,0 +1,342 @@
+// ═══════════════════════════════════════════════════════
+//  PETZ — Design System
+//  Inspired by: warm orange palette, dark sidebar, card-first layout
+// ═══════════════════════════════════════════════════════
+
+// ── Tokens ──────────────────────────────────────────────
+$primary:        #F97316;
+$primary-dark:   #C2410C;
+$primary-light:  #FFEDD5;
+$sidebar-bg:     #1C0902;
+$sidebar-hover:  rgba(249,115,22,0.14);
+$sidebar-active: #F97316;
+$page-bg:        #FFF8F4;
+$surface:        #FFFFFF;
+$border:         #F0E0D6;
+$text-1:         #1C0902;
+$text-2:         #78716C;
+$text-3:         #A8A29E;
+$nav-width:      255px;
+$font:           'DM Sans', sans-serif;
+
+// ── Reset ────────────────────────────────────────────────
+*, *::before, *::after { box-sizing: border-box; }
+html, body {
+  height: 100%; margin: 0;
+  font-family: $font;
+  background: $page-bg;
+  color: $text-1;
+}
+
+// ═══════════════════════════════════════════════════════
+//  Angular Material overrides  (Angular Material 20 MDC)
+// ═══════════════════════════════════════════════════════
+
+// — Buttons ───────────────────────────────────────────
+.mat-mdc-raised-button.mat-primary,
+.mat-mdc-flat-button.mat-primary,
+.mdc-button--raised.mat-primary {
+  --mdc-filled-button-container-color: #{$primary} !important;
+  --mdc-filled-button-label-text-color: #fff !important;
+  --mdc-protected-button-container-color: #{$primary} !important;
+  background-color: $primary !important;
+  color: #fff !important;
+  box-shadow: 0 4px 14px rgba(249,115,22,0.35) !important;
+}
+
+.mat-mdc-outlined-button.mat-primary,
+.mat-mdc-button.mat-primary {
+  color: $primary !important;
+}
+
+.mat-mdc-raised-button,
+.mat-mdc-flat-button,
+.mat-mdc-outlined-button,
+.mat-mdc-button {
+  font-family: $font !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+}
+
+.mat-mdc-icon-button.mat-primary { color: $primary !important; }
+
+// — Toolbar ───────────────────────────────────────────
+mat-toolbar, .mat-toolbar {
+  font-family: $font !important;
+  background: $surface !important;
+  color: $text-1 !important;
+  border-bottom: 1px solid $border !important;
+  box-shadow: none !important;
+  height: 64px !important;
+}
+
+// — Form fields ───────────────────────────────────────
+.mat-mdc-form-field {
+  width: 100%;
+  font-family: $font !important;
+}
+.mat-mdc-form-field.mat-focused {
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing {
+    border-color: $primary !important;
+  }
+  .mat-mdc-floating-label, label { color: $primary !important; }
+}
+.mdc-text-field--focused .mdc-floating-label { color: $primary !important; }
+.mat-mdc-select-value { color: $text-1 !important; }
+.mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+  background: $primary-light !important;
+  span { color: $primary !important; }
+}
+
+// — Spinner ───────────────────────────────────────────
+.mat-mdc-progress-spinner circle,
+.mdc-circular-progress__indeterminate-circle-graphic {
+  stroke: $primary !important;
+}
+
+// — Snack bar ─────────────────────────────────────────
+.mat-mdc-snack-bar-container {
+  --mdc-snackbar-container-color: #{$text-1};
+  border-radius: 10px !important;
+}
+
+// — Slide toggle ──────────────────────────────────────
+.mat-mdc-slide-toggle.mat-primary {
+  --mdc-switch-selected-track-color: #{$primary};
+  --mdc-switch-selected-handle-color: #{$primary};
+}
+
+// — Cards ─────────────────────────────────────────────
+mat-card, .mat-mdc-card {
+  border-radius: 16px !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06) !important;
+  border: 1px solid $border !important;
+  font-family: $font !important;
+}
+
+// — Table ─────────────────────────────────────────────
+.mat-mdc-table {
+  font-family: $font !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+.mat-mdc-header-row { background: #FFF4EE !important; }
+.mat-mdc-header-cell {
+  color: $text-2 !important;
+  font-weight: 700 !important;
+  font-size: 0.78rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+.mat-mdc-row:hover { background: #FFF8F4 !important; }
+
+// — Menu ──────────────────────────────────────────────
+.mat-mdc-menu-panel {
+  border-radius: 14px !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12) !important;
+  border: 1px solid $border !important;
+}
+.mat-mdc-menu-item { font-family: $font !important; }
+
+// — Badge ─────────────────────────────────────────────
+.mat-badge-content {
+  background: $primary !important;
+  color: #fff !important;
+}
+
+// ═══════════════════════════════════════════════════════
+//  Layout
+// ═══════════════════════════════════════════════════════
+.page-container {
+  padding: 28px 32px;
+  max-width: 1280px;
+  margin: 0 auto;
+
+  > h1:first-child {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: $text-1;
+    margin: 0 0 6px;
+  }
+}
+
+.page-subtitle {
+  color: $text-2;
+  margin: 0 0 24px;
+  font-size: 0.9rem;
+}
+
+// ── Card utilities ────────────────────────────────────
+.card {
+  background: $surface;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border: 1px solid $border;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+
+// ── Stat cards (colorful) ─────────────────────────────
+.stat-card {
+  border-radius: 20px !important;
+  border: none !important;
+  overflow: hidden !important;
+  position: relative;
+
+  mat-card-content { padding: 22px 20px !important; }
+
+  .stat-icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+    background: rgba(255,255,255,0.25);
+    mat-icon { font-size: 26px; width: 26px; height: 26px; color: #fff; }
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+    margin: 0 0 6px;
+  }
+
+  .stat-label {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.8);
+    font-weight: 500;
+    margin: 0;
+  }
+
+  &.orange  { background: linear-gradient(135deg, #FF9748 0%, #F97316 100%) !important; }
+  &.purple  { background: linear-gradient(135deg, #B97AFB 0%, #7C3AED 100%) !important; }
+  &.pink    { background: linear-gradient(135deg, #F472B6 0%, #DB2777 100%) !important; }
+  &.green   { background: linear-gradient(135deg, #34D399 0%, #059669 100%) !important; }
+}
+
+// ── Sidebar nav items ─────────────────────────────────
+.sidenav {
+  width: $nav-width !important;
+  background: $sidebar-bg !important;
+  border-right: none !important;
+
+  .nav-logo {
+    padding: 28px 20px 20px;
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: $primary;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 8px;
+
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: $primary;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+    }
+  }
+
+  a[mat-list-item], .mat-mdc-list-item {
+    color: #A8A29E !important;
+    border-radius: 12px !important;
+    margin: 2px 12px !important;
+    height: 46px !important;
+    transition: all 0.18s ease !important;
+
+    .mdc-list-item__content,
+    .mat-mdc-list-item-unscoped-content {
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+    }
+
+    mat-icon { color: #78716C !important; font-size: 20px; transition: color 0.18s; }
+    span { font-weight: 500; font-size: 0.9rem; }
+
+    &:hover {
+      background: $sidebar-hover !important;
+      color: $primary !important;
+      mat-icon { color: $primary !important; }
+    }
+
+    &.active {
+      background: $primary !important;
+      color: #fff !important;
+      box-shadow: 0 4px 12px rgba(249,115,22,0.4) !important;
+      mat-icon { color: #fff !important; }
+      span { color: #fff !important; }
+    }
+  }
+}
+
+// ── Status chips ─────────────────────────────────────
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  &.pending      { background: #FEF3C7; color: #92400E; }
+  &.confirmed    { background: #D1FAE5; color: #065F46; }
+  &.completed    { background: #DBEAFE; color: #1E40AF; }
+  &.cancelled    { background: #FEE2E2; color: #991B1B; }
+  &.approved     { background: #D1FAE5; color: #065F46; }
+  &.rejected     { background: #FEE2E2; color: #991B1B; }
+  &.available    { background: #FFEDD5; color: #9A3412; }
+  &.assigned     { background: #EDE9FE; color: #5B21B6; }
+  &.in_progress  { background: #DBEAFE; color: #1E40AF; }
+  &.in progress  { background: #DBEAFE; color: #1E40AF; }
+}
+
+// ── Forms ────────────────────────────────────────────
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+// ── Typography ───────────────────────────────────────
+h1, h2, h3 { font-family: $font; }
+h1 { font-size: 1.7rem; font-weight: 800; }
+h2 { font-size: 1.35rem; font-weight: 700; }
+h3 { font-size: 1.1rem;  font-weight: 600; }
+
+// ── Quick action buttons ──────────────────────────────
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.18s;
+
+  &.orange { background: $primary; color: #fff; box-shadow: 0 4px 14px rgba(249,115,22,0.3); }
+  &.ghost  { background: $primary-light; color: $primary; }
+  &.dark   { background: $text-1; color: #fff; }
+
+  &:hover { transform: translateY(-1px); filter: brightness(1.05); }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}
+
+// ── Scrollbar ─────────────────────────────────────────
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #E7D5CC; border-radius: 99px; }

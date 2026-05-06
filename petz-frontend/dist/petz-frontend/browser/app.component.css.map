@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/app.component.scss"],
+  "sourcesContent": ["mat-sidenav-container {\n  height: 100vh;\n  background: #FFF8F4;\n}\n\nmat-sidenav-content {\n  background: #FFF8F4;\n  display: flex;\n  flex-direction: column;\n}\n\n.content-area {\n  flex: 1;\n  overflow-y: auto;\n  padding: 0;\n}\n\n// ── User avatar circle ────────────────────────────────\n.user-avatar {\n  width: 36px;\n  height: 36px;\n  border-radius: 50%;\n  background: linear-gradient(135deg, #FF9748, #F97316);\n  color: #fff;\n  font-weight: 800;\n  font-size: 1rem;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  box-shadow: 0 2px 8px rgba(249,115,22,0.4);\n}\n\n// ── Toolbar ───────────────────────────────────────────\nmat-toolbar {\n  position: sticky;\n  top: 0;\n  z-index: 100;\n  padding: 0 24px !important;\n}\n\n// ── Sidenav panel ────────────────────────────────────\nmat-sidenav {\n  box-shadow: 4px 0 24px rgba(0,0,0,0.15) !important;\n}\n"],
+  "mappings": ";AAAA;AACE,UAAA;AACA,cAAA;;AAGF;AACE,cAAA;AACA,WAAA;AACA,kBAAA;;AAGF,CAAA;AACE,QAAA;AACA,cAAA;AACA,WAAA;;AAIF,CAAA;AACE,SAAA;AACA,UAAA;AACA,iBAAA;AACA;IAAA;MAAA,MAAA;MAAA,OAAA;MAAA;AACA,SAAA;AACA,eAAA;AACA,aAAA;AACA,WAAA;AACA,eAAA;AACA,mBAAA;AACA,cAAA,EAAA,IAAA,IAAA,KAAA,GAAA,EAAA,GAAA,EAAA,EAAA,EAAA;;AAIF;AACE,YAAA;AACA,OAAA;AACA,WAAA;AACA,WAAA,EAAA;;AAIF;AACE,cAAA,IAAA,EAAA,KAAA,KAAA,CAAA,EAAA,CAAA,EAAA,CAAA,EAAA;;",
+  "names": []
+}
