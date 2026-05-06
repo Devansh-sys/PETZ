@@ -1,5 +1,5 @@
 # Maven build output
-target/
+*.target/*
 *.class
 
 # Local secrets — NEVER commit these

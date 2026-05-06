@@ -251,33 +251,257 @@ CREATE TABLE IF NOT EXISTS file_uploads (
 
 -- ----------------------------------------------------------
 -- SEED DATA
+-- All passwords = admin@petz123
+-- BCrypt hash (cost 10): $2a$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG
 -- ----------------------------------------------------------
 
--- Default ADMIN user (password: admin@petz123)
--- Hash generated: BCrypt cost 10 for "admin@petz123"
-INSERT INTO users (name, email, password_hash, phone, role)
-VALUES ('Admin User', 'admin@petz.com',
-        '$2b$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG',
-        '9999999999', 'ADMIN')
-ON DUPLICATE KEY UPDATE password_hash = '$2b$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG';
+-- ── USERS ──────────────────────────────────────────────────
+INSERT INTO users (name, email, password_hash, phone, role, city, address) VALUES
+('Admin User',      'admin@petz.com',     '$2a$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG', '9999999999', 'ADMIN',    'Mumbai', '1 Admin Lane, Mumbai'),
+('Riya Sharma',     'ngo@petz.com',       '$2a$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG', '9888888888', 'NGO',      'Mumbai', '23 NGO Colony, Andheri'),
+('Arjun Mehta',     'hospital@petz.com',  '$2a$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG', '9777777777', 'HOSPITAL', 'Delhi',  '45 Hospital Road, Saket'),
+('John Doe',        'user@petz.com',      '$2a$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG', '9666666666', 'USER',     'Mumbai', '12 Park Street, Bandra'),
+('Sneha Kapoor',    'ngo2@petz.com',      '$2a$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG', '9555555555', 'NGO',      'Delhi',  '67 Green Avenue, Saket'),
+('Vikram Singh',    'hospital2@petz.com', '$2a$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG', '9444444444', 'HOSPITAL', 'Bangalore', '89 Clinic Road, Koramangala'),
+('Priya Nair',      'user2@petz.com',     '$2a$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG', '9333333333', 'USER',     'Delhi',  '34 Lotus Colony, Dwarka')
+ON DUPLICATE KEY UPDATE password_hash = '$2a$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG';
 
--- Sample NGO owner (password: admin@petz123)
-INSERT INTO users (name, email, password_hash, phone, role)
-VALUES ('NGO Owner', 'ngo@petz.com',
-        '$2b$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG',
-        '9888888888', 'NGO')
-ON DUPLICATE KEY UPDATE password_hash = '$2b$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG';
+-- ── NGOS ───────────────────────────────────────────────────
+INSERT INTO ngos (owner_user_id, name, registration_no, description, city, address, phone, email, is_verified, is_active)
+SELECT id, 'Paws & Care NGO', 'NGO-REG-001',
+       'We rescue and rehabilitate stray animals across Mumbai. Operating since 2015.',
+       'Mumbai', '23 NGO Colony, Andheri West', '9888888888', 'contact@pawscare.org', TRUE, TRUE
+FROM users WHERE email = 'ngo@petz.com'
+ON DUPLICATE KEY UPDATE name = name;
 
--- Sample hospital owner (password: admin@petz123)
-INSERT INTO users (name, email, password_hash, phone, role)
-VALUES ('Hospital Owner', 'hospital@petz.com',
-        '$2b$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG',
-        '9777777777', 'HOSPITAL')
-ON DUPLICATE KEY UPDATE password_hash = '$2b$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG';
+INSERT INTO ngos (owner_user_id, name, registration_no, description, city, address, phone, email, is_verified, is_active)
+SELECT id, 'Happy Tails Foundation', 'NGO-REG-002',
+       'Dedicated to finding loving homes for abandoned and rescued animals in Delhi.',
+       'Delhi', '67 Green Avenue, Saket', '9555555555', 'info@happytails.org', TRUE, TRUE
+FROM users WHERE email = 'ngo2@petz.com'
+ON DUPLICATE KEY UPDATE name = name;
 
--- Sample regular user (password: admin@petz123)
-INSERT INTO users (name, email, password_hash, phone, role)
-VALUES ('John Doe', 'user@petz.com',
-        '$2b$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG',
-        '9666666666', 'USER')
-ON DUPLICATE KEY UPDATE password_hash = '$2b$10$edSboBRto4R0pN4NIX4oh.OObHEeKRCySjiSFulEa4.7IsE42UgWG';
+-- ── HOSPITALS ──────────────────────────────────────────────
+INSERT INTO hospitals (owner_user_id, name, address, city, phone, email, latitude, longitude, is_active)
+SELECT id, 'City Pet Hospital',
+       '45 Hospital Road, Saket', 'Delhi', '9777777777', 'info@citypethospital.com',
+       28.5274856, 77.2167157, TRUE
+FROM users WHERE email = 'hospital@petz.com'
+ON DUPLICATE KEY UPDATE name = name;
+
+INSERT INTO hospitals (owner_user_id, name, address, city, phone, email, latitude, longitude, is_active)
+SELECT id, 'Healthy Paws Clinic',
+       '89 Clinic Road, Koramangala', 'Bangalore', '9444444444', 'care@healthypaws.com',
+       12.9352273, 77.6244516, TRUE
+FROM users WHERE email = 'hospital2@petz.com'
+ON DUPLICATE KEY UPDATE name = name;
+
+-- ── DOCTORS ────────────────────────────────────────────────
+INSERT INTO doctors (hospital_id, name, specialization, phone, email, schedule_start, schedule_end, slot_duration, is_active)
+SELECT h.id, 'Dr. Anil Sharma', 'General Veterinary', '9111111111', 'anil@citypethospital.com',
+       '09:00:00', '17:00:00', 30, TRUE
+FROM hospitals h WHERE h.email = 'info@citypethospital.com'
+ON DUPLICATE KEY UPDATE name = name;
+
+INSERT INTO doctors (hospital_id, name, specialization, phone, email, schedule_start, schedule_end, slot_duration, is_active)
+SELECT h.id, 'Dr. Priya Mehta', 'Surgery & Orthopaedics', '9222222222', 'priya@citypethospital.com',
+       '10:00:00', '18:00:00', 45, TRUE
+FROM hospitals h WHERE h.email = 'info@citypethospital.com'
+ON DUPLICATE KEY UPDATE name = name;
+
+INSERT INTO doctors (hospital_id, name, specialization, phone, email, schedule_start, schedule_end, slot_duration, is_active)
+SELECT h.id, 'Dr. Raj Kumar', 'Dermatology & Nutrition', '9333111111', 'raj@healthypaws.com',
+       '09:00:00', '15:00:00', 30, TRUE
+FROM hospitals h WHERE h.email = 'care@healthypaws.com'
+ON DUPLICATE KEY UPDATE name = name;
+
+INSERT INTO doctors (hospital_id, name, specialization, phone, email, schedule_start, schedule_end, slot_duration, is_active)
+SELECT h.id, 'Dr. Sara Singh', 'Dentistry & Ophthalmology', '9444111111', 'sara@healthypaws.com',
+       '11:00:00', '19:00:00', 30, TRUE
+FROM hospitals h WHERE h.email = 'care@healthypaws.com'
+ON DUPLICATE KEY UPDATE name = name;
+
+-- ── PETS ───────────────────────────────────────────────────
+INSERT INTO pets (owner_id, name, species, breed, age_years, gender, weight_kg, notes)
+SELECT id, 'Bruno', 'Dog', 'Labrador Retriever', 3, 'Male', 28.5, 'Friendly and loves to play fetch.'
+FROM users WHERE email = 'user@petz.com'
+ON DUPLICATE KEY UPDATE name = name;
+
+INSERT INTO pets (owner_id, name, species, breed, age_years, gender, weight_kg, notes)
+SELECT id, 'Whiskers', 'Cat', 'Persian', 2, 'Female', 4.2, 'Shy but affectionate once comfortable.'
+FROM users WHERE email = 'user@petz.com'
+ON DUPLICATE KEY UPDATE name = name;
+
+INSERT INTO pets (owner_id, name, species, breed, age_years, gender, weight_kg, notes)
+SELECT id, 'Max', 'Dog', 'German Shepherd', 4, 'Male', 32.0, 'Very active, needs daily walks.'
+FROM users WHERE email = 'user2@petz.com'
+ON DUPLICATE KEY UPDATE name = name;
+
+INSERT INTO pets (owner_id, name, species, breed, age_years, gender, weight_kg, notes)
+SELECT id, 'Milo', 'Cat', 'Siamese', 1, 'Male', 3.5, 'Playful kitten, vaccinated.'
+FROM users WHERE email = 'user2@petz.com'
+ON DUPLICATE KEY UPDATE name = name;
+
+-- ── APPOINTMENTS ───────────────────────────────────────────
+INSERT INTO appointments (user_id, pet_id, hospital_id, doctor_id, appt_date, appt_time, reason, status)
+SELECT
+    u.id,
+    p.id,
+    h.id,
+    d.id,
+    DATE_ADD(CURDATE(), INTERVAL 2 DAY),
+    '10:00:00',
+    'Annual vaccination and general checkup',
+    'CONFIRMED'
+FROM users u, pets p, hospitals h, doctors d
+WHERE u.email = 'user@petz.com'
+  AND p.name = 'Bruno' AND p.owner_id = u.id
+  AND h.email = 'info@citypethospital.com'
+  AND d.email = 'anil@citypethospital.com'
+LIMIT 1;
+
+INSERT INTO appointments (user_id, pet_id, hospital_id, doctor_id, appt_date, appt_time, reason, status)
+SELECT
+    u.id,
+    p.id,
+    h.id,
+    d.id,
+    DATE_ADD(CURDATE(), INTERVAL 5 DAY),
+    '11:30:00',
+    'Skin allergy follow-up',
+    'PENDING'
+FROM users u, pets p, hospitals h, doctors d
+WHERE u.email = 'user@petz.com'
+  AND p.name = 'Whiskers' AND p.owner_id = u.id
+  AND h.email = 'info@citypethospital.com'
+  AND d.email = 'priya@citypethospital.com'
+LIMIT 1;
+
+INSERT INTO appointments (user_id, pet_id, hospital_id, doctor_id, appt_date, appt_time, reason, status)
+SELECT
+    u.id,
+    p.id,
+    h.id,
+    d.id,
+    DATE_ADD(CURDATE(), INTERVAL 3 DAY),
+    '14:00:00',
+    'Dental cleaning and eye examination',
+    'PENDING'
+FROM users u, pets p, hospitals h, doctors d
+WHERE u.email = 'user2@petz.com'
+  AND p.name = 'Max' AND p.owner_id = u.id
+  AND h.email = 'care@healthypaws.com'
+  AND d.email = 'sara@healthypaws.com'
+LIMIT 1;
+
+-- ── RESCUE REPORTS ─────────────────────────────────────────
+INSERT INTO rescue_reports (reporter_id, assigned_ngo, animal_type, description, latitude, longitude, address, status, criticality)
+SELECT u.id, n.id,
+       'Dog',
+       'Injured stray dog found near the main market, limping badly, needs urgent care.',
+       19.0760, 72.8777,
+       'Near Main Market, Andheri West, Mumbai',
+       'ASSIGNED', 'HIGH'
+FROM users u, ngos n
+WHERE u.email = 'user@petz.com' AND n.email = 'contact@pawscare.org'
+LIMIT 1;
+
+INSERT INTO rescue_reports (reporter_id, assigned_ngo, animal_type, description, latitude, longitude, address, status, criticality)
+SELECT u.id, n.id,
+       'Cat',
+       'Kitten stuck on rooftop, meowing continuously, unable to come down.',
+       28.6139, 77.2090,
+       'Block C, Saket, Delhi',
+       'PENDING', 'MEDIUM'
+FROM users u, ngos n
+WHERE u.email = 'user2@petz.com' AND n.email = 'info@happytails.org'
+LIMIT 1;
+
+INSERT INTO rescue_reports (reporter_id, assigned_ngo, animal_type, description, latitude, longitude, address, status, criticality, resolution_notes)
+SELECT u.id, n.id,
+       'Bird',
+       'Injured pigeon with broken wing found in the park.',
+       19.0522, 72.8311,
+       'Central Park, Bandra, Mumbai',
+       'RESOLVED', 'LOW',
+       'Bird was rescued and handed over to a wildlife rehabilitator.'
+FROM users u, ngos n
+WHERE u.email = 'user@petz.com' AND n.email = 'contact@pawscare.org'
+LIMIT 1;
+
+-- ── ADOPTABLE ANIMALS ──────────────────────────────────────
+INSERT INTO adoptable_animals (ngo_id, name, species, breed, age_months, gender, description, city, is_vaccinated, is_neutered, status)
+SELECT id, 'Charlie', 'Dog', 'Mixed Breed', 18, 'Male',
+       'Friendly and energetic dog, great with kids. Rescued from the streets.',
+       'Mumbai', TRUE, TRUE, 'AVAILABLE'
+FROM ngos WHERE email = 'contact@pawscare.org'
+ON DUPLICATE KEY UPDATE name = name;
+
+INSERT INTO adoptable_animals (ngo_id, name, species, breed, age_months, gender, description, city, is_vaccinated, is_neutered, status)
+SELECT id, 'Luna', 'Cat', 'Tabby', 8, 'Female',
+       'Sweet and calm cat, loves cuddles. Good with other cats.',
+       'Mumbai', TRUE, TRUE, 'AVAILABLE'
+FROM ngos WHERE email = 'contact@pawscare.org'
+ON DUPLICATE KEY UPDATE name = name;
+
+INSERT INTO adoptable_animals (ngo_id, name, species, breed, age_months, gender, description, city, is_vaccinated, is_neutered, status)
+SELECT id, 'Rocky', 'Dog', 'Beagle Mix', 24, 'Male',
+       'Playful and loyal dog. Trained for basic commands. Loves outdoor activities.',
+       'Delhi', TRUE, FALSE, 'AVAILABLE'
+FROM ngos WHERE email = 'info@happytails.org'
+ON DUPLICATE KEY UPDATE name = name;
+
+INSERT INTO adoptable_animals (ngo_id, name, species, breed, age_months, gender, description, city, is_vaccinated, is_neutered, status)
+SELECT id, 'Bella', 'Cat', 'Persian Mix', 12, 'Female',
+       'Gentle and quiet cat, prefers a calm home environment. Fully vaccinated.',
+       'Delhi', TRUE, TRUE, 'AVAILABLE'
+FROM ngos WHERE email = 'info@happytails.org'
+ON DUPLICATE KEY UPDATE name = name;
+
+-- ── ADOPTION APPLICATIONS ──────────────────────────────────
+INSERT INTO adoption_applications (animal_id, applicant_id, ngo_id, reason, experience, housing_type, has_other_pets, status)
+SELECT a.id, u.id, n.id,
+       'I have always wanted a dog companion. I work from home so I can give him full attention.',
+       'Had a dog for 5 years growing up.',
+       'APARTMENT', FALSE, 'PENDING'
+FROM adoptable_animals a, users u, ngos n
+WHERE a.name = 'Charlie' AND u.email = 'user@petz.com' AND n.email = 'contact@pawscare.org'
+LIMIT 1;
+
+INSERT INTO adoption_applications (animal_id, applicant_id, ngo_id, reason, experience, housing_type, has_other_pets, status)
+SELECT a.id, u.id, n.id,
+       'Looking for a gentle cat to keep me company. I live alone and have a quiet home.',
+       'Owned two cats before, very experienced.',
+       'HOUSE', FALSE, 'APPROVED'
+FROM adoptable_animals a, users u, ngos n
+WHERE a.name = 'Bella' AND u.email = 'user2@petz.com' AND n.email = 'info@happytails.org'
+LIMIT 1;
+
+-- ── NOTIFICATIONS ──────────────────────────────────────────
+INSERT INTO notifications (user_id, title, message, type, is_read)
+SELECT id, 'Welcome to Petz!', 'Your account has been created successfully. Start exploring our services.', 'GENERAL', FALSE
+FROM users WHERE email = 'user@petz.com';
+
+INSERT INTO notifications (user_id, title, message, type, is_read)
+SELECT id, 'Appointment Confirmed', 'Your appointment for Bruno at City Pet Hospital on has been confirmed.', 'APPOINTMENT', FALSE
+FROM users WHERE email = 'user@petz.com';
+
+INSERT INTO notifications (user_id, title, message, type, is_read)
+SELECT id, 'Rescue Report Update', 'Your rescue report has been assigned to Paws & Care NGO.', 'RESCUE', TRUE
+FROM users WHERE email = 'user@petz.com';
+
+INSERT INTO notifications (user_id, title, message, type, is_read)
+SELECT id, 'Welcome to Petz!', 'Your account has been created successfully. Start exploring our services.', 'GENERAL', FALSE
+FROM users WHERE email = 'user2@petz.com';
+
+INSERT INTO notifications (user_id, title, message, type, is_read)
+SELECT id, 'Adoption Application Approved', 'Congratulations! Your adoption application for Bella has been approved.', 'ADOPTION', FALSE
+FROM users WHERE email = 'user2@petz.com';
+
+INSERT INTO notifications (user_id, title, message, type, is_read)
+SELECT id, 'New Rescue Report', 'A new rescue report has been assigned to your NGO. Please review it.', 'RESCUE', FALSE
+FROM users WHERE email = 'ngo@petz.com';
+
+INSERT INTO notifications (user_id, title, message, type, is_read)
+SELECT id, 'New Adoption Application', 'A new adoption application has been submitted for Charlie.', 'ADOPTION', FALSE
+FROM users WHERE email = 'ngo@petz.com';
