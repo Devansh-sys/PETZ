@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: '/api/v1',
-  wsUrl: '/api/v1/ws'
+  apiUrl: 'https://YOUR_RAILWAY_URL/api/v1',
+  wsUrl: 'https://YOUR_RAILWAY_URL/api/v1/ws'
 };
