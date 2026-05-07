@@ -56,7 +56,7 @@ public class AppointmentController {
     // Hospital admin endpoints
     @GetMapping("/hospital")
     @PreAuthorize("hasRole('HOSPITAL')")
-    public ResponseEntity<ApiResponse<List<Appointment>>> hospitalAppointments() {
+    public ResponseEntity<ApiResponse<List<AppointmentResponse>>> hospitalAppointments() {
         Long userId = securityUtil.getCurrentUserId();
         Long hospitalId = hospitalService.getByOwner(userId).getId();
         return ResponseEntity.ok(ApiResponse.ok(appointmentService.getByHospital(hospitalId)));

@@ -4,6 +4,7 @@ import com.petz.entity.Appointment;
 import com.petz.entity.Doctor;
 import com.petz.entity.Hospital;
 import com.petz.entity.Pet;
+import com.petz.entity.User;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -36,8 +37,11 @@ public class AppointmentResponse {
     private String petName;
     private String petSpecies;
     private String petBreed;
+    private String userName;
+    private String userEmail;
+    private String userPhone;
 
-    public static AppointmentResponse from(Appointment a, Hospital h, Doctor d, Pet p) {
+    public static AppointmentResponse from(Appointment a, Hospital h, Doctor d, Pet p, User u) {
         AppointmentResponse r = new AppointmentResponse();
         r.setId(a.getId());
         r.setUserId(a.getUserId());
@@ -66,6 +70,11 @@ public class AppointmentResponse {
             r.setPetName(p.getName());
             r.setPetSpecies(p.getSpecies());
             r.setPetBreed(p.getBreed());
+        }
+        if (u != null) {
+            r.setUserName(u.getName());
+            r.setUserEmail(u.getEmail());
+            r.setUserPhone(u.getPhone());
         }
         return r;
     }
