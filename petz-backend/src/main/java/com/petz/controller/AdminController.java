@@ -1,5 +1,6 @@
 package com.petz.controller;
 
+import com.petz.dto.response.RescueReportResponse;
 import com.petz.dto.response.UserResponse;
 import com.petz.entity.Hospital;
 import com.petz.entity.Ngo;
@@ -34,6 +35,19 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.ok(userService.getAllUsers()));
     }
 
+    @GetMapping("/pending-approvals")
+    public ResponseEntity<ApiResponse<List<UserResponse>>> pendingApprovals() {
+        return ResponseEntity.ok(ApiResponse.ok(userService.getPendingApprovals()));
+    }
+
+    @PatchMapping("/users/{id}/approve")
+    public ResponseEntity<ApiResponse<UserResponse>> approveUser(
+            @PathVariable Long id,
+            @RequestBody Map<String, Boolean> body) {
+        return ResponseEntity.ok(ApiResponse.ok(
+                userService.approveUser(id, body.getOrDefault("approved", true)), "User approval updated."));
+    }
+
     @PatchMapping("/users/{id}/toggle")
     public ResponseEntity<ApiResponse<UserResponse>> toggleUser(
             @PathVariable Long id,
@@ -46,7 +60,7 @@ public class AdminController {
 
     @GetMapping("/ngos")
     public ResponseEntity<ApiResponse<List<Ngo>>> listNgos() {
-        return ResponseEntity.ok(ApiResponse.ok(ngoService.getAll()));
+        return ResponseEntity.ok(ApiResponse.ok(ngoService.getAllForAdmin()));
     }
 
     @GetMapping("/ngos/unverified")
@@ -74,7 +88,7 @@ public class AdminController {
 
     @GetMapping("/hospitals")
     public ResponseEntity<ApiResponse<List<Hospital>>> listHospitals() {
-        return ResponseEntity.ok(ApiResponse.ok(hospitalService.getAll()));
+        return ResponseEntity.ok(ApiResponse.ok(hospitalService.getAllForAdmin()));
     }
 
     @PatchMapping("/hospitals/{id}/toggle")
@@ -88,11 +102,11 @@ public class AdminController {
     // ── Rescues ───────────────────────────────────────────────────────
 
     @GetMapping("/rescues")
-    public ResponseEntity<ApiResponse<List<RescueReport>>> listRescues(
+    public ResponseEntity<ApiResponse<List<RescueReportResponse>>> listRescues(
             @RequestParam(required = false) String status) {
-        List<RescueReport> list = status != null
-                ? rescueService.getByStatus(status)
-                : rescueService.getAll();
+        List<RescueReportResponse> list = status != null
+                ? rescueService.getByStatusEnriched(status)
+                : rescueService.getAllEnriched();
         return ResponseEntity.ok(ApiResponse.ok(list));
     }
 

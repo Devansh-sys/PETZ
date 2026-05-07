@@ -279,6 +279,7 @@ const CIRC = +(2 * Math.PI * 34).toFixed(2); // 213.63
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
       gap: 20px; margin-bottom: 36px;
+      align-items: start; /* rows don't grow when a card's sc-bottom expands */
     }
 
     /* ── Stat card shell ── */
@@ -287,7 +288,8 @@ const CIRC = +(2 * Math.PI * 34).toFixed(2); // 213.63
       box-shadow: 0 4px 20px rgba(0,0,0,0.08);
       transition: transform 0.22s ease, box-shadow 0.22s ease;
       cursor: default;
-      &:hover { transform: translateY(-5px); }
+      position: relative; z-index: 1; /* allow hover z-index elevation */
+      &:hover { transform: translateY(-5px); z-index: 10; }
       &.orange:hover { box-shadow: 0 14px 40px rgba(255,140,66,0.35); }
       &.purple:hover { box-shadow: 0 14px 40px rgba(124,58,237,0.35); }
       &.pink:hover   { box-shadow: 0 14px 40px rgba(219,39,119,0.35); }
@@ -326,11 +328,15 @@ const CIRC = +(2 * Math.PI * 34).toFixed(2); // 213.63
     /* ── Bottom legend half ── */
     .sc-bottom {
       background: #fff; padding: 12px 14px 14px;
-      display: flex; gap: 7px; flex-wrap: wrap; align-items: stretch;
-      min-height: 52px;
+      display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-start;
+      /* Fixed height: prevents the card layout from growing on hover,
+         which was causing the card to push down and overlap content below.
+         The parent .stat-card-v2 overflow:hidden handles boundary clipping. */
+      height: 80px;
+      box-sizing: border-box;
     }
 
-    /* ── Legend item (pill that expands on hover) ── */
+    /* ── Legend item ── */
     .leg-item {
       display: flex; flex-direction: column; gap: 0;
       background: #F8FAFC; border: 1px solid #EDF2F7;
@@ -345,17 +351,23 @@ const CIRC = +(2 * Math.PI * 34).toFixed(2); // 213.63
 
     .leg-main { display: flex; align-items: center; gap: 5px; }
     .leg-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .leg-lbl  { font-size: 0.7rem; font-weight: 600; color: #4A6478; flex: 1; min-width: 0; }
+    .leg-lbl  {
+      font-size: 0.7rem; font-weight: 600; color: #4A6478;
+      flex: 1; min-width: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
 
     .leg-cnt {
       font-size: 0.7rem; font-weight: 800; color: #1A3547;
       background: #EDF2F7; border-radius: 999px; padding: 1px 7px;
+      flex-shrink: 0;
       transition: opacity 0.22s;
     }
     .leg-item.hovered .leg-cnt { opacity: 0.3; }
 
     .leg-pct {
       font-size: 0.69rem; font-weight: 800; color: #374151;
+      flex-shrink: 0;
       opacity: 0; max-width: 0; overflow: hidden; white-space: nowrap;
       transition: opacity 0.22s 0.08s, max-width 0.22s;
     }

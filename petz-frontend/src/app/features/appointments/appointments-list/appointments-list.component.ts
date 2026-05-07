@@ -315,12 +315,14 @@ export class AppointmentsListComponent implements OnInit {
 
   getDay(date: string): string {
     if (!date) return '—';
-    return new Date(date).getDate().toString().padStart(2, '0');
+    // Append T00:00:00 to force LOCAL-time parsing — bare date strings are parsed as UTC
+    // which shifts the day for timezones ahead of UTC (e.g. IST +5:30)
+    return new Date(date + 'T00:00:00').getDate().toString().padStart(2, '0');
   }
 
   getMonth(date: string): string {
     if (!date) return '';
-    return new Date(date).toLocaleDateString('en-US', { month: 'short' });
+    return new Date(date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short' });
   }
 
   cancel(id: number): void {
@@ -333,7 +335,9 @@ export class AppointmentsListComponent implements OnInit {
 
   formatFullDate(dateStr: string): string {
     if (!dateStr) return '—';
-    return new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    // Append T00:00:00 to force local-time parsing — bare date strings are UTC which shifts the day for UTC+ timezones (e.g. IST +5:30)
+    const d = dateStr.length === 10 ? dateStr + 'T00:00:00' : dateStr;
+    return new Date(d).toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   }
 
   formatTime(timeStr: string): string {

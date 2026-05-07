@@ -1,7 +1,0 @@
-# ── Local Development Secrets ────────────────────────────
-# Copy this file to application-local.properties and fill in your real values.
-# application-local.properties is gitignored and will never be committed.
-DB_URL=jdbc:mysql://localhost:3306/petz_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-DB_USERNAME=your_db_username
-DB_PASSWORD=your_db_password
-JWT_SECRET=replace-with-a-strong-random-secret-at-least-32-chars

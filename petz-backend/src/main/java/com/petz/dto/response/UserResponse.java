@@ -15,5 +15,6 @@ public class UserResponse {
     private String address;
     private String city;
     private Boolean isActive;
+    private Boolean isApproved;
     private LocalDateTime createdAt;
 }

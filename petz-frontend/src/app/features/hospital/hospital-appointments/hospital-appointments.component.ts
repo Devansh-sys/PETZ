@@ -160,10 +160,16 @@ interface WeekDay {
                 <mat-icon>check_circle</mat-icon> Confirm Appointment
               </button>
             }
-            @if (selected.status === 'CONFIRMED') {
+            @if (selected.status === 'CONFIRMED' && isPast(selected.apptDate)) {
               <button mat-raised-button class="action-complete" (click)="updateStatus(selected, 'COMPLETED')">
                 <mat-icon>done_all</mat-icon> Mark Completed
               </button>
+            }
+            @if (selected.status === 'CONFIRMED' && !isPast(selected.apptDate)) {
+              <div class="future-note">
+                <mat-icon>schedule</mat-icon>
+                Can only be marked complete on or after the appointment date
+              </div>
             }
             @if (selected.status === 'PENDING' || selected.status === 'CONFIRMED') {
               <button mat-stroked-button class="action-cancel" (click)="updateStatus(selected, 'CANCELLED')">
@@ -359,9 +365,14 @@ interface WeekDay {
                     <mat-icon>check_circle</mat-icon>
                   </button>
                 }
-                @if (a.status === 'CONFIRMED') {
+                @if (a.status === 'CONFIRMED' && isPast(a.apptDate)) {
                   <button mat-icon-button class="q-complete" title="Mark complete" (click)="updateStatus(a,'COMPLETED')">
                     <mat-icon>done_all</mat-icon>
+                  </button>
+                }
+                @if (a.status === 'CONFIRMED' && !isPast(a.apptDate)) {
+                  <button mat-icon-button class="q-future" title="Appointment not yet due" disabled>
+                    <mat-icon>schedule</mat-icon>
                   </button>
                 }
                 <button mat-icon-button class="q-detail" title="View details">
@@ -635,7 +646,16 @@ interface WeekDay {
     .appt-quick { display: flex; gap: 4px; flex-shrink: 0; }
     .q-confirm { color: #2EB894 !important; &:hover { background: #D1FAE5 !important; } }
     .q-complete { color: #4F8FD4 !important; &:hover { background: #DBEAFE !important; } }
+    .q-future   { color: #D1D5DB !important; cursor: not-allowed !important; }
     .q-detail   { color: #8BA3B5 !important; &:hover { background: #F0F6FF !important; color: #4F8FD4 !important; } }
+
+    .future-note {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.75rem; font-weight: 600; color: #8BA3B5;
+      background: #F8FAFB; border-radius: 10px;
+      padding: 8px 12px; width: 100%;
+      mat-icon { font-size: 15px; width: 15px; height: 15px; color: #B0C4D4; flex-shrink: 0; }
+    }
   `]
 })
 export class HospitalAppointmentsComponent implements OnInit {
@@ -741,7 +761,12 @@ export class HospitalAppointmentsComponent implements OnInit {
   }
 
   toDateStr(d: Date): string {
-    return d.toISOString().split('T')[0];
+    // Use local date components — .toISOString() returns UTC which shifts the date
+    // for users in timezones ahead of UTC (e.g. IST UTC+5:30 midnight → previous UTC day)
+    const y  = d.getFullYear();
+    const m  = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${dd}`;
   }
 
   // ── Filters ──
@@ -799,6 +824,13 @@ export class HospitalAppointmentsComponent implements OnInit {
     const ampm = h >= 12 ? 'PM' : 'AM';
     const hr = h % 12 || 12;
     return `${hr}:${String(m).padStart(2, '0')} ${ampm}`;
+  }
+
+  // ── Date guard — returns true if appointment date is today or in the past ──
+  isPast(apptDate: string): boolean {
+    if (!apptDate) return false;
+    const today = this.toDateStr(new Date());
+    return apptDate <= today;
   }
 
   // ── Status update ──

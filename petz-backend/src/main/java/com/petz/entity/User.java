@@ -47,6 +47,9 @@ public class User {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
+    @Column(name = "is_approved", nullable = false)
+    private Boolean isApproved = true;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

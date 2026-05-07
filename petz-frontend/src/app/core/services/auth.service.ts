@@ -16,7 +16,8 @@ export class AuthService {
 
   register(data: { name: string; email: string; password: string; phone?: string; role?: string }): Observable<any> {
     return this.http.post<any>(`${environment.apiUrl}/auth/register`, data).pipe(
-      tap(res => { if (res.success) this.storeAuth(res.data); })
+      // Only store auth if a real token was issued (NGO/HOSPITAL pending approval get token=null)
+      tap(res => { if (res.success && res.data?.token) this.storeAuth(res.data); })
     );
   }
 
@@ -38,7 +39,8 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    return !!token && token !== 'null'; // guard against localStorage storing the string "null"
   }
 
   getRole(): string | null {
@@ -50,7 +52,7 @@ export class AuthService {
   }
 
   private storeAuth(data: AuthResponse): void {
-    localStorage.setItem(this.TOKEN_KEY, data.token);
+    if (data.token) localStorage.setItem(this.TOKEN_KEY, data.token); // never store null as "null" string
     localStorage.setItem(this.USER_KEY, JSON.stringify(data));
     this.currentUser$.next(data);
   }

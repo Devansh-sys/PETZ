@@ -51,6 +51,11 @@ public class HospitalService {
         return hospitalRepo.findByIsActive(true);
     }
 
+    // Admin-specific: returns ALL hospitals including inactive/pending-approval ones
+    public List<Hospital> getAllForAdmin() {
+        return hospitalRepo.findAll();
+    }
+
     public List<Hospital> getByCity(String city) {
         return hospitalRepo.findByCityAndIsActive(city, true);
     }

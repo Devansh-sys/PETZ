@@ -64,11 +64,19 @@ public class AppointmentService {
 
     public Appointment updateStatus(Long id, String status, Long hospitalOwnerId) {
         Appointment a = getById(id);
+        AppointmentStatus newStatus;
         try {
-            a.setStatus(AppointmentStatus.valueOf(status.toUpperCase()));
+            newStatus = AppointmentStatus.valueOf(status.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid status: " + status);
         }
+
+        // Guard: cannot mark a future appointment as COMPLETED
+        if (newStatus == AppointmentStatus.COMPLETED && a.getApptDate().isAfter(LocalDate.now())) {
+            throw new BadRequestException("Cannot mark a future appointment as completed. The appointment date has not arrived yet.");
+        }
+
+        a.setStatus(newStatus);
         a = appointmentRepo.save(a);
 
         if (a.getStatus() == AppointmentStatus.CONFIRMED) {

@@ -3,7 +3,10 @@ package com.petz.service;
 import com.petz.dto.request.UpdateProfileRequest;
 import com.petz.dto.response.UserResponse;
 import com.petz.entity.User;
+import com.petz.enums.Role;
 import com.petz.exception.ResourceNotFoundException;
+import com.petz.repository.HospitalRepository;
+import com.petz.repository.NgoRepository;
 import com.petz.repository.UserRepository;
 import com.petz.util.FileStorageUtil;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,8 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepo;
+    private final HospitalRepository hospitalRepo;
+    private final NgoRepository ngoRepo;
     private final FileStorageUtil fileStorage;
 
     public UserResponse getProfile(Long userId) {
@@ -52,6 +57,41 @@ public class UserService {
         return toResponse(userRepo.save(user));
     }
 
+    public List<UserResponse> getPendingApprovals() {
+        return userRepo.findAll().stream()
+                .filter(u -> Boolean.FALSE.equals(u.getIsApproved())
+                        && (u.getRole() == Role.NGO || u.getRole() == Role.HOSPITAL))
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    public UserResponse approveUser(Long userId, boolean approved) {
+        User user = getUser(userId);
+        user.setIsApproved(approved);
+        User saved = userRepo.save(user);
+
+        // When approving/revoking a hospital account, sync the Hospital entity's isActive flag
+        // so it appears (or disappears) in public listings and appointment booking accordingly.
+        if (user.getRole() == Role.HOSPITAL) {
+            hospitalRepo.findByOwnerUserId(userId).ifPresent(h -> {
+                h.setIsActive(approved);
+                hospitalRepo.save(h);
+            });
+        }
+
+        // When approving/revoking an NGO account, sync the NGO entity's isActive flag.
+        // Also set isVerified=true on approval so the NGO appears as verified in the admin panel.
+        if (user.getRole() == Role.NGO) {
+            ngoRepo.findByOwnerUserId(userId).ifPresent(ngo -> {
+                ngo.setIsActive(approved);
+                if (approved) ngo.setIsVerified(true);
+                ngoRepo.save(ngo);
+            });
+        }
+
+        return toResponse(saved);
+    }
+
     private User getUser(Long id) {
         return userRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
@@ -68,6 +108,7 @@ public class UserService {
         r.setAddress(u.getAddress());
         r.setCity(u.getCity());
         r.setIsActive(u.getIsActive());
+        r.setIsApproved(u.getIsApproved());
         r.setCreatedAt(u.getCreatedAt());
         return r;
     }

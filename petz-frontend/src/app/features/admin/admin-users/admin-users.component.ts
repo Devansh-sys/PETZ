@@ -27,6 +27,46 @@ import { MatSnackBar } from '@angular/material/snack-bar';
         </div>
       </div>
 
+      <!-- ── Pending Approvals Banner ── -->
+      @if (pendingApprovals.length > 0) {
+        <div class="pending-section">
+          <div class="pending-section-header">
+            <div class="pending-title">
+              <span class="pending-dot"></span>
+              <mat-icon>pending_actions</mat-icon>
+              <span>Pending Approvals</span>
+              <span class="pending-count-badge">{{ pendingApprovals.length }}</span>
+            </div>
+            <p class="pending-subtitle">These NGO / Hospital accounts are waiting for your approval before they can log in.</p>
+          </div>
+          <div class="pending-list">
+            @for (u of pendingApprovals; track u.id) {
+              <div class="pending-card">
+                <div class="pending-avatar" [ngClass]="'pa-' + u.role?.toLowerCase()">
+                  {{ u.name?.charAt(0)?.toUpperCase() || '?' }}
+                </div>
+                <div class="pending-info">
+                  <div class="pending-name">{{ u.name }}</div>
+                  <div class="pending-email">{{ u.email }}</div>
+                  <span class="role-badge role-{{ u.role?.toLowerCase() }}">{{ u.role }}</span>
+                </div>
+                <div class="pending-meta">
+                  <span class="pending-date">{{ u.createdAt ? 'Registered ' + (u.createdAt | date:'mediumDate') : 'Just registered' }}</span>
+                </div>
+                <div class="pending-actions">
+                  <button class="approve-btn" (click)="approve(u)" title="Approve">
+                    <mat-icon>check_circle</mat-icon> Approve
+                  </button>
+                  <button class="reject-btn" (click)="reject(u)" title="Reject">
+                    <mat-icon>cancel</mat-icon> Reject
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
       <!-- ── Filter Panel ── -->
       <div class="filter-panel">
 
@@ -293,6 +333,71 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     }
   `,
   styles: [`
+    /* ── Pending Approvals ── */
+    .pending-section {
+      background: linear-gradient(135deg, #FFFBEB, #FEF3C7);
+      border: 1.5px solid #FCD34D;
+      border-radius: 18px; padding: 20px 22px; margin-bottom: 20px;
+    }
+    .pending-section-header { margin-bottom: 16px; }
+    .pending-title {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 1rem; font-weight: 800; color: #92400E; margin-bottom: 6px;
+      mat-icon { font-size: 20px; width: 20px; height: 20px; color: #D97706; }
+    }
+    .pending-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #EF4444;
+      animation: pulse 1.4s infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+    .pending-count-badge {
+      background: #D97706; color: #fff; border-radius: 999px;
+      padding: 1px 9px; font-size: 0.72rem; font-weight: 800;
+    }
+    .pending-subtitle { font-size: 0.78rem; color: #92400E; opacity: 0.75; margin: 0; }
+    .pending-list { display: flex; flex-direction: column; gap: 10px; }
+    .pending-card {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      background: #fff; border: 1px solid #FCD34D;
+      border-radius: 14px; padding: 14px 16px;
+      box-shadow: 0 2px 8px rgba(217,119,6,0.08);
+    }
+    .pending-avatar {
+      width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+      color: #fff; font-weight: 800; font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+      &.pa-ngo      { background: linear-gradient(135deg,#7C3AED,#5B21B6); }
+      &.pa-hospital { background: linear-gradient(135deg,#059669,#047857); }
+    }
+    .pending-info { flex: 1; min-width: 160px; display: flex; flex-direction: column; gap: 4px; }
+    .pending-name  { font-weight: 700; font-size: 0.9rem; color: #1A3547; }
+    .pending-email { font-size: 0.75rem; color: #8BA3B5; }
+    .pending-meta { flex-shrink: 0; }
+    .pending-date  { font-size: 0.72rem; color: #92400E; font-weight: 600; }
+    .pending-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .approve-btn {
+      display: flex; align-items: center; gap: 5px;
+      background: #ECFDF5; border: 1.5px solid #6EE7B7;
+      border-radius: 10px; padding: 7px 14px;
+      font-size: 0.78rem; font-weight: 700; color: #059669;
+      cursor: pointer; font-family: 'Quicksand', system-ui, sans-serif;
+      mat-icon { font-size: 16px; width: 16px; height: 16px; }
+      &:hover { background: #D1FAE5; }
+    }
+    .reject-btn {
+      display: flex; align-items: center; gap: 5px;
+      background: #FEF2F2; border: 1.5px solid #FECACA;
+      border-radius: 10px; padding: 7px 14px;
+      font-size: 0.78rem; font-weight: 700; color: #DC2626;
+      cursor: pointer; font-family: 'Quicksand', system-ui, sans-serif;
+      mat-icon { font-size: 16px; width: 16px; height: 16px; }
+      &:hover { background: #FEE2E2; }
+    }
+
     /* ── Header ── */
     .header-right { display: flex; align-items: center; gap: 12px; }
     .back-btn {
@@ -511,6 +616,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class AdminUsersComponent implements OnInit {
   users: any[] = [];
+  pendingApprovals: any[] = [];
   cols = ['avatar', 'name', 'role', 'status', 'city', 'joined', 'actions'];
   loading  = true;
   selected: any | null = null;
@@ -550,6 +656,13 @@ export class AdminUsersComponent implements OnInit {
     this.api.get<any>('/admin/users').subscribe({
       next: res => { this.users = res.data ?? []; this.loading = false; },
       error: ()  => { this.loading = false; }
+    });
+    this.loadPendingApprovals();
+  }
+
+  loadPendingApprovals(): void {
+    this.api.get<any>('/admin/pending-approvals').subscribe({
+      next: res => { this.pendingApprovals = res.data ?? []; }
     });
   }
 
@@ -625,6 +738,28 @@ export class AdminUsersComponent implements OnInit {
         user.isActive = res.data.isActive;
         if (this.selected?.id === user.id) this.selected = { ...this.selected, isActive: user.isActive };
         this.snack.open(`User ${user.isActive ? 'activated' : 'deactivated'}.`, '', { duration: 2500 });
+      }
+    });
+  }
+
+  approve(user: any): void {
+    this.api.patch<any>(`/admin/users/${user.id}/approve`, { approved: true }).subscribe({
+      next: res => {
+        this.pendingApprovals = this.pendingApprovals.filter(u => u.id !== user.id);
+        // Also update the user in the main list if already loaded
+        const existing = this.users.find(u => u.id === user.id);
+        if (existing) { existing.isApproved = true; }
+        else { this.users.push({ ...res.data }); }
+        this.snack.open(`${user.name} has been approved. They can now log in.`, 'OK', { duration: 4000 });
+      }
+    });
+  }
+
+  reject(user: any): void {
+    this.api.patch<any>(`/admin/users/${user.id}/toggle`, { active: false }).subscribe({
+      next: () => {
+        this.pendingApprovals = this.pendingApprovals.filter(u => u.id !== user.id);
+        this.snack.open(`${user.name}'s registration has been rejected.`, '', { duration: 3000 });
       }
     });
   }

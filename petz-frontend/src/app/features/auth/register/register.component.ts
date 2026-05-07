@@ -1,8 +1,14 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '../../../core/services/auth.service';
+
+function passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
+  const pass    = group.get('password')?.value;
+  const confirm = group.get('confirmPassword')?.value;
+  return pass && confirm && pass !== confirm ? { passwordMismatch: true } : null;
+}
 
 @Component({
   standalone: false,
@@ -52,18 +58,20 @@ import { AuthService } from '../../../core/services/auth.service';
             <p>Fill in the details to get started</p>
           </div>
 
-          <form [formGroup]="form" (ngSubmit)="submit()">
+          <form [formGroup]="form" (ngSubmit)="submit()" autocomplete="on">
             <div class="fields-grid">
               <div class="field-group">
                 <label>Full Name</label>
-                <mat-form-field appearance="outline">
-                  <input matInput formControlName="name" placeholder="John Doe">
+                <mat-form-field appearance="outline" style="width:100%">
+                  <input matInput formControlName="name" placeholder="John Doe"
+                         name="name" autocomplete="name">
                 </mat-form-field>
               </div>
               <div class="field-group">
                 <label>Phone</label>
-                <mat-form-field appearance="outline">
-                  <input matInput formControlName="phone" placeholder="+91 00000 00000">
+                <mat-form-field appearance="outline" style="width:100%">
+                  <input matInput formControlName="phone" placeholder="+91 00000 00000"
+                         name="phone" autocomplete="tel" type="tel">
                 </mat-form-field>
               </div>
             </div>
@@ -71,7 +79,8 @@ import { AuthService } from '../../../core/services/auth.service';
             <div class="field-group">
               <label>Email address</label>
               <mat-form-field appearance="outline">
-                <input matInput type="email" formControlName="email" placeholder="you@example.com">
+                <input matInput type="email" formControlName="email" placeholder="you@example.com"
+                       name="email" autocomplete="email">
               </mat-form-field>
             </div>
 
@@ -80,7 +89,8 @@ import { AuthService } from '../../../core/services/auth.service';
               <mat-form-field appearance="outline">
                 <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">lock_outline</mat-icon>
                 <input matInput [type]="showPassword ? 'text' : 'password'"
-                       formControlName="password" placeholder="min. 6 characters">
+                       formControlName="password" placeholder="min. 6 characters"
+                       name="password" autocomplete="new-password">
                 <button mat-icon-button matSuffix type="button"
                         (click)="showPassword = !showPassword"
                         [title]="showPassword ? 'Hide password' : 'Show password'"
@@ -88,6 +98,29 @@ import { AuthService } from '../../../core/services/auth.service';
                   <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
                 </button>
               </mat-form-field>
+            </div>
+
+            <div class="field-group">
+              <label>Confirm Password</label>
+              <mat-form-field appearance="outline"
+                [class.mismatch]="form.hasError('passwordMismatch') && form.get('confirmPassword')?.touched">
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">lock_outline</mat-icon>
+                <input matInput [type]="showConfirm ? 'text' : 'password'"
+                       formControlName="confirmPassword" placeholder="Re-enter your password"
+                       name="confirm-password" autocomplete="new-password">
+                <button mat-icon-button matSuffix type="button"
+                        (click)="showConfirm = !showConfirm"
+                        [title]="showConfirm ? 'Hide password' : 'Show password'"
+                        style="color:#8BA3B5">
+                  <mat-icon>{{ showConfirm ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+              </mat-form-field>
+              @if (form.hasError('passwordMismatch') && form.get('confirmPassword')?.touched) {
+                <div class="pw-error">
+                  <mat-icon style="font-size:14px;width:14px;height:14px;vertical-align:middle">error_outline</mat-icon>
+                  Passwords do not match
+                </div>
+              }
             </div>
 
             <div class="field-group">
@@ -179,7 +212,10 @@ import { AuthService } from '../../../core/services/auth.service';
 
     .field-group {
       margin-bottom: 14px;
+      min-width: 0;        /* prevent grid children from overflowing their cell */
+      overflow: hidden;    /* clip any residual mat-form-field overflow */
       label { display: block; font-size: 0.8rem; font-weight: 700; color: #1A3547; margin-bottom: 5px; }
+      mat-form-field { max-width: 100%; }
     }
 
     .auth-footer {
@@ -187,36 +223,57 @@ import { AuthService } from '../../../core/services/auth.service';
       a { color: #FF8C42; font-weight: 700; text-decoration: none; }
       a:hover { text-decoration: underline; }
     }
+
+    .pw-error {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 0.75rem; font-weight: 600; color: #DC2626;
+      margin-top: -10px; margin-bottom: 6px;
+    }
+
+    .mismatch .mat-mdc-notch-piece { border-color: #DC2626 !important; }
   `]
 })
 export class RegisterComponent {
   form: FormGroup;
   loading = false;
   showPassword = false;
+  showConfirm  = false;
 
   constructor(private fb: FormBuilder, private auth: AuthService,
               private router: Router, private snack: MatSnackBar) {
     this.form = this.fb.group({
-      name:     ['', Validators.required],
-      email:    ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      phone:    [''],
-      role:     ['USER']
-    });
+      name:            ['', Validators.required],
+      email:           ['', [Validators.required, Validators.email]],
+      password:        ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', Validators.required],
+      phone:           [''],
+      role:            ['USER']
+    }, { validators: passwordMatchValidator });
   }
 
   submit(): void {
     if (this.form.invalid) return;
     this.loading = true;
-    this.auth.register(this.form.value).subscribe({
+    // Strip confirmPassword — backend doesn't need it
+    const { confirmPassword, ...payload } = this.form.value;
+    this.auth.register(payload).subscribe({
       next: (res) => {
         if (res.success) {
           const role = res.data?.role;
-          const dest = role === 'ADMIN' ? '/admin'
-                     : role === 'NGO'      ? '/ngo'
-                     : role === 'HOSPITAL' ? '/hospital'
-                     : '/dashboard';
-          this.router.navigate([dest]);
+          const isApproved = res.data?.isApproved;
+
+          // NGO / HOSPITAL accounts require admin approval before they can log in
+          if ((role === 'NGO' || role === 'HOSPITAL') && !isApproved) {
+            this.snack.open(
+              'Account created! Your registration is pending admin approval. You will be notified once approved.',
+              'OK',
+              { duration: 8000 }
+            );
+            this.router.navigate(['/auth/login']);
+          } else {
+            const dest = role === 'ADMIN' ? '/admin' : '/dashboard';
+            this.router.navigate([dest]);
+          }
         } else {
           this.snack.open(res.message, 'Close', { duration: 3000 });
         }

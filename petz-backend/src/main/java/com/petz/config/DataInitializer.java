@@ -85,6 +85,10 @@ public class DataInitializer implements CommandLineRunner {
                 "Dedicated to rehabilitating and rehoming stray animals in the Greater Chennai area.",
                 "Chennai", "T. Nagar, Chennai - 600017", "9877777777", "ngo2@petz.com");
 
+        // ── 2b. Backfill Hospital / NGO entities for any user missing one ──
+        backfillHospitalEntities();
+        backfillNgoEntities();
+
         // ── 3. Hospitals ──────────────────────────────────────────
         Hospital hosp1 = seedHospital(hospUser,
                 "VetCare Animal Hospital",
@@ -155,6 +159,10 @@ public class DataInitializer implements CommandLineRunner {
                 user.setIsActive(true);
                 changed = true;
             }
+            if (!Boolean.TRUE.equals(user.getIsApproved())) {
+                user.setIsApproved(true);
+                changed = true;
+            }
             if (changed) {
                 user = userRepository.save(user);
                 log.info("🔑 Updated user: {}", email);
@@ -168,10 +176,56 @@ public class DataInitializer implements CommandLineRunner {
             u.setRole(role);
             u.setPhone(phone);
             u.setIsActive(true);
+            u.setIsApproved(true);
             u = userRepository.save(u);
             log.info("👤 Created user: {} ({})", email, role);
             return u;
         });
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    //  2b. BACKFILL — ensure every HOSPITAL-role user has a Hospital entity
+    //      Handles accounts registered before this auto-creation fix was deployed.
+    // ════════════════════════════════════════════════════════════════
+
+    private void backfillHospitalEntities() {
+        userRepository.findAll().stream()
+                .filter(u -> u.getRole() == Role.HOSPITAL)
+                .forEach(u -> {
+                    if (hospitalRepository.findByOwnerUserId(u.getId()).isEmpty()) {
+                        Hospital h = new Hospital();
+                        h.setOwnerUserId(u.getId());
+                        h.setName(u.getName());
+                        h.setPhone(u.getPhone());
+                        h.setEmail(u.getEmail());
+                        h.setCity("Chennai");
+                        // Activate if user is already approved; keep inactive if still pending
+                        h.setIsActive(Boolean.TRUE.equals(u.getIsApproved()));
+                        hospitalRepository.save(h);
+                        log.info("🏥 Backfilled Hospital entity for user: {} ({})", u.getEmail(), u.getId());
+                    }
+                });
+    }
+
+    private void backfillNgoEntities() {
+        userRepository.findAll().stream()
+                .filter(u -> u.getRole() == Role.NGO)
+                .forEach(u -> {
+                    if (ngoRepository.findByOwnerUserId(u.getId()).isEmpty()) {
+                        Ngo ngo = new Ngo();
+                        ngo.setOwnerUserId(u.getId());
+                        ngo.setName(u.getName());
+                        ngo.setPhone(u.getPhone());
+                        ngo.setEmail(u.getEmail());
+                        ngo.setCity("Chennai");
+                        // Activate + verify if user is already approved; keep inactive if pending
+                        boolean approved = Boolean.TRUE.equals(u.getIsApproved());
+                        ngo.setIsActive(approved);
+                        ngo.setIsVerified(approved);
+                        ngoRepository.save(ngo);
+                        log.info("🏢 Backfilled NGO entity for user: {} ({})", u.getEmail(), u.getId());
+                    }
+                });
     }
 
     // ════════════════════════════════════════════════════════════════

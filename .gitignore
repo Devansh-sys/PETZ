@@ -7,6 +7,12 @@ petz-frontend/node_modules/
 petz-frontend/.angular/cache/
 petz-frontend/dist/
 
+# ── Docs / generated files ───────────────────────────────
+docs/
+
+# ── Claude session data ──────────────────────────────────
+.claude/
+
 # ── General ──────────────────────────────────────────────
 .env
 *.env

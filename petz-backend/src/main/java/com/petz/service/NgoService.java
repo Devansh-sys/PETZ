@@ -47,6 +47,11 @@ public class NgoService {
         return ngoRepo.findByIsActive(true);
     }
 
+    // Admin-specific: returns ALL NGOs including inactive/pending-approval ones
+    public List<Ngo> getAllForAdmin() {
+        return ngoRepo.findAll();
+    }
+
     public List<Ngo> getUnverified() {
         return ngoRepo.findByIsVerified(false);
     }

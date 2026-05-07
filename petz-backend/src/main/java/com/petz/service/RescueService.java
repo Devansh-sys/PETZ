@@ -151,9 +151,33 @@ public class RescueService {
         return rescueRepo.findAll();
     }
 
+    public List<RescueReportResponse> getAllEnriched() {
+        return rescueRepo.findAll().stream()
+                .map(r -> {
+                    Ngo ngo = r.getAssignedNgo() != null
+                            ? ngoRepo.findById(r.getAssignedNgo()).orElse(null) : null;
+                    return RescueReportResponse.from(r, ngo);
+                })
+                .toList();
+    }
+
     public List<RescueReport> getByStatus(String status) {
         try {
             return rescueRepo.findByStatus(RescueStatus.valueOf(status.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid status: " + status);
+        }
+    }
+
+    public List<RescueReportResponse> getByStatusEnriched(String status) {
+        try {
+            return rescueRepo.findByStatus(RescueStatus.valueOf(status.toUpperCase())).stream()
+                    .map(r -> {
+                        Ngo ngo = r.getAssignedNgo() != null
+                                ? ngoRepo.findById(r.getAssignedNgo()).orElse(null) : null;
+                        return RescueReportResponse.from(r, ngo);
+                    })
+                    .toList();
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid status: " + status);
         }

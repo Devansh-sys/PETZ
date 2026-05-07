@@ -182,17 +182,37 @@ interface Doctor {
           <div class="form-row">
             <div class="field-group">
               <label class="field-label">Schedule Start</label>
-              <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">schedule</mat-icon>
-                <input matInput type="time" [(ngModel)]="newDoc.scheduleStart">
-              </mat-form-field>
+              <div class="time-picker">
+                <mat-icon class="time-ico">schedule</mat-icon>
+                <select class="tp-sel tp-hour" [(ngModel)]="startHour" (ngModelChange)="updateTimes()">
+                  @for (h of hours; track h) { <option [value]="h">{{ h }}</option> }
+                </select>
+                <span class="tp-sep">:</span>
+                <select class="tp-sel tp-min" [(ngModel)]="startMin" (ngModelChange)="updateTimes()">
+                  @for (m of minutes; track m) { <option [value]="m">{{ m }}</option> }
+                </select>
+                <select class="tp-sel tp-ampm" [(ngModel)]="startAmPm" (ngModelChange)="updateTimes()">
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
             </div>
             <div class="field-group">
               <label class="field-label">Schedule End</label>
-              <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">schedule</mat-icon>
-                <input matInput type="time" [(ngModel)]="newDoc.scheduleEnd">
-              </mat-form-field>
+              <div class="time-picker">
+                <mat-icon class="time-ico">schedule</mat-icon>
+                <select class="tp-sel tp-hour" [(ngModel)]="endHour" (ngModelChange)="updateTimes()">
+                  @for (h of hours; track h) { <option [value]="h">{{ h }}</option> }
+                </select>
+                <span class="tp-sep">:</span>
+                <select class="tp-sel tp-min" [(ngModel)]="endMin" (ngModelChange)="updateTimes()">
+                  @for (m of minutes; track m) { <option [value]="m">{{ m }}</option> }
+                </select>
+                <select class="tp-sel tp-ampm" [(ngModel)]="endAmPm" (ngModelChange)="updateTimes()">
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
             </div>
           </div>
           <div class="field-group">
@@ -583,6 +603,37 @@ interface Doctor {
     .field-group { margin-bottom: 4px; }
     .field-label { display: block; font-size: 0.78rem; font-weight: 700; color: #1A3547; margin-bottom: 6px; }
     @media (max-width: 560px) { .form-row { grid-template-columns: 1fr; } }
+
+    /* ── Time picker dropdowns ── */
+    .time-picker {
+      display: flex; align-items: center; gap: 4px;
+      background: #fff; border: 1.5px solid #C8DCE8; border-radius: 12px;
+      padding: 0 14px; height: 56px; transition: border-color 0.2s;
+      &:focus-within { border-color: #4F8FD4; box-shadow: 0 0 0 3px rgba(79,143,212,0.1); }
+    }
+    .time-ico {
+      color: #8BA3B5; font-size: 20px; width: 20px; height: 20px;
+      flex-shrink: 0; margin-right: 8px;
+    }
+    .tp-sel {
+      border: none; outline: none; background: transparent;
+      font-family: inherit; font-weight: 700; color: #1A3547;
+      cursor: pointer; appearance: none; -webkit-appearance: none;
+      text-align: center;
+    }
+    .tp-hour { font-size: 1.05rem; width: 32px; }
+    .tp-min  { font-size: 1.05rem; width: 32px; }
+    .tp-ampm {
+      font-size: 0.78rem; font-weight: 800; letter-spacing: 0.04em;
+      background: #EEF4FA; color: #4F8FD4; border-radius: 8px;
+      padding: 4px 10px; margin-left: 6px; cursor: pointer;
+      transition: background 0.15s;
+      &:hover { background: #D9ECFC; }
+    }
+    .tp-sep {
+      font-size: 1.1rem; font-weight: 900; color: #8BA3B5;
+      margin: 0 1px; line-height: 1; user-select: none;
+    }
   `]
 })
 export class DoctorsManageComponent implements OnInit {
@@ -593,6 +644,12 @@ export class DoctorsManageComponent implements OnInit {
 
   showForm = false;
   newDoc: any = { slotDuration: 30 };
+
+  // Time picker state
+  readonly hours   = ['1','2','3','4','5','6','7','8','9','10','11','12'];
+  readonly minutes = ['00','15','30','45'];
+  startHour = '9';  startMin = '00';  startAmPm = 'AM';
+  endHour   = '5';  endMin   = '00';  endAmPm   = 'PM';
 
   searchQ = '';
   filterSpec = '';
@@ -605,6 +662,7 @@ export class DoctorsManageComponent implements OnInit {
   constructor(private api: ApiService, private snack: MatSnackBar) {}
 
   ngOnInit(): void {
+    this.updateTimes(); // pre-populate newDoc with default start/end times
     this.api.get<any>('/hospitals/profile').subscribe({
       next: res => {
         this.hospitalId = res.data?.id;
@@ -655,6 +713,25 @@ export class DoctorsManageComponent implements OnInit {
     this.filterSpec = '';
     this.sortBy = 'name-asc';
     this.applyFilters();
+  }
+
+  // ── Time picker helpers ──
+  updateTimes(): void {
+    this.newDoc.scheduleStart = this.to24(this.startHour, this.startMin, this.startAmPm);
+    this.newDoc.scheduleEnd   = this.to24(this.endHour,   this.endMin,   this.endAmPm);
+  }
+
+  private to24(hour: string, min: string, ampm: string): string {
+    let h = parseInt(hour, 10);
+    if (ampm === 'AM' && h === 12) h = 0;
+    if (ampm === 'PM' && h !== 12) h += 12;
+    return `${String(h).padStart(2, '0')}:${min}`;
+  }
+
+  private resetTimePicker(): void {
+    this.startHour = '9';  this.startMin = '00';  this.startAmPm = 'AM';
+    this.endHour   = '5';  this.endMin   = '00';  this.endAmPm   = 'PM';
+    this.updateTimes();
   }
 
   // ── Computed helpers ──
@@ -726,6 +803,7 @@ export class DoctorsManageComponent implements OnInit {
         this.applyFilters();
         this.showForm = false;
         this.newDoc = { slotDuration: 30 };
+        this.resetTimePicker();
         this.snack.open('Doctor added successfully!', '', { duration: 2000 });
       },
       error: err => this.snack.open(err.error?.message ?? 'Error adding doctor.', 'Close', { duration: 3000 })
