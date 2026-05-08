@@ -48,7 +48,13 @@ public class UserService {
     }
 
     public List<UserResponse> getAllUsers() {
-        return userRepo.findAll().stream().map(this::toResponse).collect(Collectors.toList());
+        return userRepo.findAll().stream()
+                // Exclude NGO/HOSPITAL users who are still pending approval —
+                // those are already shown in the Pending Approvals section.
+                .filter(u -> !((u.getRole() == Role.NGO || u.getRole() == Role.HOSPITAL)
+                        && Boolean.FALSE.equals(u.getIsApproved())))
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 
     public UserResponse toggleActive(Long userId, boolean active) {
