@@ -54,13 +54,6 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- H2 (Codespace / local dev — in-memory, no server needed) -->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
         <!-- JJWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

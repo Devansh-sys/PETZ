@@ -6,23 +6,7 @@ import { environment } from '../../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class ApiService {
 
-  /**
-   * Resolves the API base URL at runtime.
-   *
-   * • GitHub Codespaces  — frontend is served from  <name>-4200.app.github.dev
-   *                        backend is forwarded at   <name>-8081.app.github.dev
-   *                        We auto-swap the port segment so no env-file changes are needed.
-   *
-   * • Local dev / Railway / Netlify — falls back to environment.apiUrl as normal.
-   */
   private get base(): string {
-    const host = window.location.hostname;
-    if (host.includes('.app.github.dev')) {
-      // Replace the frontend port segment with the backend port
-      const backendHost = host.replace('-4200.app.github.dev', '-8081.app.github.dev')
-                              .replace('-4200.preview.app.github.dev', '-8081.preview.app.github.dev');
-      return `https://${backendHost}/api/v1`;
-    }
     return environment.apiUrl;
   }
 
