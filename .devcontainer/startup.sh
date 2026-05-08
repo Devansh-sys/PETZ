@@ -1,7 +1,7 @@
 #!/bin/bash
 # ─────────────────────────────────────────────────────────────
 # PETZ Platform — Codespace Startup Script
-# Boots Spring Boot (H2, port 8081) + Angular (port 4200)
+# Boots MySQL (local) + Spring Boot (port 8081) + Angular (port 4200)
 # Usage: bash .devcontainer/startup.sh
 # ─────────────────────────────────────────────────────────────
 
@@ -14,9 +14,26 @@ echo "   PETZ Platform — Codespace Dev Server"
 echo "   ─────────────────────────────────────────"
 echo ""
 
+# ── MySQL ─────────────────────────────────────────────────────
+echo "🗄️  Ensuring MySQL is running..."
+
+# Start MySQL service if not already running
+sudo service mysql start 2>/dev/null || true
+
+# Wait for MySQL to be ready (max 30s)
+TRIES=0
+until mysqladmin ping -u root --silent 2>/dev/null || (( TRIES++ >= 15 )); do
+  sleep 2
+done
+
+# Create the database if it doesn't exist
+mysql -u root -e "CREATE DATABASE IF NOT EXISTS petzdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>/dev/null
+echo "   ✅ MySQL is up — database 'petzdb' ready"
+echo ""
+
 # ── Backend ──────────────────────────────────────────────────
 echo "🚀 Starting Spring Boot backend..."
-echo "   Profile : codespace (H2 in-memory DB)"
+echo "   Profile : codespace (MySQL localhost)"
 echo "   Port    : 8081"
 echo ""
 
@@ -26,12 +43,12 @@ mvn spring-boot:run \
   > /tmp/petz-backend.log 2>&1 &
 BACKEND_PID=$!
 
-# Wait until the backend responds (max 90s)
+# Wait until the backend responds (max 120s)
 echo "   ⏳ Waiting for backend to be ready..."
 TRIES=0
 until curl -sf "http://localhost:8081/api/v1/public/health" > /dev/null 2>&1 \
    || curl -sf "http://localhost:8081/api/v1/actuator/health" > /dev/null 2>&1 \
-   || (( TRIES++ >= 45 )); do
+   || (( TRIES++ >= 60 )); do
   sleep 2
 done
 
@@ -39,7 +56,7 @@ if kill -0 $BACKEND_PID 2>/dev/null; then
   echo "   ✅ Backend is up!"
 else
   echo "   ❌ Backend failed to start. Check /tmp/petz-backend.log"
-  cat /tmp/petz-backend.log | tail -30
+  tail -30 /tmp/petz-backend.log
   exit 1
 fi
 
@@ -58,10 +75,11 @@ FRONTEND_PID=$!
 
 echo ""
 echo "✅ ─────────────────────────────────────────"
-echo "   Both services are running!"
+echo "   All services are running!"
 echo ""
-echo "   📡 Backend  → Ports tab → port 8081"
-echo "   🌍 Frontend → Ports tab → port 4200"
+echo "   🗄️  MySQL     → localhost:3306  (DB: petzdb)"
+echo "   📡 Backend   → Ports tab → port 8081"
+echo "   🌍 Frontend  → Ports tab → port 4200"
 echo ""
 echo "   Logs:"
 echo "   Backend  : tail -f /tmp/petz-backend.log"
