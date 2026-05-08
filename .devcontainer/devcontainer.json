@@ -1,0 +1,38 @@
+{
+  "name": "PETZ Platform",
+
+  // Universal image ships with Java 17, Node 20, Maven — no extra features needed
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+
+  // Forward backend (8081) and Angular dev server (4200)
+  "forwardPorts": [8081, 4200],
+  "portsAttributes": {
+    "8081": {
+      "label": "Backend API",
+      "onAutoForward": "silent",
+      "visibility": "public"
+    },
+    "4200": {
+      "label": "Frontend App",
+      "onAutoForward": "openBrowserOnce",
+      "visibility": "public"
+    }
+  },
+
+  // Pre-install all dependencies so startup.sh runs instantly
+  "postCreateCommand": "cd petz-frontend && npm install && cd ../petz-backend && mvn dependency:resolve -q",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-spring-boot",
+        "angular.ng-template",
+        "ms-vscode.vscode-typescript-next"
+      ],
+      "settings": {
+        "java.compile.nullAnalysis.mode": "disabled"
+      }
+    }
+  }
+}
