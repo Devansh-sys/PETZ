@@ -4,14 +4,6 @@
   // Universal image ships with Java 17, Node 20, Maven
   "image": "mcr.microsoft.com/devcontainers/universal:2",
 
-  // Install MySQL 8 server inside the container — no external DB needed
-  "features": {
-    "ghcr.io/devcontainers/features/mysql:1": {
-      "version": "8.0",
-      "rootPassword": ""
-    }
-  },
-
   // Forward MySQL (3306), backend (8081), and Angular dev server (4200)
   "forwardPorts": [3306, 8081, 4200],
   "portsAttributes": {
@@ -32,8 +24,8 @@
     }
   },
 
-  // Pre-install all dependencies so startup.sh runs instantly
-  "postCreateCommand": "cd petz-frontend && npm install && cd ../petz-backend && mvn dependency:resolve -q",
+  // Install MySQL + pre-resolve all dependencies when container is first created
+  "postCreateCommand": "bash .devcontainer/postCreate.sh",
 
   "customizations": {
     "vscode": {
