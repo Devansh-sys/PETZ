@@ -628,8 +628,12 @@ export class AdminNgosComponent implements OnInit {
   loadNgos(): void {
     this.loading = true;
     this.api.get<any>('/admin/ngos').subscribe({
-      next: res => { this.ngos = res.data ?? []; this.loading = false; },
-      error: ()  => { this.loading = false; }
+      next: res => {
+        // Only show approved (active) NGOs — pending ones are in the Pending Approvals section.
+        this.ngos = (res.data ?? []).filter((n: any) => n.isActive !== false);
+        this.loading = false;
+      },
+      error: () => { this.loading = false; }
     });
   }
 
