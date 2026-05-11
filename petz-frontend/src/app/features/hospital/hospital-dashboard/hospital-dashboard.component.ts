@@ -86,82 +86,70 @@ interface Seg { color: string; dash: string; offset: string; }
       <div class="kpi-strip">
 
         <div class="kpi-item">
-          <svg width="44" height="44" viewBox="0 0 44 44">
-            <circle cx="22" cy="22" r="18" fill="none" stroke="#E0EBF2" stroke-width="4"/>
-            <circle cx="22" cy="22" r="18" fill="none" stroke="#4F8FD4" stroke-width="4"
-                    stroke-linecap="round" [attr.stroke-dasharray]="gaugeDash(todayCount, Math.max(totalCount,1))"
-                    [attr.stroke-dashoffset]="'-28.3'" transform="rotate(-90 22 22)"/>
-          </svg>
+          <div class="kpi-icon-box" style="background:linear-gradient(135deg,#6BAEE8,#4F8FD4)">
+            <mat-icon>today</mat-icon>
+          </div>
           <div class="kpi-text">
             <div class="kpi-val" style="color:#4F8FD4">{{ todayCount }}</div>
             <div class="kpi-label">Today</div>
+            <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#4F8FD4" [style.width.%]="pctOf(todayCount, totalCount)"></div></div>
           </div>
         </div>
 
         <div class="kpi-item">
-          <svg width="44" height="44" viewBox="0 0 44 44">
-            <circle cx="22" cy="22" r="18" fill="none" stroke="#E0EBF2" stroke-width="4"/>
-            <circle cx="22" cy="22" r="18" fill="none" stroke="#2EB894" stroke-width="4"
-                    stroke-linecap="round" [attr.stroke-dasharray]="gaugeDash(doctorCount, Math.max(doctorCount,1))"
-                    [attr.stroke-dashoffset]="'-28.3'" transform="rotate(-90 22 22)"/>
-          </svg>
+          <div class="kpi-icon-box" style="background:linear-gradient(135deg,#50CCA8,#2EB894)">
+            <mat-icon>medical_services</mat-icon>
+          </div>
           <div class="kpi-text">
             <div class="kpi-val" style="color:#2EB894">{{ doctorCount }}</div>
             <div class="kpi-label">Doctors</div>
+            <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#2EB894;width:100%"></div></div>
           </div>
         </div>
 
         <div class="kpi-item">
-          <svg width="44" height="44" viewBox="0 0 44 44">
-            <circle cx="22" cy="22" r="18" fill="none" stroke="#E0EBF2" stroke-width="4"/>
-            <circle cx="22" cy="22" r="18" fill="none" stroke="#E89340" stroke-width="4"
-                    stroke-linecap="round" [attr.stroke-dasharray]="gaugeDash(pendingCount, Math.max(totalCount,1))"
-                    [attr.stroke-dashoffset]="'-28.3'" transform="rotate(-90 22 22)"/>
-          </svg>
+          <div class="kpi-icon-box" style="background:linear-gradient(135deg,#F0A85A,#E89340)">
+            <mat-icon>schedule</mat-icon>
+          </div>
           <div class="kpi-text">
             <div class="kpi-val" style="color:#E89340">{{ pendingCount }}</div>
             <div class="kpi-label">Pending</div>
+            <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#E89340" [style.width.%]="pctOf(pendingCount, totalCount)"></div></div>
           </div>
         </div>
 
         <div class="kpi-item">
-          <svg width="44" height="44" viewBox="0 0 44 44">
-            <circle cx="22" cy="22" r="18" fill="none" stroke="#E0EBF2" stroke-width="4"/>
-            <circle cx="22" cy="22" r="18" fill="none" stroke="#7C62CC" stroke-width="4"
-                    stroke-linecap="round" [attr.stroke-dasharray]="gaugeDash(completedCount, Math.max(totalCount,1))"
-                    [attr.stroke-dashoffset]="'-28.3'" transform="rotate(-90 22 22)"/>
-          </svg>
+          <div class="kpi-icon-box" style="background:linear-gradient(135deg,#9B82E0,#7C62CC)">
+            <mat-icon>check_circle</mat-icon>
+          </div>
           <div class="kpi-text">
             <div class="kpi-val" style="color:#7C62CC">{{ completedCount }}</div>
             <div class="kpi-label">Completed</div>
+            <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#7C62CC" [style.width.%]="pctOf(completedCount, totalCount)"></div></div>
           </div>
         </div>
 
         <div class="kpi-divider"></div>
 
         <div class="kpi-item">
-          <svg width="44" height="44" viewBox="0 0 44 44">
-            <circle cx="22" cy="22" r="18" fill="none" stroke="#E0EBF2" stroke-width="4"/>
-            <circle cx="22" cy="22" r="18" fill="none" stroke="#E05858" stroke-width="4"
-                    stroke-linecap="round" [attr.stroke-dasharray]="gaugeDash(cancelledCount, Math.max(totalCount,1))"
-                    [attr.stroke-dashoffset]="'-28.3'" transform="rotate(-90 22 22)"/>
-          </svg>
+          <div class="kpi-icon-box" style="background:linear-gradient(135deg,#E87070,#E05858)">
+            <mat-icon>cancel</mat-icon>
+          </div>
           <div class="kpi-text">
             <div class="kpi-val" style="color:#E05858">{{ cancelledCount }}</div>
             <div class="kpi-label">Cancelled</div>
+            <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#E05858" [style.width.%]="pctOf(cancelledCount, totalCount)"></div></div>
           </div>
         </div>
 
         <div class="kpi-item">
-          <svg width="44" height="44" viewBox="0 0 44 44">
-            <circle cx="22" cy="22" r="18" fill="none" stroke="#E0EBF2" stroke-width="4"/>
-            <circle cx="22" cy="22" r="18" fill="none" stroke="#4F8FD4" stroke-width="4"
-                    stroke-linecap="round" [attr.stroke-dasharray]="gaugeDash(totalCount, Math.max(totalCount,1))"
-                    [attr.stroke-dashoffset]="'-28.3'" transform="rotate(-90 22 22)"/>
-          </svg>
+          <div class="kpi-icon-box" style="background:linear-gradient(135deg,#4A7CC4,#1A3547)">
+            <mat-icon>event_note</mat-icon>
+          </div>
           <div class="kpi-text">
             <div class="kpi-val" style="color:#1A3547">{{ totalCount }}</div>
             <div class="kpi-label">Total</div>
+            <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#1A3547;width:100%"></div></div>
           </div>
         </div>
 
@@ -211,12 +199,19 @@ interface Seg { color: string; dash: string; offset: string; }
                   <span class="leg-label">Cancelled</span>
                   <span class="leg-val">{{ cancelledCount }}</span>
                 </div>
+                @if (noShowCount > 0) {
+                  <div class="legend-item">
+                    <span class="leg-dot" style="background:#94A3B8"></span>
+                    <span class="leg-label">No Show</span>
+                    <span class="leg-val">{{ noShowCount }}</span>
+                  </div>
+                }
               </div>
             </div>
           }
         </div>
 
-        <!-- Weekly Breakdown bar chart -->
+        <!-- Weekly Breakdown — smooth line chart -->
         <div class="chart-panel">
           <div class="panel-title">
             This Week
@@ -227,20 +222,57 @@ interface Seg { color: string; dash: string; offset: string; }
           } @else if (totalCount === 0) {
             <div class="chart-empty">No appointments this week</div>
           } @else {
-            <div class="bar-chart">
-              @for (day of weekBars; track day.name) {
-                <div class="bar-col">
-                  <div class="bar-label-top">{{ day.count > 0 ? day.count : '' }}</div>
-                  <div class="bar-track">
-                    <div class="bar-fill"
-                         [class.bar-today]="day.isToday"
-                         [style.height.%]="barHeight(day.count)">
-                    </div>
-                  </div>
-                  <div class="bar-day" [class.today-label]="day.isToday">{{ day.name }}</div>
-                </div>
+            <svg class="line-chart-svg" viewBox="0 0 300 120" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <linearGradient id="lcAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%"   stop-color="#4F8FD4" stop-opacity="0.22"/>
+                  <stop offset="100%" stop-color="#4F8FD4" stop-opacity="0.01"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Horizontal gridlines -->
+              <line x1="20" y1="15"  x2="280" y2="15"  stroke="#EEF1F5" stroke-width="1"/>
+              <line x1="20" y1="55"  x2="280" y2="55"  stroke="#EEF1F5" stroke-width="1"/>
+              <line x1="20" y1="95"  x2="280" y2="95"  stroke="#EEF1F5" stroke-width="1"/>
+
+              <!-- Area fill under the line -->
+              <path [attr.d]="weekAreaPath" fill="url(#lcAreaGrad)"/>
+
+              <!-- The line itself -->
+              <path [attr.d]="weekLinePath"
+                    fill="none" stroke="#4F8FD4" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+
+              <!-- Data points, count labels, day labels -->
+              @for (pt of weekLinePoints; track pt.name) {
+
+                <!-- Count label above each point (skip zeros) -->
+                @if (pt.count > 0) {
+                  <text [attr.x]="pt.x" [attr.y]="pt.y - 7"
+                        text-anchor="middle" font-size="8" font-weight="700"
+                        [attr.fill]="pt.isToday ? '#4F8FD4' : '#4A6478'">{{ pt.count }}</text>
+                }
+
+                <!-- Regular point: white fill, blue stroke -->
+                @if (!pt.isToday) {
+                  <circle [attr.cx]="pt.x" [attr.cy]="pt.y"
+                          r="3.5" fill="#fff" stroke="#4F8FD4" stroke-width="2"/>
+                }
+
+                <!-- Today: solid filled bullseye -->
+                @if (pt.isToday) {
+                  <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="6" fill="#4F8FD4" opacity="0.18"/>
+                  <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="4"  fill="#4F8FD4"/>
+                  <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="1.8" fill="#fff"/>
+                }
+
+                <!-- Day label at bottom -->
+                <text [attr.x]="pt.x" y="113"
+                      text-anchor="middle" font-size="7.5" font-weight="700"
+                      [attr.fill]="pt.isToday ? '#4F8FD4' : '#B0C4D4'"
+                      style="text-transform:uppercase;letter-spacing:0.04em">{{ pt.name }}</text>
               }
-            </div>
+            </svg>
           }
         </div>
 
@@ -388,18 +420,31 @@ interface Seg { color: string; dash: string; offset: string; }
     .kpi-strip {
       display: flex; align-items: center; gap: 0;
       background: #fff; border: 1px solid #E0EBF2; border-radius: 16px;
-      padding: 16px 8px; margin-bottom: 22px;
+      padding: 16px 12px; margin-bottom: 22px;
       box-shadow: 0 2px 8px rgba(26,53,71,0.05);
       flex-wrap: wrap;
     }
     .kpi-item {
-      flex: 1; min-width: 80px;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      padding: 4px 12px;
+      flex: 1; min-width: 90px;
+      display: flex; align-items: center; gap: 10px;
+      padding: 4px 10px;
     }
-    .kpi-text { display: flex; flex-direction: column; }
+    .kpi-icon-box {
+      width: 42px; height: 42px; border-radius: 13px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.14);
+      mat-icon { font-size: 20px; width: 20px; height: 20px; color: #fff; }
+    }
+    .kpi-text { display: flex; flex-direction: column; flex: 1; min-width: 0; }
     .kpi-val  { font-size: 1.2rem; font-weight: 900; line-height: 1; }
-    .kpi-label{ font-size: 0.68rem; font-weight: 600; color: #8BA3B5; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 3px; }
+    .kpi-label{ font-size: 0.65rem; font-weight: 600; color: #8BA3B5; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 3px; }
+    .kpi-bar-track {
+      height: 3px; background: #EEF1F5; border-radius: 999px; margin-top: 5px; overflow: hidden;
+    }
+    .kpi-bar-fill {
+      height: 100%; border-radius: 999px; min-width: 3px;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
     .kpi-divider {
       width: 1px; height: 44px; background: #E0EBF2; flex-shrink: 0; margin: 0 4px;
     }
@@ -432,26 +477,11 @@ interface Seg { color: string; dash: string; offset: string; }
     .leg-label { font-size: 0.75rem; color: #4A6478; font-weight: 600; flex: 1; }
     .leg-val { font-size: 0.82rem; font-weight: 800; color: #1A3547; }
 
-    /* Bar chart */
-    .bar-chart {
-      display: flex; align-items: flex-end; gap: 6px; height: 110px;
+    /* ── Line chart ── */
+    .line-chart-svg {
+      width: 100%; display: block;
+      overflow: visible; /* so count labels above top gridline aren't clipped */
     }
-    .bar-col {
-      flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; gap: 3px;
-    }
-    .bar-label-top { font-size: 0.65rem; font-weight: 700; color: #4F8FD4; min-height: 14px; }
-    .bar-track {
-      flex: 1; width: 100%; background: #F0F4F8; border-radius: 6px; overflow: hidden;
-      display: flex; align-items: flex-end;
-    }
-    .bar-fill {
-      width: 100%; min-height: 4px;
-      background: linear-gradient(180deg, #4F8FD4, #7C62CC);
-      border-radius: 6px; transition: height 0.6s ease;
-    }
-    .bar-fill.bar-today { background: linear-gradient(180deg, #2EB894, #4F8FD4); }
-    .bar-day { font-size: 0.62rem; font-weight: 700; color: #8BA3B5; text-transform: uppercase; letter-spacing: 0.04em; }
-    .today-label { color: #4F8FD4; }
 
     /* Doctor capacity */
     .doctor-capacity {
@@ -519,20 +549,21 @@ export class HospitalDashboardComponent implements OnInit {
   hospital: any = null;
   loading = true;
 
-  // Counts
+  // Counts — AppointmentStatus: PENDING, CONFIRMED, COMPLETED, CANCELLED, NO_SHOW
   totalCount     = 0;
   todayCount     = 0;
   pendingCount   = 0;
   confirmedCount = 0;
   completedCount = 0;
   cancelledCount = 0;
+  noShowCount    = 0;
   doctorCount    = 0;
   scheduledDoctors = 0;
   totalDailySlots  = 0;
 
   // Charts
   statusSegs: Seg[] = [];
-  weekBars: { name: string; count: number; isToday: boolean }[] = [];
+  weekBars: { name: string; count: number; isToday: boolean; pending: number; confirmed: number; completed: number; cancelled: number }[] = [];
   topSpecs: { name: string; count: number }[] = [];
   weekLabel = '';
   todayLabel = '';
@@ -558,6 +589,7 @@ export class HospitalDashboardComponent implements OnInit {
       this.confirmedCount = all.filter(a => a.status === 'CONFIRMED').length;
       this.completedCount = all.filter(a => a.status === 'COMPLETED').length;
       this.cancelledCount = all.filter(a => a.status === 'CANCELLED').length;
+      this.noShowCount    = all.filter(a => a.status === 'NO_SHOW').length;
 
       const todayStr = new Date().toISOString().split('T')[0];
       this.todayCount = all.filter(a => a.apptDate === todayStr).length;
@@ -584,11 +616,13 @@ export class HospitalDashboardComponent implements OnInit {
   }
 
   buildStatusDonut(): void {
+    // All 5 AppointmentStatus values — totalCount must equal sum of all 5
     const segs = [
       { val: this.pendingCount,   color: '#E89340' },
       { val: this.confirmedCount, color: '#4F8FD4' },
       { val: this.completedCount, color: '#2EB894' },
       { val: this.cancelledCount, color: '#E05858' },
+      { val: this.noShowCount,    color: '#94A3B8' },
     ];
     this.statusSegs = this.buildSegs(segs, this.totalCount);
   }
@@ -624,10 +658,15 @@ export class HospitalDashboardComponent implements OnInit {
       const d = new Date(monday);
       d.setDate(monday.getDate() + i);
       const ds = d.toISOString().split('T')[0];
+      const dayAppts = all.filter(a => a.apptDate === ds);
       return {
         name: names[i],
-        count: all.filter(a => a.apptDate === ds).length,
-        isToday: ds === todayStr
+        count:     dayAppts.length,
+        isToday:   ds === todayStr,
+        pending:   dayAppts.filter(a => a.status === 'PENDING').length,
+        confirmed: dayAppts.filter(a => a.status === 'CONFIRMED').length,
+        completed: dayAppts.filter(a => a.status === 'COMPLETED').length,
+        cancelled: dayAppts.filter(a => a.status === 'CANCELLED' || a.status === 'NO_SHOW').length,
       };
     });
   }
@@ -654,8 +693,64 @@ export class HospitalDashboardComponent implements OnInit {
   }
 
   barHeight(count: number): number {
-    const max = Math.max(...this.weekBars.map(b => b.count), 1);
-    return Math.round((count / max) * 100);
+    if (count === 0) return 0;
+    const max = Math.max(...this.weekBars.map(b => b.count), 5);
+    return Math.max(Math.round((count / max) * 100), 8);
+  }
+
+  /** Maximum daily count — floor at 3 so a single appointment never pegs the top */
+  get yMax(): number {
+    return Math.max(...this.weekBars.map(b => b.count), 3);
+  }
+
+  // ── Line chart helpers (viewBox 0 0 300 120) ──
+  // X: 20..280 (260px across 6 gaps),  Y: 15..95 (80px tall)
+  get weekLinePoints(): { x: number; y: number; count: number; name: string; isToday: boolean }[] {
+    const max = this.yMax;
+    return this.weekBars.map((b, i) => ({
+      x: 20 + i * (260 / 6),
+      y: 15 + (1 - b.count / max) * 80,
+      count: b.count,
+      name:  b.name,
+      isToday: b.isToday
+    }));
+  }
+
+  /** Smooth cubic-bezier line through all points */
+  get weekLinePath(): string {
+    const pts = this.weekLinePoints;
+    if (pts.length < 2) return '';
+    let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+    for (let i = 1; i < pts.length; i++) {
+      const p = pts[i - 1], c = pts[i];
+      const cpX = (p.x + c.x) / 2;
+      d += ` C ${cpX.toFixed(1)} ${p.y.toFixed(1)} ${cpX.toFixed(1)} ${c.y.toFixed(1)} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`;
+    }
+    return d;
+  }
+
+  /** Same curve closed at the baseline (y=95) to form the gradient fill area */
+  get weekAreaPath(): string {
+    const pts = this.weekLinePoints;
+    if (pts.length < 2) return '';
+    const base = 95;
+    let d = `M ${pts[0].x.toFixed(1)} ${base} L ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+    for (let i = 1; i < pts.length; i++) {
+      const p = pts[i - 1], c = pts[i];
+      const cpX = (p.x + c.x) / 2;
+      d += ` C ${cpX.toFixed(1)} ${p.y.toFixed(1)} ${cpX.toFixed(1)} ${c.y.toFixed(1)} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`;
+    }
+    d += ` L ${pts[pts.length - 1].x.toFixed(1)} ${base} Z`;
+    return d;
+  }
+
+  /** @deprecated kept only for barHeight calls that may still exist */
+  segPx(count: number): number {
+    return Math.round((count / this.yMax) * 90);
+  }
+
+  pctOf(part: number, total: number): number {
+    return total > 0 ? Math.round((part / total) * 100) : 0;
   }
 
   gaugeDash(active: number, total: number): string {

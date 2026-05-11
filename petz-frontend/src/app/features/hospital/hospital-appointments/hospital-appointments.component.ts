@@ -195,16 +195,26 @@ interface WeekDay {
             <p>Manage incoming and scheduled vet appointments</p>
           </div>
         </div>
-        <div class="total-badge">
-          <mat-icon>event</mat-icon>
-          <span>{{ allAppts.length }} total</span>
+        <div class="header-right">
+          <div class="view-toggle">
+            <button class="vt-btn" [class.active]="viewMode==='week'" (click)="switchView('week')">
+              <mat-icon>date_range</mat-icon> Week
+            </button>
+            <button class="vt-btn" [class.active]="viewMode==='all'" (click)="switchView('all')">
+              <mat-icon>list_alt</mat-icon> All Time
+            </button>
+          </div>
+          <div class="total-badge">
+            <mat-icon>event</mat-icon>
+            <span>{{ viewMode === 'week' ? weekTotal() + ' this week' : allAppts.length + ' total' }}</span>
+          </div>
         </div>
       </div>
 
       <!-- Stat strip -->
       <div class="stat-strip">
-        <div class="stat-item" (click)="filterStatus=''" [class.active]="filterStatus===''">
-          <div class="stat-val">{{ allAppts.length }}</div>
+        <div class="stat-item" (click)="filterStatus=''; applyFilters()" [class.active]="filterStatus===''">
+          <div class="stat-val">{{ viewMode === 'week' ? weekTotal() : allAppts.length }}</div>
           <div class="stat-label">All</div>
           <div class="stat-bar" style="background:#4F8FD4"></div>
         </div>
@@ -230,7 +240,8 @@ interface WeekDay {
         </div>
       </div>
 
-      <!-- Week Strip -->
+      <!-- Week Strip (visible in week mode only) -->
+      @if (viewMode === 'week') {
       <div class="week-strip-card">
         <div class="week-nav">
           <button mat-icon-button class="nav-btn" (click)="prevWeek()" title="Previous week">
@@ -243,8 +254,8 @@ interface WeekDay {
         </div>
         <div class="week-days">
           <div class="week-all-btn" [class.active]="!selectedDate" (click)="clearDateFilter()">
-            <div class="wd-num">All</div>
-            <div class="wd-name">Week</div>
+            <mat-icon class="week-all-icon">calendar_view_week</mat-icon>
+            <div class="wd-name">This Week</div>
             <div class="wd-count">{{ weekTotal() }}</div>
           </div>
           @for (day of weekDays; track day.label) {
@@ -264,6 +275,7 @@ interface WeekDay {
           }
         </div>
       </div>
+      } <!-- end @if viewMode === 'week' -->
 
       <!-- Filter bar -->
       <div class="filter-bar">
@@ -496,6 +508,26 @@ interface WeekDay {
     .chip-completed { background: #D1FAE5; color: #065F46; }
     .chip-cancelled { background: #FEE2E2; color: #991B1B; }
 
+    /* ── Header right group ── */
+    .header-right {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end;
+    }
+
+    /* ── View mode toggle ── */
+    .view-toggle {
+      display: flex; align-items: center;
+      background: #F0F4F8; border-radius: 10px; padding: 3px; gap: 2px;
+    }
+    .vt-btn {
+      display: flex; align-items: center; gap: 5px;
+      border: none; background: transparent; cursor: pointer;
+      font-size: 0.75rem; font-weight: 700; color: #8BA3B5;
+      padding: 5px 12px; border-radius: 8px; transition: all 0.15s ease;
+      mat-icon { font-size: 14px; width: 14px; height: 14px; }
+      &:hover:not(.active) { color: #4F8FD4; background: rgba(79,143,212,0.08); }
+      &.active { background: #fff; color: #4F8FD4; box-shadow: 0 1px 4px rgba(26,53,71,0.1); }
+    }
+
     /* ── Back btn ── */
     .back-btn {
       width: 38px !important; height: 38px !important;
@@ -557,8 +589,16 @@ interface WeekDay {
     }
     .week-all-btn {
       background: #F8FAFB; border-color: #E0EBF2;
-      &.active { background: #4F8FD4; border-color: #4F8FD4; .wd-num,.wd-name,.wd-count { color: #fff !important; } }
+      &.active {
+        background: #4F8FD4; border-color: #4F8FD4;
+        .week-all-icon, .wd-name, .wd-count { color: #fff !important; }
+        .wd-count { background: rgba(255,255,255,0.25) !important; }
+      }
       &:hover:not(.active) { border-color: #4F8FD4; }
+    }
+    .week-all-icon {
+      font-size: 22px; width: 22px; height: 22px;
+      color: #4F8FD4; margin-bottom: 4px;
     }
     .week-day-cell {
       background: #F8FAFB; border-color: #F8FAFB;
@@ -667,6 +707,7 @@ export class HospitalAppointmentsComponent implements OnInit {
   searchQ = '';
   filterStatus = '';
   sortBy = 'date-asc';
+  viewMode: 'week' | 'all' = 'week';
 
   // Week strip
   weekStart: Date = this.getMonday(new Date());
@@ -731,15 +772,17 @@ export class HospitalAppointmentsComponent implements OnInit {
   prevWeek(): void {
     this.weekStart = new Date(this.weekStart);
     this.weekStart.setDate(this.weekStart.getDate() - 7);
+    this.selectedDate = null; // reset day selection when navigating weeks
     this.buildWeek();
-    if (this.selectedDate) this.applyFilters();
+    this.applyFilters();
   }
 
   nextWeek(): void {
     this.weekStart = new Date(this.weekStart);
     this.weekStart.setDate(this.weekStart.getDate() + 7);
+    this.selectedDate = null; // reset day selection when navigating weeks
     this.buildWeek();
-    if (this.selectedDate) this.applyFilters();
+    this.applyFilters();
   }
 
   selectDay(d: Date): void {
@@ -774,11 +817,27 @@ export class HospitalAppointmentsComponent implements OnInit {
     const q = this.searchQ.toLowerCase();
     const ds = this.selectedDate ? this.toDateStr(this.selectedDate) : null;
 
+    // Compute week boundaries (used only in 'week' mode)
+    const weekStartStr = this.toDateStr(this.weekStart);
+    const weekEndDate = new Date(this.weekStart);
+    weekEndDate.setDate(this.weekStart.getDate() + 6);
+    const weekEndStr = this.toDateStr(weekEndDate);
+
     let list = this.allAppts.filter(a => {
       const matchSearch = !q || [a.petName, a.userName, a.doctorName, a.reason, a.petSpecies, a.userEmail]
         .some(v => v?.toLowerCase().includes(q));
       const matchStatus = !this.filterStatus || a.status === this.filterStatus;
-      const matchDate = !ds || a.apptDate === ds;
+      let matchDate: boolean;
+      if (ds) {
+        // A specific day is selected — always filter to that day regardless of mode
+        matchDate = a.apptDate === ds;
+      } else if (this.viewMode === 'week') {
+        // Week mode, no specific day → constrain to the displayed week
+        matchDate = a.apptDate >= weekStartStr && a.apptDate <= weekEndStr;
+      } else {
+        // All-time mode, no specific day → no date constraint
+        matchDate = true;
+      }
       return matchSearch && matchStatus && matchDate;
     });
 
@@ -802,9 +861,23 @@ export class HospitalAppointmentsComponent implements OnInit {
     this.applyFilters();
   }
 
+  switchView(mode: 'week' | 'all'): void {
+    this.viewMode = mode;
+    this.selectedDate = null; // clear any pinned day when switching modes
+    this.applyFilters();
+  }
+
   // ── Stat helpers ──
   countBy(status: string): number {
-    return this.allAppts.filter(a => a.status === status).length;
+    if (this.viewMode === 'all') {
+      return this.allAppts.filter(a => a.status === status).length;
+    }
+    // Week mode — count within the currently displayed week
+    const start = this.toDateStr(this.weekStart);
+    const endDate = new Date(this.weekStart);
+    endDate.setDate(this.weekStart.getDate() + 6);
+    const end = this.toDateStr(endDate);
+    return this.allAppts.filter(a => a.status === status && a.apptDate >= start && a.apptDate <= end).length;
   }
 
   // ── Date / time formatting ──

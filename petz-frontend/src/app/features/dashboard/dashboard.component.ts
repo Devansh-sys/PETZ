@@ -327,12 +327,8 @@ const CIRC = +(2 * Math.PI * 34).toFixed(2); // 213.63
 
     /* ── Bottom legend half ── */
     .sc-bottom {
-      background: #fff; padding: 12px 14px 14px;
-      display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-start;
-      /* Fixed height: prevents the card layout from growing on hover,
-         which was causing the card to push down and overlap content below.
-         The parent .stat-card-v2 overflow:hidden handles boundary clipping. */
-      height: 80px;
+      background: #fff; padding: 10px 14px 12px;
+      display: flex; flex-direction: column; gap: 5px;
       box-sizing: border-box;
     }
 
@@ -340,8 +336,8 @@ const CIRC = +(2 * Math.PI * 34).toFixed(2); // 213.63
     .leg-item {
       display: flex; flex-direction: column; gap: 0;
       background: #F8FAFC; border: 1px solid #EDF2F7;
-      border-radius: 10px; padding: 5px 9px 5px 8px;
-      flex: 1; min-width: 68px;
+      border-radius: 8px; padding: 5px 10px;
+      width: 100%; box-sizing: border-box;
       transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
       &.hovered {
         background: #fff; border-color: #CBD5E1;
@@ -349,10 +345,10 @@ const CIRC = +(2 * Math.PI * 34).toFixed(2); // 213.63
       }
     }
 
-    .leg-main { display: flex; align-items: center; gap: 5px; }
+    .leg-main { display: flex; align-items: center; gap: 6px; }
     .leg-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
     .leg-lbl  {
-      font-size: 0.7rem; font-weight: 600; color: #4A6478;
+      font-size: 0.72rem; font-weight: 600; color: #4A6478;
       flex: 1; min-width: 0;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
@@ -379,7 +375,7 @@ const CIRC = +(2 * Math.PI * 34).toFixed(2); // 213.63
       background: #E5E7EB; margin-top: 0;
       transition: height 0.22s ease, margin-top 0.22s ease;
     }
-    .leg-item.hovered .leg-bar-track { height: 4px; margin-top: 5px; }
+    .leg-item.hovered .leg-bar-track { height: 3px; margin-top: 4px; }
 
     .leg-bar-fill {
       height: 100%; border-radius: 999px; width: 0%;
@@ -472,11 +468,12 @@ export class DashboardComponent implements OnInit {
     });
 
     // ── Appointments ──
+    // Backend enum: PENDING, CONFIRMED, COMPLETED, CANCELLED, NO_SHOW
     this.api.get<any>('/appointments/my').pipe(catchError(() => of({ data: [] }))).subscribe(res => {
       const appts: any[] = res.data ?? [];
-      const upcoming  = appts.filter(a => a.status === 'SCHEDULED').length;
+      const upcoming  = appts.filter(a => a.status === 'PENDING' || a.status === 'CONFIRMED').length;
       const completed = appts.filter(a => a.status === 'COMPLETED').length;
-      const cancelled = appts.filter(a => a.status === 'CANCELLED').length;
+      const cancelled = appts.filter(a => a.status === 'CANCELLED' || a.status === 'NO_SHOW').length;
       const legend = this.withPct([
         { label: 'Upcoming',  color: '#6366F1', count: upcoming  },
         { label: 'Done',      color: '#10B981', count: completed },
@@ -491,36 +488,44 @@ export class DashboardComponent implements OnInit {
     });
 
     // ── Rescue Reports ──
+    // Backend enum: PENDING, ASSIGNED, IN_PROGRESS, COMPLETED, RESOLVED, CANCELLED
     this.api.get<any>('/rescue/my').pipe(catchError(() => of({ data: [] }))).subscribe(res => {
       const reports: any[] = res.data ?? [];
-      const pending  = reports.filter(r => r.status === 'PENDING').length;
-      const active   = reports.filter(r => r.status === 'ASSIGNED' || r.status === 'IN_PROGRESS').length;
-      const resolved = reports.filter(r => r.status === 'RESOLVED').length;
-      const legend = this.withPct([
-        { label: 'Pending',  color: '#F59E0B', count: pending  },
-        { label: 'Active',   color: '#EC4899', count: active   },
-        { label: 'Resolved', color: '#10B981', count: resolved },
-      ]);
+      const pending   = reports.filter(r => r.status === 'PENDING').length;
+      const active    = reports.filter(r => r.status === 'ASSIGNED' || r.status === 'IN_PROGRESS').length;
+      const resolved  = reports.filter(r => r.status === 'RESOLVED' || r.status === 'COMPLETED').length;
+      const cancelled = reports.filter(r => r.status === 'CANCELLED').length;
+      // Build legend — only include categories that have data (except always show the 3 base ones)
+      const raw = [
+        { label: 'Pending',   color: '#F59E0B', count: pending   },
+        { label: 'Active',    color: '#EC4899', count: active    },
+        { label: 'Resolved',  color: '#10B981', count: resolved  },
+        ...(cancelled > 0 ? [{ label: 'Cancelled', color: '#94A3B8', count: cancelled }] : []),
+      ];
+      const legend = this.withPct(raw);
       this.rescueCard = {
         total:   reports.length,
         segs:    this.buildSegs(legend),
         legend,
-        insight: active > 0 ? `${active} active` : resolved > 0 ? 'All resolved' : 'No reports yet',
+        insight: active > 0 ? `${active} active` : resolved > 0 ? 'All resolved' : pending > 0 ? `${pending} pending` : 'No reports yet',
       };
     });
 
     // ── Adoptions ──
+    // Backend enum: PENDING, UNDER_REVIEW, APPROVED, REJECTED, WITHDRAWN
     this.api.get<any>('/adoption/my-applications').pipe(catchError(() => of({ data: [] }))).subscribe(res => {
       const apps: any[] = res.data ?? [];
-      const pending  = apps.filter(a => a.status === 'PENDING').length;
-      const review   = apps.filter(a => a.status === 'UNDER_REVIEW').length;
-      const approved = apps.filter(a => a.status === 'APPROVED').length;
-      const rejected = apps.filter(a => a.status === 'REJECTED').length;
+      const pending   = apps.filter(a => a.status === 'PENDING').length;
+      const review    = apps.filter(a => a.status === 'UNDER_REVIEW').length;
+      const approved  = apps.filter(a => a.status === 'APPROVED').length;
+      const rejected  = apps.filter(a => a.status === 'REJECTED').length;
+      const withdrawn = apps.filter(a => a.status === 'WITHDRAWN').length;
       const raw = [
-        { label: 'Pending',   color: '#F59E0B', count: pending  },
-        { label: 'In Review', color: '#6366F1', count: review   },
-        { label: 'Approved',  color: '#10B981', count: approved },
-        { label: 'Rejected',  color: '#EF4444', count: rejected },
+        { label: 'Pending',   color: '#F59E0B', count: pending   },
+        { label: 'In Review', color: '#6366F1', count: review    },
+        { label: 'Approved',  color: '#10B981', count: approved  },
+        { label: 'Rejected',  color: '#EF4444', count: rejected  },
+        ...(withdrawn > 0 ? [{ label: 'Withdrawn', color: '#94A3B8', count: withdrawn }] : []),
       ].filter(l => l.count > 0);
       const legend = this.withPct(raw.length ? raw : [
         { label: 'Pending',   color: '#F59E0B', count: 0 },

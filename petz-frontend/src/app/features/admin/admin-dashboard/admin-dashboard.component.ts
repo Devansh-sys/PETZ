@@ -53,22 +53,14 @@ import { ApiService } from '../../../core/services/api.service';
 
           <!-- Users -->
           <div class="kpi-item">
-            <div class="kpi-ring-wrap">
-              <svg width="44" height="44" viewBox="0 0 44 44">
-                <circle cx="22" cy="22" r="18" fill="none" stroke="#EEF1F5" stroke-width="3"/>
-                <circle cx="22" cy="22" r="18" fill="none" stroke="#4F8FD4" stroke-width="3"
-                        stroke-linecap="round" transform="rotate(-90 22 22)"
-                        [attr.stroke-dasharray]="gaugeDash(activeUsers, users.length)"/>
-              </svg>
-              <div class="kpi-icon-abs" style="background:#4F8FD4">
-                <mat-icon>people</mat-icon>
-              </div>
+            <div class="kpi-icon-box" style="background:linear-gradient(135deg,#6BAEE8,#4F8FD4)">
+              <mat-icon>people</mat-icon>
             </div>
             <div class="kpi-text">
               <div class="kpi-num">{{ users.length }}</div>
               <div class="kpi-lbl">Total Users</div>
               <div class="kpi-sub"><span class="dot dg"></span>{{ activeUsers }} active<span class="sep">·</span><span class="dot dr"></span>{{ inactiveUsers }} inactive</div>
-              <div class="kpi-hpct">{{ pct(activeUsers, users.length) }}% active</div>
+              <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#4F8FD4" [style.width.%]="pct(activeUsers, users.length)"></div></div>
             </div>
           </div>
 
@@ -76,22 +68,14 @@ import { ApiService } from '../../../core/services/api.service';
 
           <!-- NGOs -->
           <div class="kpi-item">
-            <div class="kpi-ring-wrap">
-              <svg width="44" height="44" viewBox="0 0 44 44">
-                <circle cx="22" cy="22" r="18" fill="none" stroke="#EEF1F5" stroke-width="3"/>
-                <circle cx="22" cy="22" r="18" fill="none" stroke="#7C62CC" stroke-width="3"
-                        stroke-linecap="round" transform="rotate(-90 22 22)"
-                        [attr.stroke-dasharray]="gaugeDash(verifiedNgos, ngos.length)"/>
-              </svg>
-              <div class="kpi-icon-abs" style="background:#7C62CC">
-                <mat-icon>business</mat-icon>
-              </div>
+            <div class="kpi-icon-box" style="background:linear-gradient(135deg,#9B82E0,#7C62CC)">
+              <mat-icon>business</mat-icon>
             </div>
             <div class="kpi-text">
               <div class="kpi-num">{{ ngos.length }}</div>
               <div class="kpi-lbl">Registered NGOs</div>
               <div class="kpi-sub"><span class="dot dg"></span>{{ verifiedNgos }} verified<span class="sep">·</span><span class="dot da"></span>{{ unverifiedNgos }} pending</div>
-              <div class="kpi-hpct">{{ pct(verifiedNgos, ngos.length) }}% verified</div>
+              <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#7C62CC" [style.width.%]="pct(verifiedNgos, ngos.length)"></div></div>
             </div>
           </div>
 
@@ -99,22 +83,14 @@ import { ApiService } from '../../../core/services/api.service';
 
           <!-- Rescues -->
           <div class="kpi-item">
-            <div class="kpi-ring-wrap">
-              <svg width="44" height="44" viewBox="0 0 44 44">
-                <circle cx="22" cy="22" r="18" fill="none" stroke="#EEF1F5" stroke-width="3"/>
-                <circle cx="22" cy="22" r="18" fill="none" stroke="#E05858" stroke-width="3"
-                        stroke-linecap="round" transform="rotate(-90 22 22)"
-                        [attr.stroke-dasharray]="gaugeDash(completedRescues, rescues.length)"/>
-              </svg>
-              <div class="kpi-icon-abs" style="background:#E05858">
-                <mat-icon>emergency</mat-icon>
-              </div>
+            <div class="kpi-icon-box" style="background:linear-gradient(135deg,#E87070,#E05858)">
+              <mat-icon>emergency</mat-icon>
             </div>
             <div class="kpi-text">
               <div class="kpi-num">{{ rescues.length }}</div>
               <div class="kpi-lbl">Total Rescues</div>
               <div class="kpi-sub"><span class="dot da"></span>{{ pendingRescues }} pending<span class="sep">·</span><span class="dot dg"></span>{{ completedRescues }} resolved</div>
-              <div class="kpi-hpct">{{ pct(completedRescues, rescues.length) }}% resolved</div>
+              <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#E05858" [style.width.%]="pct(completedRescues, rescues.length)"></div></div>
             </div>
           </div>
 
@@ -122,22 +98,14 @@ import { ApiService } from '../../../core/services/api.service';
 
           <!-- Hospitals -->
           <div class="kpi-item">
-            <div class="kpi-ring-wrap">
-              <svg width="44" height="44" viewBox="0 0 44 44">
-                <circle cx="22" cy="22" r="18" fill="none" stroke="#EEF1F5" stroke-width="3"/>
-                <circle cx="22" cy="22" r="18" fill="none" stroke="#2EB894" stroke-width="3"
-                        stroke-linecap="round" transform="rotate(-90 22 22)"
-                        [attr.stroke-dasharray]="gaugeDash(activeHospitals, hospitals.length)"/>
-              </svg>
-              <div class="kpi-icon-abs" style="background:#2EB894">
-                <mat-icon>local_hospital</mat-icon>
-              </div>
+            <div class="kpi-icon-box" style="background:linear-gradient(135deg,#50CCA8,#2EB894)">
+              <mat-icon>local_hospital</mat-icon>
             </div>
             <div class="kpi-text">
               <div class="kpi-num">{{ hospitals.length }}</div>
               <div class="kpi-lbl">Hospitals</div>
               <div class="kpi-sub"><span class="dot dg"></span>{{ activeHospitals }} active<span class="sep">·</span><span class="dot dr"></span>{{ inactiveHospitals }} inactive</div>
-              <div class="kpi-hpct">{{ pct(activeHospitals, hospitals.length) }}% active</div>
+              <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#2EB894" [style.width.%]="pct(activeHospitals, hospitals.length)"></div></div>
             </div>
           </div>
 
@@ -145,22 +113,14 @@ import { ApiService } from '../../../core/services/api.service';
 
           <!-- Adoptions -->
           <div class="kpi-item">
-            <div class="kpi-ring-wrap">
-              <svg width="44" height="44" viewBox="0 0 44 44">
-                <circle cx="22" cy="22" r="18" fill="none" stroke="#EEF1F5" stroke-width="3"/>
-                <circle cx="22" cy="22" r="18" fill="none" stroke="#E89340" stroke-width="3"
-                        stroke-linecap="round" transform="rotate(-90 22 22)"
-                        [attr.stroke-dasharray]="gaugeDash(approvedAdoptions, adoptions.length)"/>
-              </svg>
-              <div class="kpi-icon-abs" style="background:#E89340">
-                <mat-icon>pets</mat-icon>
-              </div>
+            <div class="kpi-icon-box" style="background:linear-gradient(135deg,#F0A85A,#E89340)">
+              <mat-icon>pets</mat-icon>
             </div>
             <div class="kpi-text">
               <div class="kpi-num">{{ adoptions.length }}</div>
               <div class="kpi-lbl">Adoptions</div>
               <div class="kpi-sub"><span class="dot da"></span>{{ pendingAdoptions }} pending<span class="sep">·</span><span class="dot dg"></span>{{ approvedAdoptions }} approved</div>
-              <div class="kpi-hpct">{{ pct(approvedAdoptions, adoptions.length) }}% approved</div>
+              <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#E89340" [style.width.%]="pct(approvedAdoptions, adoptions.length)"></div></div>
             </div>
           </div>
 
@@ -445,26 +405,31 @@ import { ApiService } from '../../../core/services/api.service';
       gap:0; flex-wrap:wrap;
     }
     .kpi-item {
-      flex:1; min-width:130px; display:flex; align-items:center; gap:10px;
+      flex:1; min-width:130px; display:flex; align-items:center; gap:12px;
       padding:4px 14px; border-radius:12px; cursor:default; transition:background 0.2s;
       &:first-child { padding-left:0; }
       &:last-child  { padding-right:0; }
       &:hover { background:#F8F9FB; }
-      &:hover .kpi-hpct { opacity:1; transform:translateY(0); }
     }
     .kpi-div { width:1px; height:40px; background:#E8EDF3; flex-shrink:0; }
 
-    .kpi-ring-wrap { position:relative; width:44px; height:44px; flex-shrink:0; }
-    .kpi-icon-abs {
-      position:absolute; inset:7px; border-radius:8px;
+    .kpi-icon-box {
+      width:46px; height:46px; border-radius:14px; flex-shrink:0;
       display:flex; align-items:center; justify-content:center;
-      mat-icon { font-size:14px; width:14px; height:14px; color:#fff; }
+      box-shadow:0 4px 12px rgba(0,0,0,0.15);
+      mat-icon { font-size:22px; width:22px; height:22px; color:#fff; }
     }
     .kpi-text  { flex:1; min-width:0; }
     .kpi-num   { font-size:1.55rem; font-weight:900; color:#1E2D3D; line-height:1; letter-spacing:-0.03em; }
     .kpi-lbl   { font-size:0.6rem; color:#94A3B8; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; margin:3px 0 4px; }
     .kpi-sub   { display:flex; align-items:center; gap:4px; font-size:0.67rem; font-weight:600; color:#64748B; flex-wrap:wrap; }
-    .kpi-hpct  { font-size:0.67rem; font-weight:700; color:#4F8FD4; margin-top:4px; opacity:0; transform:translateY(3px); transition:all 0.18s ease; }
+    .kpi-bar-track {
+      height:3px; background:#EEF1F5; border-radius:999px; margin-top:6px; overflow:hidden;
+    }
+    .kpi-bar-fill {
+      height:100%; border-radius:999px; transition:width 0.6s cubic-bezier(0.4,0,0.2,1);
+      min-width:3px;
+    }
 
     .dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; display:inline-block; }
     .dg  { background:#2EB894; }
@@ -593,30 +558,40 @@ export class AdminDashboardComponent implements OnInit {
   get unverifiedNgos()    { return this.ngos.filter(n => !n.isVerified).length; }
   get activeNgos()        { return this.ngos.filter(n => n.isActive !== false).length; }
   get inactiveNgos()      { return this.ngos.filter(n => n.isActive === false).length; }
+  // Rescue: PENDING, ASSIGNED, IN_PROGRESS, COMPLETED, RESOLVED, CANCELLED
   get pendingRescues()    { return this.rescues.filter(r => r.status === 'PENDING').length; }
   get assignedRescues()   { return this.rescues.filter(r => r.status === 'ASSIGNED').length; }
   get inProgressRescues() { return this.rescues.filter(r => r.status === 'IN_PROGRESS').length; }
   get completedRescues()  { return this.rescues.filter(r => r.status === 'COMPLETED' || r.status === 'RESOLVED').length; }
+  get cancelledRescues()  { return this.rescues.filter(r => r.status === 'CANCELLED').length; }
   get criticalPending()   {
     return this.rescues.filter(r =>
       r.criticality === 'CRITICAL' &&
       (r.status === 'PENDING' || r.status === 'ASSIGNED' || r.status === 'IN_PROGRESS')
     ).length;
   }
-  get activeHospitals()   { return this.hospitals.filter(h => h.isActive !== false).length; }
-  get inactiveHospitals() { return this.hospitals.filter(h => h.isActive === false).length; }
-  get pendingAdoptions()  { return this.adoptions.filter(a => a.status === 'PENDING').length; }
-  get approvedAdoptions() { return this.adoptions.filter(a => a.status === 'APPROVED').length; }
-  get rejectedAdoptions() { return this.adoptions.filter(a => a.status === 'REJECTED').length; }
+  get activeHospitals()     { return this.hospitals.filter(h => h.isActive !== false).length; }
+  get inactiveHospitals()   { return this.hospitals.filter(h => h.isActive === false).length; }
+  // Adoption: PENDING, UNDER_REVIEW, APPROVED, REJECTED, WITHDRAWN
+  get pendingAdoptions()    { return this.adoptions.filter(a => a.status === 'PENDING').length; }
+  get reviewAdoptions()     { return this.adoptions.filter(a => a.status === 'UNDER_REVIEW').length; }
+  get approvedAdoptions()   { return this.adoptions.filter(a => a.status === 'APPROVED').length; }
+  get rejectedAdoptions()   { return this.adoptions.filter(a => a.status === 'REJECTED').length; }
+  get withdrawnAdoptions()  { return this.adoptions.filter(a => a.status === 'WITHDRAWN').length; }
 
   /* ── Chart data ─────────────────────── */
   get rescuePipeline() {
-    return [
+    // All RescueStatus values: PENDING, ASSIGNED, IN_PROGRESS, COMPLETED, RESOLVED, CANCELLED
+    const base = [
       { label:'Pending',     count:this.pendingRescues,    color:'#E89340' },
-      { label:'Assigned',    count:this.assignedRescues,   color:'#E89340' },
+      { label:'Assigned',    count:this.assignedRescues,   color:'#4F8FD4' }, // fixed: was same color as Pending
       { label:'In Progress', count:this.inProgressRescues, color:'#7C62CC' },
       { label:'Resolved',    count:this.completedRescues,  color:'#2EB894' },
     ];
+    if (this.cancelledRescues > 0) {
+      base.push({ label:'Cancelled', count:this.cancelledRescues, color:'#94A3B8' });
+    }
+    return base;
   }
 
   get urgencyBreakdown() {
@@ -638,19 +613,26 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   get ngoBreakdown() {
+    // verifiedNgos + unverifiedNgos = ngos.length (mutually exclusive, no double-count)
+    // Inactive is excluded: the /admin/ngos endpoint returns only active NGOs
     return [
       { label:'Verified',   count:this.verifiedNgos,   color:'#2EB894' },
       { label:'Unverified', count:this.unverifiedNgos, color:'#D4B840' },
-      { label:'Inactive',   count:this.inactiveNgos,   color:'#E05858' },
     ];
   }
 
   get adoptionSegments() {
-    return [
-      { label:'Pending',  count:this.pendingAdoptions,  color:'#E89340' },
-      { label:'Approved', count:this.approvedAdoptions, color:'#2EB894' },
-      { label:'Rejected', count:this.rejectedAdoptions, color:'#E05858' },
+    // All AdoptionStatus values: PENDING, UNDER_REVIEW, APPROVED, REJECTED, WITHDRAWN
+    const base = [
+      { label:'Pending',     count:this.pendingAdoptions,   color:'#E89340' },
+      { label:'Under Review',count:this.reviewAdoptions,    color:'#4F8FD4' },
+      { label:'Approved',    count:this.approvedAdoptions,  color:'#2EB894' },
+      { label:'Rejected',    count:this.rejectedAdoptions,  color:'#E05858' },
     ];
+    if (this.withdrawnAdoptions > 0) {
+      base.push({ label:'Withdrawn', count:this.withdrawnAdoptions, color:'#94A3B8' });
+    }
+    return base;
   }
 
   constructor(private api: ApiService) {}
