@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { RescueReport } from '../../../core/models/rescue.model';
+import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
 
 @Component({
   standalone: false,
@@ -54,7 +55,38 @@ import { RescueReport } from '../../../core/models/rescue.model';
 
         @if (rescues.length > 0) {
 
-          <!-- Summary chips + filter -->
+          <!-- Search + secondary filter bar -->
+          <div class="search-filter-bar">
+            <div class="search-wrap">
+              <mat-icon class="search-icon">search</mat-icon>
+              <input class="search-input" [(ngModel)]="searchFilter.search"
+                     placeholder="Search by animal type, description, address…">
+            </div>
+            <div class="select-group">
+              <label class="select-label">Urgency</label>
+              <select class="fsel" [(ngModel)]="searchFilter.criticality">
+                <option value="">All</option>
+                <option value="CRITICAL">Critical</option>
+                <option value="HIGH">High</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="LOW">Low</option>
+              </select>
+            </div>
+            <div class="select-group">
+              <label class="select-label">Sort</label>
+              <select class="fsel" [(ngModel)]="searchFilter.sort">
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+              </select>
+            </div>
+            @if (hasSearchFilters) {
+              <button class="clear-btn" (click)="clearSearchFilters()">
+                <mat-icon>close</mat-icon> Clear
+              </button>
+            }
+          </div>
+
+          <!-- Status chips filter -->
           <div class="filter-bar">
             <button class="filter-btn" [class.active]="activeFilter === 'ALL'"
                     (click)="activeFilter = 'ALL'">
@@ -143,6 +175,11 @@ import { RescueReport } from '../../../core/models/rescue.model';
                   </div>
                 }
 
+              </div>
+            }
+            @if (filtered().length === 0) {
+              <div style="grid-column:1/-1;text-align:center;padding:32px;color:#8BA3B5;font-size:0.88rem">
+                No rescue reports match your filters.
               </div>
             }
           </div>
@@ -295,7 +332,48 @@ import { RescueReport } from '../../../core/models/rescue.model';
       &:active { transform: translateY(0); }
     }
 
-    /* ── Filter bar ── */
+    /* ── Search + secondary filter bar ── */
+    .search-filter-bar {
+      background: #fff; border-radius: 16px;
+      box-shadow: 0 1px 8px rgba(26,53,71,0.06);
+      padding: 14px 18px; display: flex; gap: 10px; align-items: flex-end;
+      margin-bottom: 14px; flex-wrap: wrap;
+    }
+    .search-wrap {
+      position: relative; flex: 1; min-width: 160px;
+    }
+    .search-icon {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      font-size: 16px; width: 16px; height: 16px; color: #94A3B8;
+    }
+    .search-input {
+      width: 100%; height: 36px; border: 1px solid #E0EBF2; border-radius: 10px;
+      padding: 0 12px 0 34px; font-size: 0.82rem; background: #F8FAFB;
+      color: #1A3547; outline: none; box-sizing: border-box;
+      font-family: inherit;
+      &::placeholder { color: #94A3B8; }
+      &:focus { border-color: #FF8C42; }
+    }
+    .select-group { display: flex; flex-direction: column; gap: 3px; }
+    .select-label { font-size: 0.62rem; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.05em; }
+    .fsel {
+      height: 36px; border: 1px solid #E0EBF2; border-radius: 10px;
+      padding: 0 10px; font-size: 0.82rem; color: #1A3547;
+      background: #F8FAFB; outline: none; cursor: pointer;
+      font-family: inherit;
+      &:focus { border-color: #FF8C42; }
+    }
+    .clear-btn {
+      display: flex; align-items: center; gap: 4px;
+      height: 36px; border: 1px solid #E0EBF2; border-radius: 10px;
+      padding: 0 12px; background: #F8FAFB; color: #64748B;
+      font-size: 0.78rem; font-weight: 600; cursor: pointer;
+      font-family: inherit;
+      mat-icon { font-size: 15px; width: 15px; height: 15px; }
+      &:hover { border-color: #E05858; color: #E05858; }
+    }
+
+    /* ── Status chip filter bar ── */
     .filter-bar {
       display: flex; flex-wrap: wrap; gap: 8px;
       margin-bottom: 20px;
@@ -509,33 +587,64 @@ export class RescueListComponent implements OnInit {
   activeFilter = 'ALL';
   selected: RescueReport | null = null;
 
+  searchFilter = { search: '', criticality: '', sort: 'newest' };
+
   readonly steps = [
     { key: 'PENDING',     label: 'Reported'    },
-    { key: 'ASSIGNED',    label: 'Assigned'    },
-    { key: 'IN_PROGRESS', label: 'In Progress' },
+    { key: 'ASSIGNED',    label: 'Reported to NGO' },
+    { key: 'IN_PROGRESS', label: 'Assigned & In Progress' },
     { key: 'COMPLETED',   label: 'Completed'   }
   ];
 
   readonly statusFilters = [
-    { key: 'PENDING',     label: 'Pending'     },
-    { key: 'ASSIGNED',    label: 'Assigned'    },
-    { key: 'IN_PROGRESS', label: 'In Progress' },
-    { key: 'COMPLETED',   label: 'Completed'   },
-    { key: 'CANCELLED',   label: 'Cancelled'   }
+    { key: 'PENDING',     label: 'Pending'               },
+    { key: 'ASSIGNED',    label: 'Reported'              },
+    { key: 'IN_PROGRESS', label: 'Assigned & In Progress'},
+    { key: 'COMPLETED',   label: 'Completed'             },
+    { key: 'CANCELLED',   label: 'Cancelled'             }
   ];
 
   constructor(private api: ApiService) {}
 
   ngOnInit(): void {
     this.api.get<any>('/rescue/my').subscribe({
-      next: res => { this.rescues = res.data ?? []; this.loading = false; },
-      error: ()  => { this.loading = false; }
+      next: res => {
+        this.rescues = (res.data ?? []).map((r: any) => ({
+          ...r,
+          reportedAt: r.reportedAt && !r.reportedAt.endsWith('Z') && !r.reportedAt.includes('+')
+            ? r.reportedAt + 'Z' : r.reportedAt,
+          updatedAt: r.updatedAt && !r.updatedAt.endsWith('Z') && !r.updatedAt.includes('+')
+            ? r.updatedAt + 'Z' : r.updatedAt,
+        }));
+        this.loading = false;
+      },
+      error: () => { this.loading = false; }
     });
   }
 
+  get hasSearchFilters(): boolean {
+    return !!(this.searchFilter.search || this.searchFilter.criticality || this.searchFilter.sort !== 'newest');
+  }
+
+  clearSearchFilters(): void {
+    this.searchFilter = { search: '', criticality: '', sort: 'newest' };
+  }
+
   filtered(): RescueReport[] {
-    if (this.activeFilter === 'ALL') return this.rescues;
-    return this.rescues.filter(r => r.status === this.activeFilter);
+    let r = this.activeFilter === 'ALL' ? this.rescues : this.rescues.filter(x => x.status === this.activeFilter);
+    const q = this.searchFilter.search.toLowerCase().trim();
+    if (q) r = r.filter(x =>
+      (x.animalType || '').toLowerCase().includes(q) ||
+      (x.description || '').toLowerCase().includes(q) ||
+      (x.address || '').toLowerCase().includes(q)
+    );
+    if (this.searchFilter.criticality) r = r.filter(x => x.criticality === this.searchFilter.criticality);
+    if (this.searchFilter.sort === 'newest') {
+      r = [...r].sort((a, b) => new Date(b.reportedAt || 0).getTime() - new Date(a.reportedAt || 0).getTime());
+    } else {
+      r = [...r].sort((a, b) => new Date(a.reportedAt || 0).getTime() - new Date(b.reportedAt || 0).getTime());
+    }
+    return r;
   }
 
   countOf(status: string): number {
@@ -550,18 +659,14 @@ export class RescueListComponent implements OnInit {
   }
 
   statusLabel(status: string): string {
-    const map: Record<string, string> = {
-      PENDING: 'Pending', ASSIGNED: 'Assigned',
-      IN_PROGRESS: 'In Progress', COMPLETED: 'Completed', CANCELLED: 'Cancelled'
-    };
-    return map[status] ?? status;
+    return rescueStatusLabel(status);
   }
 
   statusHint(status: string): string {
     const map: Record<string, string> = {
-      PENDING:     'Your report is awaiting pickup by a rescue NGO.',
-      ASSIGNED:    'An NGO has been assigned and will respond shortly.',
-      IN_PROGRESS: 'The rescue team is actively working on this case.',
+      PENDING:     'Your report is queued — an NGO will be assigned shortly.',
+      ASSIGNED:    'Waiting for NGO confirmation. They have 5 minutes to accept. If they don\'t respond, another NGO will be assigned automatically.',
+      IN_PROGRESS: 'A rescue team is actively on the way — help is coming!',
       COMPLETED:   'This animal has been successfully rescued. Thank you!',
       CANCELLED:   'This report has been cancelled.'
     };

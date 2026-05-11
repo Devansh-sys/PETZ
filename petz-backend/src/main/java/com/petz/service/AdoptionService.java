@@ -168,9 +168,17 @@ public class AdoptionService {
                 .toList();
     }
 
-    public List<AdoptionApplication> getApplicationsByNgo(Long ngoUserId) {
+    public List<AdoptionApplicationResponse> getApplicationsByNgo(Long ngoUserId) {
         Ngo ngo = getNgo(ngoUserId);
-        return applicationRepo.findByNgoId(ngo.getId());
+        return applicationRepo.findByNgoId(ngo.getId()).stream()
+                .map(app -> {
+                    AdoptableAnimal animal = app.getAnimalId() != null
+                            ? animalRepo.findById(app.getAnimalId()).orElse(null) : null;
+                    Ngo appNgo = app.getNgoId() != null
+                            ? ngoRepo.findById(app.getNgoId()).orElse(null) : null;
+                    return AdoptionApplicationResponse.from(app, animal, appNgo);
+                })
+                .toList();
     }
 
     public List<AdoptionApplication> getAllApplications() {

@@ -387,7 +387,7 @@ interface WeekDay {
                     <mat-icon>schedule</mat-icon>
                   </button>
                 }
-                <button mat-icon-button class="q-detail" title="View details">
+                <button mat-icon-button class="q-detail" title="View details" (click)="selected = a">
                   <mat-icon>open_in_new</mat-icon>
                 </button>
               </div>

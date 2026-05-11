@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
+import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
 
 @Component({
   standalone: false,
@@ -166,7 +167,7 @@ import { ApiService } from '../../../core/services/api.service';
               <ng-container matColumnDef="status">
                 <th mat-header-cell *matHeaderCellDef>Status</th>
                 <td mat-cell *matCellDef="let r">
-                  <span class="chip" [ngClass]="statusClass(r.status)">{{ r.status }}</span>
+                  <span class="chip" [ngClass]="statusClass(r.status)">{{ statusLabel(r.status) }}</span>
                 </td>
               </ng-container>
 
@@ -202,7 +203,7 @@ import { ApiService } from '../../../core/services/api.service';
               <div class="popup-id-row">
                 <span class="popup-id-badge">#{{ selected.id }}</span>
                 <span class="crit-badge crit-{{ selected.criticality?.toLowerCase() }}">{{ selected.criticality }}</span>
-                <span class="chip small-chip" [ngClass]="statusClass(selected.status)">{{ selected.status }}</span>
+                <span class="chip small-chip" [ngClass]="statusClass(selected.status)">{{ statusLabel(selected.status) }}</span>
               </div>
             </div>
           </div>
@@ -548,11 +549,11 @@ export class AdminRescuesComponent implements OnInit {
   };
 
   statuses = [
-    { label: 'All',         value: '' },
-    { label: 'Pending',     value: 'PENDING' },
-    { label: 'Assigned',    value: 'ASSIGNED' },
-    { label: 'In Progress', value: 'IN_PROGRESS' },
-    { label: 'Completed',   value: 'COMPLETED' }
+    { label: 'All',                    value: '' },
+    { label: 'Pending',                value: 'PENDING' },
+    { label: 'Reported',               value: 'ASSIGNED' },
+    { label: 'Assigned & In Progress', value: 'IN_PROGRESS' },
+    { label: 'Completed',              value: 'COMPLETED' }
   ];
 
   urgencies = [
@@ -649,6 +650,10 @@ export class AdminRescuesComponent implements OnInit {
   clearAll(): void {
     this.filters = { search: '', status: '', urgency: '', animalType: '', assignment: '', sort: 'newest' };
     this.applyFilters();
+  }
+
+  statusLabel(status: string): string {
+    return rescueStatusLabel(status);
   }
 
   statusClass(status: string): string {

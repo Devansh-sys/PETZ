@@ -89,7 +89,7 @@ public class AdoptionController {
 
     @GetMapping("/ngo/applications")
     @PreAuthorize("hasRole('NGO')")
-    public ResponseEntity<ApiResponse<List<AdoptionApplication>>> ngoApplications() {
+    public ResponseEntity<ApiResponse<List<AdoptionApplicationResponse>>> ngoApplications() {
         Long userId = securityUtil.getCurrentUserId();
         return ResponseEntity.ok(ApiResponse.ok(adoptionService.getApplicationsByNgo(userId)));
     }

@@ -56,6 +56,10 @@ public class RescueReport {
     @Column(name = "resolution_notes", columnDefinition = "TEXT")
     private String resolutionNotes;
 
+    /** Comma-separated NGO IDs that have already declined or timed out — excluded from reassignment */
+    @Column(name = "declined_ngo_ids", columnDefinition = "TEXT")
+    private String declinedNgoIds;
+
     @CreationTimestamp
     @Column(name = "reported_at", updatable = false)
     private LocalDateTime reportedAt;
