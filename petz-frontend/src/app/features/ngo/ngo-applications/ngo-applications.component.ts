@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { AdoptionApplication } from '../../../core/models/adoption.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   standalone: false,
@@ -141,7 +142,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
                       <div style="display:flex;align-items:center;gap:10px">
                         <div class="ani-avatar">
                           @if (app.animalPhotoUrl) {
-                            <img [src]="app.animalPhotoUrl" [alt]="app.animalName" class="ani-avatar-img">
+                            <img [src]="imgSrc(app.animalPhotoUrl)" [alt]="app.animalName" class="ani-avatar-img"
+                                 (error)="$any($event.target).style.display='none'">
                           } @else {
                             <mat-icon class="ani-avatar-icon">pets</mat-icon>
                           }
@@ -230,7 +232,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
               <div class="section-head">Animal Details</div>
               <div class="animal-block">
                 @if (selected.animalPhotoUrl) {
-                  <img [src]="selected.animalPhotoUrl" [alt]="selected.animalName" class="animal-thumb">
+                  <img [src]="imgSrc(selected.animalPhotoUrl)" [alt]="selected.animalName" class="animal-thumb"
+                       (error)="$any($event.target).style.display='none'">
                 }
                 <div class="animal-facts">
                   <div class="detail-grid-sm">
@@ -437,6 +440,11 @@ export class NgoApplicationsComponent implements OnInit {
   get rejectedCount() { return this.applications.filter(a => a.status === 'REJECTED').length; }
   get uniqueAnimals() { return new Set(this.applications.map(a => a.animalId)).size; }
   get hasActiveFilters() { return !!(this.filter.search || this.filter.status); }
+
+  imgSrc(url?: string): string {
+    if (!url) return '';
+    return url.startsWith('http') ? url : environment.mediaUrl + url;
+  }
 
   statusClass(s: string): string {
     switch (s?.toUpperCase()) {

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { AdoptionApplication } from '../../../core/models/adoption.model';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   standalone: false,
@@ -97,7 +98,8 @@ import { AdoptionApplication } from '../../../core/models/adoption.model';
                 <div class="app-left">
                   <div class="app-num-badge">
                     @if (app.animalPhotoUrl) {
-                      <img [src]="app.animalPhotoUrl" style="width:100%;height:100%;object-fit:cover;border-radius:14px" />
+                      <img [src]="imgSrc(app.animalPhotoUrl)" style="width:100%;height:100%;object-fit:cover;border-radius:14px"
+                           (error)="$any($event.target).style.display='none'" />
                     } @else {
                       <mat-icon style="color:#fff;font-size:20px">pets</mat-icon>
                     }
@@ -171,7 +173,8 @@ import { AdoptionApplication } from '../../../core/models/adoption.model';
             <div style="display:flex;align-items:center;gap:14px">
               <div class="modal-animal-icon">
                 @if (selected.animalPhotoUrl) {
-                  <img [src]="selected.animalPhotoUrl" style="width:100%;height:100%;object-fit:cover;border-radius:14px" />
+                  <img [src]="imgSrc(selected.animalPhotoUrl)" style="width:100%;height:100%;object-fit:cover;border-radius:14px"
+                       (error)="$any($event.target).style.display='none'" />
                 } @else {
                   <mat-icon>pets</mat-icon>
                 }
@@ -536,6 +539,11 @@ export class MyApplicationsComponent implements OnInit {
 
   get hasActiveFilters(): boolean {
     return !!(this.filter.search || this.filter.status || this.filter.sort !== 'newest');
+  }
+
+  imgSrc(url?: string): string {
+    if (!url) return '';
+    return url.startsWith('http') ? url : environment.mediaUrl + url;
   }
 
   statusLabel(status: string): string {

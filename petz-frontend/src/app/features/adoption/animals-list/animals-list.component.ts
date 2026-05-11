@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { AdoptableAnimal } from '../../../core/models/adoption.model';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   standalone: false,
@@ -129,7 +130,10 @@ import { AdoptableAnimal } from '../../../core/models/adoption.model';
           @for (a of displayed; track a.id) {
             <div class="animal-card" [routerLink]="['/adoption/animals', a.id]">
               <div class="animal-img-wrap">
-                <img [src]="a.photoUrl || 'assets/animal-placeholder.png'" [alt]="a.name">
+                @if (imgSrc(a.photoUrl)) {
+                  <img [src]="imgSrc(a.photoUrl)" [alt]="a.name"
+                       (error)="$any($event.target).style.display='none'">
+                }
                 <div class="animal-species-tag">{{ a.species }}</div>
                 @if (a.isAdoptionReady) {
                   <div class="ready-badge">
@@ -345,6 +349,12 @@ export class AnimalsListComponent implements OnInit {
   loading = true;
   filters = { species: '', city: '' };
   clientFilter = { gender: '', vaccinated: false, neutered: false, sort: 'newest' };
+
+  /** Resolves a backend-relative /uploads/... path to a full URL. */
+  imgSrc(url?: string): string {
+    if (!url) return '';
+    return url.startsWith('http') ? url : environment.mediaUrl + url;
+  }
 
   constructor(private api: ApiService) {}
 
