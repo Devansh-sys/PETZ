@@ -16,13 +16,25 @@ echo ""
 
 # ── MySQL ─────────────────────────────────────────────────────
 echo "🗄️  Starting MySQL..."
-sudo service mysql start 2>/dev/null || true
 
-# Wait for MySQL to be ready (max 30s)
+# Start MySQL service
+sudo service mysql start
+
+# Wait for MySQL to actually be ready (max 60s)
 TRIES=0
-until mysqladmin ping -u root --silent 2>/dev/null || (( TRIES++ >= 15 )); do
+echo "   ⏳ Waiting for MySQL to be ready..."
+until mysqladmin ping -u root --silent 2>/dev/null; do
+  if (( TRIES++ >= 30 )); then
+    echo "   ❌ MySQL failed to start after 60s. Check logs:"
+    sudo tail -20 /var/log/mysql/error.log 2>/dev/null || echo "   (no log found)"
+    exit 1
+  fi
   sleep 2
 done
+
+# Ensure database exists
+mysql -u root -e "CREATE DATABASE IF NOT EXISTS petzdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>/dev/null \
+  || sudo mysql -e "CREATE DATABASE IF NOT EXISTS petzdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
 echo "   ✅ MySQL is up — database 'petzdb' ready"
 echo ""
@@ -64,8 +76,6 @@ echo "   Port : 4200"
 echo ""
 
 cd "$ROOT/petz-frontend"
-# --host 0.0.0.0   → makes it reachable via Codespace forwarded URL
-# --disable-host-check → prevents "Invalid Host header" errors in Codespace
 npx ng serve --host 0.0.0.0 --port 4200 --disable-host-check &
 FRONTEND_PID=$!
 

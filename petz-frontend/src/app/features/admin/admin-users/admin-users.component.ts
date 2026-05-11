@@ -654,8 +654,15 @@ export class AdminUsersComponent implements OnInit {
 
   ngOnInit(): void {
     this.api.get<any>('/admin/users').subscribe({
-      next: res => { this.users = res.data ?? []; this.loading = false; },
-      error: ()  => { this.loading = false; }
+      next: res => {
+        // Exclude NGO/HOSPITAL accounts that are still pending approval —
+        // they belong in the Pending Approvals section, not the main users list.
+        this.users = (res.data ?? []).filter((u: any) =>
+          !((u.role === 'NGO' || u.role === 'HOSPITAL') && u.isApproved === false)
+        );
+        this.loading = false;
+      },
+      error: () => { this.loading = false; }
     });
     this.loadPendingApprovals();
   }
