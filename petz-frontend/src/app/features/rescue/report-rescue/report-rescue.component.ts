@@ -175,6 +175,33 @@ const CHENNAI_AREAS: ChennaiArea[] = [
             </mat-form-field>
           </div>
 
+          <!-- Photo upload (optional) -->
+          <div class="field-group">
+            <label class="field-label">Photo <span class="optional-badge">Optional</span></label>
+            <div class="upload-area" (click)="photoInput.click()"
+                 [class.has-image]="imagePreview"
+                 [style.backgroundImage]="imagePreview ? 'url(' + imagePreview + ')' : 'none'">
+              @if (!imagePreview) {
+                <div class="upload-placeholder">
+                  <mat-icon>add_a_photo</mat-icon>
+                  <span>Click to upload a photo of the animal</span>
+                  <small>JPG, PNG or WEBP · max 5 MB</small>
+                </div>
+              }
+              @if (imagePreview) {
+                <button mat-mini-fab type="button" class="remove-photo-btn"
+                        (click)="removePhoto($event)">
+                  <mat-icon>close</mat-icon>
+                </button>
+              }
+            </div>
+            <input #photoInput type="file" accept="image/jpeg,image/png,image/webp"
+                   style="display:none" (change)="onFileSelected($event)">
+            @if (fileError) {
+              <p class="file-error"><mat-icon>error_outline</mat-icon> {{ fileError }}</p>
+            }
+          </div>
+
           <!-- Submit -->
           <div style="display:flex;gap:12px;margin-top:8px">
             <button mat-raised-button type="submit"
@@ -277,6 +304,38 @@ const CHENNAI_AREAS: ChennaiArea[] = [
       margin: 8px 0 0; font-size: 0.78rem; color: #DC2626;
       mat-icon { font-size: 15px; width: 15px; height: 15px; }
     }
+    .optional-badge {
+      font-size: 0.68rem; font-weight: 600; color: #8BA3B5;
+      background: #EAF2F8; border-radius: 6px;
+      padding: 1px 7px; margin-left: 6px; vertical-align: middle;
+    }
+    .upload-area {
+      border: 2px dashed #C8DCE8; border-radius: 14px;
+      min-height: 130px; cursor: pointer; position: relative;
+      display: flex; align-items: center; justify-content: center;
+      background-size: cover; background-position: center;
+      overflow: hidden; transition: border-color 0.2s;
+      &:hover { border-color: #FF8C42; }
+      &.has-image { border-style: solid; border-color: #FF8C42; }
+    }
+    .upload-placeholder {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      color: #8BA3B5; pointer-events: none;
+      mat-icon { font-size: 36px; width: 36px; height: 36px; color: #C8DCE8; }
+      span { font-size: 0.82rem; font-weight: 600; }
+      small { font-size: 0.72rem; }
+    }
+    .remove-photo-btn {
+      position: absolute !important; top: 8px; right: 8px;
+      width: 28px !important; height: 28px !important;
+      background: rgba(0,0,0,0.55) !important;
+      mat-icon { font-size: 16px; width: 16px; height: 16px; color: #fff; }
+    }
+    .file-error {
+      display: flex; align-items: center; gap: 4px;
+      margin: 4px 0 0; font-size: 0.76rem; color: #DC2626;
+      mat-icon { font-size: 14px; width: 14px; height: 14px; }
+    }
     @media (max-width: 560px) {
       .form-row { grid-template-columns: 1fr; }
     }
@@ -291,6 +350,10 @@ export class ReportRescueComponent {
   lat: number = 0;
   lng: number = 0;
   fullAddress = '';
+
+  selectedFile: File | null = null;
+  imagePreview: string | null = null;
+  fileError = '';
 
   areas: ChennaiArea[] = CHENNAI_AREAS;
 
@@ -365,6 +428,28 @@ export class ReportRescueComponent {
     this.form.get('landmark')?.valueChanges.subscribe(() => this.buildFullAddress());
   }
 
+  // ── Photo upload ──────────────────────────────────────────────
+  onFileSelected(event: Event): void {
+    this.fileError = '';
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      this.fileError = 'File is too large. Maximum size is 5 MB.';
+      return;
+    }
+    this.selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = () => { this.imagePreview = reader.result as string; };
+    reader.readAsDataURL(file);
+  }
+
+  removePhoto(event: MouseEvent): void {
+    event.stopPropagation();
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.fileError = '';
+  }
+
   // ── Submit ────────────────────────────────────────────────────
   submit(): void {
     if (this.form.invalid || !this.isLocationSet()) return;
@@ -386,6 +471,9 @@ export class ReportRescueComponent {
 
     const formData = new FormData();
     formData.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+    if (this.selectedFile) {
+      formData.append('photo', this.selectedFile);
+    }
 
     this.api.postFormData<any>('/rescue', formData).subscribe({
       next: (res: any) => {

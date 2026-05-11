@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   standalone: false,
@@ -242,7 +243,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
               @if (selected.photoUrl) {
                 <div style="margin-bottom:14px">
                   <div class="detail-label" style="margin-bottom:6px">Photo</div>
-                  <img [src]="selected.photoUrl" alt="Rescue photo" class="rescue-photo">
+                  <img [src]="resolvePhotoUrl(selected.photoUrl)" alt="Rescue photo" class="rescue-photo">
                 </div>
               }
 
@@ -450,6 +451,13 @@ export class NgoRescuesComponent implements OnInit {
   get completedCount() { return this.rescues.filter(r => r.status === 'COMPLETED' || r.status === 'RESOLVED').length; }
   get criticalCount()  { return this.rescues.filter(r => r.criticality === 'CRITICAL').length; }
   get hasActiveFilters(){ return !!(this.filter.search || this.filter.status || this.filter.criticality); }
+
+  resolvePhotoUrl(url: string): string {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    const serverRoot = environment.apiUrl.replace('/api/v1', '');
+    return serverRoot + url;
+  }
 
   critClass(c: string): string {
     return (c || 'low').toLowerCase();
