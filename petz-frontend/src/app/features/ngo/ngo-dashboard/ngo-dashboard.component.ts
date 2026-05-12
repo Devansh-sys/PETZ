@@ -449,8 +449,8 @@ export class NgoDashboardComponent implements OnInit {
   get rescuePipeline() {
     const base = [
       { label: 'Pending',     count: this.pendingRescues,                                              color: '#E89340' },
-      { label: 'Assigned',    count: this.rescues.filter(r => r.status === 'ASSIGNED').length,         color: '#4F8FD4' },
-      { label: 'In Progress', count: this.rescues.filter(r => r.status === 'IN_PROGRESS').length,      color: '#7C62CC' },
+      { label: 'Reported',               count: this.rescues.filter(r => r.status === 'ASSIGNED').length,    color: '#4F8FD4' },
+      { label: 'Assigned & In Progress', count: this.rescues.filter(r => r.status === 'IN_PROGRESS').length, color: '#7C62CC' },
       { label: 'Resolved',    count: this.completedRescues,                                             color: '#2EB894' },
     ];
     // Show Cancelled only if data exists — avoids cluttering legend when 0

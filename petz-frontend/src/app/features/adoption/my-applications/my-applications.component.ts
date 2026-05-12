@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { AdoptionApplication } from '../../../core/models/adoption.model';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   standalone: false,
@@ -51,17 +52,54 @@ import { AdoptionApplication } from '../../../core/models/adoption.model';
           </div>
         }
 
-        <!-- Application cards -->
         @if (applications.length > 0) {
+
+          <!-- Filter Bar -->
+          <div class="filter-bar-card">
+            <div class="search-wrap">
+              <mat-icon class="search-icon">search</mat-icon>
+              <input class="search-input" [(ngModel)]="filter.search" (ngModelChange)="applyFilters()"
+                     placeholder="Search by animal name or species…">
+            </div>
+            <div class="select-group">
+              <label class="select-label">Status</label>
+              <select class="fsel" [(ngModel)]="filter.status" (ngModelChange)="applyFilters()">
+                <option value="">All</option>
+                <option value="PENDING">Pending</option>
+                <option value="UNDER_REVIEW">Under Review</option>
+                <option value="APPROVED">Approved</option>
+                <option value="REJECTED">Rejected</option>
+                <option value="WITHDRAWN">Withdrawn</option>
+              </select>
+            </div>
+            <div class="select-group">
+              <label class="select-label">Sort</label>
+              <select class="fsel" [(ngModel)]="filter.sort" (ngModelChange)="applyFilters()">
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+              </select>
+            </div>
+            @if (hasActiveFilters) {
+              <button class="clear-btn" (click)="clearFilters()">
+                <mat-icon>close</mat-icon> Clear
+              </button>
+            }
+          </div>
+
+          <!-- Results count -->
+          <div class="results-count">Showing {{ filtered.length }} of {{ applications.length }} applications</div>
+
+          <!-- Application cards -->
           <div style="display:flex;flex-direction:column;gap:14px">
-            @for (app of applications; track app.id) {
+            @for (app of filtered; track app.id) {
               <div class="app-card" (click)="selected = app" style="cursor:pointer">
 
                 <!-- Left: number + info -->
                 <div class="app-left">
                   <div class="app-num-badge">
                     @if (app.animalPhotoUrl) {
-                      <img [src]="app.animalPhotoUrl" style="width:100%;height:100%;object-fit:cover;border-radius:14px" />
+                      <img [src]="imgSrc(app.animalPhotoUrl)" style="width:100%;height:100%;object-fit:cover;border-radius:14px"
+                           (error)="$any($event.target).style.display='none'" />
                     } @else {
                       <mat-icon style="color:#fff;font-size:20px">pets</mat-icon>
                     }
@@ -97,6 +135,11 @@ import { AdoptionApplication } from '../../../core/models/adoption.model';
 
               </div>
             }
+            @if (filtered.length === 0) {
+              <div class="card" style="text-align:center;padding:32px;color:#8BA3B5;font-size:0.88rem">
+                No applications match your filters.
+              </div>
+            }
           </div>
 
           <!-- Summary chips -->
@@ -130,7 +173,8 @@ import { AdoptionApplication } from '../../../core/models/adoption.model';
             <div style="display:flex;align-items:center;gap:14px">
               <div class="modal-animal-icon">
                 @if (selected.animalPhotoUrl) {
-                  <img [src]="selected.animalPhotoUrl" style="width:100%;height:100%;object-fit:cover;border-radius:14px" />
+                  <img [src]="imgSrc(selected.animalPhotoUrl)" style="width:100%;height:100%;object-fit:cover;border-radius:14px"
+                       (error)="$any($event.target).style.display='none'" />
                 } @else {
                   <mat-icon>pets</mat-icon>
                 }
@@ -272,6 +316,51 @@ import { AdoptionApplication } from '../../../core/models/adoption.model';
     }
   `,
   styles: [`
+    /* ── Filter bar ── */
+    .filter-bar-card {
+      background: #fff; border-radius: 16px;
+      box-shadow: 0 1px 8px rgba(26,53,71,0.06);
+      padding: 14px 18px; display: flex; gap: 10px; align-items: flex-end;
+      margin-bottom: 10px; flex-wrap: wrap;
+    }
+    .search-wrap {
+      position: relative; flex: 1; min-width: 160px;
+    }
+    .search-icon {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      font-size: 16px; width: 16px; height: 16px; color: #94A3B8;
+    }
+    .search-input {
+      width: 100%; height: 36px; border: 1px solid #E0EBF2; border-radius: 10px;
+      padding: 0 12px 0 34px; font-size: 0.82rem; background: #F8FAFB;
+      color: #1A3547; outline: none; box-sizing: border-box;
+      font-family: inherit;
+      &::placeholder { color: #94A3B8; }
+      &:focus { border-color: #FF8C42; }
+    }
+    .select-group { display: flex; flex-direction: column; gap: 3px; }
+    .select-label { font-size: 0.62rem; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.05em; }
+    .fsel {
+      height: 36px; border: 1px solid #E0EBF2; border-radius: 10px;
+      padding: 0 10px; font-size: 0.82rem; color: #1A3547;
+      background: #F8FAFB; outline: none; cursor: pointer;
+      font-family: inherit;
+      &:focus { border-color: #FF8C42; }
+    }
+    .clear-btn {
+      display: flex; align-items: center; gap: 4px;
+      height: 36px; border: 1px solid #E0EBF2; border-radius: 10px;
+      padding: 0 12px; background: #F8FAFB; color: #64748B;
+      font-size: 0.78rem; font-weight: 600; cursor: pointer;
+      font-family: inherit;
+      mat-icon { font-size: 15px; width: 15px; height: 15px; }
+      &:hover { border-color: #E05858; color: #E05858; }
+    }
+    .results-count {
+      font-size: 0.78rem; color: #8BA3B5; font-weight: 600; margin-bottom: 10px;
+    }
+
+    /* ── Application cards ── */
     .app-card {
       display: flex; align-items: flex-start; gap: 16px;
       background: #fff; border: 1px solid #E0EBF2;
@@ -404,8 +493,11 @@ import { AdoptionApplication } from '../../../core/models/adoption.model';
 })
 export class MyApplicationsComponent implements OnInit {
   applications: AdoptionApplication[] = [];
+  filtered: AdoptionApplication[] = [];
   loading = true;
   selected: AdoptionApplication | null = null;
+
+  filter = { search: '', status: '', sort: 'newest' };
 
   get pendingCount(): number  { return this.applications.filter(a => a.status === 'PENDING').length; }
   get approvedCount(): number { return this.applications.filter(a => a.status === 'APPROVED').length; }
@@ -414,9 +506,44 @@ export class MyApplicationsComponent implements OnInit {
 
   ngOnInit(): void {
     this.api.get<any>('/adoption/my-applications').subscribe({
-      next: res => { this.applications = res.data ?? []; this.loading = false; },
-      error: ()  => { this.loading = false; }
+      next: res => {
+        this.applications = res.data ?? [];
+        this.loading = false;
+        this.applyFilters();
+      },
+      error: () => { this.loading = false; }
     });
+  }
+
+  applyFilters(): void {
+    let r = [...this.applications];
+    const q = this.filter.search.toLowerCase().trim();
+    if (q) r = r.filter(a =>
+      (a.animalName || '').toLowerCase().includes(q) ||
+      (a.animalSpecies || '').toLowerCase().includes(q) ||
+      (a.animalBreed || '').toLowerCase().includes(q)
+    );
+    if (this.filter.status) r = r.filter(a => a.status === this.filter.status);
+    if (this.filter.sort === 'newest') {
+      r.sort((a, b) => new Date(b.appliedAt || 0).getTime() - new Date(a.appliedAt || 0).getTime());
+    } else {
+      r.sort((a, b) => new Date(a.appliedAt || 0).getTime() - new Date(b.appliedAt || 0).getTime());
+    }
+    this.filtered = r;
+  }
+
+  clearFilters(): void {
+    this.filter = { search: '', status: '', sort: 'newest' };
+    this.applyFilters();
+  }
+
+  get hasActiveFilters(): boolean {
+    return !!(this.filter.search || this.filter.status || this.filter.sort !== 'newest');
+  }
+
+  imgSrc(url?: string): string {
+    if (!url) return '';
+    return url.startsWith('http') ? url : environment.mediaUrl + url;
   }
 
   statusLabel(status: string): string {

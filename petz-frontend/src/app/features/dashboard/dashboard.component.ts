@@ -491,15 +491,17 @@ export class DashboardComponent implements OnInit {
     // Backend enum: PENDING, ASSIGNED, IN_PROGRESS, COMPLETED, RESOLVED, CANCELLED
     this.api.get<any>('/rescue/my').pipe(catchError(() => of({ data: [] }))).subscribe(res => {
       const reports: any[] = res.data ?? [];
-      const pending   = reports.filter(r => r.status === 'PENDING').length;
-      const active    = reports.filter(r => r.status === 'ASSIGNED' || r.status === 'IN_PROGRESS').length;
-      const resolved  = reports.filter(r => r.status === 'RESOLVED' || r.status === 'COMPLETED').length;
-      const cancelled = reports.filter(r => r.status === 'CANCELLED').length;
-      // Build legend — only include categories that have data (except always show the 3 base ones)
+      const pending    = reports.filter(r => r.status === 'PENDING').length;
+      const reported   = reports.filter(r => r.status === 'ASSIGNED').length;
+      const inProgress = reports.filter(r => r.status === 'IN_PROGRESS').length;
+      const active     = reported + inProgress;
+      const resolved   = reports.filter(r => r.status === 'RESOLVED' || r.status === 'COMPLETED').length;
+      const cancelled  = reports.filter(r => r.status === 'CANCELLED').length;
       const raw = [
-        { label: 'Pending',   color: '#F59E0B', count: pending   },
-        { label: 'Active',    color: '#EC4899', count: active    },
-        { label: 'Resolved',  color: '#10B981', count: resolved  },
+        { label: 'Pending',               color: '#F59E0B', count: pending    },
+        { label: 'Reported',              color: '#EC4899', count: reported   },
+        { label: 'Assigned & In Progress',color: '#8B5CF6', count: inProgress },
+        { label: 'Resolved',              color: '#10B981', count: resolved   },
         ...(cancelled > 0 ? [{ label: 'Cancelled', color: '#94A3B8', count: cancelled }] : []),
       ];
       const legend = this.withPct(raw);

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { AdoptableAnimal } from '../../../core/models/adoption.model';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   standalone: false,
@@ -28,7 +29,7 @@ import { AdoptableAnimal } from '../../../core/models/adoption.model';
         </div>
       </div>
 
-      <!-- Search filters -->
+      <!-- Search filters (API-based) -->
       <div class="search-bar-card">
         <div class="search-field">
           <mat-icon>search</mat-icon>
@@ -46,6 +47,40 @@ import { AdoptableAnimal } from '../../../core/models/adoption.model';
         </button>
       </div>
 
+      <!-- Client-side secondary filter bar -->
+      <div class="client-filter-bar">
+        <div class="select-group">
+          <label class="select-label">Gender</label>
+          <select class="fsel" [(ngModel)]="clientFilter.gender" (ngModelChange)="applyClientFilters()">
+            <option value="">All</option>
+            <option value="MALE">Male</option>
+            <option value="FEMALE">Female</option>
+          </select>
+        </div>
+        <button class="toggle-chip" [class.chip-active]="clientFilter.vaccinated"
+                (click)="clientFilter.vaccinated = !clientFilter.vaccinated; applyClientFilters()">
+          💉 Vaccinated
+        </button>
+        <button class="toggle-chip" [class.chip-active]="clientFilter.neutered"
+                (click)="clientFilter.neutered = !clientFilter.neutered; applyClientFilters()">
+          ✂️ Neutered
+        </button>
+        <div class="select-group">
+          <label class="select-label">Sort</label>
+          <select class="fsel" [(ngModel)]="clientFilter.sort" (ngModelChange)="applyClientFilters()">
+            <option value="newest">Newest First</option>
+            <option value="name">Name A–Z</option>
+            <option value="youngest">Age: Youngest</option>
+            <option value="oldest_age">Age: Oldest</option>
+          </select>
+        </div>
+        @if (hasClientFilters) {
+          <button class="clear-btn" (click)="clearClientFilters()">
+            <mat-icon>close</mat-icon> Clear
+          </button>
+        }
+      </div>
+
       <!-- Loading -->
       @if (loading) {
         <div class="loading-state">
@@ -56,14 +91,14 @@ import { AdoptableAnimal } from '../../../core/models/adoption.model';
 
       @if (!loading) {
         <!-- Results count -->
-        @if (animals.length > 0) {
+        @if (allAnimals.length > 0) {
           <div class="results-count">
-            <span>{{ animals.length }} animals available for adoption</span>
+            <span>Showing {{ displayed.length }} of {{ allAnimals.length }} animals available for adoption</span>
           </div>
         }
 
         <!-- Animal cards -->
-        @if (animals.length === 0) {
+        @if (allAnimals.length === 0) {
           <div class="card">
             <div class="empty-state">
               <div class="empty-icon">
@@ -78,11 +113,27 @@ import { AdoptableAnimal } from '../../../core/models/adoption.model';
           </div>
         }
 
+        @if (displayed.length === 0 && allAnimals.length > 0) {
+          <div class="card">
+            <div class="empty-state">
+              <div class="empty-icon"><mat-icon>filter_alt_off</mat-icon></div>
+              <h3>No matches</h3>
+              <p>No animals match your current filters. Try clearing some filters.</p>
+              <button mat-stroked-button (click)="clearClientFilters()" style="margin-top:8px;border-radius:10px">
+                Clear filters
+              </button>
+            </div>
+          </div>
+        }
+
         <div class="animal-grid">
-          @for (a of animals; track a.id) {
+          @for (a of displayed; track a.id) {
             <div class="animal-card" [routerLink]="['/adoption/animals', a.id]">
               <div class="animal-img-wrap">
-                <img [src]="a.photoUrl || 'assets/animal-placeholder.png'" [alt]="a.name">
+                @if (imgSrc(a.photoUrl)) {
+                  <img [src]="imgSrc(a.photoUrl)" [alt]="a.name"
+                       (error)="$any($event.target).style.display='none'">
+                }
                 <div class="animal-species-tag">{{ a.species }}</div>
                 @if (a.isAdoptionReady) {
                   <div class="ready-badge">
@@ -132,7 +183,7 @@ import { AdoptableAnimal } from '../../../core/models/adoption.model';
       border: 1px solid #E0EBF2;
       box-shadow: 0 4px 16px rgba(26,53,71,0.06);
       padding: 10px 10px 10px 20px;
-      margin-bottom: 24px;
+      margin-bottom: 14px;
       gap: 0;
     }
     .search-field {
@@ -163,6 +214,39 @@ import { AdoptableAnimal } from '../../../core/models/adoption.model';
       border-radius: 12px !important;
       flex-shrink: 0;
     }
+
+    /* ── Client-side filter bar ── */
+    .client-filter-bar {
+      display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap;
+      background: #fff; border-radius: 14px; border: 1px solid #E0EBF2;
+      padding: 12px 16px; margin-bottom: 16px;
+    }
+    .select-group { display: flex; flex-direction: column; gap: 3px; }
+    .select-label { font-size: 0.62rem; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.05em; }
+    .fsel {
+      height: 36px; border: 1px solid #E0EBF2; border-radius: 10px;
+      padding: 0 10px; font-size: 0.82rem; color: #1A3547;
+      background: #F8FAFB; outline: none; cursor: pointer;
+      font-family: inherit;
+      &:focus { border-color: #FF8C42; }
+    }
+    .toggle-chip {
+      height: 36px; padding: 0 14px; border: 1px solid #E0EBF2; border-radius: 10px;
+      background: #F8FAFB; font-size: 0.82rem; cursor: pointer;
+      font-family: inherit; color: #4A6478; transition: all 0.15s;
+      &:hover { border-color: #FF8C42; }
+    }
+    .chip-active { background: #FFF3E8; border-color: #FF8C42; color: #FF8C42; font-weight: 700; }
+    .clear-btn {
+      display: flex; align-items: center; gap: 4px;
+      height: 36px; border: 1px solid #E0EBF2; border-radius: 10px;
+      padding: 0 12px; background: #F8FAFB; color: #64748B;
+      font-size: 0.78rem; font-weight: 600; cursor: pointer;
+      font-family: inherit;
+      mat-icon { font-size: 15px; width: 15px; height: 15px; }
+      &:hover { border-color: #E05858; color: #E05858; }
+    }
+
     .results-count {
       margin-bottom: 18px;
       font-size: 0.82rem;
@@ -260,8 +344,17 @@ import { AdoptableAnimal } from '../../../core/models/adoption.model';
 })
 export class AnimalsListComponent implements OnInit {
   animals: AdoptableAnimal[] = [];
+  allAnimals: AdoptableAnimal[] = [];
+  displayed: AdoptableAnimal[] = [];
   loading = true;
   filters = { species: '', city: '' };
+  clientFilter = { gender: '', vaccinated: false, neutered: false, sort: 'newest' };
+
+  /** Resolves a backend-relative /uploads/... path to a full URL. */
+  imgSrc(url?: string): string {
+    if (!url) return '';
+    return url.startsWith('http') ? url : environment.mediaUrl + url;
+  }
 
   constructor(private api: ApiService) {}
 
@@ -273,13 +366,45 @@ export class AnimalsListComponent implements OnInit {
     if (this.filters.species) params['species'] = this.filters.species;
     if (this.filters.city)    params['city']    = this.filters.city;
     this.api.get<any>('/adoption/animals', params).subscribe({
-      next: res => { this.animals = res.data ?? []; this.loading = false; },
-      error: ()  => { this.loading = false; }
+      next: res => {
+        this.animals = res.data ?? [];
+        this.allAnimals = this.animals;
+        this.loading = false;
+        this.applyClientFilters();
+      },
+      error: () => { this.loading = false; }
     });
+  }
+
+  get hasClientFilters(): boolean {
+    return !!(this.clientFilter.gender || this.clientFilter.vaccinated || this.clientFilter.neutered || this.clientFilter.sort !== 'newest');
+  }
+
+  applyClientFilters(): void {
+    let r = [...this.allAnimals];
+    if (this.clientFilter.gender) r = r.filter(a => (a.gender || '').toUpperCase() === this.clientFilter.gender);
+    if (this.clientFilter.vaccinated) r = r.filter(a => a.isVaccinated);
+    if (this.clientFilter.neutered)   r = r.filter(a => a.isNeutered);
+    if (this.clientFilter.sort === 'newest') {
+      r.sort((a, b) => b.id - a.id);
+    } else if (this.clientFilter.sort === 'name') {
+      r.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    } else if (this.clientFilter.sort === 'youngest') {
+      r.sort((a, b) => (a.ageMonths || 999) - (b.ageMonths || 999));
+    } else if (this.clientFilter.sort === 'oldest_age') {
+      r.sort((a, b) => (b.ageMonths || 0) - (a.ageMonths || 0));
+    }
+    this.displayed = r;
+  }
+
+  clearClientFilters(): void {
+    this.clientFilter = { gender: '', vaccinated: false, neutered: false, sort: 'newest' };
+    this.applyClientFilters();
   }
 
   clearFilters(): void {
     this.filters = { species: '', city: '' };
+    this.clearClientFilters();
     this.search();
   }
 }

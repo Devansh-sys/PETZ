@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { environment } from '../../../../environments/environment';
+import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
 
 @Component({
   standalone: false,
@@ -48,12 +48,12 @@ import { environment } from '../../../../environments/environment';
             <div class="stat-div"></div>
             <div class="stat-item">
               <div class="stat-num" style="color:#E89340">{{ assignedCount }}</div>
-              <div class="stat-lbl">Awaiting Response</div>
+              <div class="stat-lbl">Reported</div>
             </div>
             <div class="stat-div"></div>
             <div class="stat-item">
               <div class="stat-num" style="color:#4F8FD4">{{ inProgressCount }}</div>
-              <div class="stat-lbl">In Progress</div>
+              <div class="stat-lbl">Assigned & In Progress</div>
             </div>
             <div class="stat-div"></div>
             <div class="stat-item">
@@ -79,8 +79,8 @@ import { environment } from '../../../../environments/environment';
             <label class="select-label">Status</label>
             <select class="fsel" [(ngModel)]="filter.status" (ngModelChange)="applyFilters()">
               <option value="">All</option>
-              <option value="ASSIGNED">Awaiting Response</option>
-              <option value="IN_PROGRESS">In Progress</option>
+              <option value="ASSIGNED">Reported</option>
+              <option value="IN_PROGRESS">Assigned &amp; In Progress</option>
               <option value="COMPLETED">Completed</option>
             </select>
           </div>
@@ -158,7 +158,7 @@ import { environment } from '../../../../environments/environment';
               </div>
               <div class="rc-right" (click)="$event.stopPropagation()">
                 <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-                  <span class="status-chip" [ngClass]="statusClass(r.status)">{{ r.status }}</span>
+                  <span class="status-chip" [ngClass]="statusClass(r.status)">{{ statusLabel(r.status) }}</span>
                   <span class="crit-pill" [ngClass]="'crit-' + critClass(r.criticality)">{{ r.criticality }}</span>
                 </div>
                 <div class="rc-actions">
@@ -212,7 +212,7 @@ import { environment } from '../../../../environments/environment';
 
               <!-- Status + time -->
               <div class="popup-status-row">
-                <span class="status-chip" [ngClass]="statusClass(selected.status)">{{ selected.status }}</span>
+                <span class="status-chip" [ngClass]="statusClass(selected.status)">{{ statusLabel(selected.status) }}</span>
                 @if (selected.reportedAt) {
                   <span class="time-ago">{{ timeAgo(selected.reportedAt) }}</span>
                   <span class="popup-date">{{ fmtDate(selected.reportedAt) }}</span>
@@ -243,7 +243,7 @@ import { environment } from '../../../../environments/environment';
               @if (selected.photoUrl) {
                 <div style="margin-bottom:14px">
                   <div class="detail-label" style="margin-bottom:6px">Photo</div>
-                  <img [src]="resolvePhotoUrl(selected.photoUrl)" alt="Rescue photo" class="rescue-photo">
+                  <img [src]="selected.photoUrl" alt="Rescue photo" class="rescue-photo">
                 </div>
               }
 
@@ -452,15 +452,12 @@ export class NgoRescuesComponent implements OnInit {
   get criticalCount()  { return this.rescues.filter(r => r.criticality === 'CRITICAL').length; }
   get hasActiveFilters(){ return !!(this.filter.search || this.filter.status || this.filter.criticality); }
 
-  resolvePhotoUrl(url: string): string {
-    if (!url) return '';
-    if (url.startsWith('http')) return url;
-    const serverRoot = environment.apiUrl.replace('/api/v1', '');
-    return serverRoot + url;
-  }
-
   critClass(c: string): string {
     return (c || 'low').toLowerCase();
+  }
+
+  statusLabel(s: string): string {
+    return rescueStatusLabel(s);
   }
 
   statusClass(s: string): string {
@@ -474,7 +471,9 @@ export class NgoRescuesComponent implements OnInit {
   }
 
   timeAgo(iso: string): string {
-    const diff = Date.now() - new Date(iso).getTime();
+    // Append 'Z' if no timezone — backend sends UTC without suffix, browser would treat as local otherwise
+    const utc = iso && !iso.endsWith('Z') && !iso.includes('+') ? iso + 'Z' : iso;
+    const diff = Date.now() - new Date(utc).getTime();
     const mins = Math.floor(diff / 60000);
     const hrs  = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
@@ -484,7 +483,8 @@ export class NgoRescuesComponent implements OnInit {
   }
 
   fmtDate(iso: string): string {
-    return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    const utc = iso && !iso.endsWith('Z') && !iso.includes('+') ? iso + 'Z' : iso;
+    return new Date(utc).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   }
 
   applyFilters(): void {

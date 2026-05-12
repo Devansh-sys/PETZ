@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { AdoptableAnimal } from '../../../core/models/adoption.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   standalone: false,
@@ -20,7 +21,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
             <p class="page-sub">Manage all animals listed for adoption</p>
           </div>
         </div>
-        <button mat-raised-button color="primary" (click)="showForm = !showForm">
+        <button mat-raised-button color="primary" (click)="showForm ? cancelForm() : (showForm = true)">
           <mat-icon>{{ showForm ? 'close' : 'add' }}</mat-icon>
           {{ showForm ? 'Cancel' : 'Add Animal' }}
         </button>
@@ -76,11 +77,35 @@ import { MatSnackBar } from '@angular/material/snack-bar';
               </mat-form-field>
             </div>
           </div>
+          <!-- Photo upload (full width) -->
+          <div class="form-row-full">
+            <label class="field-label">Animal Photo <span class="field-opt">Optional</span></label>
+            <input type="file" #photoInput accept="image/*" style="display:none"
+                   (change)="onPhotoSelected($event)">
+            <div class="photo-upload-zone" (click)="photoInput.click()">
+              @if (photoPreview) {
+                <img [src]="photoPreview" class="photo-preview-img" alt="Preview">
+                <div class="photo-change-overlay">
+                  <mat-icon>edit</mat-icon>
+                  <span>Change Photo</span>
+                </div>
+              } @else {
+                <div class="photo-placeholder">
+                  <mat-icon>add_photo_alternate</mat-icon>
+                  <span class="photo-cta">Click to upload a photo</span>
+                  <span class="photo-hint">JPG or PNG · max 5 MB</span>
+                </div>
+              }
+            </div>
+          </div>
+
           <div class="form-actions">
-            <button mat-raised-button color="primary" (click)="addAnimal()" [disabled]="!newAnimal.name">
-              <mat-icon>save</mat-icon> Save Animal
+            <button mat-raised-button color="primary" (click)="addAnimal()" [disabled]="!newAnimal.name || saving">
+              @if (saving) { <mat-spinner diameter="16" style="margin-right:6px"></mat-spinner> }
+              @else { <mat-icon>save</mat-icon> }
+              {{ saving ? 'Saving…' : 'Save Animal' }}
             </button>
-            <button mat-stroked-button (click)="showForm = false" class="cancel-btn">Cancel</button>
+            <button mat-stroked-button (click)="cancelForm()" class="cancel-btn">Cancel</button>
           </div>
         </div>
       }
@@ -200,7 +225,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
                     <div style="display:flex;align-items:center;gap:12px">
                       <div class="ani-avatar">
                         @if (a.photoUrl) {
-                          <img [src]="a.photoUrl" [alt]="a.name" class="ani-avatar-img">
+                          <img [src]="imgSrc(a.photoUrl)" [alt]="a.name" class="ani-avatar-img"
+                               (error)="$any($event.target).style.display='none'">
                         } @else {
                           <mat-icon class="ani-avatar-icon">pets</mat-icon>
                         }
@@ -243,7 +269,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
             <!-- Header -->
             <div class="popup-hdr">
               @if (selected.photoUrl) {
-                <img [src]="selected.photoUrl" [alt]="selected.name" class="popup-photo">
+                <img [src]="imgSrc(selected.photoUrl)" [alt]="selected.name" class="popup-photo"
+                     (error)="$any($event.target).style.display='none'">
               } @else {
                 <div class="popup-photo-ph">
                   <mat-icon>pets</mat-icon>
@@ -335,7 +362,36 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     .form-row    { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; @media(max-width:560px){ grid-template-columns:1fr; } }
     .field-group { margin-bottom: 4px; mat-form-field { width: 100%; } }
     .field-label { display: block; font-size: 0.78rem; font-weight: 700; color: #1A3547; margin-bottom: 6px; }
-    .form-actions { display: flex; gap: 10px; margin-top: 10px; }
+    .form-row-full { margin-bottom: 16px; }
+    .field-opt { font-size: 0.68rem; font-weight: 500; color: #94A3B8; margin-left: 6px; text-transform: none; letter-spacing: 0; }
+
+    /* Photo upload zone */
+    .photo-upload-zone {
+      width: 100%; height: 170px; border: 2px dashed #D0DCE8; border-radius: 14px;
+      cursor: pointer; overflow: hidden; position: relative; background: #F8FAFB;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.15s, background 0.15s;
+      &:hover { border-color: #FF8C42; background: #FFF7ED; }
+    }
+    .photo-preview-img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .photo-change-overlay {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.42);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      opacity: 0; transition: opacity 0.2s; color: #fff;
+      font-size: 0.82rem; font-weight: 700;
+      mat-icon { font-size: 22px; width: 22px; height: 22px; }
+    }
+    .photo-upload-zone:hover .photo-change-overlay { opacity: 1; }
+    .photo-placeholder {
+      display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none;
+      mat-icon { font-size: 36px; width: 36px; height: 36px; color: #C8DCE8; }
+    }
+    .photo-cta  { font-size: 0.84rem; font-weight: 700; color: #8BA3B5; }
+    .photo-hint { font-size: 0.7rem; color: #C0CEDB; }
+
+    .form-actions { display: flex; gap: 10px; margin-top: 10px; align-items: center; }
     .cancel-btn  { border-radius: 12px !important; height: 42px !important; color: #4A6478 !important; border-color: #C8DCE8 !important; }
 
     /* ── Stat Strip ───────────────────────────────────── */
@@ -479,7 +535,12 @@ export class NgoAnimalsComponent implements OnInit {
   filtered: AdoptableAnimal[] = [];
   selected: AdoptableAnimal | null = null;
   showForm = false;
+  saving   = false;
   newAnimal: any = {};
+
+  // Photo upload state
+  photoFile:    File | null   = null;
+  photoPreview: string | null = null;
 
   filter = { search: '', species: '', status: '', sort: 'newest' };
 
@@ -492,6 +553,11 @@ export class NgoAnimalsComponent implements OnInit {
   }
   get hasActiveFilters(): boolean {
     return !!(this.filter.search || this.filter.species || this.filter.status);
+  }
+
+  imgSrc(url?: string): string {
+    if (!url) return '';
+    return url.startsWith('http') ? url : environment.mediaUrl + url;
   }
 
   fmtAge(months?: number): string {
@@ -541,17 +607,61 @@ export class NgoAnimalsComponent implements OnInit {
     });
   }
 
+  onPhotoSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.photoFile = file;
+    const reader = new FileReader();
+    reader.onload = e => { this.photoPreview = e.target?.result as string; };
+    reader.readAsDataURL(file);
+  }
+
+  cancelForm(): void {
+    this.showForm    = false;
+    this.newAnimal   = {};
+    this.photoFile   = null;
+    this.photoPreview = null;
+  }
+
   addAnimal(): void {
-    if (!this.newAnimal.name) return;
+    if (!this.newAnimal.name || this.saving) return;
+    this.saving = true;
+
     this.api.post<any>('/adoption/ngo/animals', this.newAnimal).subscribe({
       next: res => {
-        this.animals.push(res.data);
-        this.applyFilters();
-        this.showForm = false;
-        this.newAnimal = {};
-        this.snack.open('Animal added successfully!', '', { duration: 2000 });
+        const savedAnimal: AdoptableAnimal = res.data;
+
+        const finalize = () => {
+          this.animals.push(savedAnimal);
+          this.applyFilters();
+          this.saving = false;
+          this.cancelForm();
+          this.snack.open('Animal added successfully!', '', { duration: 2500 });
+        };
+
+        // Upload photo if one was selected
+        if (this.photoFile) {
+          const form = new FormData();
+          form.append('file', this.photoFile);
+          this.api.postFormData<any>(`/adoption/ngo/animals/${savedAnimal.id}/photo`, form).subscribe({
+            next: photoRes => {
+              if (photoRes?.data?.photoUrl) savedAnimal.photoUrl = photoRes.data.photoUrl;
+              finalize();
+            },
+            error: () => {
+              // Photo upload failed — animal is still saved; just skip the photo
+              this.snack.open('Animal saved, but photo upload failed.', 'OK', { duration: 3500 });
+              finalize();
+            }
+          });
+        } else {
+          finalize();
+        }
       },
-      error: err => this.snack.open(err.error?.message ?? 'Error adding animal.', 'Close', { duration: 3000 })
+      error: err => {
+        this.saving = false;
+        this.snack.open(err.error?.message ?? 'Error adding animal.', 'Close', { duration: 3000 });
+      }
     });
   }
 

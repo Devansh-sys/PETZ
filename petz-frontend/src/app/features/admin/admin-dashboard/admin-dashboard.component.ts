@@ -584,8 +584,8 @@ export class AdminDashboardComponent implements OnInit {
     // All RescueStatus values: PENDING, ASSIGNED, IN_PROGRESS, COMPLETED, RESOLVED, CANCELLED
     const base = [
       { label:'Pending',     count:this.pendingRescues,    color:'#E89340' },
-      { label:'Assigned',    count:this.assignedRescues,   color:'#4F8FD4' }, // fixed: was same color as Pending
-      { label:'In Progress', count:this.inProgressRescues, color:'#7C62CC' },
+      { label:'Reported',               count:this.assignedRescues,   color:'#4F8FD4' },
+      { label:'Assigned & In Progress', count:this.inProgressRescues, color:'#7C62CC' },
       { label:'Resolved',    count:this.completedRescues,  color:'#2EB894' },
     ];
     if (this.cancelledRescues > 0) {
