@@ -1,0 +1,324 @@
+<div class="page-wrap">
+
+  <!-- ── Header ─────────────────────────────────────────── -->
+  <div class="page-hdr">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button mat-icon-button routerLink="/ngo" class="back-btn">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1 class="page-title">Adoption Applications</h1>
+        <p class="page-sub">Review and process incoming adoption requests</p>
+      </div>
+    </div>
+    @if (pendingCount > 0) {
+      <div class="pending-badge">
+        <mat-icon>assignment</mat-icon>
+        <span>{{ pendingCount }} pending</span>
+      </div>
+    }
+  </div>
+
+  @if (loading) {
+    <div class="loading-state">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Loading applications…</span>
+    </div>
+  }
+
+  @if (!loading) {
+
+    <!-- ── Stat Strip ──────────────────────────────────── -->
+    @if (applications.length > 0) {
+      <div class="stat-strip">
+        <div class="stat-item">
+          <div class="stat-num">{{ applications.length }}</div>
+          <div class="stat-lbl">Total</div>
+        </div>
+        <div class="stat-div"></div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:#7C62CC">{{ pendingCount }}</div>
+          <div class="stat-lbl">Pending</div>
+        </div>
+        <div class="stat-div"></div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:#2EB894">{{ approvedCount }}</div>
+          <div class="stat-lbl">Approved</div>
+        </div>
+        <div class="stat-div"></div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:#E05858">{{ rejectedCount }}</div>
+          <div class="stat-lbl">Rejected</div>
+        </div>
+        <div class="stat-div"></div>
+        <div class="stat-item">
+          <div class="stat-num">{{ uniqueAnimals }}</div>
+          <div class="stat-lbl">Animals</div>
+        </div>
+      </div>
+    }
+
+    <!-- ── Filter Bar ──────────────────────────────────── -->
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input class="search-input" placeholder="Search by animal name or reason…"
+               [(ngModel)]="filter.search" (ngModelChange)="applyFilters()">
+      </div>
+      <div class="select-group">
+        <label class="select-label">Status</label>
+        <select class="fsel" [(ngModel)]="filter.status" (ngModelChange)="applyFilters()">
+          <option value="">All</option>
+          <option value="PENDING">Pending</option>
+          <option value="APPROVED">Approved</option>
+          <option value="REJECTED">Rejected</option>
+        </select>
+      </div>
+      <div class="select-group">
+        <label class="select-label">Sort</label>
+        <select class="fsel" [(ngModel)]="filter.sort" (ngModelChange)="applyFilters()">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="pending">Pending First</option>
+        </select>
+      </div>
+      @if (hasActiveFilters) {
+        <button class="clear-btn" (click)="clearFilters()">
+          <mat-icon>close</mat-icon> Clear
+        </button>
+      }
+    </div>
+
+    <!-- ── Empty: no applications ─────────────────────── -->
+    @if (applications.length === 0) {
+      <div class="empty-card">
+        <mat-icon class="empty-icon">assignment</mat-icon>
+        <h3 class="empty-h3">No applications yet</h3>
+        <p class="empty-p">Adoption applications will appear here once submitted.</p>
+      </div>
+    }
+
+    <!-- ── Empty: filter no-results ───────────────────── -->
+    @if (applications.length > 0 && filtered.length === 0) {
+      <div class="empty-card">
+        <mat-icon class="empty-icon" style="color:#CBD5E1">search_off</mat-icon>
+        <h3 class="empty-h3">No applications match your filters</h3>
+        <p class="empty-p">Try adjusting or clearing the active filters.</p>
+        <button class="clear-btn" style="margin-top:10px" (click)="clearFilters()">
+          <mat-icon>close</mat-icon> Clear Filters
+        </button>
+      </div>
+    }
+
+    <!-- ── Table ───────────────────────────────────────── -->
+    @if (filtered.length > 0) {
+      <div class="table-wrap">
+        <table class="app-table">
+          <thead>
+            <tr>
+              <th>ANIMAL</th>
+              <th>APPLICANT</th>
+              <th>REASON</th>
+              <th>HOUSING</th>
+              <th>APPLIED</th>
+              <th>STATUS</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (app of filtered; track app.id) {
+              <tr class="app-row" (click)="selected = app">
+                <td>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div class="ani-avatar">
+                      @if (app.animalPhotoUrl) {
+                        <img [src]="imgSrc(app.animalPhotoUrl)" [alt]="app.animalName" class="ani-avatar-img"
+                             (error)="$any($event.target).style.display='none'">
+                      } @else {
+                        <mat-icon class="ani-avatar-icon">pets</mat-icon>
+                      }
+                    </div>
+                    <div>
+                      <div class="cell-name">{{ app.animalName || ('Animal #' + app.animalId) }}</div>
+                      <div class="cell-sub">{{ app.animalSpecies || '—' }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="cell-main">Applicant #{{ app.applicantId }}</div>
+                  @if (app.housingType) {
+                    <div class="cell-sub">{{ app.housingType }}</div>
+                  }
+                </td>
+                <td>
+                  <div class="reason-clip">{{ app.reason || '—' }}</div>
+                </td>
+                <td>
+                  @if (app.housingType) {
+                    <span class="housing-chip">{{ app.housingType }}</span>
+                  } @else {
+                    <span class="cell-sub">—</span>
+                  }
+                </td>
+                <td>
+                  <div class="cell-main">{{ app.appliedAt ? fmtDate(app.appliedAt) : '—' }}</div>
+                </td>
+                <td>
+                  <span class="status-chip" [ngClass]="statusClass(app.status)">{{ app.status }}</span>
+                </td>
+                <td (click)="$event.stopPropagation()">
+                  @if (app.status === 'PENDING') {
+                    <div style="display:flex;gap:6px">
+                      <button class="btn-approve" (click)="review(app.id, 'APPROVED')" title="Approve">
+                        <mat-icon>check_circle</mat-icon>
+                      </button>
+                      <button class="btn-reject" (click)="review(app.id, 'REJECTED')" title="Reject">
+                        <mat-icon>cancel</mat-icon>
+                      </button>
+                    </div>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+  }
+
+  <!-- ── Detail Popup ────────────────────────────────────── -->
+  @if (selected) {
+    <div class="overlay" (click)="selected = null; reviewNote = ''">
+      <div class="popup" (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="popup-hdr">
+          <div class="popup-app-num">#{{ selected.id }}</div>
+          <div class="popup-hdr-info">
+            <span class="popup-type-pill">Adoption Application</span>
+            <div class="popup-name">{{ selected.animalName || ('Animal #' + selected.animalId) }}</div>
+            <div class="popup-breed">
+              {{ selected.animalSpecies || '' }}{{ selected.animalBreed ? ' · ' + selected.animalBreed : '' }}
+            </div>
+          </div>
+          <button class="popup-close" (click)="selected = null; reviewNote = ''">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="popup-body">
+
+          <!-- Status + date -->
+          <div class="popup-status-row">
+            <span class="status-chip" [ngClass]="statusClass(selected.status)">{{ selected.status }}</span>
+            @if (selected.appliedAt) {
+              <span class="popup-date">Applied {{ fmtDate(selected.appliedAt) }}</span>
+            }
+          </div>
+
+          <!-- Animal info block -->
+          <div class="section-head">Animal Details</div>
+          <div class="animal-block">
+            @if (selected.animalPhotoUrl) {
+              <img [src]="imgSrc(selected.animalPhotoUrl)" [alt]="selected.animalName" class="animal-thumb"
+                   (error)="$any($event.target).style.display='none'">
+            }
+            <div class="animal-facts">
+              <div class="detail-grid-sm">
+                <div class="detail-item">
+                  <div class="detail-label">Name</div>
+                  <div class="detail-val">{{ selected.animalName || '—' }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Species</div>
+                  <div class="detail-val">{{ selected.animalSpecies || '—' }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Breed</div>
+                  <div class="detail-val">{{ selected.animalBreed || '—' }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Age</div>
+                  <div class="detail-val">{{ fmtAge(selected.animalAgeMonths) }}</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+                @if (selected.animalIsVaccinated) { <span class="badge-vax">Vaccinated</span> }
+                @if (selected.animalIsNeutered)   { <span class="badge-neut">Neutered</span> }
+                @if (selected.animalCity)          { <span class="badge-city"><mat-icon>place</mat-icon>{{ selected.animalCity }}</span> }
+              </div>
+            </div>
+          </div>
+
+          <!-- Applicant info -->
+          <div class="section-head">Applicant Info</div>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <div class="detail-label">Applicant ID</div>
+              <div class="detail-val">#{{ selected.applicantId }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Housing Type</div>
+              <div class="detail-val">{{ selected.housingType || '—' }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Other Pets</div>
+              <div class="detail-val">{{ selected.hasOtherPets ? 'Yes' : 'No' }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Applied</div>
+              <div class="detail-val">{{ selected.appliedAt ? fmtDate(selected.appliedAt) : '—' }}</div>
+            </div>
+          </div>
+
+          @if (selected.reason) {
+            <div class="detail-notes">
+              <div class="detail-label" style="margin-bottom:6px">Reason for Adoption</div>
+              <div class="notes-box">{{ selected.reason }}</div>
+            </div>
+          }
+
+          @if (selected.experience) {
+            <div class="detail-notes">
+              <div class="detail-label" style="margin-bottom:6px">Pet Experience</div>
+              <div class="notes-box">{{ selected.experience }}</div>
+            </div>
+          }
+
+          @if (selected.adminNotes) {
+            <div class="detail-notes">
+              <div class="detail-label" style="margin-bottom:6px">Admin Notes</div>
+              <div class="notes-box">{{ selected.adminNotes }}</div>
+            </div>
+          }
+
+          <!-- Review notes (only shown when pending) -->
+          @if (selected.status === 'PENDING') {
+            <div class="detail-notes">
+              <div class="detail-label" style="margin-bottom:6px">Review Notes <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:0.7rem;color:#B0BEC5">(optional — sent to applicant)</span></div>
+              <textarea class="notes-input" rows="2"
+                        [(ngModel)]="reviewNote"
+                        placeholder="Add a reason or message for the applicant…"></textarea>
+            </div>
+          }
+
+          <!-- Actions -->
+          @if (selected.status === 'PENDING') {
+            <div class="popup-actions">
+              <button class="btn-approve-wide" (click)="review(selected.id, 'APPROVED', reviewNote)">
+                <mat-icon>check_circle</mat-icon> Approve Application
+              </button>
+              <button class="btn-reject-wide" (click)="review(selected.id, 'REJECTED', reviewNote)">
+                <mat-icon>cancel</mat-icon> Reject
+              </button>
+            </div>
+          }
+
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

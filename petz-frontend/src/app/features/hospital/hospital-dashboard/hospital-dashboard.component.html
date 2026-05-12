@@ -1,0 +1,347 @@
+<div class="page-container">
+
+  <!-- ── Header ── -->
+  <div class="page-header" style="margin-bottom:20px">
+    <div class="page-header-left">
+      <h1 style="margin-bottom:2px">Hospital Dashboard</h1>
+      <p style="margin:0">
+        @if (hospital?.name) {
+          <span style="color:#2EB894;font-weight:700">{{ hospital.name }}</span>
+          &nbsp;·&nbsp;
+        }
+        Welcome back — here's your operation overview
+      </p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="today-badge">
+        <mat-icon>today</mat-icon>
+        <span>{{ todayLabel }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Pending alert bar ── -->
+  @if (!loading && pendingCount > 0) {
+    <div class="alert-bar" routerLink="/hospital/appointments" style="cursor:pointer">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="blink-dot"></span>
+        <strong>{{ pendingCount }} appointment{{ pendingCount > 1 ? 's' : '' }} awaiting confirmation</strong>
+        <span style="opacity:0.75;font-size:0.82rem">— review and confirm to notify pet owners</span>
+      </div>
+      <mat-icon style="opacity:0.8">arrow_forward</mat-icon>
+    </div>
+  }
+
+  <!-- ── Profile card ── -->
+  @if (hospital) {
+    <div class="profile-card">
+      <div class="profile-left-stripe"></div>
+      <div class="profile-logo">
+        @if (hospital.logoUrl) {
+          <img [src]="hospital.logoUrl" [alt]="hospital.name">
+        } @else {
+          <mat-icon>local_hospital</mat-icon>
+        }
+      </div>
+      <div class="profile-info">
+        <div class="profile-name">{{ hospital.name }}</div>
+        <div class="profile-meta">
+          @if (hospital.address || hospital.city) {
+            <span class="meta-item">
+              <mat-icon>place</mat-icon>
+              {{ hospital.address }}{{ hospital.city ? ', ' + hospital.city : '' }}
+            </span>
+          }
+          @if (hospital.phone) {
+            <span class="meta-item">
+              <mat-icon>phone</mat-icon>{{ hospital.phone }}
+            </span>
+          }
+          @if (hospital.email) {
+            <span class="meta-item">
+              <mat-icon>email</mat-icon>{{ hospital.email }}
+            </span>
+          }
+        </div>
+      </div>
+      <div class="profile-badge">
+        <mat-icon style="font-size:14px;width:14px;height:14px;vertical-align:middle;margin-right:3px">verified</mat-icon>
+        Registered
+      </div>
+    </div>
+  }
+
+  <!-- ── KPI strip ── -->
+  <div class="kpi-strip">
+
+    <div class="kpi-item">
+      <div class="kpi-icon-box" style="background:linear-gradient(135deg,#6BAEE8,#4F8FD4)">
+        <mat-icon>today</mat-icon>
+      </div>
+      <div class="kpi-text">
+        <div class="kpi-val" style="color:#4F8FD4">{{ todayCount }}</div>
+        <div class="kpi-label">Today</div>
+        <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#4F8FD4" [style.width.%]="pctOf(todayCount, totalCount)"></div></div>
+      </div>
+    </div>
+
+    <div class="kpi-item">
+      <div class="kpi-icon-box" style="background:linear-gradient(135deg,#50CCA8,#2EB894)">
+        <mat-icon>medical_services</mat-icon>
+      </div>
+      <div class="kpi-text">
+        <div class="kpi-val" style="color:#2EB894">{{ doctorCount }}</div>
+        <div class="kpi-label">Doctors</div>
+        <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#2EB894;width:100%"></div></div>
+      </div>
+    </div>
+
+    <div class="kpi-item">
+      <div class="kpi-icon-box" style="background:linear-gradient(135deg,#F0A85A,#E89340)">
+        <mat-icon>schedule</mat-icon>
+      </div>
+      <div class="kpi-text">
+        <div class="kpi-val" style="color:#E89340">{{ pendingCount }}</div>
+        <div class="kpi-label">Pending</div>
+        <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#E89340" [style.width.%]="pctOf(pendingCount, totalCount)"></div></div>
+      </div>
+    </div>
+
+    <div class="kpi-item">
+      <div class="kpi-icon-box" style="background:linear-gradient(135deg,#9B82E0,#7C62CC)">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+      <div class="kpi-text">
+        <div class="kpi-val" style="color:#7C62CC">{{ completedCount }}</div>
+        <div class="kpi-label">Completed</div>
+        <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#7C62CC" [style.width.%]="pctOf(completedCount, totalCount)"></div></div>
+      </div>
+    </div>
+
+    <div class="kpi-divider"></div>
+
+    <div class="kpi-item">
+      <div class="kpi-icon-box" style="background:linear-gradient(135deg,#E87070,#E05858)">
+        <mat-icon>cancel</mat-icon>
+      </div>
+      <div class="kpi-text">
+        <div class="kpi-val" style="color:#E05858">{{ cancelledCount }}</div>
+        <div class="kpi-label">Cancelled</div>
+        <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#E05858" [style.width.%]="pctOf(cancelledCount, totalCount)"></div></div>
+      </div>
+    </div>
+
+    <div class="kpi-item">
+      <div class="kpi-icon-box" style="background:linear-gradient(135deg,#4A7CC4,#1A3547)">
+        <mat-icon>event_note</mat-icon>
+      </div>
+      <div class="kpi-text">
+        <div class="kpi-val" style="color:#1A3547">{{ totalCount }}</div>
+        <div class="kpi-label">Total</div>
+        <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#1A3547;width:100%"></div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Charts row ── -->
+  <div class="charts-row">
+
+    <!-- Appointment Status Donut -->
+    <div class="chart-panel">
+      <div class="panel-title">Appointment Status</div>
+      @if (loading) {
+        <div class="chart-loading"><mat-spinner diameter="28"></mat-spinner></div>
+      } @else if (totalCount === 0) {
+        <div class="chart-empty">No appointments yet</div>
+      } @else {
+        <div class="donut-wrap">
+          <svg width="160" height="160" viewBox="0 0 160 160">
+            @for (seg of statusSegs; track $index) {
+              <circle cx="80" cy="80" r="34" fill="none"
+                      [attr.stroke]="seg.color" stroke-width="22"
+                      [attr.stroke-dasharray]="seg.dash"
+                      [attr.stroke-dashoffset]="seg.offset"
+                      transform="rotate(-90 80 80)"/>
+            }
+            <text x="80" y="76" text-anchor="middle" font-size="22" font-weight="900" fill="#1A3547">{{ totalCount }}</text>
+            <text x="80" y="92" text-anchor="middle" font-size="10" font-weight="600" fill="#8BA3B5">TOTAL</text>
+          </svg>
+          <div class="donut-legend">
+            <div class="legend-item">
+              <span class="leg-dot" style="background:#E89340"></span>
+              <span class="leg-label">Pending</span>
+              <span class="leg-val">{{ pendingCount }}</span>
+            </div>
+            <div class="legend-item">
+              <span class="leg-dot" style="background:#4F8FD4"></span>
+              <span class="leg-label">Confirmed</span>
+              <span class="leg-val">{{ confirmedCount }}</span>
+            </div>
+            <div class="legend-item">
+              <span class="leg-dot" style="background:#2EB894"></span>
+              <span class="leg-label">Completed</span>
+              <span class="leg-val">{{ completedCount }}</span>
+            </div>
+            <div class="legend-item">
+              <span class="leg-dot" style="background:#E05858"></span>
+              <span class="leg-label">Cancelled</span>
+              <span class="leg-val">{{ cancelledCount }}</span>
+            </div>
+            @if (noShowCount > 0) {
+              <div class="legend-item">
+                <span class="leg-dot" style="background:#94A3B8"></span>
+                <span class="leg-label">No Show</span>
+                <span class="leg-val">{{ noShowCount }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Weekly Breakdown — smooth line chart -->
+    <div class="chart-panel">
+      <div class="panel-title">
+        This Week
+        <span class="panel-sub">{{ weekLabel }}</span>
+      </div>
+      @if (loading) {
+        <div class="chart-loading"><mat-spinner diameter="28"></mat-spinner></div>
+      } @else if (totalCount === 0) {
+        <div class="chart-empty">No appointments this week</div>
+      } @else {
+        <svg class="line-chart-svg" viewBox="0 0 300 120" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="lcAreaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#4F8FD4" stop-opacity="0.22"/>
+              <stop offset="100%" stop-color="#4F8FD4" stop-opacity="0.01"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Horizontal gridlines -->
+          <line x1="20" y1="15"  x2="280" y2="15"  stroke="#EEF1F5" stroke-width="1"/>
+          <line x1="20" y1="55"  x2="280" y2="55"  stroke="#EEF1F5" stroke-width="1"/>
+          <line x1="20" y1="95"  x2="280" y2="95"  stroke="#EEF1F5" stroke-width="1"/>
+
+          <!-- Area fill under the line -->
+          <path [attr.d]="weekAreaPath" fill="url(#lcAreaGrad)"/>
+
+          <!-- The line itself -->
+          <path [attr.d]="weekLinePath"
+                fill="none" stroke="#4F8FD4" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round"/>
+
+          <!-- Data points, count labels, day labels -->
+          @for (pt of weekLinePoints; track pt.name) {
+
+            <!-- Count label above each point (skip zeros) -->
+            @if (pt.count > 0) {
+              <text [attr.x]="pt.x" [attr.y]="pt.y - 7"
+                    text-anchor="middle" font-size="8" font-weight="700"
+                    [attr.fill]="pt.isToday ? '#4F8FD4' : '#4A6478'">{{ pt.count }}</text>
+            }
+
+            <!-- Regular point: white fill, blue stroke -->
+            @if (!pt.isToday) {
+              <circle [attr.cx]="pt.x" [attr.cy]="pt.y"
+                      r="3.5" fill="#fff" stroke="#4F8FD4" stroke-width="2"/>
+            }
+
+            <!-- Today: solid filled bullseye -->
+            @if (pt.isToday) {
+              <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="6" fill="#4F8FD4" opacity="0.18"/>
+              <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="4"  fill="#4F8FD4"/>
+              <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="1.8" fill="#fff"/>
+            }
+
+            <!-- Day label at bottom -->
+            <text [attr.x]="pt.x" y="113"
+                  text-anchor="middle" font-size="7.5" font-weight="700"
+                  [attr.fill]="pt.isToday ? '#4F8FD4' : '#B0C4D4'"
+                  style="text-transform:uppercase;letter-spacing:0.04em">{{ pt.name }}</text>
+          }
+        </svg>
+      }
+    </div>
+
+    <!-- Doctor capacity panel -->
+    <div class="chart-panel">
+      <div class="panel-title">Doctor Capacity</div>
+      @if (loading) {
+        <div class="chart-loading"><mat-spinner diameter="28"></mat-spinner></div>
+      } @else if (doctorCount === 0) {
+        <div class="chart-empty">No doctors added</div>
+      } @else {
+        <div class="doctor-capacity">
+          <div class="cap-stat">
+            <div class="cap-big" style="color:#2EB894">{{ scheduledDoctors }}</div>
+            <div class="cap-lbl">Scheduled</div>
+          </div>
+          <div class="cap-divider"></div>
+          <div class="cap-stat">
+            <div class="cap-big" style="color:#E89340">{{ doctorCount - scheduledDoctors }}</div>
+            <div class="cap-lbl">No Schedule</div>
+          </div>
+          <div class="cap-divider"></div>
+          <div class="cap-stat">
+            <div class="cap-big" style="color:#4F8FD4">{{ totalDailySlots }}</div>
+            <div class="cap-lbl">Slots/Day</div>
+          </div>
+        </div>
+        <div class="spec-list">
+          @for (spec of topSpecs; track spec.name) {
+            <div class="spec-row">
+              <span class="spec-name">{{ spec.name }}</span>
+              <span class="spec-count">{{ spec.count }} dr{{ spec.count > 1 ? 's' : '' }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+  </div>
+
+  <!-- ── Nav cards ── -->
+  <div class="nav-grid">
+
+    <div class="nav-card" routerLink="/hospital/appointments">
+      <div class="nav-stripe" style="background:linear-gradient(180deg,#4F8FD4,#7C62CC)"></div>
+      <div class="nav-icon-wrap" style="background:linear-gradient(135deg,#1A3B7A,#4F8FD4)">
+        <mat-icon>event</mat-icon>
+      </div>
+      <div class="nav-body">
+        <div class="nav-title">Appointments</div>
+        <div class="nav-desc">View and manage all scheduled visits</div>
+      </div>
+      <div class="nav-right">
+        @if (pendingCount > 0) {
+          <span class="nav-chip amber">{{ pendingCount }} pending</span>
+        }
+        @if (todayCount > 0) {
+          <span class="nav-chip blue">{{ todayCount }} today</span>
+        }
+        <mat-icon class="nav-arrow">chevron_right</mat-icon>
+      </div>
+    </div>
+
+    <div class="nav-card" routerLink="/hospital/doctors">
+      <div class="nav-stripe" style="background:linear-gradient(180deg,#2EB894,#4F8FD4)"></div>
+      <div class="nav-icon-wrap" style="background:linear-gradient(135deg,#0A5840,#2EB894)">
+        <mat-icon>medical_services</mat-icon>
+      </div>
+      <div class="nav-body">
+        <div class="nav-title">Manage Doctors</div>
+        <div class="nav-desc">Add, view and manage medical staff</div>
+      </div>
+      <div class="nav-right">
+        @if (doctorCount > 0) {
+          <span class="nav-chip teal">{{ doctorCount }} doctor{{ doctorCount !== 1 ? 's' : '' }}</span>
+        }
+        <mat-icon class="nav-arrow">chevron_right</mat-icon>
+      </div>
+    </div>
+
+  </div>
+
+</div>

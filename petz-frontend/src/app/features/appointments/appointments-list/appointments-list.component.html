@@ -1,0 +1,302 @@
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-header-left" style="display:flex;align-items:center">
+      <button mat-icon-button routerLink="/dashboard"
+              style="background:#fff;border:1px solid #F0E0D6;border-radius:10px;margin-right:12px">
+        <mat-icon style="color:#4A6478">arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1>My Appointments</h1>
+        <p>Track all your scheduled vet visits</p>
+      </div>
+    </div>
+    <div class="page-header-actions">
+      <button mat-raised-button color="primary" routerLink="/appointments/book">
+        <mat-icon>add</mat-icon> Book Appointment
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-state">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Fetching appointments...</span>
+    </div>
+  }
+
+  @if (!loading) {
+    <!-- Empty -->
+    @if (appointments.length === 0) {
+      <div class="card">
+        <div class="empty-state">
+          <div class="empty-icon">
+            <mat-icon>event_busy</mat-icon>
+          </div>
+          <h3>No appointments</h3>
+          <p>You haven't booked any vet visits yet. Schedule one for your pet today.</p>
+          <button mat-raised-button color="primary" routerLink="/appointments/book" style="margin-top:8px">
+            <mat-icon>add</mat-icon> Book Now
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (appointments.length > 0) {
+
+      <!-- Stat strip -->
+      <div class="stat-strip">
+        <div class="stat-pill">
+          <span class="stat-num">{{ appointments.length }}</span>
+          <span class="stat-lbl">Total</span>
+        </div>
+        <div class="stat-pill stat-upcoming">
+          <span class="stat-num">{{ upcomingCount }}</span>
+          <span class="stat-lbl">Upcoming</span>
+        </div>
+        <div class="stat-pill stat-completed">
+          <span class="stat-num">{{ completedCount }}</span>
+          <span class="stat-lbl">Completed</span>
+        </div>
+      </div>
+
+      <!-- Week Strip -->
+      <div class="week-strip-card">
+
+        <!-- All-appointments toggle — distinct from day cells -->
+        <div class="week-all-row">
+          <button class="all-btn" [class.all-btn-active]="!selectedDate"
+                  (click)="selectedDate = null; applyFilters()">
+            <mat-icon>event_note</mat-icon>
+            All Appointments
+            <span class="all-count">{{ appointments.length }}</span>
+          </button>
+          <span class="week-label">
+            Week of {{ weekDays[0]?.num }} – {{ weekDays[6]?.num }}
+            {{ weekDays[6]?.label }}
+          </span>
+        </div>
+
+        <!-- 7-day strip -->
+        <div class="week-nav">
+          <button class="week-nav-btn" (click)="changeWeek(-1)">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <div class="week-days">
+            @for (d of weekDays; track d.key) {
+              <div class="day-cell"
+                   [class.day-selected]="selectedDate === d.key"
+                   [class.day-today]="d.isToday"
+                   (click)="selectDay(d.key)">
+                <span class="day-lbl">{{ d.label }}</span>
+                <span class="day-num">{{ d.num }}</span>
+                @if (d.hasAppts) { <span class="day-dot"></span> }
+                @else { <span class="day-dot-empty"></span> }
+              </div>
+            }
+          </div>
+          <button class="week-nav-btn" (click)="changeWeek(1)">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar-card">
+        <div class="search-wrap">
+          <mat-icon class="search-icon">search</mat-icon>
+          <input class="search-input" [(ngModel)]="filter.search" (ngModelChange)="applyFilters()"
+                 placeholder="Search by reason, hospital, doctor…">
+        </div>
+        <div class="select-group">
+          <label class="select-label">Status</label>
+          <select class="fsel" [(ngModel)]="filter.status" (ngModelChange)="applyFilters()">
+            <option value="">All</option>
+            <option value="PENDING">Pending</option>
+            <option value="CONFIRMED">Confirmed</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+        </div>
+        <div class="select-group">
+          <label class="select-label">Sort</label>
+          <select class="fsel" [(ngModel)]="filter.sort" (ngModelChange)="applyFilters()">
+            <option value="upcoming">Upcoming First</option>
+            <option value="newest">Newest Booked</option>
+            <option value="oldest">Oldest Booked</option>
+          </select>
+        </div>
+        @if (hasActiveFilters) {
+          <button class="clear-btn" (click)="clearFilters()">
+            <mat-icon>close</mat-icon> Clear
+          </button>
+        }
+      </div>
+
+      <!-- Results count -->
+      <div class="results-count">Showing {{ filtered.length }} of {{ appointments.length }} appointments</div>
+
+      <!-- Appointments list -->
+      <div class="card-flat">
+        @for (a of filtered; track a.id) {
+          <div class="appt-row" (click)="selected = a" style="cursor:pointer">
+            <div class="appt-date-badge">
+              <div class="appt-day">{{ getDay(a.apptDate) }}</div>
+              <div class="appt-month">{{ getMonth(a.apptDate) }}</div>
+            </div>
+
+            <div class="appt-details">
+              <div class="appt-title">{{ a.reason || 'General Checkup' }}</div>
+              <div class="appt-sub">
+                <mat-icon>schedule</mat-icon>
+                {{ a.apptTime || '—' }}
+              </div>
+            </div>
+
+            <div class="appt-right">
+              <span class="chip" [ngClass]="a.status.toLowerCase()">{{ a.status }}</span>
+              @if (a.status === 'PENDING' || a.status === 'CONFIRMED') {
+                <button mat-icon-button class="cancel-btn"
+                        (click)="cancel(a.id); $event.stopPropagation()" title="Cancel appointment">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              }
+            </div>
+          </div>
+        }
+        @if (filtered.length === 0) {
+          <div style="padding:32px;text-align:center;color:#8BA3B5;font-size:0.88rem">
+            No appointments match your filters.
+          </div>
+        }
+      </div>
+    }
+  }
+
+</div>
+
+<!-- Detail Modal -->
+@if (selected) {
+  <div class="modal-backdrop" (click)="selected = null">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">Appointment Details</div>
+          <div class="modal-sub">{{ formatFullDate(selected.apptDate) }}</div>
+        </div>
+        <button mat-icon-button (click)="selected = null">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="detail-row">
+          <mat-icon class="detail-icon">event</mat-icon>
+          <div>
+            <div class="detail-label">Date</div>
+            <div class="detail-value">{{ formatFullDate(selected.apptDate) }}</div>
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <mat-icon class="detail-icon">schedule</mat-icon>
+          <div>
+            <div class="detail-label">Time</div>
+            <div class="detail-value">{{ formatTime(selected.apptTime) }}</div>
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <mat-icon class="detail-icon">info</mat-icon>
+          <div>
+            <div class="detail-label">Status</div>
+            <span class="chip" [ngClass]="selected.status.toLowerCase()">{{ selected.status }}</span>
+          </div>
+        </div>
+
+        @if (selected.hospitalName) {
+          <div class="detail-row">
+            <mat-icon class="detail-icon">local_hospital</mat-icon>
+            <div>
+              <div class="detail-label">Hospital</div>
+              <div class="detail-value">{{ selected.hospitalName }}</div>
+              @if (selected.hospitalCity || selected.hospitalAddress) {
+                <div class="detail-meta">{{ selected.hospitalAddress }}{{ selected.hospitalCity ? ', ' + selected.hospitalCity : '' }}</div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (selected.doctorName) {
+          <div class="detail-row">
+            <mat-icon class="detail-icon">person</mat-icon>
+            <div>
+              <div class="detail-label">Doctor</div>
+              <div class="detail-value">Dr. {{ selected.doctorName }}</div>
+              @if (selected.doctorSpecialization) {
+                <div class="detail-meta">{{ selected.doctorSpecialization }}</div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (selected.petName) {
+          <div class="detail-row">
+            <mat-icon class="detail-icon">pets</mat-icon>
+            <div>
+              <div class="detail-label">Pet</div>
+              <div class="detail-value">{{ selected.petName }}</div>
+              @if (selected.petBreed || selected.petSpecies) {
+                <div class="detail-meta">{{ selected.petBreed || selected.petSpecies }}</div>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="detail-row">
+          <mat-icon class="detail-icon">medical_services</mat-icon>
+          <div>
+            <div class="detail-label">Reason for Visit</div>
+            <div class="detail-value">{{ selected.reason || 'General Checkup' }}</div>
+          </div>
+        </div>
+
+        @if (selected.notes) {
+          <div class="detail-row">
+            <mat-icon class="detail-icon">notes</mat-icon>
+            <div>
+              <div class="detail-label">Notes</div>
+              <div class="detail-value">{{ selected.notes }}</div>
+            </div>
+          </div>
+        }
+
+        @if (selected.createdAt) {
+          <div class="detail-row">
+            <mat-icon class="detail-icon">history</mat-icon>
+            <div>
+              <div class="detail-label">Booked On</div>
+              <div class="detail-value">{{ formatFullDate(selected.createdAt) }}</div>
+            </div>
+          </div>
+        }
+
+      </div>
+
+      @if (selected.status === 'PENDING' || selected.status === 'CONFIRMED') {
+        <div class="modal-footer">
+          <button mat-stroked-button class="cancel-appt-btn"
+                  (click)="cancel(selected.id); selected = null">
+            <mat-icon>cancel</mat-icon> Cancel Appointment
+          </button>
+        </div>
+      }
+
+    </div>
+  </div>
+}

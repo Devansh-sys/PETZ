@@ -1,0 +1,26 @@
+.form-section-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #8BA3B5;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #E0EBF2;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+.field-group { margin-bottom: 4px; }
+.field-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #1A3547;
+  margin-bottom: 6px;
+}
+@media (max-width: 560px) {
+  .form-row { grid-template-columns: 1fr; }
+}

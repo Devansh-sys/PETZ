@@ -1,0 +1,166 @@
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-header-left" style="display:flex;align-items:center">
+      <button mat-icon-button routerLink="/dashboard"
+              style="background:#fff;border:1px solid #E0EBF2;border-radius:10px;margin-right:12px">
+        <mat-icon style="color:#4A6478">arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1>Find Your Companion</h1>
+        <p>Animals looking for a loving forever home</p>
+      </div>
+    </div>
+    <div class="page-header-actions">
+      <button mat-stroked-button routerLink="/adoption/my"
+              style="border-radius:10px;color:#4A6478;border-color:#C8DCE8">
+        <mat-icon>assignment</mat-icon> My Applications
+      </button>
+    </div>
+  </div>
+
+  <!-- Search filters (API-based) -->
+  <div class="search-bar-card">
+    <div class="search-field">
+      <mat-icon>search</mat-icon>
+      <input [(ngModel)]="filters.species" placeholder="Species (Dog, Cat, Bird...)"
+             (keyup.enter)="search()">
+    </div>
+    <div class="search-divider"></div>
+    <div class="search-field">
+      <mat-icon>place</mat-icon>
+      <input [(ngModel)]="filters.city" placeholder="City or area"
+             (keyup.enter)="search()">
+    </div>
+    <button mat-raised-button color="primary" (click)="search()" class="search-btn">
+      <mat-icon>search</mat-icon> Search
+    </button>
+  </div>
+
+  <!-- Client-side secondary filter bar -->
+  <div class="client-filter-bar">
+    <div class="select-group">
+      <label class="select-label">Gender</label>
+      <select class="fsel" [(ngModel)]="clientFilter.gender" (ngModelChange)="applyClientFilters()">
+        <option value="">All</option>
+        <option value="MALE">Male</option>
+        <option value="FEMALE">Female</option>
+      </select>
+    </div>
+    <button class="toggle-chip" [class.chip-active]="clientFilter.vaccinated"
+            (click)="clientFilter.vaccinated = !clientFilter.vaccinated; applyClientFilters()">
+      💉 Vaccinated
+    </button>
+    <button class="toggle-chip" [class.chip-active]="clientFilter.neutered"
+            (click)="clientFilter.neutered = !clientFilter.neutered; applyClientFilters()">
+      ✂️ Neutered
+    </button>
+    <div class="select-group">
+      <label class="select-label">Sort</label>
+      <select class="fsel" [(ngModel)]="clientFilter.sort" (ngModelChange)="applyClientFilters()">
+        <option value="newest">Newest First</option>
+        <option value="name">Name A–Z</option>
+        <option value="youngest">Age: Youngest</option>
+        <option value="oldest_age">Age: Oldest</option>
+      </select>
+    </div>
+    @if (hasClientFilters) {
+      <button class="clear-btn" (click)="clearClientFilters()">
+        <mat-icon>close</mat-icon> Clear
+      </button>
+    }
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-state">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Finding animals near you...</span>
+    </div>
+  }
+
+  @if (!loading) {
+    <!-- Results count -->
+    @if (allAnimals.length > 0) {
+      <div class="results-count">
+        <span>Showing {{ displayed.length }} of {{ allAnimals.length }} animals available for adoption</span>
+      </div>
+    }
+
+    <!-- Animal cards -->
+    @if (allAnimals.length === 0) {
+      <div class="card">
+        <div class="empty-state">
+          <div class="empty-icon">
+            <mat-icon>favorite_border</mat-icon>
+          </div>
+          <h3>No animals found</h3>
+          <p>Try adjusting your search filters or check back later for new arrivals.</p>
+          <button mat-stroked-button (click)="clearFilters()" style="margin-top:8px;border-radius:10px">
+            Clear filters
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (displayed.length === 0 && allAnimals.length > 0) {
+      <div class="card">
+        <div class="empty-state">
+          <div class="empty-icon"><mat-icon>filter_alt_off</mat-icon></div>
+          <h3>No matches</h3>
+          <p>No animals match your current filters. Try clearing some filters.</p>
+          <button mat-stroked-button (click)="clearClientFilters()" style="margin-top:8px;border-radius:10px">
+            Clear filters
+          </button>
+        </div>
+      </div>
+    }
+
+    <div class="animal-grid">
+      @for (a of displayed; track a.id) {
+        <div class="animal-card" [routerLink]="['/adoption/animals', a.id]">
+          <div class="animal-img-wrap">
+            @if (imgSrc(a.photoUrl)) {
+              <img [src]="imgSrc(a.photoUrl)" [alt]="a.name"
+                   (error)="$any($event.target).style.display='none'">
+            }
+            <div class="animal-species-tag">{{ a.species }}</div>
+            @if (a.isAdoptionReady) {
+              <div class="ready-badge">
+                <mat-icon>check_circle</mat-icon> Ready to adopt
+              </div>
+            }
+          </div>
+          <div class="animal-body">
+            <div class="animal-name">{{ a.name }}</div>
+            <div class="animal-meta">
+              {{ a.breed || 'Mixed' }}
+              @if (a.ageMonths) { · {{ a.ageMonths < 12 ? a.ageMonths + ' mo' : (a.ageMonths / 12 | number:'1.0-1') + ' yr' }} }
+            </div>
+            @if (a.city) {
+              <div class="animal-location">
+                <mat-icon>place</mat-icon> {{ a.city }}
+              </div>
+            }
+            <div class="animal-tags">
+              @if (a.isVaccinated) {
+                <span class="tag tag-green">💉 Vaccinated</span>
+              }
+              @if (a.isNeutered) {
+                <span class="tag tag-blue">✂️ Neutered</span>
+              }
+            </div>
+          </div>
+          <div class="animal-cta">
+            <button mat-raised-button color="primary" class="adopt-btn"
+                    [routerLink]="['/adoption/animals', a.id]">
+              View Profile
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>
