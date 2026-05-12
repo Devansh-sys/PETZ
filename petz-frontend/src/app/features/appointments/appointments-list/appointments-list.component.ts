@@ -322,7 +322,7 @@ import { Appointment } from '../../../core/models/appointment.model';
     }
     .stat-num { font-weight: 900; font-size: 0.95rem; color: #1A3547; }
     .stat-lbl { font-size: 0.74rem; color: #8BA3B5; }
-    .stat-upcoming { background: #FFF3E8; border-color: #FDBF8A; .stat-num { color: #FF8C42; } }
+    .stat-upcoming { background: #FFF7ED; border-color: #C8DCE8; .stat-num { color: #FF8C42; } }
     .stat-completed { background: #D1FAE5; border-color: #A7F3D0; .stat-num { color: #065F46; } }
 
     /* ── Week strip ── */
@@ -345,7 +345,7 @@ import { Appointment } from '../../../core/models/appointment.model';
       &:hover { border-color: #FF8C42; color: #FF8C42; }
     }
     .all-btn-active {
-      background: #FFF3E8; border-color: #FF8C42; color: #FF8C42;
+      background: #FFF7ED; border-color: #FF8C42; color: #FF8C42;
       .all-count { background: #FF8C42; color: #fff; }
     }
     .all-count {
@@ -434,7 +434,7 @@ import { Appointment } from '../../../core/models/appointment.model';
       align-items: center;
       gap: 18px;
       padding: 16px 22px;
-      border-bottom: 1px solid #FAF0EB;
+      border-bottom: 1px solid #E0EBF2;
       transition: background 0.15s;
       &:last-child { border-bottom: none; }
       &:hover { background: #FFF7ED; }
@@ -442,7 +442,7 @@ import { Appointment } from '../../../core/models/appointment.model';
     .appt-date-badge {
       min-width: 54px;
       text-align: center;
-      background: #FFEDD5;
+      background: #FFF7ED;
       border-radius: 14px;
       padding: 8px 6px;
     }
@@ -488,7 +488,7 @@ import { Appointment } from '../../../core/models/appointment.model';
     .modal-header {
       display: flex; align-items: flex-start; justify-content: space-between;
       padding: 22px 22px 16px;
-      border-bottom: 1px solid #FAF0EB;
+      border-bottom: 1px solid #E0EBF2;
       background: linear-gradient(135deg, #FFF7ED 0%, #fff 100%);
     }
     .modal-title { font-size: 1.1rem; font-weight: 800; color: #1A3547; }
@@ -508,7 +508,7 @@ import { Appointment } from '../../../core/models/appointment.model';
 
     .modal-footer {
       padding: 14px 22px 20px;
-      border-top: 1px solid #FAF0EB;
+      border-top: 1px solid #E0EBF2;
     }
     .cancel-appt-btn {
       width: 100%; border-color: #DC2626 !important; color: #DC2626 !important; border-radius: 10px !important;

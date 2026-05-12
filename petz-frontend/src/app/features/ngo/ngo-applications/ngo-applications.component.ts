@@ -199,7 +199,7 @@ import { environment } from '../../../../environments/environment';
 
       <!-- ── Detail Popup ────────────────────────────────────── -->
       @if (selected) {
-        <div class="overlay" (click)="selected = null">
+        <div class="overlay" (click)="selected = null; reviewNote = ''">
           <div class="popup" (click)="$event.stopPropagation()">
 
             <!-- Header -->
@@ -212,7 +212,7 @@ import { environment } from '../../../../environments/environment';
                   {{ selected.animalSpecies || '' }}{{ selected.animalBreed ? ' · ' + selected.animalBreed : '' }}
                 </div>
               </div>
-              <button class="popup-close" (click)="selected = null">
+              <button class="popup-close" (click)="selected = null; reviewNote = ''">
                 <mat-icon>close</mat-icon>
               </button>
             </div>
@@ -304,13 +304,23 @@ import { environment } from '../../../../environments/environment';
                 </div>
               }
 
+              <!-- Review notes (only shown when pending) -->
+              @if (selected.status === 'PENDING') {
+                <div class="detail-notes">
+                  <div class="detail-label" style="margin-bottom:6px">Review Notes <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:0.7rem;color:#B0BEC5">(optional — sent to applicant)</span></div>
+                  <textarea class="notes-input" rows="2"
+                            [(ngModel)]="reviewNote"
+                            placeholder="Add a reason or message for the applicant…"></textarea>
+                </div>
+              }
+
               <!-- Actions -->
               @if (selected.status === 'PENDING') {
                 <div class="popup-actions">
-                  <button class="btn-approve-wide" (click)="review(selected.id, 'APPROVED')">
+                  <button class="btn-approve-wide" (click)="review(selected.id, 'APPROVED', reviewNote)">
                     <mat-icon>check_circle</mat-icon> Approve Application
                   </button>
-                  <button class="btn-reject-wide" (click)="review(selected.id, 'REJECTED')">
+                  <button class="btn-reject-wide" (click)="review(selected.id, 'REJECTED', reviewNote)">
                     <mat-icon>cancel</mat-icon> Reject
                   </button>
                 </div>
@@ -366,9 +376,9 @@ import { environment } from '../../../../environments/environment';
     }
     .app-row { cursor: pointer; transition: background 0.15s; &:hover { background: #FAFCFF; } }
 
-    .ani-avatar     { width: 40px; height: 40px; border-radius: 12px; overflow: hidden; background: #FFF4EE; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .ani-avatar     { width: 40px; height: 40px; border-radius: 12px; overflow: hidden; background: #FFF7ED; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     .ani-avatar-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .ani-avatar-icon{ font-size: 20px !important; width: 20px !important; height: 20px !important; color: #FDBF8A; }
+    .ani-avatar-icon{ font-size: 20px !important; width: 20px !important; height: 20px !important; color: #C8DCE8; }
 
     .cell-name    { font-weight: 800; font-size: 0.85rem; color: #1A3547; }
     .cell-main    { font-weight: 600; font-size: 0.82rem; color: #2D4A5E; }
@@ -422,6 +432,7 @@ import { environment } from '../../../../environments/environment';
     .badge-neut { font-size: 0.6rem; font-weight: 700; padding: 3px 7px; border-radius: 6px; background: #EEF0FC; color: #5040A0; }
     .badge-city { font-size: 0.6rem; font-weight: 700; padding: 3px 7px; border-radius: 6px; background: #F0F4FF; color: #3A6EA8; display: flex; align-items: center; gap: 2px; mat-icon { font-size: 10px; width: 10px; height: 10px; } }
 
+    .notes-input { width: 100%; border: 1px solid #E0EBF2; border-radius: 12px; padding: 10px 14px; font-size: 0.82rem; color: #1A3547; background: #F8FAFB; outline: none; resize: vertical; box-sizing: border-box; font-family: inherit; &:focus { border-color: #7C62CC; background: #fff; } }
     .popup-actions { display: flex; gap: 10px; margin-top: 6px; }
     .btn-approve-wide { display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; height: 42px; border-radius: 12px; border: none; background: #2EB894; color: #fff; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: background 0.15s; mat-icon { font-size: 17px; width: 17px; height: 17px; } &:hover { background: #1E9A7A; } }
     .btn-reject-wide  { display: flex; align-items: center; gap: 6px; padding: 0 18px; height: 42px; border-radius: 12px; border: 1px solid #FECACA; background: #FEF2F2; color: #E05858; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.15s; mat-icon { font-size: 17px; width: 17px; height: 17px; } &:hover { background: #FECACA; border-color: #E05858; } }
@@ -430,8 +441,9 @@ import { environment } from '../../../../environments/environment';
 export class NgoApplicationsComponent implements OnInit {
   applications: AdoptionApplication[] = [];
   filtered:     AdoptionApplication[] = [];
-  loading  = true;
-  selected: AdoptionApplication | null = null;
+  loading    = true;
+  selected:  AdoptionApplication | null = null;
+  reviewNote = '';
 
   filter = { search: '', status: '', sort: 'newest' };
 
@@ -495,13 +507,16 @@ export class NgoApplicationsComponent implements OnInit {
     });
   }
 
-  review(id: number, status: string): void {
-    this.api.patch<any>(`/adoption/ngo/applications/${id}/review`, { status }).subscribe({
+  review(id: number, status: string, notes: string = ''): void {
+    const body: any = { status };
+    if (notes.trim()) body.notes = notes.trim();
+    this.api.patch<any>(`/adoption/ngo/applications/${id}/review`, body).subscribe({
       next: () => {
         const a = this.applications.find(x => x.id === id);
         if (a) a.status = status;
         this.applyFilters();
         if (this.selected?.id === id) this.selected = null;
+        this.reviewNote = '';
         this.snack.open(`Application ${status.toLowerCase()}.`, '', { duration: 2000 });
       },
       error: err => this.snack.open(err.error?.message ?? 'Error processing application.', 'Close', { duration: 3000 })

@@ -388,7 +388,7 @@ import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
     }
     .crit-low      { background: #D1FAE5; color: #065F46; }
     .crit-medium   { background: #FEF3C7; color: #92400E; }
-    .crit-high     { background: #FFEDD5; color: #9A3412; }
+    .crit-high     { background: #FFF3E8; color: #9A3412; }
     .crit-critical { background: #FEE2E2; color: #991B1B; }
 
     /* ── Status chip ────────────────────────── */
@@ -417,7 +417,7 @@ import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
     .table-row:hover { background: #F9FBFB !important; }
 
     .urgency-row-critical { border-left: 4px solid #DC2626 !important; }
-    .urgency-row-high     { border-left: 4px solid #EA580C !important; }
+    .urgency-row-high     { border-left: 4px solid #FF8C42 !important; }
     .urgency-row-medium   { border-left: 4px solid #D97706 !important; }
     .urgency-row-low      { border-left: 4px solid #059669 !important; }
 
@@ -460,7 +460,7 @@ import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
       background: linear-gradient(135deg, #EF4444 0%, #991B1B 100%);
     }
     .crit-header-critical { background: linear-gradient(135deg, #DC2626 0%, #7F1D1D 100%); }
-    .crit-header-high     { background: linear-gradient(135deg, #EA580C 0%, #9A3412 100%); }
+    .crit-header-high     { background: linear-gradient(135deg, #FF8C42 0%, #9A3412 100%); }
     .crit-header-medium   { background: linear-gradient(135deg, #D97706 0%, #92400E 100%); }
     .crit-header-low      { background: linear-gradient(135deg, #059669 0%, #064E3B 100%); }
 

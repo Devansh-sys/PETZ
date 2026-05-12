@@ -166,7 +166,7 @@ import { ApiService } from '../../../core/services/api.service';
       align-items: center;
       gap: 8px;
       background: #FFF7ED;
-      border: 1px solid #FFEDD5;
+      border: 1px solid #FFF3E8;
       border-radius: 12px;
       padding: 12px 16px;
       font-size: 0.82rem;

@@ -154,7 +154,7 @@ function passwordMatchValidator(group: AbstractControl): ValidationErrors | null
 
     .auth-left {
       width: 40%;
-      background: linear-gradient(160deg, #1A3547 0%, #2D5D7B 60%, #3D7EA6 100%);
+      background: linear-gradient(160deg, #1A3547 0%, #2D5D7B 60%, #FF8C42 100%);
       padding: 60px 48px;
       display: flex; flex-direction: column; justify-content: center; color: #fff;
       @media (max-width: 768px) { display: none; }
@@ -167,7 +167,7 @@ function passwordMatchValidator(group: AbstractControl): ValidationErrors | null
     .feature-item { display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.85); font-weight: 500; font-size: 0.9rem; }
     .f-icon {
       width: 36px; height: 36px; border-radius: 12px;
-      background: rgba(255,140,66,0.18);
+      background: rgba(255,140,66,0.12);
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
       mat-icon { color: #FF8C42; font-size: 18px; width: 18px; height: 18px; }
     }

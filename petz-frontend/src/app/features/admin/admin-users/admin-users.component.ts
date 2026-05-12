@@ -408,7 +408,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     }
     .user-count-badge {
       display: flex; align-items: center; gap: 6px;
-      background: #FFEDD5; color: #9A3412; border-radius: 999px; padding: 6px 14px;
+      background: #FFF3E8; color: #1A3547; border-radius: 999px; padding: 6px 14px;
       font-size: 0.78rem; font-weight: 700;
       mat-icon { font-size: 16px; width: 16px; height: 16px; }
     }
@@ -504,9 +504,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       strong { color: #1A3547; }
     }
     .active-filters-badge {
-      background: #FFF7ED; border: 1px solid #FED7AA;
+      background: #FFF3E8; border: 1px solid #C8DCE8;
       border-radius: 999px; padding: 2px 10px;
-      font-size: 0.7rem; font-weight: 700; color: #C2410C;
+      font-size: 0.7rem; font-weight: 700; color: #FF8C42;
     }
 
     /* ── Table ── */
@@ -580,7 +580,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       background: linear-gradient(135deg,#FF9F5A,#FF8C42);
       color: #fff; font-weight: 900; font-size: 1.8rem;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 6px 20px rgba(255,140,66,0.4);
+      box-shadow: 0 6px 20px rgba(255,140,66,0.30);
     }
     .modal-id-badge {
       position: absolute; top: 12px; left: 16px;

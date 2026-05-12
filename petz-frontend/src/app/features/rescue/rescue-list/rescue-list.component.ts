@@ -175,6 +175,14 @@ import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
                   </div>
                 }
 
+                <!-- Reporter phone (visible to reporter) -->
+                @if (r.reporterPhone) {
+                  <div class="rescue-location" style="color:#4A6478">
+                    <mat-icon>phone</mat-icon>
+                    <span>{{ r.reporterPhone }}</span>
+                  </div>
+                }
+
               </div>
             }
             @if (filtered().length === 0) {
@@ -255,6 +263,17 @@ import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
                 <div>
                   <div class="detail-label">Location</div>
                   <div class="detail-value" style="font-weight:500">{{ selected.address }}</div>
+                </div>
+              </div>
+            }
+
+            <!-- Reporter Phone -->
+            @if (selected.reporterPhone) {
+              <div class="detail-row">
+                <mat-icon class="detail-icon">phone</mat-icon>
+                <div>
+                  <div class="detail-label">Your Contact Number</div>
+                  <div class="detail-value">{{ selected.reporterPhone }}</div>
                 </div>
               </div>
             }
@@ -483,7 +502,7 @@ import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
       font-size: 0.78rem; line-height: 1.4;
       mat-icon { font-size: 16px; width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
     }
-    .hint-pending     { background: #FFF3EC; color: #9A3412; mat-icon { color: #FF8C42; } }
+    .hint-pending     { background: #FFF7ED; color: #9A3412; mat-icon { color: #FF8C42; } }
     .hint-assigned    { background: #EFF6FF; color: #1E40AF; mat-icon { color: #3B82F6; } }
     .hint-in_progress { background: #FDF4FF; color: #7E22CE; mat-icon { color: #9333EA; } }
     .hint-completed   { background: #F0FDF4; color: #15803D; mat-icon { color: #22C55E; } }
@@ -524,7 +543,7 @@ import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
     .modal-header {
       display: flex; align-items: flex-start; justify-content: space-between;
       padding: 22px 22px 16px; border-bottom: 1px solid #F0F4F8;
-      background: linear-gradient(135deg, #FFF3EC 0%, #fff 100%);
+      background: linear-gradient(135deg, #FFF7ED 0%, #fff 100%);
       position: sticky; top: 0; z-index: 1;
     }
     .header-completed { background: linear-gradient(135deg, #F0FDF4 0%, #fff 100%) !important; }
@@ -568,7 +587,7 @@ import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
 
     .ngo-pending-box {
       display: flex; align-items: center; gap: 10px;
-      background: #FFF3EC; border: 1px solid #FDBF8A; border-radius: 12px;
+      background: #FFF3E8; border: 1px solid #C8DCE8; border-radius: 12px;
       padding: 12px 14px; font-size: 0.82rem; color: #9A3412;
       mat-icon { color: #FF8C42; font-size: 18px; flex-shrink: 0; }
     }

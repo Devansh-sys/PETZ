@@ -236,7 +236,7 @@ import { environment } from '../../../../environments/environment';
       font-family: inherit; color: #4A6478; transition: all 0.15s;
       &:hover { border-color: #FF8C42; }
     }
-    .chip-active { background: #FFF3E8; border-color: #FF8C42; color: #FF8C42; font-weight: 700; }
+    .chip-active { background: #FFF7ED; border-color: #FF8C42; color: #FF8C42; font-weight: 700; }
     .clear-btn {
       display: flex; align-items: center; gap: 4px;
       height: 36px; border: 1px solid #E0EBF2; border-radius: 10px;
@@ -271,13 +271,13 @@ import { environment } from '../../../../environments/environment';
       &:hover {
         transform: translateY(-4px);
         box-shadow: 0 12px 36px rgba(26,53,71,0.12);
-        border-color: #FDBF8A;
+        border-color: #C8DCE8;
       }
     }
     .animal-img-wrap {
       position: relative;
       height: 175px;
-      background: #FFF4EE;
+      background: #FFF7ED;
       overflow: hidden;
       img {
         width: 100%; height: 100%;

@@ -440,9 +440,9 @@ import { environment } from '../../../../environments/environment';
     }
     .ani-row { cursor: pointer; transition: background 0.15s; &:hover { background: #FAFCFF; } }
 
-    .ani-avatar      { width: 42px; height: 42px; border-radius: 12px; overflow: hidden; background: #FFF4EE; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .ani-avatar      { width: 42px; height: 42px; border-radius: 12px; overflow: hidden; background: #FFF7ED; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     .ani-avatar-img  { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .ani-avatar-icon { font-size: 22px !important; width: 22px !important; height: 22px !important; color: #FDBF8A; }
+    .ani-avatar-icon { font-size: 22px !important; width: 22px !important; height: 22px !important; color: #C8DCE8; }
 
     .cell-name    { font-weight: 800; font-size: 0.88rem; color: #1A3547; }
     .cell-species { font-size: 0.72rem; color: #94A3B8; margin-top: 2px; }
@@ -462,7 +462,7 @@ import { environment } from '../../../../environments/environment';
 
     /* ── Empty ────────────────────────────────────────── */
     .empty-card     { background: #fff; border-radius: 20px; box-shadow: 0 1px 12px rgba(26,53,71,0.07); display: flex; flex-direction: column; align-items: center; padding: 52px 24px; margin-bottom: 24px; text-align: center; }
-    .empty-icon-big { font-size: 44px !important; width: 44px !important; height: 44px !important; color: #FDBF8A; margin-bottom: 12px; }
+    .empty-icon-big { font-size: 44px !important; width: 44px !important; height: 44px !important; color: #C8DCE8; margin-bottom: 12px; }
     .empty-h3       { font-size: 1rem; font-weight: 800; color: #1A3547; margin: 0 0 6px; }
     .empty-p        { font-size: 0.82rem; color: #94A3B8; margin: 0; }
 
@@ -480,7 +480,7 @@ import { environment } from '../../../../environments/environment';
 
     .popup-hdr {
       display: flex; align-items: center; gap: 16px;
-      background: linear-gradient(135deg, #2EB894 0%, #4F8FD4 100%);
+      background: linear-gradient(135deg, #2EB894 0%, #F97316 100%);
       padding: 22px; position: relative;
     }
     .popup-photo    { width: 70px; height: 70px; border-radius: 16px; object-fit: cover; border: 3px solid rgba(255,255,255,0.35); flex-shrink: 0; }

@@ -72,6 +72,14 @@ public class AdoptionController {
         return ResponseEntity.ok(ApiResponse.ok(adoptionService.getByNgo(userId)));
     }
 
+    @DeleteMapping("/ngo/animals/{id}")
+    @PreAuthorize("hasRole('NGO')")
+    public ResponseEntity<ApiResponse<Void>> deleteAnimal(@PathVariable Long id) {
+        Long userId = securityUtil.getCurrentUserId();
+        adoptionService.deleteAnimal(id, userId);
+        return ResponseEntity.ok(ApiResponse.ok(null, "Animal removed."));
+    }
+
     // ── Adoption applications ─────────────────────────────────────────
 
     @PostMapping("/apply")

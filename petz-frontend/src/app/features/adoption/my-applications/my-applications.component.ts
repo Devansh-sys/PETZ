@@ -375,7 +375,7 @@ import { environment } from '../../../../environments/environment';
       background: linear-gradient(135deg, #FF9F5A, #FF8C42);
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0; overflow: hidden;
-      box-shadow: 0 4px 10px rgba(255,140,66,0.3);
+      box-shadow: 0 4px 10px rgba(255,140,66,0.30);
     }
     .app-detail { flex: 1; min-width: 0; }
     .app-title { font-weight: 800; font-size: 0.95rem; color: #1A3547; margin-bottom: 5px; }

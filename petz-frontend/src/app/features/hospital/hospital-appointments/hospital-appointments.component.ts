@@ -216,7 +216,7 @@ interface WeekDay {
         <div class="stat-item" (click)="filterStatus=''; applyFilters()" [class.active]="filterStatus===''">
           <div class="stat-val">{{ viewMode === 'week' ? weekTotal() : allAppts.length }}</div>
           <div class="stat-label">All</div>
-          <div class="stat-bar" style="background:#4F8FD4"></div>
+          <div class="stat-bar" style="background:#F97316"></div>
         </div>
         <div class="stat-item" (click)="filterStatus='PENDING'; applyFilters()" [class.active]="filterStatus==='PENDING'">
           <div class="stat-val" style="color:#E89340">{{ countBy('PENDING') }}</div>
@@ -224,9 +224,9 @@ interface WeekDay {
           <div class="stat-bar" style="background:#E89340"></div>
         </div>
         <div class="stat-item" (click)="filterStatus='CONFIRMED'; applyFilters()" [class.active]="filterStatus==='CONFIRMED'">
-          <div class="stat-val" style="color:#4F8FD4">{{ countBy('CONFIRMED') }}</div>
+          <div class="stat-val" style="color:#F97316">{{ countBy('CONFIRMED') }}</div>
           <div class="stat-label">Confirmed</div>
-          <div class="stat-bar" style="background:#4F8FD4"></div>
+          <div class="stat-bar" style="background:#F97316"></div>
         </div>
         <div class="stat-item" (click)="filterStatus='COMPLETED'; applyFilters()" [class.active]="filterStatus==='COMPLETED'">
           <div class="stat-val" style="color:#2EB894">{{ countBy('COMPLETED') }}</div>
@@ -449,7 +449,7 @@ interface WeekDay {
     }
     .sec-icon { font-size: 14px; width:14px; height:14px; }
     .pet-ic  { color: #2EB894; }
-    .doc-ic  { color: #4F8FD4; }
+    .doc-ic  { color: #F97316; }
     .own-ic  { color: #7C62CC; }
     .rsn-ic  { color: #E89340; }
     .nts-ic  { color: #4A6478; }
@@ -482,7 +482,7 @@ interface WeekDay {
       mat-icon { margin-right: 6px; font-size: 16px; width:16px; height:16px; }
     }
     .action-complete {
-      background: linear-gradient(135deg, #1A3B7A, #4F8FD4) !important;
+      background: linear-gradient(135deg, #1A3B7A, #F97316) !important;
       color: #fff !important; border-radius: 10px !important; font-weight: 700 !important;
       mat-icon { margin-right: 6px; font-size: 16px; width:16px; height:16px; }
     }
@@ -495,7 +495,7 @@ interface WeekDay {
     .action-close {
       border-color: #E0EBF2 !important; color: #8BA3B5 !important;
       border-radius: 10px !important; margin-left: auto;
-      &:hover { border-color: #4F8FD4 !important; color: #4F8FD4 !important; }
+      &:hover { border-color: #F97316 !important; color: #F97316 !important; }
     }
 
     /* ── Status chips ── */
@@ -524,8 +524,8 @@ interface WeekDay {
       font-size: 0.75rem; font-weight: 700; color: #8BA3B5;
       padding: 5px 12px; border-radius: 8px; transition: all 0.15s ease;
       mat-icon { font-size: 14px; width: 14px; height: 14px; }
-      &:hover:not(.active) { color: #4F8FD4; background: rgba(79,143,212,0.08); }
-      &.active { background: #fff; color: #4F8FD4; box-shadow: 0 1px 4px rgba(26,53,71,0.1); }
+      &:hover:not(.active) { color: #F97316; background: rgba(249,115,22,0.08); }
+      &.active { background: #fff; color: #F97316; box-shadow: 0 1px 4px rgba(26,53,71,0.1); }
     }
 
     /* ── Back btn ── */
@@ -552,8 +552,8 @@ interface WeekDay {
       border: 1px solid #E0EBF2; border-radius: 14px;
       padding: 14px 16px 10px; cursor: pointer; position: relative; overflow: hidden;
       transition: all 0.18s ease;
-      &:hover { border-color: #4F8FD4; box-shadow: 0 4px 16px rgba(79,143,212,0.12); }
-      &.active { border-color: #4F8FD4; background: #F0F6FF; }
+      &:hover { border-color: #F97316; box-shadow: 0 4px 16px rgba(249,115,22,0.12); }
+      &.active { border-color: #F97316; background: #FFF7ED; }
     }
     .stat-val  { font-size: 1.5rem; font-weight: 900; color: #1A3547; line-height: 1; }
     .stat-label { font-size: 0.7rem; font-weight: 600; color: #8BA3B5; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
@@ -573,7 +573,7 @@ interface WeekDay {
     .nav-btn {
       width: 32px !important; height: 32px !important; border-radius: 8px !important;
       color: #4A6478 !important;
-      &:hover { background: #F0F6FF !important; color: #4F8FD4 !important; }
+      &:hover { background: #FFF7ED !important; color: #F97316 !important; }
     }
     .week-label { font-size: 0.8rem; font-weight: 700; color: #1A3547; min-width: 200px; text-align: center; }
     .week-days {
@@ -590,28 +590,28 @@ interface WeekDay {
     .week-all-btn {
       background: #F8FAFB; border-color: #E0EBF2;
       &.active {
-        background: #4F8FD4; border-color: #4F8FD4;
+        background: #F97316; border-color: #F97316;
         .week-all-icon, .wd-name, .wd-count { color: #fff !important; }
         .wd-count { background: rgba(255,255,255,0.25) !important; }
       }
-      &:hover:not(.active) { border-color: #4F8FD4; }
+      &:hover:not(.active) { border-color: #F97316; }
     }
     .week-all-icon {
       font-size: 22px; width: 22px; height: 22px;
-      color: #4F8FD4; margin-bottom: 4px;
+      color: #F97316; margin-bottom: 4px;
     }
     .week-day-cell {
       background: #F8FAFB; border-color: #F8FAFB;
-      &:hover:not(.selected) { border-color: #E0EBF2; background: #F0F6FF; }
-      &.selected { background: #4F8FD4; border-color: #4F8FD4; .wd-num,.wd-name,.wd-count { color: #fff !important; } }
-      &.today:not(.selected) { border-color: #4F8FD4; .wd-num { color: #4F8FD4; } }
+      &:hover:not(.selected) { border-color: #E0EBF2; background: #FFF7ED; }
+      &.selected { background: #F97316; border-color: #F97316; .wd-num,.wd-name,.wd-count { color: #fff !important; } }
+      &.today:not(.selected) { border-color: #F97316; .wd-num { color: #F97316; } }
       &.has-appts:not(.selected) { .wd-count { background: #E89340; color: #fff; } }
     }
     .wd-name { font-size: 0.6rem; font-weight: 700; color: #8BA3B5; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
     .wd-num  { font-size: 1rem; font-weight: 800; color: #1A3547; line-height: 1; margin-bottom: 6px; }
     .wd-count {
       font-size: 0.65rem; font-weight: 700;
-      background: #E8F1F8; color: #4F8FD4;
+      background: #FFF3E8; color: #F97316;
       border-radius: 999px; padding: 1px 7px; min-width: 18px; text-align: center;
     }
     .wd-empty { font-size: 0.9rem; color: #E0EBF2; }
@@ -625,7 +625,7 @@ interface WeekDay {
       display: flex; align-items: center; gap: 8px;
       background: #fff; border: 1.5px solid #E0EBF2; border-radius: 12px;
       padding: 0 12px; height: 40px;
-      &:focus-within { border-color: #4F8FD4; }
+      &:focus-within { border-color: #F97316; }
     }
     .search-icon { font-size: 18px; width:18px; height:18px; color: #8BA3B5; flex-shrink:0; }
     .search-input {
@@ -643,7 +643,7 @@ interface WeekDay {
       display: flex; flex-direction: column; gap: 2px;
       background: #fff; border: 1.5px solid #E0EBF2; border-radius: 12px;
       padding: 4px 12px 6px; cursor: pointer; transition: border-color 0.15s;
-      &:focus-within { border-color: #4F8FD4; }
+      &:focus-within { border-color: #F97316; }
     }
     .sel-label { font-size: 0.6rem; font-weight: 700; color: #8BA3B5; text-transform: uppercase; letter-spacing: 0.06em; }
     .select-wrap select {
@@ -657,16 +657,16 @@ interface WeekDay {
       background: #fff; border: 1.5px solid #E0EBF2; border-radius: 14px;
       display: flex; align-items: center; gap: 16px;
       padding: 14px 16px; cursor: pointer; transition: all 0.18s ease;
-      &:hover { border-color: #4F8FD4; box-shadow: 0 4px 16px rgba(79,143,212,0.1); transform: translateX(2px); }
+      &:hover { border-color: #F97316; box-shadow: 0 4px 16px rgba(249,115,22,0.1); transform: translateX(2px); }
     }
     .row-pending { border-left: 4px solid #E89340; }
 
     .appt-date-blk {
       display: flex; flex-direction: column; align-items: center;
-      background: #F0F6FF; border-radius: 12px; padding: 8px 12px;
+      background: #FFF7ED; border-radius: 12px; padding: 8px 12px;
       min-width: 56px; flex-shrink: 0;
     }
-    .date-num { font-size: 1.3rem; font-weight: 900; color: #4F8FD4; line-height: 1; }
+    .date-num { font-size: 1.3rem; font-weight: 900; color: #F97316; line-height: 1; }
     .date-mon { font-size: 0.6rem; font-weight: 700; color: #8BA3B5; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 1px; }
     .date-time { font-size: 0.68rem; font-weight: 600; color: #7C62CC; margin-top: 4px; }
 
@@ -685,9 +685,9 @@ interface WeekDay {
 
     .appt-quick { display: flex; gap: 4px; flex-shrink: 0; }
     .q-confirm { color: #2EB894 !important; &:hover { background: #D1FAE5 !important; } }
-    .q-complete { color: #4F8FD4 !important; &:hover { background: #DBEAFE !important; } }
+    .q-complete { color: #F97316 !important; &:hover { background: #DBEAFE !important; } }
     .q-future   { color: #D1D5DB !important; cursor: not-allowed !important; }
-    .q-detail   { color: #8BA3B5 !important; &:hover { background: #F0F6FF !important; color: #4F8FD4 !important; } }
+    .q-detail   { color: #8BA3B5 !important; &:hover { background: #FFF7ED !important; color: #F97316 !important; } }
 
     .future-note {
       display: flex; align-items: center; gap: 6px;

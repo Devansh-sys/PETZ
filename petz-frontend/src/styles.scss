@@ -1,37 +1,39 @@
 // ═══════════════════════════════════════════════════════════
-//  PETZ — Premium Design System v3  "Nurturing Professionalism"
-//  Primary   : #FF8C42  Deep Sunset Orange
-//  Secondary : #2D5D7B  Slate Blue
-//  Background: #F9FBFB  Soft Mint White
-//  Accent    : #FFE8D6  Pale Peach
+//  PETZ — Premium Design System v4
+//  Primary   : #FF8C42  Orange (warm, energetic — CTAs, accents)
+//  Secondary : #E07828  Dark Orange
+//  Background: #F9FBFB  Soft Mint White (original)
+//  Cards     : #FFFFFF  Pure White (ClickUp pattern)
 // ═══════════════════════════════════════════════════════════
 
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 // ── Design tokens ─────────────────────────────────────────
-$primary:        #FF8C42;       // Deep Sunset Orange — action, CTAs
-$primary-dark:   #2D5D7B;       // Slate Blue — trust, headers
-$primary-hover:  #E87530;       // Darker orange for hover
-$primary-light:  #FFE8D6;       // Pale Peach — chip/card accent
-$primary-pale:   #FFF3EC;       // Very light peach — hover bg
-$sidebar-bg:     #1A3547;       // Deep Navy
+$primary:        #FF8C42;       // Orange — action, CTAs (warm, energetic)
+$primary-dark:   #E07828;       // Dark Orange — hover, emphasis
+$primary-hover:  #E8731A;       // Hover orange
+$primary-light:  #FFF3E8;       // Light orange tint — chip/card accent
+$primary-pale:   #FFF7ED;       // Very light orange — hover bg
+$sidebar-bg:     #1A3547;       // Deep Navy (original)
 $sidebar-sect:   #22435C;
-$sidebar-hover:  rgba(255,140,66,0.14);
+$sidebar-hover:  rgba(255,140,66,0.15);
 $sidebar-border: rgba(255,255,255,0.08);
-$page-bg:        #F9FBFB;       // Soft Mint White
+$page-bg:        #F9FBFB;       // Soft Mint White (original)
 $surface:        #FFFFFF;
-$surface-2:      #F2F7FA;       // Light blue-grey surface
-$border:         #E0EBF2;       // Cool blue border
+$surface-2:      #F2F7FA;       // Light blue-grey surface (original)
+$border:         #E0EBF2;       // Cool blue border (original)
 $border-2:       #C8DCE8;
-$text-1:         #1A3547;       // Deep slate — primary text
-$text-2:         #4A6478;       // Blue-grey — secondary text
-$text-3:         #8BA3B5;       // Muted blue-grey — captions
+$text-1:         #1A3547;       // Deep slate — primary text (original)
+$text-2:         #4A6478;       // Blue-grey — secondary text (original)
+$text-3:         #8BA3B5;       // Muted blue-grey — captions (original)
+$accent:         #FF8C42;       // Orange — logo brand mark & "Z" text accent (= $primary)
 $nav-width:      260px;
 $font:           'Inter', system-ui, -apple-system, sans-serif;
 $font-heading:   'Quicksand', system-ui, sans-serif;
 
 // ── Gradients ─────────────────────────────────────────────
-$grad-orange:    linear-gradient(135deg, #FF9F5A 0%, #FF8C42 100%);
+$grad-primary:   linear-gradient(135deg, #FF9F5A 0%, #FF8C42 100%);  // Main CTA — orange
+$grad-orange:    linear-gradient(135deg, #FF9F5A 0%, #FF8C42 100%);  // Kept for stat-card accents
 $grad-purple:    linear-gradient(135deg, #B97AFB 0%, #7C3AED 100%);
 $grad-pink:      linear-gradient(135deg, #F472B6 0%, #DB2777 100%);
 $grad-green:     linear-gradient(135deg, #34D399 0%, #059669 100%);
@@ -44,7 +46,7 @@ $shadow-sm:  0 2px 8px  rgba(26,53,71,0.05);
 $shadow-md:  0 4px 20px rgba(26,53,71,0.08);
 $shadow-lg:  0 8px 32px rgba(26,53,71,0.10);
 $shadow-xl:  0 16px 48px rgba(26,53,71,0.12);
-$shadow-btn: 0 6px 20px rgba(255,140,66,0.35);
+$shadow-btn: 0 6px 20px rgba(255,140,66,0.30);
 
 // ── Animations ────────────────────────────────────────────
 @keyframes fadeIn   { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
@@ -90,10 +92,10 @@ h1, h2, h3, h4 {
   --mdc-filled-button-container-color: #{$primary} !important;
   --mdc-filled-button-label-text-color: #fff !important;
   --mdc-protected-button-container-color: #{$primary} !important;
-  background: $grad-orange !important;
+  background: $grad-primary !important;
   color: #fff !important;
   box-shadow: $shadow-btn !important;
-  &:hover { box-shadow: 0 8px 24px rgba(255,140,66,0.5) !important; }
+  &:hover { box-shadow: 0 8px 24px rgba(255,140,66,0.40) !important; }
   &:disabled { background: $border !important; box-shadow: none !important; color: $text-3 !important; }
 }
 
@@ -159,7 +161,7 @@ mat-toolbar, .mat-toolbar {
   &:hover {
     .mdc-notched-outline__leading,
     .mdc-notched-outline__notch,
-    .mdc-notched-outline__trailing { border-color: #A8C4D4 !important; }
+    .mdc-notched-outline__trailing { border-color: #A5AFF5 !important; }
   }
 }
 
@@ -223,7 +225,7 @@ mat-card, .mat-mdc-card {
 }
 .mat-mdc-cell {
   font-family: $font !important;
-  border-bottom: 1px solid #EEF4F8 !important;
+  border-bottom: 1px solid $border !important;
   color: $text-1 !important;
   font-size: 0.88rem !important;
 }
@@ -363,52 +365,77 @@ mat-card, .mat-mdc-card {
 }
 
 .stat-card {
-  border-radius: 24px !important;
-  border: none !important;
-  overflow: hidden !important;
+  // ClickUp-style: pure white card, color only on icon + value
+  border-radius: 20px !important;
+  border: 1px solid $border !important;
+  background: $surface !important;
+  box-shadow: $shadow-sm !important;
+  overflow: visible !important;
   position: relative;
   cursor: default;
   transition: transform 0.22s ease, box-shadow 0.22s ease !important;
-  &:hover { transform: translateY(-4px) scale(1.01) !important; box-shadow: $shadow-xl !important; }
+  &:hover { transform: translateY(-3px) !important; box-shadow: $shadow-md !important; border-color: $border-2 !important; }
 
   mat-card-content { padding: 22px 20px !important; }
 
   .stat-icon {
-    width: 46px; height: 46px;
-    border-radius: 14px;
+    width: 42px; height: 42px;
+    border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
     margin-bottom: 14px;
-    background: rgba(255,255,255,0.2);
-    mat-icon { font-size: 24px; width: 24px; height: 24px; color: #fff; }
+    mat-icon { font-size: 22px; width: 22px; height: 22px; }
   }
 
   .stat-value {
     font-family: $font-heading;
-    font-size: 2rem;
-    font-weight: 700;
-    color: #fff;
+    font-size: 2.1rem;
+    font-weight: 800;
     line-height: 1;
     margin: 0 0 6px;
     letter-spacing: -0.03em;
   }
 
   .stat-label {
-    font-size: 0.8rem;
-    color: rgba(255,255,255,0.78);
+    font-size: 0.78rem;
+    color: $text-3;
     font-weight: 500;
     margin: 0;
-    letter-spacing: 0.01em;
   }
 
-  &.orange { background: $grad-orange !important; box-shadow: 0 8px 24px rgba(255,140,66,0.30) !important; }
-  &.purple { background: $grad-purple !important; box-shadow: 0 8px 24px rgba(124,58,237,0.30) !important; }
-  &.pink   { background: $grad-pink   !important; box-shadow: 0 8px 24px rgba(219,39,119,0.30) !important; }
-  &.green  { background: $grad-green  !important; box-shadow: 0 8px 24px rgba(5,150,105,0.30)  !important; }
-  &.blue   { background: $grad-blue   !important; box-shadow: 0 8px 24px rgba(45,93,123,0.30)  !important; }
-  &.red    { background: $grad-red    !important; box-shadow: 0 8px 24px rgba(220,38,38,0.30)  !important; }
+  // Each variant: white card + colored top accent + colored icon + colored number
+  &.orange {
+    border-top: 3px solid #F59E0B !important;
+    .stat-icon { background: rgba(245,158,11,0.10); mat-icon { color: #F59E0B; } }
+    .stat-value { color: #D97706; }
+  }
+  &.purple {
+    border-top: 3px solid #6875F5 !important;
+    .stat-icon { background: rgba(104,117,245,0.10); mat-icon { color: #6875F5; } }
+    .stat-value { color: #6875F5; }
+  }
+  &.pink {
+    border-top: 3px solid #EC4899 !important;
+    .stat-icon { background: rgba(236,72,153,0.10); mat-icon { color: #EC4899; } }
+    .stat-value { color: #DB2777; }
+  }
+  &.green {
+    border-top: 3px solid #10B981 !important;
+    .stat-icon { background: rgba(16,185,129,0.10); mat-icon { color: #10B981; } }
+    .stat-value { color: #059669; }
+  }
+  &.blue {
+    border-top: 3px solid #3B82F6 !important;
+    .stat-icon { background: rgba(59,130,246,0.10); mat-icon { color: #3B82F6; } }
+    .stat-value { color: #2563EB; }
+  }
+  &.red {
+    border-top: 3px solid #EF4444 !important;
+    .stat-icon { background: rgba(239,68,68,0.10); mat-icon { color: #EF4444; } }
+    .stat-value { color: #DC2626; }
+  }
 }
 
-// ── Sidebar ───────────────────────────────────────────────
+// ── Sidebar ── Original dark navy ──────────────────────────
 .sidenav {
   width: $nav-width !important;
   background: $grad-sidebar !important;
@@ -433,7 +460,7 @@ mat-card, .mat-mdc-card {
       color: #fff;
       letter-spacing: 2px;
       text-transform: uppercase;
-      span { color: $primary; }
+      span { color: $accent; }  // Gold brand mark
     }
   }
 
@@ -505,13 +532,13 @@ mat-card, .mat-mdc-card {
       .nav-user-avatar {
         width: 34px; height: 34px;
         border-radius: 10px;
-        background: $grad-orange;
+        background: $grad-primary;
         display: flex; align-items: center; justify-content: center;
         font-weight: 700;
         font-size: 0.9rem;
         color: #fff;
         flex-shrink: 0;
-        box-shadow: 0 2px 8px rgba(255,140,66,0.4);
+        box-shadow: 0 2px 8px rgba(255,140,66,0.40);
       }
 
       .nav-user-info {
@@ -702,12 +729,12 @@ h3 { font-size: 1rem;    font-weight: 700; }
   font-size: 0.88rem;
   cursor: pointer;
   border: none;
-  background: $grad-orange;
+  background: $grad-primary;
   color: #fff;
   box-shadow: $shadow-btn;
   transition: all 0.22s;
   font-family: $font;
-  &:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(255,140,66,0.5); }
+  &:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(255,140,66,0.45); }
   mat-icon { font-size: 18px; width: 18px; height: 18px; }
 }
 

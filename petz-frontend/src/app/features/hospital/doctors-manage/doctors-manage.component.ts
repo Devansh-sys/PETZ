@@ -40,7 +40,7 @@ interface Doctor {
             <!-- Schedule section -->
             <div class="popup-section">
               <div class="section-label">
-                <mat-icon class="sec-icon" style="color:#4F8FD4">schedule</mat-icon> Working Schedule
+                <mat-icon class="sec-icon" style="color:#F97316">schedule</mat-icon> Working Schedule
               </div>
               <div class="detail-grid-3">
                 <div class="detail-item">
@@ -66,7 +66,7 @@ interface Doctor {
               <div class="detail-grid-3">
                 <div class="detail-item">
                   <span class="dk">Slots / Day</span>
-                  <span class="dv" style="color:#4F8FD4">{{ slotsPerDay(selected) }}</span>
+                  <span class="dv" style="color:#F97316">{{ slotsPerDay(selected) }}</span>
                 </div>
                 <div class="detail-item">
                   <span class="dk">Hours / Day</span>
@@ -138,7 +138,7 @@ interface Doctor {
         <div class="stat-item">
           <div class="stat-val">{{ doctors.length }}</div>
           <div class="stat-label">Total Doctors</div>
-          <div class="stat-bar" style="background:#4F8FD4"></div>
+          <div class="stat-bar" style="background:#F97316"></div>
         </div>
         <div class="stat-item">
           <div class="stat-val" style="color:#7C62CC">{{ uniqueSpecs() }}</div>
@@ -392,7 +392,7 @@ interface Doctor {
     @keyframes slideUp { from { transform: translateY(24px); opacity:0 } to { transform: translateY(0); opacity:1 } }
 
     .popup-hdr {
-      background: linear-gradient(135deg, #0A5840 0%, #1E9A7A 60%, #4F8FD4 100%);
+      background: linear-gradient(135deg, #0A5840 0%, #1E9A7A 60%, #F97316 100%);
       border-radius: 20px 20px 0 0; padding: 22px 22px 18px;
       display: flex; align-items: center; justify-content: space-between;
     }
@@ -440,7 +440,7 @@ interface Doctor {
     }
     .tl-fill {
       position: absolute; top: 0; bottom: 0;
-      background: linear-gradient(90deg, #2EB894, #4F8FD4);
+      background: linear-gradient(90deg, #2EB894, #F97316);
       border-radius: 8px; display: flex; align-items: center; justify-content: center;
       min-width: 60px;
     }
@@ -458,7 +458,7 @@ interface Doctor {
     .action-close {
       border-color: #E0EBF2 !important; color: #8BA3B5 !important;
       border-radius: 10px !important; margin-left: auto;
-      &:hover { border-color: #4F8FD4 !important; color: #4F8FD4 !important; }
+      &:hover { border-color: #F97316 !important; color: #F97316 !important; }
     }
 
     /* ── Stat strip ── */
@@ -485,7 +485,7 @@ interface Doctor {
       display: flex; align-items: center; gap: 8px;
       background: #fff; border: 1.5px solid #E0EBF2; border-radius: 12px;
       padding: 0 12px; height: 42px;
-      &:focus-within { border-color: #4F8FD4; }
+      &:focus-within { border-color: #F97316; }
     }
     .search-icon { font-size: 18px; width:18px; height:18px; color: #8BA3B5; flex-shrink:0; }
     .search-input {
@@ -503,7 +503,7 @@ interface Doctor {
       display: flex; flex-direction: column; gap: 2px;
       background: #fff; border: 1.5px solid #E0EBF2; border-radius: 12px;
       padding: 4px 12px 6px; cursor: pointer;
-      &:focus-within { border-color: #4F8FD4; }
+      &:focus-within { border-color: #F97316; }
     }
     .sel-label { font-size: 0.6rem; font-weight: 700; color: #8BA3B5; text-transform: uppercase; letter-spacing: 0.06em; }
     .select-wrap select {
@@ -532,7 +532,7 @@ interface Doctor {
     }
     .doc-stripe {
       height: 4px;
-      background: linear-gradient(90deg, #2EB894, #4F8FD4);
+      background: linear-gradient(90deg, #2EB894, #F97316);
     }
     .doc-card-header {
       display: flex; align-items: center; gap: 12px; padding: 16px 16px 12px;
@@ -568,10 +568,10 @@ interface Doctor {
       flex: 1; height: 6px; background: #F0F4F8; border-radius: 999px; overflow: hidden;
     }
     .slot-bar-fill {
-      height: 100%; background: linear-gradient(90deg, #2EB894, #4F8FD4);
+      height: 100%; background: linear-gradient(90deg, #2EB894, #F97316);
       border-radius: 999px; transition: width 0.5s ease;
     }
-    .slot-bar-label { font-size: 0.68rem; font-weight: 700; color: #4F8FD4; white-space: nowrap; }
+    .slot-bar-label { font-size: 0.68rem; font-weight: 700; color: #F97316; white-space: nowrap; }
 
     .doc-card-footer {
       padding: 10px 14px 14px;
@@ -609,7 +609,7 @@ interface Doctor {
       display: flex; align-items: center; gap: 4px;
       background: #fff; border: 1.5px solid #C8DCE8; border-radius: 12px;
       padding: 0 14px; height: 56px; transition: border-color 0.2s;
-      &:focus-within { border-color: #4F8FD4; box-shadow: 0 0 0 3px rgba(79,143,212,0.1); }
+      &:focus-within { border-color: #F97316; box-shadow: 0 0 0 3px rgba(249,115,22,0.1); }
     }
     .time-ico {
       color: #8BA3B5; font-size: 20px; width: 20px; height: 20px;
@@ -625,10 +625,10 @@ interface Doctor {
     .tp-min  { font-size: 1.05rem; width: 32px; }
     .tp-ampm {
       font-size: 0.78rem; font-weight: 800; letter-spacing: 0.04em;
-      background: #EEF4FA; color: #4F8FD4; border-radius: 8px;
+      background: #FFF3E8; color: #F97316; border-radius: 8px;
       padding: 4px 10px; margin-left: 6px; cursor: pointer;
       transition: background 0.15s;
-      &:hover { background: #D9ECFC; }
+      &:hover { background: #FFF3E8; }
     }
     .tp-sep {
       font-size: 1.1rem; font-weight: 900; color: #8BA3B5;

@@ -47,13 +47,18 @@ import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
             </div>
             <div class="stat-div"></div>
             <div class="stat-item">
+              <div class="stat-num" style="color:#7C62CC">{{ pendingCount }}</div>
+              <div class="stat-lbl">Pending</div>
+            </div>
+            <div class="stat-div"></div>
+            <div class="stat-item">
               <div class="stat-num" style="color:#E89340">{{ assignedCount }}</div>
               <div class="stat-lbl">Reported</div>
             </div>
             <div class="stat-div"></div>
             <div class="stat-item">
-              <div class="stat-num" style="color:#4F8FD4">{{ inProgressCount }}</div>
-              <div class="stat-lbl">Assigned & In Progress</div>
+              <div class="stat-num" style="color:#F97316">{{ inProgressCount }}</div>
+              <div class="stat-lbl">In Progress</div>
             </div>
             <div class="stat-div"></div>
             <div class="stat-item">
@@ -79,8 +84,9 @@ import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
             <label class="select-label">Status</label>
             <select class="fsel" [(ngModel)]="filter.status" (ngModelChange)="applyFilters()">
               <option value="">All</option>
+              <option value="PENDING">Pending</option>
               <option value="ASSIGNED">Reported</option>
-              <option value="IN_PROGRESS">Assigned &amp; In Progress</option>
+              <option value="IN_PROGRESS">In Progress</option>
               <option value="COMPLETED">Completed</option>
             </select>
           </div>
@@ -169,9 +175,7 @@ import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
                     <button class="btn-decline" (click)="respond(r.id, 'DECLINE')">Decline</button>
                   }
                   @if (r.status === 'IN_PROGRESS') {
-                    <button class="btn-complete" (click)="complete(r.id)">
-                      <mat-icon>done_all</mat-icon> Complete
-                    </button>
+                    <span class="open-hint"><mat-icon>open_in_new</mat-icon> Open to complete</span>
                   }
                 </div>
               </div>
@@ -238,6 +242,20 @@ import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
                   <div class="detail-val">{{ selected.updatedAt ? fmtDate(selected.updatedAt) : '—' }}</div>
                 </div>
               </div>
+
+              <!-- Reporter Contact -->
+              @if (selected.reporterPhone) {
+                <div class="reporter-contact-box">
+                  <div class="reporter-contact-label">
+                    <mat-icon>contact_phone</mat-icon> Reporter Contact
+                  </div>
+                  <a class="reporter-call-btn" [href]="'tel:' + selected.reporterPhone">
+                    <mat-icon>call</mat-icon>
+                    <span>{{ selected.reporterPhone }}</span>
+                    <span class="call-hint">Tap to call</span>
+                  </a>
+                </div>
+              }
 
               <!-- Photo -->
               @if (selected.photoUrl) {
@@ -337,7 +355,7 @@ import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
 
     /* ── Empty ────────────────────────────────────────── */
     .empty-card { background: #fff; border-radius: 20px; box-shadow: 0 1px 12px rgba(26,53,71,0.07); display: flex; flex-direction: column; align-items: center; padding: 52px 24px; margin-bottom: 24px; text-align: center; }
-    .empty-icon { font-size: 44px !important; width: 44px !important; height: 44px !important; color: #FDBF8A; margin-bottom: 12px; }
+    .empty-icon { font-size: 44px !important; width: 44px !important; height: 44px !important; color: #C8DCE8; margin-bottom: 12px; }
     .empty-h3   { font-size: 1rem; font-weight: 800; color: #1A3547; margin: 0 0 6px; }
     .empty-p    { font-size: 0.82rem; color: #94A3B8; margin: 0; }
     .loading-state { display: flex; align-items: center; gap: 12px; padding: 40px 0; color: #94A3B8; font-size: 0.85rem; }
@@ -377,10 +395,11 @@ import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
     .rc-right   { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
     .rc-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 
-    .time-ago   { font-size: 0.68rem; font-weight: 700; background: #F0F4FF; color: #4F8FD4; padding: 2px 8px; border-radius: 999px; }
+    .time-ago   { font-size: 0.68rem; font-weight: 700; background: #FFF7ED; color: #F97316; padding: 2px 8px; border-radius: 999px; }
 
     /* ── Status / Crit chips ──────────────────────────── */
     .status-chip  { font-size: 0.63rem; font-weight: 800; padding: 4px 10px; border-radius: 999px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+    .chip-pending    { background: #EDE9FE; color: #5B21B6; }
     .chip-assigned   { background: #FFF0E0; color: #C06020; }
     .chip-in_progress{ background: #EEF4FC; color: #3A6EA8; }
     .chip-completed  { background: #D8F5EE; color: #1A7A5E; }
@@ -388,15 +407,15 @@ import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
 
     .crit-pill    { font-size: 0.63rem; font-weight: 800; padding: 3px 9px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.06em; }
     .crit-critical{ background: #FEE2E2; color: #991B1B; }
-    .crit-high    { background: #FFEDD5; color: #9A3412; }
+    .crit-high    { background: #FFF3E8; color: #9A3412; }
     .crit-medium  { background: #FEF9C3; color: #854D0E; }
     .crit-low     { background: #D1FAE5; color: #065F46; }
 
     /* ── Action Buttons ───────────────────────────────── */
-    .btn-accept { display: flex; align-items: center; gap: 4px; height: 36px; padding: 0 14px; border-radius: 10px; border: none; background: #4F8FD4; color: #fff; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: background 0.15s; mat-icon { font-size: 15px; width: 15px; height: 15px; } &:hover { background: #3A72B0; } }
+    .btn-accept { display: flex; align-items: center; gap: 4px; height: 36px; padding: 0 14px; border-radius: 10px; border: none; background: #F97316; color: #fff; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: background 0.15s; mat-icon { font-size: 15px; width: 15px; height: 15px; } &:hover { background: #D04A0A; } }
     .btn-decline { height: 36px; padding: 0 14px; border-radius: 10px; border: 1px solid #FECACA; background: #FEF2F2; color: #E05858; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.15s; &:hover { background: #FECACA; } }
-    .btn-complete { display: flex; align-items: center; gap: 4px; height: 36px; padding: 0 14px; border-radius: 10px; border: none; background: #2EB894; color: #fff; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: background 0.15s; mat-icon { font-size: 15px; width: 15px; height: 15px; } &:hover { background: #1E9A7A; } }
     .btn-complete-wide { display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center; height: 42px; border-radius: 12px; border: none; background: #2EB894; color: #fff; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: background 0.15s; mat-icon { font-size: 17px; width: 17px; height: 17px; } &:hover { background: #1E9A7A; } }
+    .open-hint { display: flex; align-items: center; gap: 3px; font-size: 0.72rem; font-weight: 600; color: #94A3B8; mat-icon { font-size: 13px; width: 13px; height: 13px; } }
 
     /* ── Overlay / Popup ──────────────────────────────── */
     .overlay { position: fixed; inset: 0; background: rgba(10,24,36,0.45); backdrop-filter: blur(3px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; }
@@ -435,6 +454,31 @@ import { rescueStatusLabel } from '../../../core/utils/rescue-status.util';
 
     .rescue-photo { width: 100%; max-height: 200px; object-fit: cover; border-radius: 12px; }
     .popup-actions { display: flex; gap: 10px; margin-top: 4px; }
+
+    /* ── Reporter Contact Box ─────────────────────────── */
+    .reporter-contact-box {
+      background: #F0FDF4; border: 1px solid #A7F3D0; border-radius: 14px;
+      padding: 14px 16px; margin-bottom: 14px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .reporter-contact-label {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.62rem; font-weight: 800; color: #15803D;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      mat-icon { font-size: 15px; width: 15px; height: 15px; }
+    }
+    .reporter-call-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: #22C55E; color: #fff; border-radius: 12px;
+      padding: 10px 18px; text-decoration: none;
+      font-size: 1rem; font-weight: 800; letter-spacing: 0.02em;
+      transition: background 0.15s; width: fit-content;
+      mat-icon { font-size: 20px; width: 20px; height: 20px; }
+      &:hover { background: #16A34A; }
+    }
+    .call-hint {
+      font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.8); margin-left: 2px;
+    }
   `]
 })
 export class NgoRescuesComponent implements OnInit {
@@ -446,6 +490,7 @@ export class NgoRescuesComponent implements OnInit {
 
   filter = { search: '', status: '', criticality: '', sort: 'newest' };
 
+  get pendingCount()   { return this.rescues.filter(r => r.status === 'PENDING').length; }
   get assignedCount()  { return this.rescues.filter(r => r.status === 'ASSIGNED').length; }
   get inProgressCount(){ return this.rescues.filter(r => r.status === 'IN_PROGRESS').length; }
   get completedCount() { return this.rescues.filter(r => r.status === 'COMPLETED' || r.status === 'RESOLVED').length; }
@@ -462,6 +507,7 @@ export class NgoRescuesComponent implements OnInit {
 
   statusClass(s: string): string {
     switch (s?.toUpperCase()) {
+      case 'PENDING':     return 'chip-pending';
       case 'ASSIGNED':    return 'chip-assigned';
       case 'IN_PROGRESS': return 'chip-in_progress';
       case 'COMPLETED':

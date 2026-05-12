@@ -231,7 +231,7 @@ import { AuthService } from '../../../core/services/auth.service';
     .hero-img-wrap {
       position: relative;
       height: 360px;
-      background: #FFF4EE;
+      background: #FFF7ED;
       img { width: 100%; height: 100%; object-fit: cover; }
     }
     .species-overlay {
@@ -259,7 +259,7 @@ import { AuthService } from '../../../core/services/auth.service';
     }
     .ptag-green  { background: #D1FAE5; color: #065F46; }
     .ptag-blue   { background: #DBEAFE; color: #1E40AF; }
-    .ptag-orange { background: #FFEDD5; color: #9A3412; }
+    .ptag-orange { background: #FFF3E8; color: #9A3412; }
     .ptag-grey   { background: #F1F5F9; color: #475569; }
     .location-row {
       display: flex; align-items: center; gap: 4px;
@@ -326,7 +326,7 @@ import { AuthService } from '../../../core/services/auth.service';
     /* Login nudge */
     .login-nudge {
       display: flex; align-items: center; gap: 16px;
-      background: #FFF7ED; border: 1px solid #FFEDD5;
+      background: #FFF3E8; border: 1px solid #C8DCE8;
       border-radius: 18px; padding: 20px 24px;
       margin-bottom: 24px;
       mat-icon { font-size: 28px; color: #FF8C42; flex-shrink: 0; }

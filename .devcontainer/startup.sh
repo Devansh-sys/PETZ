@@ -54,8 +54,8 @@ BACKEND_PID=$!
 # Wait until the backend responds (max 120s)
 echo "   ⏳ Waiting for backend to be ready..."
 TRIES=0
-until curl -sf "http://localhost:8081/api/v1/public/health" > /dev/null 2>&1 \
-   || curl -sf "http://localhost:8081/api/v1/actuator/health" > /dev/null 2>&1 \
+until curl -sf "http://localhost:8081/api/public/health" > /dev/null 2>&1 \
+   || curl -sf "http://localhost:8081/api/actuator/health" > /dev/null 2>&1 \
    || (( TRIES++ >= 60 )); do
   sleep 2
 done

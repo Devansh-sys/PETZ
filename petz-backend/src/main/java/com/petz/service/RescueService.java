@@ -44,6 +44,7 @@ public class RescueService {
     public RescueReport submitRescue(Long reporterId, RescueRequest req, MultipartFile photo) throws IOException {
         RescueReport r = new RescueReport();
         r.setReporterId(reporterId);
+        r.setReporterPhone(req.getReporterPhone());
         r.setAnimalType(req.getAnimalType());
         r.setDescription(req.getDescription());
         r.setLatitude(req.getLatitude());

@@ -103,13 +103,13 @@ import { Pet } from '../../../core/models/pet.model';
       &:hover {
         transform: translateY(-4px);
         box-shadow: 0 12px 36px rgba(26,53,71,0.12);
-        border-color: #FDBF8A;
+        border-color: #C8DCE8;
       }
     }
     .pet-img-wrap {
       position: relative;
       height: 165px;
-      background: #FFF4EE;
+      background: #FFF7ED;
       overflow: hidden;
     }
     .pet-img-cover {

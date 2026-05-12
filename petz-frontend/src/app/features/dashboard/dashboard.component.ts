@@ -166,7 +166,7 @@ const CIRC = +(2 * Math.PI * 34).toFixed(2); // 213.63
       <div class="sc-ring">
         <svg width="92" height="92" viewBox="0 0 92 92">
           <circle cx="46" cy="46" r="34" fill="none"
-                  stroke="rgba(255,255,255,0.18)" stroke-width="10"/>
+                  stroke="#E0EBF2" stroke-width="10"/>
           @if (card.segs.length === 0) {
             <circle cx="46" cy="46" r="34" fill="none"
                     [attr.stroke]="empty" stroke-width="10" stroke-opacity="0.25"
@@ -181,7 +181,7 @@ const CIRC = +(2 * Math.PI * 34).toFixed(2); // 213.63
                     transform="rotate(-90 46 46)"/>
           }
           <text x="46" y="51" text-anchor="middle"
-                font-size="21" font-weight="900" fill="white"
+                font-size="21" font-weight="900" fill="#1A3547"
                 font-family="system-ui,-apple-system,sans-serif">{{ card.total }}</text>
         </svg>
       </div>
@@ -215,7 +215,7 @@ const CIRC = +(2 * Math.PI * 34).toFixed(2); // 213.63
       display: flex; justify-content: space-between; align-items: flex-start;
       margin-bottom: 28px;
     }
-    .greeting-text { font-size: 1.9rem; font-weight: 900; color: #FF8C42; margin: 0 0 4px; }
+    .greeting-text { font-size: 1.9rem; font-weight: 900; color: #1A3547; margin: 0 0 4px; }
     .date-badge {
       display: flex; align-items: center; gap: 6px;
       background: #fff; border: 1px solid #E0EBF2; border-radius: 10px;
@@ -282,48 +282,56 @@ const CIRC = +(2 * Math.PI * 34).toFixed(2); // 213.63
       align-items: start; /* rows don't grow when a card's sc-bottom expands */
     }
 
-    /* ── Stat card shell ── */
+    /* ── Stat card shell — ClickUp white-card pattern ── */
     .stat-card-v2 {
       border-radius: 20px; overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      background: #fff;
+      border: 1px solid #E0EBF2;
+      box-shadow: 0 2px 10px rgba(26,53,71,0.06);
       transition: transform 0.22s ease, box-shadow 0.22s ease;
       cursor: default;
-      position: relative; z-index: 1; /* allow hover z-index elevation */
-      &:hover { transform: translateY(-5px); z-index: 10; }
-      &.orange:hover { box-shadow: 0 14px 40px rgba(255,140,66,0.35); }
-      &.purple:hover { box-shadow: 0 14px 40px rgba(124,58,237,0.35); }
-      &.pink:hover   { box-shadow: 0 14px 40px rgba(219,39,119,0.35); }
-      &.green:hover  { box-shadow: 0 14px 40px rgba(5,150,105,0.35); }
+      position: relative; z-index: 1;
+      &:hover { transform: translateY(-4px); box-shadow: 0 10px 28px rgba(26,53,71,0.10); z-index: 10; border-color: #C8DCE8; }
+      // Colored top accent bar via ::before (more reliable than border-top shorthand)
+      &::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0;
+        height: 4px; z-index: 2;
+      }
+      &.orange::before { background: #F97316; }
+      &.purple::before { background: #7C3AED; }
+      &.pink::before   { background: #DB2777; }
+      &.green::before  { background: #059669; }
     }
 
-    /* ── Top gradient half ── */
+    /* ── Top section — NOW WHITE ── */
     .sc-top {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 14px 16px 20px; min-height: 118px;
+      padding: 18px 14px 14px 20px; min-height: 118px;
+      background: #fff;
     }
-    .stat-card-v2.orange .sc-top { background: linear-gradient(135deg,#FFAB5E 0%,#FF8C42 100%); }
-    .stat-card-v2.purple .sc-top { background: linear-gradient(135deg,#C084FC 0%,#7C3AED 100%); }
-    .stat-card-v2.pink   .sc-top { background: linear-gradient(135deg,#F472B6 0%,#DB2777 100%); }
-    .stat-card-v2.green  .sc-top { background: linear-gradient(135deg,#34D399 0%,#059669 100%); }
 
     .sc-info { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
     .sc-icon-box {
-      width: 36px; height: 36px; border-radius: 10px;
-      background: rgba(255,255,255,0.25);
-      display: flex; align-items: center; justify-content: center; margin-bottom: 6px;
-      mat-icon { font-size: 19px; width: 19px; height: 19px; color: #fff; }
+      width: 38px; height: 38px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 8px;
+      mat-icon { font-size: 20px; width: 20px; height: 20px; }
     }
-    .sc-label  { font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.9); text-transform: uppercase; letter-spacing: 0.06em; }
-    .sc-insight {
-      font-size: 0.74rem; font-weight: 600; color: rgba(255,255,255,0.68);
-      transition: color 0.2s, font-weight 0.2s;
-    }
-    .stat-card-v2:hover .sc-insight { color: rgba(255,255,255,0.95); font-weight: 700; }
+    .stat-card-v2.orange .sc-icon-box { background: rgba(249,115,22,0.10); mat-icon { color: #F97316; } }
+    .stat-card-v2.purple .sc-icon-box { background: rgba(124,58,237,0.10); mat-icon { color: #7C3AED; } }
+    .stat-card-v2.pink   .sc-icon-box { background: rgba(219,39,119,0.10); mat-icon { color: #DB2777; } }
+    .stat-card-v2.green  .sc-icon-box { background: rgba(5,150,105,0.10);  mat-icon { color: #059669; } }
 
-    /* donut ring */
-    .sc-ring { flex-shrink: 0; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.12)); }
+    .sc-label  { font-size: 0.78rem; font-weight: 700; color: #4A6478; text-transform: uppercase; letter-spacing: 0.06em; }
+    .sc-insight {
+      font-size: 0.74rem; font-weight: 600; color: #8BA3B5;
+      transition: color 0.2s;
+    }
+    .stat-card-v2:hover .sc-insight { color: #4A6478; }
+
+    /* donut ring — darken the empty ring stroke for white bg */
+    .sc-ring { flex-shrink: 0; }
     .sc-ring svg { transition: transform 0.25s ease; }
-    .stat-card-v2:hover .sc-ring svg { transform: scale(1.1); }
+    .stat-card-v2:hover .sc-ring svg { transform: scale(1.06); }
 
     /* ── Bottom legend half ── */
     .sc-bottom {
@@ -393,14 +401,14 @@ const CIRC = +(2 * Math.PI * 34).toFixed(2); // 213.63
       display: flex; align-items: center; gap: 16px;
       background: #fff; border: 1px solid #E0EBF2;
       border-radius: 16px; padding: 18px 20px; cursor: pointer; transition: all 0.2s;
-      &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-color: #FDBF8A; }
+      &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,53,71,0.09); border-color: #C8DCE8; }
     }
     .action-icon {
       width: 48px; height: 48px; border-radius: 14px;
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
       mat-icon { font-size: 22px; width: 22px; height: 22px; color: #fff; }
       &.red    { background: linear-gradient(135deg,#F87171,#DC2626); }
-      &.orange { background: linear-gradient(135deg,#FF9F5A,#FF8C42); }
+      &.orange { background: linear-gradient(135deg,#FCD34D,#F59E0B); }
       &.purple { background: linear-gradient(135deg,#B97AFB,#7C3AED); }
       &.green  { background: linear-gradient(135deg,#34D399,#059669); }
       &.teal   { background: linear-gradient(135deg,#22D3EE,#0891B2); }

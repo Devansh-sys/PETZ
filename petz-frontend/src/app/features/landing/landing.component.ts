@@ -88,7 +88,7 @@ import { AuthService } from '../../core/services/auth.service';
             <!-- Main pet card -->
             <div class="art-card art-main">
               <div class="art-card-top">
-                <div class="art-icon-box" style="background:linear-gradient(135deg,#FF9F5A,#FF8C42)">
+                <div class="art-icon-box" style="background:linear-gradient(135deg,#F97316,#FF8C42)">
                   <mat-icon>pets</mat-icon>
                 </div>
                 <span class="art-pill green">Ready to Adopt</span>
@@ -172,7 +172,7 @@ import { AuthService } from '../../core/services/auth.service';
 
           <!-- Card 1 — Manage Pets (wide) -->
           <div class="bento-card bento-wide bento-animate" style="animation-delay:0ms">
-            <div class="bento-icon-box" style="background:linear-gradient(135deg,#FF9F5A,#FF8C42)">
+            <div class="bento-icon-box" style="background:linear-gradient(135deg,#F97316,#FF8C42)">
               <mat-icon>pets</mat-icon>
             </div>
             <h3 class="bento-title">Manage Your Pets</h3>
@@ -180,7 +180,7 @@ import { AuthService } from '../../core/services/auth.service';
               Keep all pet records, vaccinations, medical history, and appointment schedules
               in one beautiful, easy-to-navigate dashboard.
             </p>
-            <span class="bento-tag" style="background:#FFE8D6;color:#9A3412">For Pet Owners</span>
+            <span class="bento-tag" style="background:#FFF3E8;color:#E07828">For Pet Owners</span>
           </div>
 
           <!-- Card 2 — Rescue (tall) -->
@@ -385,14 +385,14 @@ import { AuthService } from '../../core/services/auth.service';
       align-items: center;
       padding: 0 6%;
       height: 68px;
-      background: rgba(255,248,244,0.88);
+      background: rgba(248,251,252,0.90);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(240,224,214,0.6);
+      border-bottom: 1px solid rgba(224,235,242,0.7);
       transition: box-shadow 0.3s, background 0.3s;
     }
     .landing-nav.scrolled {
-      background: rgba(255,248,244,0.98);
+      background: rgba(249,251,251,0.98);
       box-shadow: 0 2px 24px rgba(26,53,71,0.08);
     }
 
@@ -409,7 +409,7 @@ import { AuthService } from '../../core/services/auth.service';
       color: #1A3547;
       letter-spacing: 2px;
       text-transform: uppercase;
-      span { color: #FF8C42; }
+      span { color: #FF8C42; }  // Gold brand accent
     }
 
     .nav-links {
@@ -445,7 +445,7 @@ import { AuthService } from '../../core/services/auth.service';
       cursor: pointer;
       font-family: 'Inter', system-ui, sans-serif;
       transition: all 0.2s;
-      &:hover { background: #FFF3EC; border-color: #FF8C42; color: #FF8C42; }
+      &:hover { background: #FFF7ED; border-color: #FF8C42; color: #FF8C42; }
     }
 
     .btn-nav-primary {
@@ -458,9 +458,9 @@ import { AuthService } from '../../core/services/auth.service';
       font-weight: 700;
       cursor: pointer;
       font-family: 'Inter', system-ui, sans-serif;
-      box-shadow: 0 4px 14px rgba(255,140,66,0.35);
+      box-shadow: 0 4px 14px rgba(255,140,66,0.30);
       transition: all 0.2s;
-      &:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,140,66,0.5); }
+      &:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,140,66,0.45); }
     }
 
     /* ══════════ HERO ══════════ */
@@ -469,7 +469,7 @@ import { AuthService } from '../../core/services/auth.service';
       padding: 68px 6% 0;
       display: flex;
       align-items: center;
-      background: linear-gradient(160deg, #F9FBFB 55%, #FFE8D6 100%);
+      background: linear-gradient(160deg, #F9FBFB 55%, #FFF7ED 100%);
       position: relative;
       overflow: hidden;
     }
@@ -478,13 +478,13 @@ import { AuthService } from '../../core/services/auth.service';
       position: absolute;
       width: 600px; height: 600px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,140,66,0.09) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(255,140,66,0.07) 0%, transparent 70%);
       top: -100px; right: -100px;
       pointer-events: none;
     }
     .hero-bg-blob.b2 {
       width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(255,140,66,0.06) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(255,140,66,0.05) 0%, transparent 70%);
       bottom: -80px; left: -80px;
       top: auto; right: auto;
     }
@@ -537,7 +537,7 @@ import { AuthService } from '../../core/services/auth.service';
       margin: 0 0 22px;
     }
     .text-grad {
-      background: linear-gradient(135deg, #FF9F5A, #FF8C42);
+      background: linear-gradient(135deg, #FF8C42, #E07828);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -571,11 +571,11 @@ import { AuthService } from '../../core/services/auth.service';
       font-weight: 700;
       cursor: pointer;
       font-family: 'Inter', system-ui, sans-serif;
-      box-shadow: 0 6px 24px rgba(255,140,66,0.4);
+      box-shadow: 0 6px 24px rgba(255,140,66,0.38);
       transition: all 0.22s;
       text-decoration: none;
       border: none;
-      &:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(255,140,66,0.52); }
+      &:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(255,140,66,0.50); }
     }
 
     .btn-hero-ghost {
@@ -593,7 +593,7 @@ import { AuthService } from '../../core/services/auth.service';
       font-family: 'Inter', system-ui, sans-serif;
       transition: all 0.2s;
       text-decoration: none;
-      &:hover { background: #FFF3EC; border-color: #FF8C42; color: #FF8C42; }
+      &:hover { background: #FFF7ED; border-color: #FF8C42; color: #FF8C42; }
     }
 
     .hero-trust {
@@ -765,7 +765,7 @@ import { AuthService } from '../../core/services/auth.service';
 
     /* ══════════ STATS STRIP ══════════ */
     .stats-section {
-      background: linear-gradient(160deg, #1A3547 0%, #2D5D7B 60%, #3D7EA6 100%);
+      background: linear-gradient(160deg, #1A3547 0%, #2D5D7B 60%, #FF8C42 100%);
       padding: 60px 6%;
     }
     .stats-inner {
@@ -904,7 +904,7 @@ import { AuthService } from '../../core/services/auth.service';
     /* ══════════ HOW IT WORKS ══════════ */
     .how-section {
       padding: 100px 6%;
-      background: linear-gradient(160deg, #FFF3EC 0%, #F9FBFB 60%);
+      background: linear-gradient(160deg, #F0F5F9 0%, #F9FBFB 60%);
     }
     .how-inner { max-width: 1040px; margin: 0 auto; }
 
@@ -1030,7 +1030,7 @@ import { AuthService } from '../../core/services/auth.service';
     /* ══════════ CTA BANNER ══════════ */
     .cta-section {
       padding: 80px 6%;
-      background: linear-gradient(135deg, #FF9F5A 0%, #FF8C42 50%, #E87530 100%);
+      background: linear-gradient(160deg, #1A3547 0%, #2D5D7B 60%, #FF8C42 100%);
       position: relative;
       overflow: hidden;
       &::before {
@@ -1080,7 +1080,7 @@ import { AuthService } from '../../core/services/auth.service';
       padding: 14px 30px;
       border-radius: 14px;
       background: #fff;
-      color: #FF8C42;
+      color: #1A3547;
       font-size: 0.95rem;
       font-weight: 800;
       text-decoration: none;

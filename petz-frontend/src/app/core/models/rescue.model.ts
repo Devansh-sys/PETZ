@@ -1,6 +1,7 @@
 export interface RescueReport {
   id: number;
   reporterId: number;
+  reporterPhone?: string;
   assignedNgo?: number;
   animalType?: string;
   description?: string;
@@ -28,4 +29,5 @@ export interface RescueRequest {
   longitude?: number;
   address?: string;
   criticality?: string;
+  reporterPhone?: string;
 }

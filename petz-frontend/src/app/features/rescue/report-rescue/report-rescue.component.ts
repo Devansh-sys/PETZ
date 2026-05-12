@@ -163,8 +163,27 @@ const CHENNAI_AREAS: ChennaiArea[] = [
             </div>
           }
 
+          <!-- Reporter Contact -->
+          <div class="form-section-title" style="margin-top:16px">Your Contact</div>
+
+          <div class="field-group">
+            <label class="field-label">Your mobile number * <span class="phone-why">(so the NGO can reach you at the location)</span></label>
+            <mat-form-field appearance="outline">
+              <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">phone</mat-icon>
+              <input matInput formControlName="reporterPhone" type="tel"
+                     placeholder="10-digit mobile number e.g. 9876543210"
+                     maxlength="10">
+              @if (form.get('reporterPhone')?.hasError('required')) {
+                <mat-error>Mobile number is required</mat-error>
+              }
+              @if (form.get('reporterPhone')?.hasError('pattern')) {
+                <mat-error>Enter a valid 10-digit Indian mobile number (starts with 6–9)</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
           <!-- Situation Details -->
-          <div class="form-section-title" style="margin-top:16px">Situation Details</div>
+          <div class="form-section-title" style="margin-top:8px">Situation Details</div>
 
           <div class="field-group">
             <label class="field-label">Describe the animal's condition *</label>
@@ -253,7 +272,7 @@ const CHENNAI_AREAS: ChennaiArea[] = [
     }
     .address-preview {
       display: flex; align-items: center; gap: 8px;
-      background: #FFF7ED; border: 1px solid #FFEDD5;
+      background: #FFF7ED; border: 1px solid #FFF3E8;
       border-radius: 10px; padding: 10px 14px;
       font-size: 0.82rem; color: #9A3412; font-weight: 600;
       margin-bottom: 4px;
@@ -271,6 +290,9 @@ const CHENNAI_AREAS: ChennaiArea[] = [
       display: flex !important; align-items: center !important; gap: 6px !important;
       &:not(:disabled):hover { box-shadow: 0 6px 20px rgba(220,38,38,0.5) !important; }
       &:disabled { background: #C8DCE8 !important; box-shadow: none !important; }
+    }
+    .phone-why {
+      font-size: 0.72rem; font-weight: 500; color: #8BA3B5; margin-left: 4px;
     }
     .location-warn {
       display: flex; align-items: center; gap: 6px;
@@ -301,11 +323,12 @@ export class ReportRescueComponent {
     private snack: MatSnackBar
   ) {
     this.form = this.fb.group({
-      animalType:  ['', Validators.required],
-      criticality: ['MEDIUM'],
-      area:        [null, Validators.required],
-      landmark:    ['', Validators.required],
-      description: ['', Validators.required]
+      animalType:    ['', Validators.required],
+      criticality:   ['MEDIUM'],
+      area:          [null, Validators.required],
+      landmark:      ['', Validators.required],
+      reporterPhone: ['', [Validators.required, Validators.pattern(/^[6-9]\d{9}$/)]],
+      description:   ['', Validators.required]
     });
   }
 
@@ -376,12 +399,13 @@ export class ReportRescueComponent {
     const address  = landmark ? `${landmark}, ${area?.address}` : area?.address;
 
     const payload = {
-      animalType:  this.form.get('animalType')?.value,
-      criticality: this.form.get('criticality')?.value,
-      description: this.form.get('description')?.value,
-      address:     address,
-      latitude:    this.lat || area?.lat,
-      longitude:   this.lng || area?.lng
+      animalType:    this.form.get('animalType')?.value,
+      criticality:   this.form.get('criticality')?.value,
+      description:   this.form.get('description')?.value,
+      address:       address,
+      latitude:      this.lat || area?.lat,
+      longitude:     this.lng || area?.lng,
+      reporterPhone: this.form.get('reporterPhone')?.value
     };
 
     const formData = new FormData();

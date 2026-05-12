@@ -24,6 +24,9 @@ public class RescueReport {
     @Column(name = "reporter_id", nullable = false)
     private Long reporterId;
 
+    @Column(name = "reporter_phone", length = 20)
+    private String reporterPhone;
+
     @Column(name = "assigned_ngo")
     private Long assignedNgo;
 
