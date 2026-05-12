@@ -1,0 +1,69 @@
+
+    <div class="page-container" style="max-width:780px">
+
+      <!-- Header -->
+      <div class="page-header" style="margin-bottom:24px">
+        <div class="page-header-left" style="display:flex;align-items:center">
+          <button mat-icon-button [routerLink]="dashboardRoute"
+                  style="background:#fff;border:1px solid #E0EBF2;border-radius:10px;margin-right:12px">
+            <mat-icon style="color:#4A6478">arrow_back</mat-icon>
+          </button>
+          <div>
+            <h1>Notifications</h1>
+            <p>Stay updated on your activity</p>
+          </div>
+        </div>
+        @if (notifications.length > 0) {
+          <button mat-stroked-button (click)="markAllRead()"
+                  style="border-radius:10px;color:#4A6478;border-color:#C8DCE8;height:40px">
+            <mat-icon>done_all</mat-icon> Mark all read
+          </button>
+        }
+      </div>
+
+      <!-- Loading -->
+      @if (loading) {
+        <div class="loading-state">
+          <mat-spinner diameter="32"></mat-spinner>
+          <span>Loading notifications...</span>
+        </div>
+      }
+
+      @if (!loading) {
+
+        <!-- Empty -->
+        @if (notifications.length === 0) {
+          <div class="card">
+            <div class="empty-state">
+              <div class="empty-icon"><mat-icon>notifications_none</mat-icon></div>
+              <h3>All caught up!</h3>
+              <p>No notifications yet. Activity updates will appear here.</p>
+            </div>
+          </div>
+        }
+
+        <!-- Notification list -->
+        @if (notifications.length > 0) {
+          <div class="notif-list">
+            @for (n of notifications; track n.id) {
+              <div class="notif-card" [class.unread]="!n.isRead" (click)="markRead(n)">
+                <div class="notif-icon-wrap" [ngClass]="iconClass(n.type)">
+                  <mat-icon>{{ iconFor(n.type) }}</mat-icon>
+                </div>
+                <div class="notif-body">
+                  <p class="notif-title">{{ n.title }}</p>
+                  <p class="notif-msg">{{ n.message }}</p>
+                  @if (n.createdAt) {
+                    <p class="notif-time">{{ n.createdAt | date:'MMM d, y · h:mm a' }}</p>
+                  }
+                </div>
+                @if (!n.isRead) {
+                  <div class="unread-dot"></div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+      }
+    </div>

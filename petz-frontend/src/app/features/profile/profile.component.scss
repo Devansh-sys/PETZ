@@ -1,0 +1,88 @@
+
+    .profile-card {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 28px 28px;
+      margin-bottom: 16px;
+    }
+    .profile-avatar {
+      width: 72px; height: 72px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #FF9F5A, #FF8C42);
+      color: #fff;
+      font-size: 2rem;
+      font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 8px 24px rgba(255,140,66,0.3);
+    }
+    .profile-name {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #1A3547;
+      margin-bottom: 8px;
+    }
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .role-icon { font-size: 14px; width: 14px; height: 14px; }
+    .role-user      { background: #EFF6FF; color: #1D4ED8; }
+    .role-ngo       { background: #F0FDF4; color: #15803D; }
+    .role-hospital  { background: #FFF1F2; color: #BE123C; }
+    .role-admin     { background: #FFF7ED; color: #9A3412; }
+
+    .info-card {
+      padding: 24px 28px;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #8BA3B5;
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #E0EBF2;
+    }
+    .info-grid { display: flex; flex-direction: column; gap: 14px; }
+    .info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .info-icon-wrap {
+      width: 38px; height: 38px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      mat-icon { font-size: 18px; width: 18px; height: 18px; color: #fff; }
+    }
+    .info-icon-wrap.orange { background: linear-gradient(135deg,#FF9F5A,#FF8C42); }
+    .info-icon-wrap.purple { background: linear-gradient(135deg,#B97AFB,#7C3AED); }
+    .info-icon-wrap.green  { background: linear-gradient(135deg,#34D399,#059669); }
+    .info-icon-wrap.red    { background: linear-gradient(135deg,#F87171,#DC2626); }
+
+    .info-content { display: flex; flex-direction: column; padding-top: 2px; }
+    .info-label { font-size: 0.72rem; font-weight: 700; color: #8BA3B5; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+    .info-value { font-size: 0.9rem; font-weight: 600; color: #1A3547; }
+
+    .status-active   { color: #15803D; font-weight: 700; }
+    .status-inactive { color: #DC2626; font-weight: 700; }
+
+    .admin-notice {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 32px;
+    }

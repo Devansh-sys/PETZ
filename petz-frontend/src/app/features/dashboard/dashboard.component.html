@@ -1,0 +1,195 @@
+<div class="page-container">
+
+  <!-- ── Greeting ── -->
+  <div class="greeting-row">
+    <div>
+      <h1 class="greeting-text">{{ greeting }}, {{ firstName }}! 🐾</h1>
+      <p class="page-subtitle">Here's today's overview of the platform.</p>
+    </div>
+    <div class="date-badge">
+      <mat-icon style="font-size:16px;width:16px;height:16px;color:#FF8C42">calendar_today</mat-icon>
+      <span>{{ today }}</span>
+    </div>
+  </div>
+
+  <!-- ── Emergency Banner ── -->
+  <div class="emergency-banner" routerLink="/rescue/report">
+    <div class="emergency-left">
+      <div class="emergency-icon-wrap">
+        <mat-icon class="emergency-icon">crisis_alert</mat-icon>
+      </div>
+      <div class="emergency-text">
+        <span class="emergency-title">Animal in Distress?</span>
+        <span class="emergency-sub">Report it immediately — every second counts.</span>
+      </div>
+    </div>
+    <button class="emergency-btn" (click)="$event.stopPropagation()" routerLink="/rescue/report">
+      <mat-icon>arrow_forward</mat-icon>
+      Report Now
+    </button>
+  </div>
+
+  <!-- ── Stat cards ── -->
+  <div class="stats-grid">
+
+    <div class="stat-card-v2 orange"
+         (mouseenter)="hoveredCard='pets'" (mouseleave)="hoveredCard=null">
+      <div class="sc-top">
+        <div class="sc-info">
+          <div class="sc-icon-box"><mat-icon>pets</mat-icon></div>
+          <div class="sc-label">My Pets</div>
+          <div class="sc-insight">{{ petCard.insight }}</div>
+        </div>
+        <ng-container *ngTemplateOutlet="donut; context:{card:petCard, empty:'#FF9F5A'}"></ng-container>
+      </div>
+      <div class="sc-bottom">
+        <ng-container *ngTemplateOutlet="legend; context:{card:petCard, key:'pets'}"></ng-container>
+      </div>
+    </div>
+
+    <div class="stat-card-v2 purple"
+         (mouseenter)="hoveredCard='appts'" (mouseleave)="hoveredCard=null">
+      <div class="sc-top">
+        <div class="sc-info">
+          <div class="sc-icon-box"><mat-icon>event</mat-icon></div>
+          <div class="sc-label">Appointments</div>
+          <div class="sc-insight">{{ apptCard.insight }}</div>
+        </div>
+        <ng-container *ngTemplateOutlet="donut; context:{card:apptCard, empty:'#B97AFB'}"></ng-container>
+      </div>
+      <div class="sc-bottom">
+        <ng-container *ngTemplateOutlet="legend; context:{card:apptCard, key:'appts'}"></ng-container>
+      </div>
+    </div>
+
+    <div class="stat-card-v2 pink"
+         (mouseenter)="hoveredCard='rescue'" (mouseleave)="hoveredCard=null">
+      <div class="sc-top">
+        <div class="sc-info">
+          <div class="sc-icon-box"><mat-icon>emergency</mat-icon></div>
+          <div class="sc-label">Rescue Reports</div>
+          <div class="sc-insight">{{ rescueCard.insight }}</div>
+        </div>
+        <ng-container *ngTemplateOutlet="donut; context:{card:rescueCard, empty:'#F472B6'}"></ng-container>
+      </div>
+      <div class="sc-bottom">
+        <ng-container *ngTemplateOutlet="legend; context:{card:rescueCard, key:'rescue'}"></ng-container>
+      </div>
+    </div>
+
+    <div class="stat-card-v2 green"
+         (mouseenter)="hoveredCard='adopt'" (mouseleave)="hoveredCard=null">
+      <div class="sc-top">
+        <div class="sc-info">
+          <div class="sc-icon-box"><mat-icon>favorite</mat-icon></div>
+          <div class="sc-label">Adoptions</div>
+          <div class="sc-insight">{{ adoptCard.insight }}</div>
+        </div>
+        <ng-container *ngTemplateOutlet="donut; context:{card:adoptCard, empty:'#34D399'}"></ng-container>
+      </div>
+      <div class="sc-bottom">
+        <ng-container *ngTemplateOutlet="legend; context:{card:adoptCard, key:'adopt'}"></ng-container>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Quick actions ── -->
+  <div class="section-header"><h2>Quick Actions</h2></div>
+
+  <div class="actions-grid">
+    <div class="action-card" routerLink="/rescue">
+      <div class="action-icon red"><mat-icon>emergency</mat-icon></div>
+      <div>
+        <p class="action-title">Report Rescue</p>
+        <p class="action-desc">Submit a new animal rescue report</p>
+      </div>
+      <mat-icon class="action-arrow">chevron_right</mat-icon>
+    </div>
+
+    <div class="action-card" routerLink="/adoption/animals">
+      <div class="action-icon orange"><mat-icon>favorite</mat-icon></div>
+      <div>
+        <p class="action-title">Browse Adoptions</p>
+        <p class="action-desc">Find animals looking for a home</p>
+      </div>
+      <mat-icon class="action-arrow">chevron_right</mat-icon>
+    </div>
+
+    <div class="action-card" routerLink="/appointments/book">
+      <div class="action-icon purple"><mat-icon>event</mat-icon></div>
+      <div>
+        <p class="action-title">Book Appointment</p>
+        <p class="action-desc">Schedule a vet visit for your pet</p>
+      </div>
+      <mat-icon class="action-arrow">chevron_right</mat-icon>
+    </div>
+
+    <div class="action-card" routerLink="/adoption/my">
+      <div class="action-icon green"><mat-icon>favorite</mat-icon></div>
+      <div>
+        <p class="action-title">My Adoptions</p>
+        <p class="action-desc">Track your adoption applications</p>
+      </div>
+      <mat-icon class="action-arrow">chevron_right</mat-icon>
+    </div>
+
+    <div class="action-card" routerLink="/appointments">
+      <div class="action-icon teal"><mat-icon>calendar_month</mat-icon></div>
+      <div>
+        <p class="action-title">My Appointments</p>
+        <p class="action-desc">View all your scheduled vet visits</p>
+      </div>
+      <mat-icon class="action-arrow">chevron_right</mat-icon>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Donut ring template ── -->
+<ng-template #donut let-card="card" let-empty="empty">
+  <div class="sc-ring">
+    <svg width="92" height="92" viewBox="0 0 92 92">
+      <circle cx="46" cy="46" r="34" fill="none"
+              stroke="#E0EBF2" stroke-width="10"/>
+      @if (card.segs.length === 0) {
+        <circle cx="46" cy="46" r="34" fill="none"
+                [attr.stroke]="empty" stroke-width="10" stroke-opacity="0.25"
+                [attr.stroke-dasharray]="circ + ' 0'"
+                transform="rotate(-90 46 46)"/>
+      }
+      @for (s of card.segs; track $index) {
+        <circle cx="46" cy="46" r="34" fill="none"
+                [attr.stroke]="s.color" stroke-width="10"
+                [attr.stroke-dasharray]="s.dash"
+                [attr.stroke-dashoffset]="s.offset"
+                transform="rotate(-90 46 46)"/>
+      }
+      <text x="46" y="51" text-anchor="middle"
+            font-size="21" font-weight="900" fill="#1A3547"
+            font-family="system-ui,-apple-system,sans-serif">{{ card.total }}</text>
+    </svg>
+  </div>
+</ng-template>
+
+<!-- ── Legend template (reused per card) ── -->
+<ng-template #legend let-card="card" let-key="key">
+  @for (l of card.legend; track l.label) {
+    <div class="leg-item" [class.hovered]="hoveredCard === key">
+      <div class="leg-main">
+        <span class="leg-dot" [style.background]="l.color"></span>
+        <span class="leg-lbl">{{ l.label }}</span>
+        <span class="leg-cnt">{{ l.count }}</span>
+        <span class="leg-pct">{{ l.pct }}%</span>
+      </div>
+      <div class="leg-bar-track">
+        <div class="leg-bar-fill"
+             [style.background]="l.color"
+             [style.width.%]="hoveredCard === key ? l.pct : 0"></div>
+      </div>
+    </div>
+  }
+  @if (card.total === 0) {
+    <span class="leg-empty">No data yet</span>
+  }
+</ng-template>
