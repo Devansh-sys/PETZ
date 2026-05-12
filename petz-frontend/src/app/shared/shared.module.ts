@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ChatbotComponent } from './chatbot/chatbot.component';
 
 // Angular Material
 import { MatCardModule } from '@angular/material/card';
@@ -32,8 +31,8 @@ const MATERIAL = [
 ];
 
 @NgModule({
-  declarations: [ChatbotComponent],
+  declarations: [],
   imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, ...MATERIAL],
-  exports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, ...MATERIAL, ChatbotComponent]
+  exports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, ...MATERIAL]
 })
 export class SharedModule {}
