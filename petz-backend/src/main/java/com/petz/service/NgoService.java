@@ -4,6 +4,7 @@ import com.petz.entity.Ngo;
 import com.petz.exception.BadRequestException;
 import com.petz.exception.ResourceNotFoundException;
 import com.petz.repository.NgoRepository;
+import com.petz.repository.UserRepository;
 import com.petz.util.FileStorageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.Map;
 public class NgoService {
 
     private final NgoRepository ngoRepo;
+    private final UserRepository userRepo;
     private final FileStorageUtil fileStorage;
 
     public Ngo createOrUpdate(Long ownerUserId, Map<String, Object> body) {
@@ -47,10 +49,10 @@ public class NgoService {
         return ngoRepo.findByIsActive(true);
     }
 
-    // Admin-specific: returns only APPROVED (active) NGOs for the management page.
-    // Pending NGOs are handled separately via the pending-approvals endpoint.
+    // Admin-specific: returns ALL NGOs (active and inactive) so admin can manage them.
+    // Pending NGOs still appear in the pending-approvals section for user accounts.
     public List<Ngo> getAllForAdmin() {
-        return ngoRepo.findByIsActive(true);
+        return ngoRepo.findAll();
     }
 
     public List<Ngo> getUnverified() {
@@ -73,6 +75,16 @@ public class NgoService {
     public Ngo toggleActive(Long id, boolean active) {
         Ngo ngo = getById(id);
         ngo.setIsActive(active);
-        return ngoRepo.save(ngo);
+        ngoRepo.save(ngo);
+
+        // Sync the owner's User account isActive so login is blocked/unblocked immediately.
+        // AuthService.login() checks user.isActive — if NGO is deactivated the owner
+        // cannot log in; if reactivated they can again.
+        userRepo.findById(ngo.getOwnerUserId()).ifPresent(user -> {
+            user.setIsActive(active);
+            userRepo.save(user);
+        });
+
+        return ngo;
     }
 }

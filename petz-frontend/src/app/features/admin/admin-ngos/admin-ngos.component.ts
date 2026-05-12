@@ -629,8 +629,8 @@ export class AdminNgosComponent implements OnInit {
     this.loading = true;
     this.api.get<any>('/admin/ngos').subscribe({
       next: res => {
-        // Only show approved (active) NGOs — pending ones are in the Pending Approvals section.
-        this.ngos = (res.data ?? []).filter((n: any) => n.isActive !== false);
+        // Load ALL NGOs so admin can see and manage both active and inactive ones.
+        this.ngos = res.data ?? [];
         this.loading = false;
       },
       error: () => { this.loading = false; }

@@ -22,11 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Service
@@ -38,8 +35,6 @@ public class RescueService {
     private final NgoRepository ngoRepo;
     private final NotificationService notificationService;
     private final FileStorageUtil fileStorage;
-
-    private static final int QUEUE_TIMEOUT_MINUTES = 5;
 
     public RescueReport submitRescue(Long reporterId, RescueRequest req, MultipartFile photo) throws IOException {
         RescueReport r = new RescueReport();
@@ -58,64 +53,44 @@ public class RescueService {
             r.setPhotoUrl(fileStorage.store(photo, "rescue-photos"));
         }
         r = rescueRepo.save(r);
-        assignToNgo(r);
+        assignToNgo(r, null);
         return r;
     }
 
-    public void assignToNgo(RescueReport rescue) {
-        // Build the set of NGO IDs that have already declined or timed out for this rescue
-        Set<Long> declinedIds = new HashSet<>();
-        if (rescue.getDeclinedNgoIds() != null && !rescue.getDeclinedNgoIds().isBlank()) {
-            Arrays.stream(rescue.getDeclinedNgoIds().split(","))
-                  .map(String::trim)
-                  .filter(s -> !s.isEmpty())
-                  .map(Long::parseLong)
-                  .forEach(declinedIds::add);
-        }
-
-        // Sort NGOs by active rescue count (round-robin fairness), exclude already-declined ones
-        List<Ngo> activeNgos = ngoRepo.findByIsActive(true).stream()
-                .filter(n -> n.getIsVerified())
-                .filter(n -> !declinedIds.contains(n.getId()))
+    /**
+     * Assigns the rescue to the least-loaded active and verified NGO.
+     *
+     * @param rescue        the rescue report to assign
+     * @param excludeNgoId  NGO ID to skip (the one that just declined), or null for first assignment
+     */
+    public void assignToNgo(RescueReport rescue, Long excludeNgoId) {
+        List<Ngo> candidates = ngoRepo.findByIsActive(true).stream()
+                .filter(Ngo::getIsVerified)
+                .filter(n -> excludeNgoId == null || !n.getId().equals(excludeNgoId))
                 .sorted(Comparator.comparingLong(
                         n -> rescueRepo.countByAssignedNgoAndStatus(n.getId(), RescueStatus.IN_PROGRESS)
                 ))
-                .limit(5)
                 .toList();
 
-        // If every NGO has declined in this cycle, reset and start fresh
-        if (activeNgos.isEmpty() && !declinedIds.isEmpty()) {
-            log.info("Rescue {}: all {} NGOs declined — resetting decline list and restarting cycle.",
-                     rescue.getId(), declinedIds.size());
-            rescue.setDeclinedNgoIds(null);
+        if (candidates.isEmpty()) {
+            log.warn("Rescue {}: no active verified NGOs available to assign.", rescue.getId());
+            rescue.setStatus(RescueStatus.PENDING);
+            rescue.setAssignedNgo(null);
             rescueRepo.save(rescue);
-            activeNgos = ngoRepo.findByIsActive(true).stream()
-                    .filter(n -> n.getIsVerified())
-                    .sorted(Comparator.comparingLong(
-                            n -> rescueRepo.countByAssignedNgoAndStatus(n.getId(), RescueStatus.IN_PROGRESS)
-                    ))
-                    .limit(5)
-                    .toList();
-        }
-
-        if (activeNgos.isEmpty()) {
-            log.warn("Rescue {}: no active verified NGOs available.", rescue.getId());
             return;
         }
 
-        Ngo chosen = activeNgos.get(0);
+        Ngo chosen = candidates.get(0);
         rescue.setAssignedNgo(chosen.getId());
         rescue.setStatus(RescueStatus.ASSIGNED);
         rescueRepo.save(rescue);
 
-        // ── Update existing queue entry in-place, or create new one ──────────────
-        // Re-using the same row avoids a unique-constraint violation when re-assigning
-        // after a decline or timeout (rescue_queue.rescue_id has a UNIQUE constraint).
+        // Upsert the queue entry — reuses the same row if the rescue was previously assigned
         RescueQueue q = queueRepo.findByRescueId(rescue.getId())
                 .orElse(new RescueQueue());
         q.setRescueId(rescue.getId());
         q.setNgoId(chosen.getId());
-        q.setExpiresAt(LocalDateTime.now().plusMinutes(QUEUE_TIMEOUT_MINUTES));
+        q.setExpiresAt(LocalDateTime.now().plusYears(100)); // no timeout — kept non-null for schema compat
         q.setResponse(QueueResponse.PENDING);
         q.setRespondedAt(null);
         queueRepo.save(q);
@@ -123,7 +98,7 @@ public class RescueService {
         notificationService.notifyUser(
                 chosen.getOwnerUserId(),
                 "New Rescue Reported",
-                "A new animal rescue has been reported near you. Please respond within 5 minutes.",
+                "A new animal rescue has been reported near you. Please respond as soon as possible.",
                 rescue.getId(), "RESCUE"
         );
         log.info("Rescue {} assigned to NGO {} ({})", rescue.getId(), chosen.getId(), chosen.getName());
@@ -154,23 +129,19 @@ public class RescueService {
                     "An NGO has accepted your rescue report and is on the way.",
                     rescue.getId(), "RESCUE");
         } else {
-            // Track this NGO as declined so it won't be picked again in this rescue cycle
-            Long declinedNgoId = ngo.getId();
-            String existing = rescue.getDeclinedNgoIds();
-            rescue.setDeclinedNgoIds(
-                    (existing == null || existing.isBlank()) ? declinedNgoId.toString()
-                                                             : existing + "," + declinedNgoId
-            );
-            rescue.setStatus(RescueStatus.PENDING);
-            rescue.setAssignedNgo(null);
-            // Save queue response BEFORE calling assignToNgo (which will reuse this queue row)
+            // Mark this queue entry as declined, then assign to the next best NGO
             q.setResponse(QueueResponse.DECLINED);
             queueRepo.save(q);
-            // Re-assign to next eligible NGO
-            assignToNgo(rescue);
+
+            rescue.setStatus(RescueStatus.PENDING);
+            rescue.setAssignedNgo(null);
+            RescueReport saved = rescueRepo.save(rescue);
+
+            // Re-assign excluding the NGO that just declined
+            assignToNgo(saved, ngo.getId());
         }
 
-        return getById(rescueId); // Return fresh state after re-assignment
+        return getById(rescueId); // Return fresh state after potential re-assignment
     }
 
     public RescueReport complete(Long rescueId, Long ngoUserId, String notes) {

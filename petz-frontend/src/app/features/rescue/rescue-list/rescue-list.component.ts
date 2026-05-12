@@ -684,7 +684,7 @@ export class RescueListComponent implements OnInit {
   statusHint(status: string): string {
     const map: Record<string, string> = {
       PENDING:     'Your report is queued — an NGO will be assigned shortly.',
-      ASSIGNED:    'Waiting for NGO confirmation. They have 5 minutes to accept. If they don\'t respond, another NGO will be assigned automatically.',
+      ASSIGNED:    'Waiting for NGO confirmation. An NGO has been notified and will respond shortly.',
       IN_PROGRESS: 'A rescue team is actively on the way — help is coming!',
       COMPLETED:   'This animal has been successfully rescued. Thank you!',
       CANCELLED:   'This report has been cancelled.'

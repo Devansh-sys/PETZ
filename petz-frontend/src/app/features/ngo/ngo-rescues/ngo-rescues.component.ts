@@ -562,13 +562,20 @@ export class NgoRescuesComponent implements OnInit {
 
   respond(id: number, response: string): void {
     this.api.post<any>(`/rescue/${id}/respond`, { response }).subscribe({
-      next: res => {
-        const r = this.rescues.find(x => x.id === id);
-        if (r) r.status = res.data.status;
+      next: _res => {
+        if (response === 'DECLINE') {
+          // Remove from this NGO's list — rescue is now re-assigned to the next NGO
+          this.rescues = this.rescues.filter(x => x.id !== id);
+          this.snack.open('Rescue declined and passed to the next available NGO.', '', { duration: 3500 });
+        } else {
+          // ACCEPT — mark as IN_PROGRESS so the "Mark as Complete" button appears
+          const r = this.rescues.find(x => x.id === id);
+          if (r) r.status = 'IN_PROGRESS';
+          this.snack.open('Rescue accepted! You are now in charge.', '', { duration: 3000 });
+        }
         this.applyFilters();
-        this.snack.open(`Response recorded: ${response}`, '', { duration: 2000 });
       },
-      error: err => this.snack.open(err.error?.message ?? 'Error.', 'Close', { duration: 3000 })
+      error: err => this.snack.open(err.error?.message ?? 'Error responding to rescue.', 'Close', { duration: 3500 })
     });
   }
 

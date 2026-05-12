@@ -493,8 +493,8 @@ export class AdminHospitalsComponent implements OnInit {
     this.loading = true;
     this.api.get<any>('/admin/hospitals').subscribe({
       next: res => {
-        // Only show approved (active) hospitals — pending ones are in the Pending Approvals section.
-        this.all = (res.data ?? []).filter((h: any) => h.isActive !== false);
+        // Load ALL hospitals so admin can see and manage both active and inactive ones.
+        this.all = res.data ?? [];
         this.applyFilters();
         this.loading = false;
       },

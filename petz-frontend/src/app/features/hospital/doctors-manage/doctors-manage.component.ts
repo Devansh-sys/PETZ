@@ -17,19 +17,19 @@ interface Doctor {
   template: `
     <!-- ── Detail Popup ── -->
     @if (selected) {
-      <div class="overlay" (click)="selected = null">
+      <div class="overlay" (click)="selected = null; editMode = false">
         <div class="popup" (click)="$event.stopPropagation()">
 
           <!-- Header -->
           <div class="popup-hdr">
             <div class="popup-hdr-inner">
-              <div class="popup-avatar">{{ selected.name?.charAt(0) || 'D' }}</div>
+              <div class="popup-avatar">{{ (editMode ? editDoc.name : selected.name)?.charAt(0) || 'D' }}</div>
               <div>
-                <div class="popup-name">Dr. {{ selected.name }}</div>
-                <div class="popup-spec">{{ selected.specialization || 'General Practice' }}</div>
+                <div class="popup-name">Dr. {{ editMode ? editDoc.name : selected.name }}</div>
+                <div class="popup-spec">{{ (editMode ? editDoc.specialization : selected.specialization) || 'General Practice' }}</div>
               </div>
             </div>
-            <button class="popup-close" (click)="selected = null">
+            <button class="popup-close" (click)="selected = null; editMode = false">
               <mat-icon>close</mat-icon>
             </button>
           </div>
@@ -37,63 +37,136 @@ interface Doctor {
           <!-- Body -->
           <div class="popup-body">
 
-            <!-- Schedule section -->
-            <div class="popup-section">
-              <div class="section-label">
-                <mat-icon class="sec-icon" style="color:#F97316">schedule</mat-icon> Working Schedule
-              </div>
-              <div class="detail-grid-3">
-                <div class="detail-item">
-                  <span class="dk">Start Time</span>
-                  <span class="dv">{{ formatTime(selected.scheduleStart) }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="dk">End Time</span>
-                  <span class="dv">{{ formatTime(selected.scheduleEnd) }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="dk">Slot Duration</span>
-                  <span class="dv">{{ selected.slotDuration || '—' }} min</span>
-                </div>
-              </div>
-            </div>
+            <!-- ── VIEW MODE ── -->
+            @if (!editMode) {
 
-            <!-- Computed stats section -->
-            <div class="popup-section">
-              <div class="section-label">
-                <mat-icon class="sec-icon" style="color:#2EB894">bar_chart</mat-icon> Daily Capacity
-              </div>
-              <div class="detail-grid-3">
-                <div class="detail-item">
-                  <span class="dk">Slots / Day</span>
-                  <span class="dv" style="color:#F97316">{{ slotsPerDay(selected) }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="dk">Hours / Day</span>
-                  <span class="dv" style="color:#2EB894">{{ hoursPerDay(selected) }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="dk">Specialization</span>
-                  <span class="dv" style="color:#7C62CC;font-size:0.75rem">{{ selected.specialization || 'General' }}</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Schedule visual bar -->
-            @if (selected.scheduleStart && selected.scheduleEnd) {
+              <!-- Schedule section -->
               <div class="popup-section">
                 <div class="section-label">
-                  <mat-icon class="sec-icon" style="color:#E89340">timeline</mat-icon> Day Timeline
+                  <mat-icon class="sec-icon" style="color:#F97316">schedule</mat-icon> Working Schedule
                 </div>
-                <div class="timeline-wrap">
-                  <span class="tl-label">{{ formatTime(selected.scheduleStart) }}</span>
-                  <div class="tl-track">
-                    <div class="tl-fill" [style.left]="timelineLeft(selected) + '%'"
-                         [style.width]="timelineWidth(selected) + '%'">
-                      <span class="tl-inner">{{ slotsPerDay(selected) }} slots</span>
+                <div class="detail-grid-3">
+                  <div class="detail-item">
+                    <span class="dk">Start Time</span>
+                    <span class="dv">{{ formatTime(selected.scheduleStart) }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="dk">End Time</span>
+                    <span class="dv">{{ formatTime(selected.scheduleEnd) }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="dk">Slot Duration</span>
+                    <span class="dv">{{ selected.slotDuration || '—' }} min</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Computed stats section -->
+              <div class="popup-section">
+                <div class="section-label">
+                  <mat-icon class="sec-icon" style="color:#2EB894">bar_chart</mat-icon> Daily Capacity
+                </div>
+                <div class="detail-grid-3">
+                  <div class="detail-item">
+                    <span class="dk">Slots / Day</span>
+                    <span class="dv" style="color:#F97316">{{ slotsPerDay(selected) }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="dk">Hours / Day</span>
+                    <span class="dv" style="color:#2EB894">{{ hoursPerDay(selected) }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="dk">Specialization</span>
+                    <span class="dv" style="color:#7C62CC;font-size:0.75rem">{{ selected.specialization || 'General' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Schedule visual bar -->
+              @if (selected.scheduleStart && selected.scheduleEnd) {
+                <div class="popup-section">
+                  <div class="section-label">
+                    <mat-icon class="sec-icon" style="color:#E89340">timeline</mat-icon> Day Timeline
+                  </div>
+                  <div class="timeline-wrap">
+                    <span class="tl-label">{{ formatTime(selected.scheduleStart) }}</span>
+                    <div class="tl-track">
+                      <div class="tl-fill" [style.left]="timelineLeft(selected) + '%'"
+                           [style.width]="timelineWidth(selected) + '%'">
+                        <span class="tl-inner">{{ slotsPerDay(selected) }} slots</span>
+                      </div>
+                    </div>
+                    <span class="tl-label">{{ formatTime(selected.scheduleEnd) }}</span>
+                  </div>
+                </div>
+              }
+
+            }
+
+            <!-- ── EDIT MODE ── -->
+            @if (editMode) {
+              <div class="edit-section">
+                <div class="edit-section-title">Edit Doctor Details</div>
+
+                <div class="edit-form-row">
+                  <div class="edit-field">
+                    <label class="edit-label">Full Name *</label>
+                    <mat-form-field appearance="outline" class="edit-ff">
+                      <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">person</mat-icon>
+                      <input matInput [(ngModel)]="editDoc.name" placeholder="Doctor name">
+                    </mat-form-field>
+                  </div>
+                  <div class="edit-field">
+                    <label class="edit-label">Specialization</label>
+                    <mat-form-field appearance="outline" class="edit-ff">
+                      <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">medical_services</mat-icon>
+                      <input matInput [(ngModel)]="editDoc.specialization" placeholder="e.g. Surgery">
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <div class="edit-form-row">
+                  <div class="edit-field">
+                    <label class="edit-label">Schedule Start</label>
+                    <div class="time-picker">
+                      <mat-icon class="time-ico">schedule</mat-icon>
+                      <select class="tp-sel tp-hour" [(ngModel)]="editStartHour" (ngModelChange)="updateEditTimes()">
+                        @for (h of hours; track h) { <option [value]="h">{{ h }}</option> }
+                      </select>
+                      <span class="tp-sep">:</span>
+                      <select class="tp-sel tp-min" [(ngModel)]="editStartMin" (ngModelChange)="updateEditTimes()">
+                        @for (m of minutes; track m) { <option [value]="m">{{ m }}</option> }
+                      </select>
+                      <select class="tp-sel tp-ampm" [(ngModel)]="editStartAmPm" (ngModelChange)="updateEditTimes()">
+                        <option value="AM">AM</option>
+                        <option value="PM">PM</option>
+                      </select>
                     </div>
                   </div>
-                  <span class="tl-label">{{ formatTime(selected.scheduleEnd) }}</span>
+                  <div class="edit-field">
+                    <label class="edit-label">Schedule End</label>
+                    <div class="time-picker">
+                      <mat-icon class="time-ico">schedule</mat-icon>
+                      <select class="tp-sel tp-hour" [(ngModel)]="editEndHour" (ngModelChange)="updateEditTimes()">
+                        @for (h of hours; track h) { <option [value]="h">{{ h }}</option> }
+                      </select>
+                      <span class="tp-sep">:</span>
+                      <select class="tp-sel tp-min" [(ngModel)]="editEndMin" (ngModelChange)="updateEditTimes()">
+                        @for (m of minutes; track m) { <option [value]="m">{{ m }}</option> }
+                      </select>
+                      <select class="tp-sel tp-ampm" [(ngModel)]="editEndAmPm" (ngModelChange)="updateEditTimes()">
+                        <option value="AM">AM</option>
+                        <option value="PM">PM</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="edit-field" style="max-width:200px">
+                  <label class="edit-label">Slot Duration (minutes)</label>
+                  <mat-form-field appearance="outline" class="edit-ff">
+                    <input matInput type="number" [(ngModel)]="editDoc.slotDuration" placeholder="30" min="5" max="120">
+                  </mat-form-field>
                 </div>
               </div>
             }
@@ -102,11 +175,24 @@ interface Doctor {
 
           <!-- Actions -->
           <div class="popup-actions">
-            <button mat-raised-button class="action-delete"
-                    (click)="deleteDoctor(selected.id); selected = null">
-              <mat-icon>delete_outline</mat-icon> Remove Doctor
-            </button>
-            <button mat-stroked-button class="action-close" (click)="selected = null">Close</button>
+            @if (!editMode) {
+              <button mat-raised-button class="action-edit" (click)="startEdit()">
+                <mat-icon>edit</mat-icon> Edit Doctor
+              </button>
+              <button mat-raised-button class="action-delete"
+                      (click)="deleteDoctor(selected.id); selected = null">
+                <mat-icon>delete_outline</mat-icon> Remove
+              </button>
+              <button mat-stroked-button class="action-close" (click)="selected = null">Close</button>
+            }
+            @if (editMode) {
+              <button mat-raised-button class="action-save"
+                      [disabled]="!editDoc.name || savingEdit"
+                      (click)="saveEdit()">
+                <mat-icon>save</mat-icon> {{ savingEdit ? 'Saving…' : 'Save Changes' }}
+              </button>
+              <button mat-stroked-button class="action-close" (click)="cancelEdit()">Cancel</button>
+            }
           </div>
         </div>
       </div>
@@ -362,6 +448,10 @@ interface Doctor {
                 <button mat-stroked-button class="detail-btn" (click)="selected = d; $event.stopPropagation()">
                   <mat-icon>info_outline</mat-icon> Details
                 </button>
+                <button mat-icon-button class="edit-icon-btn"
+                        (click)="selected = d; startEdit(); $event.stopPropagation()" title="Edit doctor">
+                  <mat-icon>edit</mat-icon>
+                </button>
                 <button mat-icon-button class="del-btn"
                         (click)="deleteDoctor(d.id); $event.stopPropagation()" title="Remove">
                   <mat-icon>delete_outline</mat-icon>
@@ -450,6 +540,17 @@ interface Doctor {
       padding: 14px 22px 20px; display: flex; gap: 8px;
       border-top: 1px solid #F0F4F8;
     }
+    .action-edit {
+      background: linear-gradient(135deg, #1A5E9A, #2E86DE) !important;
+      color: #fff !important; border-radius: 10px !important; font-weight: 700 !important;
+      mat-icon { margin-right: 6px; font-size: 16px; width:16px; height:16px; }
+    }
+    .action-save {
+      background: linear-gradient(135deg, #0A5840, #1E9A7A) !important;
+      color: #fff !important; border-radius: 10px !important; font-weight: 700 !important;
+      mat-icon { margin-right: 6px; font-size: 16px; width:16px; height:16px; }
+      &:disabled { opacity: 0.6; }
+    }
     .action-delete {
       background: linear-gradient(135deg, #7B1A1A, #C03030) !important;
       color: #fff !important; border-radius: 10px !important; font-weight: 700 !important;
@@ -460,6 +561,19 @@ interface Doctor {
       border-radius: 10px !important; margin-left: auto;
       &:hover { border-color: #F97316 !important; color: #F97316 !important; }
     }
+
+    /* ── Edit form inside popup ── */
+    .edit-section { padding: 0 0 4px; }
+    .edit-section-title {
+      font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+      color: #2E86DE; margin-bottom: 14px; padding-bottom: 8px;
+      border-bottom: 1.5px solid #EBF3FC;
+    }
+    .edit-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; margin-bottom: 4px; }
+    .edit-field { margin-bottom: 8px; }
+    .edit-label { display: block; font-size: 0.78rem; font-weight: 700; color: #1A3547; margin-bottom: 6px; }
+    .edit-ff { width: 100%; }
+    @media (max-width: 480px) { .edit-form-row { grid-template-columns: 1fr; } }
 
     /* ── Stat strip ── */
     .stat-strip {
@@ -585,6 +699,12 @@ interface Doctor {
       mat-icon { font-size: 15px; width:15px; height:15px; margin-right: 4px; }
       &:hover { border-color: #2EB894 !important; color: #2EB894 !important; background: #F0FDF4 !important; }
     }
+    .edit-icon-btn {
+      width: 34px !important; height: 34px !important; border-radius: 9px !important;
+      color: #8BA3B5 !important;
+      &:hover { color: #2E86DE !important; background: #EBF3FC !important; }
+      mat-icon { font-size: 17px; }
+    }
     .del-btn {
       width: 34px !important; height: 34px !important; border-radius: 9px !important;
       color: #8BA3B5 !important;
@@ -645,11 +765,18 @@ export class DoctorsManageComponent implements OnInit {
   showForm = false;
   newDoc: any = { slotDuration: 30 };
 
-  // Time picker state
+  // ── Add-doctor time picker state ──
   readonly hours   = ['1','2','3','4','5','6','7','8','9','10','11','12'];
   readonly minutes = ['00','15','30','45'];
   startHour = '9';  startMin = '00';  startAmPm = 'AM';
   endHour   = '5';  endMin   = '00';  endAmPm   = 'PM';
+
+  // ── Edit-doctor state ──
+  editMode  = false;
+  savingEdit = false;
+  editDoc: any = {};
+  editStartHour = '9';  editStartMin = '00';  editStartAmPm = 'AM';
+  editEndHour   = '5';  editEndMin   = '00';  editEndAmPm   = 'PM';
 
   searchQ = '';
   filterSpec = '';
@@ -818,5 +945,74 @@ export class DoctorsManageComponent implements OnInit {
       this.applyFilters();
       this.snack.open('Doctor removed.', '', { duration: 2000 });
     });
+  }
+
+  // ── Edit doctor ──────────────────────────────────────────────────────
+
+  startEdit(): void {
+    if (!this.selected) return;
+    // Deep-copy so cancelling doesn't mutate the original
+    this.editDoc = { ...this.selected };
+    // Pre-fill the edit time pickers from the doctor's saved schedule
+    const start = this.from24(this.selected.scheduleStart);
+    const end   = this.from24(this.selected.scheduleEnd);
+    this.editStartHour  = start.hour;  this.editStartMin = start.min;  this.editStartAmPm = start.ampm;
+    this.editEndHour    = end.hour;    this.editEndMin   = end.min;    this.editEndAmPm   = end.ampm;
+    this.editMode = true;
+  }
+
+  cancelEdit(): void {
+    this.editMode  = false;
+    this.savingEdit = false;
+    this.editDoc   = {};
+  }
+
+  updateEditTimes(): void {
+    this.editDoc.scheduleStart = this.to24(this.editStartHour, this.editStartMin, this.editStartAmPm);
+    this.editDoc.scheduleEnd   = this.to24(this.editEndHour,   this.editEndMin,   this.editEndAmPm);
+  }
+
+  saveEdit(): void {
+    if (!this.selected || !this.editDoc.name) return;
+    this.savingEdit = true;
+    // Make sure times are up to date before saving
+    this.updateEditTimes();
+    this.api.put<any>(`/hospitals/profile/doctors/${this.selected.id}`, {
+      name:          this.editDoc.name,
+      specialization: this.editDoc.specialization,
+      scheduleStart: this.editDoc.scheduleStart,
+      scheduleEnd:   this.editDoc.scheduleEnd,
+      slotDuration:  this.editDoc.slotDuration,
+    }).subscribe({
+      next: res => {
+        // Update the local array and the selected reference
+        const idx = this.doctors.findIndex(d => d.id === this.selected!.id);
+        if (idx !== -1) {
+          this.doctors[idx] = res.data;
+          this.selected = res.data;
+        }
+        this.buildMeta();
+        this.applyFilters();
+        this.editMode   = false;
+        this.savingEdit = false;
+        this.snack.open('Doctor updated successfully!', '', { duration: 2500 });
+      },
+      error: err => {
+        this.savingEdit = false;
+        this.snack.open(err.error?.message ?? 'Error updating doctor.', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  /** Parse an HH:mm string back into { hour, min, ampm } for the time picker dropdowns */
+  private from24(time: string): { hour: string; min: string; ampm: string } {
+    if (!time) return { hour: '12', min: '00', ampm: 'PM' };
+    const [hStr, mStr] = time.split(':');
+    let h = parseInt(hStr, 10);
+    const min  = mStr ?? '00';
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    if (h === 0)  h = 12;
+    else if (h > 12) h -= 12;
+    return { hour: String(h), min, ampm };
   }
 }

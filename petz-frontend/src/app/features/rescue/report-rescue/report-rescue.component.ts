@@ -167,18 +167,21 @@ const CHENNAI_AREAS: ChennaiArea[] = [
           <div class="form-section-title" style="margin-top:16px">Your Contact</div>
 
           <div class="field-group">
-            <label class="field-label">Your mobile number * <span class="phone-why">(so the NGO can reach you at the location)</span></label>
+            <label class="field-label">
+              Your mobile number *
+              <span class="phone-why">(so the NGO can reach you at the location)</span>
+            </label>
             <mat-form-field appearance="outline">
               <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">phone</mat-icon>
               <input matInput formControlName="reporterPhone" type="tel"
                      placeholder="10-digit mobile number e.g. 9876543210"
                      maxlength="10">
-              @if (form.get('reporterPhone')?.hasError('required')) {
-                <mat-error>Mobile number is required</mat-error>
-              }
-              @if (form.get('reporterPhone')?.hasError('pattern')) {
-                <mat-error>Enter a valid 10-digit Indian mobile number (starts with 6–9)</mat-error>
-              }
+              <mat-error *ngIf="form.get('reporterPhone')?.hasError('required')">
+                Mobile number is required
+              </mat-error>
+              <mat-error *ngIf="form.get('reporterPhone')?.hasError('pattern')">
+                Enter a valid 10-digit Indian mobile number (starts with 6–9)
+              </mat-error>
             </mat-form-field>
           </div>
 
