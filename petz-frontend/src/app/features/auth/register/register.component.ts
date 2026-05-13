@@ -30,8 +30,14 @@ export class RegisterComponent {
       password:        ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required],
       phone:           [''],
-      role:            ['USER']
+      role:            ['USER'],
+      city:            [''],
+      address:         ['']
     }, { validators: passwordMatchValidator });
+  }
+
+  get isOrgRole(): boolean {
+    return ['NGO', 'HOSPITAL'].includes(this.form.get('role')?.value);
   }
 
   submit(): void {

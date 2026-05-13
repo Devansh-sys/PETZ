@@ -13,14 +13,16 @@
     </div>
     <button mat-raised-button color="primary" (click)="showForm ? cancelForm() : (showForm = true)">
       <mat-icon>{{ showForm ? 'close' : 'add' }}</mat-icon>
-      {{ showForm ? 'Cancel' : 'Add Animal' }}
+      {{ showForm ? (editMode ? 'Close Edit' : 'Cancel') : 'Add Animal' }}
     </button>
   </div>
 
-  <!-- ── Add Animal Form ─────────────────────────────────── -->
+  <!-- ── Add / Edit Animal Form ─────────────────────────── -->
   @if (showForm) {
     <div class="form-card">
-      <div class="form-section-label">New Animal Details</div>
+      <div class="form-section-label">
+        {{ editMode ? 'Edit Animal Details' : 'New Animal Details' }}
+      </div>
       <div class="form-row">
         <div class="field-group">
           <label class="field-label">Animal Name *</label>
@@ -56,17 +58,68 @@
         <div class="field-group">
           <label class="field-label">Age (months)</label>
           <mat-form-field appearance="outline">
-            <input matInput type="number" [(ngModel)]="newAnimal.ageMonths">
+            <input matInput type="number" [(ngModel)]="newAnimal.ageMonths" placeholder="e.g. 6">
           </mat-form-field>
         </div>
         <div class="field-group">
           <label class="field-label">Gender</label>
           <mat-form-field appearance="outline">
             <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">transgender</mat-icon>
-            <input matInput [(ngModel)]="newAnimal.gender" placeholder="Male / Female">
+            <mat-select [(ngModel)]="newAnimal.gender" placeholder="Select gender">
+              <mat-option value="Male">Male</mat-option>
+              <mat-option value="Female">Female</mat-option>
+            </mat-select>
           </mat-form-field>
         </div>
       </div>
+      <div class="form-row">
+        <div class="field-group radio-field-group">
+          <label class="field-label">Vaccinated?</label>
+          <div class="radio-row">
+            <mat-icon class="radio-icon">vaccines</mat-icon>
+            <mat-radio-group [(ngModel)]="newAnimal.isVaccinated" class="radio-group">
+              <mat-radio-button [value]="true">Yes</mat-radio-button>
+              <mat-radio-button [value]="false">No</mat-radio-button>
+            </mat-radio-group>
+          </div>
+        </div>
+        <div class="field-group radio-field-group">
+          <label class="field-label">Neutered?</label>
+          <div class="radio-row">
+            <mat-icon class="radio-icon">health_and_safety</mat-icon>
+            <mat-radio-group [(ngModel)]="newAnimal.isNeutered" class="radio-group">
+              <mat-radio-button [value]="true">Yes</mat-radio-button>
+              <mat-radio-button [value]="false">No</mat-radio-button>
+            </mat-radio-group>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status — shown only in edit mode -->
+      @if (editMode) {
+        <div class="field-group">
+          <label class="field-label">Status</label>
+          <mat-form-field appearance="outline">
+            <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">info_outline</mat-icon>
+            <mat-select [(ngModel)]="newAnimal.status">
+              <mat-option value="AVAILABLE">Available</mat-option>
+              <mat-option value="RESERVED">Reserved</mat-option>
+              <mat-option value="ADOPTED">Adopted</mat-option>
+              <mat-option value="ARCHIVED">Archived</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      }
+
+      <!-- Description (full width) -->
+      <div class="form-row-full">
+        <label class="field-label">Description <span class="field-opt">Optional</span></label>
+        <mat-form-field appearance="outline" style="width:100%">
+          <textarea matInput rows="3" [(ngModel)]="newAnimal.description"
+                    placeholder="e.g. Friendly and playful, great with kids…"></textarea>
+        </mat-form-field>
+      </div>
+
       <!-- Photo upload (full width) -->
       <div class="form-row-full">
         <label class="field-label">Animal Photo <span class="field-opt">Optional</span></label>
@@ -90,10 +143,12 @@
       </div>
 
       <div class="form-actions">
-        <button mat-raised-button color="primary" (click)="addAnimal()" [disabled]="!newAnimal.name || saving">
+        <button mat-raised-button color="primary"
+                (click)="editMode ? updateAnimal() : addAnimal()"
+                [disabled]="!newAnimal.name || saving">
           @if (saving) { <mat-spinner diameter="16" style="margin-right:6px"></mat-spinner> }
-          @else { <mat-icon>save</mat-icon> }
-          {{ saving ? 'Saving…' : 'Save Animal' }}
+          @else { <mat-icon>{{ editMode ? 'save' : 'add' }}</mat-icon> }
+          {{ saving ? 'Saving…' : (editMode ? 'Update Animal' : 'Save Animal') }}
         </button>
         <button mat-stroked-button (click)="cancelForm()" class="cancel-btn">Cancel</button>
       </div>
@@ -306,8 +361,8 @@
               <div class="detail-val">{{ selected.city || '—' }}</div>
             </div>
             <div class="detail-item">
-              <div class="detail-label">Adoption Ready</div>
-              <div class="detail-val">{{ selected.isAdoptionReady ? 'Yes' : 'No' }}</div>
+              <div class="detail-label">Species</div>
+              <div class="detail-val">{{ selected.species || '—' }}</div>
             </div>
           </div>
 
@@ -321,6 +376,9 @@
 
           <!-- Actions -->
           <div class="popup-actions">
+            <button class="popup-edit-btn" (click)="openEdit(selected)">
+              <mat-icon>edit</mat-icon> Edit Animal
+            </button>
             <button class="popup-del-btn" (click)="deleteAnimal(selected.id)">
               <mat-icon>delete_outline</mat-icon> Remove Animal
             </button>

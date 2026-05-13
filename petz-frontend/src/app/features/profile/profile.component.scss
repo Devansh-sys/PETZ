@@ -1,4 +1,6 @@
 
+    .loading-state { display: flex; align-items: center; gap: 12px; padding: 40px 0; color: #94A3B8; font-size: 0.85rem; }
+
     .profile-card {
       display: flex;
       align-items: center;
@@ -85,4 +87,30 @@
       align-items: center;
       text-align: center;
       padding: 32px;
+    }
+
+    /* ── Edit form ─────────────────────────────────────── */
+    .edit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 16px;
+      @media (max-width: 560px) { grid-template-columns: 1fr; }
+    }
+    .edit-field {
+      margin-bottom: 4px;
+      mat-form-field { width: 100%; }
+    }
+    .edit-field-full { grid-column: 1 / -1; }
+    .edit-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #1A3547;
+      margin-bottom: 5px;
+    }
+    .no-details-hint {
+      color: #94A3B8;
+      font-size: 0.85rem;
+      margin: 0;
+      padding: 8px 0;
     }

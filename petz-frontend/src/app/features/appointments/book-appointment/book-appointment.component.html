@@ -32,11 +32,31 @@
                       placeholder="Select a hospital"
                       (selectionChange)="onHospitalChange($event.value)">
             @for (h of hospitals; track h.id) {
-              <mat-option [value]="h.id">{{ h.name }}</mat-option>
+              <mat-option [value]="h.id">
+                {{ h.name }}{{ h.city ? ' — ' + h.city : '' }}
+              </mat-option>
             }
           </mat-select>
         </mat-form-field>
       </div>
+
+      <!-- Selected hospital address hint -->
+      @if (form.get('hospitalId')?.value) {
+        @for (h of hospitals; track h.id) {
+          @if (h.id === form.get('hospitalId')?.value && (h.address || h.phone)) {
+            <div class="hospital-hint">
+              <mat-icon>info_outline</mat-icon>
+              <span>
+                @if (h.address) { <strong>{{ h.address }}</strong> }
+                @if (h.address && h.phone) { &nbsp;·&nbsp; }
+                @if (h.phone) { 📞 {{ h.phone }} }
+                @if ((h.address || h.phone) && h.email) { &nbsp;·&nbsp; }
+                @if (h.email) { ✉️ {{ h.email }} }
+              </span>
+            </div>
+          }
+        }
+      }
 
       <div class="field-group">
         <label class="field-label">Doctor</label>

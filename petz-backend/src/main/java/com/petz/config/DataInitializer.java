@@ -198,7 +198,8 @@ public class DataInitializer implements CommandLineRunner {
                         h.setName(u.getName());
                         h.setPhone(u.getPhone());
                         h.setEmail(u.getEmail());
-                        h.setCity("Chennai");
+                        h.setCity("");      // unknown at backfill — owner can update via profile
+                        h.setAddress("");   // unknown at backfill — owner can update via profile
                         // Activate if user is already approved; keep inactive if still pending
                         h.setIsActive(Boolean.TRUE.equals(u.getIsApproved()));
                         hospitalRepository.save(h);
@@ -217,7 +218,8 @@ public class DataInitializer implements CommandLineRunner {
                         ngo.setName(u.getName());
                         ngo.setPhone(u.getPhone());
                         ngo.setEmail(u.getEmail());
-                        ngo.setCity("Chennai");
+                        ngo.setCity("");    // unknown at backfill — owner can update via profile
+                        ngo.setAddress(""); // unknown at backfill — owner can update via profile
                         // Activate + verify if user is already approved; keep inactive if pending
                         boolean approved = Boolean.TRUE.equals(u.getIsApproved());
                         ngo.setIsActive(approved);

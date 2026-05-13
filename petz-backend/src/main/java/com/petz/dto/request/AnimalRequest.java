@@ -1,5 +1,6 @@
 package com.petz.dto.request;
 
+import com.petz.enums.AnimalStatus;
 import lombok.Data;
 
 @Data
@@ -13,4 +14,5 @@ public class AnimalRequest {
     private String city;
     private Boolean isVaccinated;
     private Boolean isNeutered;
+    private AnimalStatus status;   // only used on update; ignored on create
 }

@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ChatbotComponent } from './chatbot/chatbot.component';
+import { HealioComponent } from './healio/healio.component';
 
 // Angular Material
 import { MatCardModule } from '@angular/material/card';
@@ -22,18 +22,19 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatRadioModule } from '@angular/material/radio';
 
 const MATERIAL = [
   MatCardModule, MatButtonModule, MatIconModule, MatInputModule,
   MatFormFieldModule, MatTableModule, MatProgressSpinnerModule,
   MatSnackBarModule, MatDialogModule, MatSelectModule, MatDatepickerModule,
   MatNativeDateModule, MatChipsModule, MatDividerModule, MatTooltipModule,
-  MatPaginatorModule, MatTabsModule
+  MatPaginatorModule, MatTabsModule, MatRadioModule
 ];
 
 @NgModule({
-  declarations: [ChatbotComponent],
+  declarations: [HealioComponent],
   imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, ...MATERIAL],
-  exports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, ...MATERIAL, ChatbotComponent]
+  exports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, ...MATERIAL, HealioComponent]
 })
 export class SharedModule {}

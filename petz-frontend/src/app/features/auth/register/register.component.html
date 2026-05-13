@@ -45,14 +45,15 @@
       <form [formGroup]="form" (ngSubmit)="submit()" autocomplete="on">
         <div class="fields-grid">
           <div class="field-group">
-            <label>Full Name</label>
+            <label>{{ isOrgRole ? 'Organisation Name' : 'Full Name' }}</label>
             <mat-form-field appearance="outline" style="width:100%">
-              <input matInput formControlName="name" placeholder="John Doe"
+              <input matInput formControlName="name"
+                     [placeholder]="isOrgRole ? 'e.g. City Animal Rescue NGO' : 'John Doe'"
                      name="name" autocomplete="name">
             </mat-form-field>
           </div>
           <div class="field-group">
-            <label>Phone</label>
+            <label>{{ isOrgRole ? 'Organisation Phone' : 'Phone' }}</label>
             <mat-form-field appearance="outline" style="width:100%">
               <input matInput formControlName="phone" placeholder="+91 00000 00000"
                      name="phone" autocomplete="tel" type="tel">
@@ -61,9 +62,11 @@
         </div>
 
         <div class="field-group">
-          <label>Email address</label>
+          <label>{{ isOrgRole ? 'Organisation Email' : 'Email address' }}</label>
           <mat-form-field appearance="outline">
-            <input matInput type="email" formControlName="email" placeholder="you@example.com"
+            <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">email</mat-icon>
+            <input matInput type="email" formControlName="email"
+                   [placeholder]="isOrgRole ? 'contact@yourorg.com' : 'you@example.com'"
                    name="email" autocomplete="email">
           </mat-form-field>
         </div>
@@ -117,6 +120,33 @@
             </mat-select>
           </mat-form-field>
         </div>
+
+        <!-- Organisation details — shown only for NGO / HOSPITAL -->
+        @if (isOrgRole) {
+          <div class="org-section">
+            <div class="org-section-label">
+              <mat-icon>location_on</mat-icon>
+              Organisation Location
+            </div>
+            <div class="field-group">
+              <label>City</label>
+              <mat-form-field appearance="outline">
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">location_city</mat-icon>
+                <input matInput formControlName="city" placeholder="e.g. Chennai"
+                       name="city" autocomplete="address-level2">
+              </mat-form-field>
+            </div>
+            <div class="field-group">
+              <label>Full Address</label>
+              <mat-form-field appearance="outline">
+                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">home</mat-icon>
+                <textarea matInput rows="2" formControlName="address"
+                          placeholder="e.g. 12, Anna Nagar, Chennai — 600040"
+                          name="address" autocomplete="street-address"></textarea>
+              </mat-form-field>
+            </div>
+          </div>
+        }
 
         <button mat-raised-button color="primary" type="submit"
                 [disabled]="form.invalid || loading"

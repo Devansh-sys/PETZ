@@ -62,7 +62,8 @@ public class AuthService {
             h.setName(req.getName());
             h.setPhone(req.getPhone());
             h.setEmail(req.getEmail());
-            h.setCity("Chennai");
+            h.setCity(req.getCity() != null ? req.getCity() : "");
+            h.setAddress(req.getAddress());
             h.setIsActive(false);
             hospitalRepo.save(h);
         }
@@ -75,7 +76,8 @@ public class AuthService {
             ngo.setName(req.getName());
             ngo.setPhone(req.getPhone());
             ngo.setEmail(req.getEmail());
-            ngo.setCity("Chennai");
+            ngo.setCity(req.getCity() != null ? req.getCity() : "");
+            ngo.setAddress(req.getAddress());
             ngo.setIsActive(false);
             ngo.setIsVerified(false);
             ngoRepo.save(ngo);

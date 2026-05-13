@@ -45,6 +45,31 @@
 .photo-cta  { font-size: 0.84rem; font-weight: 700; color: #8BA3B5; }
 .photo-hint { font-size: 0.7rem; color: #C0CEDB; }
 
+/* ── Radio button fields ──────────────────────────────── */
+.radio-field-group { margin-bottom: 18px; }
+.radio-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #F8FAFB;
+  border: 1px solid #E0EBF2;
+  border-radius: 12px;
+  padding: 10px 14px;
+  min-height: 52px;
+}
+.radio-icon {
+  font-size: 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+  color: #8BA3B5;
+  flex-shrink: 0;
+}
+.radio-group {
+  display: flex;
+  gap: 20px;
+  mat-radio-button { font-size: 0.85rem; font-weight: 600; color: #1A3547; }
+}
+
 .form-actions { display: flex; gap: 10px; margin-top: 10px; align-items: center; }
 .cancel-btn  { border-radius: 12px !important; height: 42px !important; color: #4A6478 !important; border-color: #C8DCE8 !important; }
 
@@ -174,6 +199,14 @@
 .notes-box    { background: #F8FAFB; border-radius: 12px; padding: 12px 14px; font-size: 0.82rem; color: #4A6478; line-height: 1.5; }
 
 .popup-actions   { display: flex; gap: 10px; }
+.popup-edit-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 18px; height: 38px; border-radius: 12px;
+  border: 1px solid #C8DCE8; background: #F0F7FF;
+  color: #2D5D7B; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.15s;
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  &:hover { background: #DBEEFF; border-color: #2D5D7B; }
+}
 .popup-del-btn {
   display: flex; align-items: center; gap: 6px;
   padding: 0 18px; height: 38px; border-radius: 12px;

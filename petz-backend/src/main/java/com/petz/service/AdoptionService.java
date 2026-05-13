@@ -64,6 +64,7 @@ public class AdoptionService {
         if (req.getCity() != null)         a.setCity(req.getCity());
         if (req.getIsVaccinated() != null) a.setIsVaccinated(req.getIsVaccinated());
         if (req.getIsNeutered() != null)   a.setIsNeutered(req.getIsNeutered());
+        if (req.getStatus() != null)       a.setStatus(req.getStatus());
         return animalRepo.save(a);
     }
 

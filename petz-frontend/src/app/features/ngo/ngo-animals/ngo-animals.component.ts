@@ -14,8 +14,10 @@ export class NgoAnimalsComponent implements OnInit {
   animals: AdoptableAnimal[] = [];
   filtered: AdoptableAnimal[] = [];
   selected: AdoptableAnimal | null = null;
-  showForm = false;
-  saving   = false;
+  showForm  = false;
+  editMode  = false;          // true = editing existing, false = adding new
+  editingId: number | null = null;
+  saving    = false;
   newAnimal: any = {};
 
   // Photo upload state
@@ -97,10 +99,33 @@ export class NgoAnimalsComponent implements OnInit {
   }
 
   cancelForm(): void {
-    this.showForm    = false;
-    this.newAnimal   = {};
-    this.photoFile   = null;
+    this.showForm     = false;
+    this.editMode     = false;
+    this.editingId    = null;
+    this.newAnimal    = {};
+    this.photoFile    = null;
     this.photoPreview = null;
+  }
+
+  openEdit(animal: AdoptableAnimal): void {
+    this.newAnimal = {
+      name:         animal.name,
+      species:      animal.species      ?? '',
+      breed:        animal.breed        ?? '',
+      city:         animal.city         ?? '',
+      ageMonths:    animal.ageMonths,
+      gender:       animal.gender       ?? '',
+      description:  animal.description  ?? '',
+      isVaccinated: animal.isVaccinated ?? false,
+      isNeutered:   animal.isNeutered   ?? false,
+      status:       animal.status,
+    };
+    this.photoPreview = animal.photoUrl ? this.imgSrc(animal.photoUrl) : null;
+    this.photoFile    = null;
+    this.editingId    = animal.id;
+    this.editMode     = true;
+    this.showForm     = true;
+    this.selected     = null;   // close detail popup
   }
 
   addAnimal(): void {
@@ -109,40 +134,62 @@ export class NgoAnimalsComponent implements OnInit {
 
     this.api.post<any>('/adoption/ngo/animals', this.newAnimal).subscribe({
       next: res => {
-        const savedAnimal: AdoptableAnimal = res.data;
-
-        const finalize = () => {
-          this.animals.push(savedAnimal);
+        const saved: AdoptableAnimal = res.data;
+        this._uploadPhotoThenFinish(saved, () => {
+          this.animals.push(saved);
           this.applyFilters();
           this.saving = false;
           this.cancelForm();
           this.snack.open('Animal added successfully!', '', { duration: 2500 });
-        };
-
-        // Upload photo if one was selected
-        if (this.photoFile) {
-          const form = new FormData();
-          form.append('file', this.photoFile);
-          this.api.postFormData<any>(`/adoption/ngo/animals/${savedAnimal.id}/photo`, form).subscribe({
-            next: photoRes => {
-              if (photoRes?.data?.photoUrl) savedAnimal.photoUrl = photoRes.data.photoUrl;
-              finalize();
-            },
-            error: () => {
-              // Photo upload failed — animal is still saved; just skip the photo
-              this.snack.open('Animal saved, but photo upload failed.', 'OK', { duration: 3500 });
-              finalize();
-            }
-          });
-        } else {
-          finalize();
-        }
+        });
       },
       error: err => {
         this.saving = false;
         this.snack.open(err.error?.message ?? 'Error adding animal.', 'Close', { duration: 3000 });
       }
     });
+  }
+
+  updateAnimal(): void {
+    if (!this.newAnimal.name || this.saving || !this.editingId) return;
+    this.saving = true;
+
+    this.api.put<any>(`/adoption/ngo/animals/${this.editingId}`, this.newAnimal).subscribe({
+      next: res => {
+        const updated: AdoptableAnimal = res.data;
+        this._uploadPhotoThenFinish(updated, () => {
+          const idx = this.animals.findIndex(a => a.id === updated.id);
+          if (idx !== -1) this.animals[idx] = updated;
+          this.applyFilters();
+          this.saving = false;
+          this.cancelForm();
+          this.snack.open('Animal updated successfully!', '', { duration: 2500 });
+        });
+      },
+      error: err => {
+        this.saving = false;
+        this.snack.open(err.error?.message ?? 'Error updating animal.', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  private _uploadPhotoThenFinish(animal: AdoptableAnimal, finalize: () => void): void {
+    if (this.photoFile) {
+      const form = new FormData();
+      form.append('file', this.photoFile);
+      this.api.postFormData<any>(`/adoption/ngo/animals/${animal.id}/photo`, form).subscribe({
+        next: photoRes => {
+          if (photoRes?.data?.photoUrl) animal.photoUrl = photoRes.data.photoUrl;
+          finalize();
+        },
+        error: () => {
+          this.snack.open('Saved, but photo upload failed.', 'OK', { duration: 3500 });
+          finalize();
+        }
+      });
+    } else {
+      finalize();
+    }
   }
 
   deleteAnimal(id: number): void {
