@@ -1,0 +1,425 @@
+
+    <div class="page-container" style="max-width:760px">
+
+      <!-- Header -->
+      <div class="page-header" style="margin-bottom:28px">
+        <div class="page-header-left" style="display:flex;align-items:center">
+          <button mat-icon-button [routerLink]="dashboardRoute"
+                  style="background:#fff;border:1px solid #E0EBF2;border-radius:10px;margin-right:12px">
+            <mat-icon style="color:#4A6478">arrow_back</mat-icon>
+          </button>
+          <div>
+            <h1>My Profile</h1>
+            <p>Your account details and information</p>
+          </div>
+        </div>
+
+        <!-- Edit / Save / Cancel controls -->
+        @if (!loading && role !== 'ADMIN') {
+          @if (!editMode) {
+            <button mat-stroked-button (click)="startEdit()"
+                    style="border-radius:12px;color:#2D5D7B;border-color:#C8DCE8;height:40px">
+              <mat-icon>edit</mat-icon> Edit Profile
+            </button>
+          } @else {
+            <div style="display:flex;gap:10px">
+              <button mat-raised-button color="primary" (click)="saveProfile()" [disabled]="saving"
+                      style="height:40px;border-radius:12px;min-width:130px">
+                @if (saving) {
+                  <mat-spinner diameter="16" style="display:inline-block;margin-right:6px"></mat-spinner>
+                }
+                {{ saving ? 'Saving…' : 'Save Changes' }}
+              </button>
+              <button mat-stroked-button (click)="cancelEdit()"
+                      style="height:40px;border-radius:12px;color:#4A6478;border-color:#C8DCE8">
+                Cancel
+              </button>
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Loading -->
+      @if (loading) {
+        <div class="loading-state">
+          <mat-spinner diameter="32"></mat-spinner>
+          <span>Loading profile...</span>
+        </div>
+      }
+
+      @if (!loading) {
+
+        <!-- ── Account card (all roles) ───────────────────── -->
+        <div class="card profile-card">
+          <div class="profile-avatar">
+            {{ avatarInitial }}
+          </div>
+          <div class="profile-main">
+            <div class="profile-name">
+              {{ editMode && role === 'USER' ? (editForm.name || user?.name) : user?.name }}
+            </div>
+            <div class="role-badge" [ngClass]="'role-' + role.toLowerCase()">
+              <mat-icon class="role-icon">{{ roleIcon }}</mat-icon>
+              {{ roleLabel }}
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Personal info ──────────────────────────────── -->
+        <div class="card info-card">
+          <div class="section-title">Account Information</div>
+          <div class="info-grid">
+            <div class="info-row">
+              <div class="info-icon-wrap orange"><mat-icon>mail_outline</mat-icon></div>
+              <div class="info-content">
+                <span class="info-label">Email</span>
+                <span class="info-value">{{ user?.email }}</span>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-icon-wrap purple"><mat-icon>badge</mat-icon></div>
+              <div class="info-content">
+                <span class="info-label">Account Type</span>
+                <span class="info-value">{{ roleLabel }}</span>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-icon-wrap green"><mat-icon>verified_user</mat-icon></div>
+              <div class="info-content">
+                <span class="info-label">Account ID</span>
+                <span class="info-value">#{{ user?.userId }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── USER: Personal Details card ───────────────── -->
+        @if (role === 'USER') {
+          <div class="card info-card">
+            <div class="section-title">Personal Details</div>
+
+            @if (!editMode) {
+              <div class="info-grid">
+                @if (user?.phone) {
+                  <div class="info-row">
+                    <div class="info-icon-wrap red"><mat-icon>phone</mat-icon></div>
+                    <div class="info-content">
+                      <span class="info-label">Phone</span>
+                      <span class="info-value">{{ user?.phone }}</span>
+                    </div>
+                  </div>
+                }
+                @if (user?.city) {
+                  <div class="info-row">
+                    <div class="info-icon-wrap green"><mat-icon>place</mat-icon></div>
+                    <div class="info-content">
+                      <span class="info-label">City</span>
+                      <span class="info-value">{{ user?.city }}</span>
+                    </div>
+                  </div>
+                }
+                @if (user?.address) {
+                  <div class="info-row">
+                    <div class="info-icon-wrap purple"><mat-icon>home</mat-icon></div>
+                    <div class="info-content">
+                      <span class="info-label">Address</span>
+                      <span class="info-value">{{ user?.address }}</span>
+                    </div>
+                  </div>
+                }
+                @if (!user?.phone && !user?.city && !user?.address) {
+                  <p class="no-details-hint">No contact details added yet. Click Edit Profile to add.</p>
+                }
+              </div>
+            } @else {
+              <!-- USER edit form -->
+              <div class="edit-grid">
+                <div class="edit-field">
+                  <label class="edit-label">Full Name</label>
+                  <mat-form-field appearance="outline">
+                    <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">person</mat-icon>
+                    <input matInput [(ngModel)]="editForm.name" placeholder="Your full name">
+                  </mat-form-field>
+                </div>
+                <div class="edit-field">
+                  <label class="edit-label">Phone</label>
+                  <mat-form-field appearance="outline">
+                    <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">phone</mat-icon>
+                    <input matInput [(ngModel)]="editForm.phone" placeholder="+91 00000 00000" type="tel">
+                  </mat-form-field>
+                </div>
+                <div class="edit-field">
+                  <label class="edit-label">City</label>
+                  <mat-form-field appearance="outline">
+                    <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">place</mat-icon>
+                    <input matInput [(ngModel)]="editForm.city" placeholder="e.g. Chennai">
+                  </mat-form-field>
+                </div>
+                <div class="edit-field edit-field-full">
+                  <label class="edit-label">Address</label>
+                  <mat-form-field appearance="outline">
+                    <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">home</mat-icon>
+                    <input matInput [(ngModel)]="editForm.address" placeholder="Your full address">
+                  </mat-form-field>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- ── NGO profile card ───────────────────────────── -->
+        @if (role === 'NGO' && profileData) {
+          <div class="card info-card">
+            <div class="section-title">NGO Details</div>
+
+            @if (!editMode) {
+              <div class="info-grid">
+                <div class="info-row">
+                  <div class="info-icon-wrap orange"><mat-icon>business</mat-icon></div>
+                  <div class="info-content">
+                    <span class="info-label">Organisation Name</span>
+                    <span class="info-value">{{ profileData.name }}</span>
+                  </div>
+                </div>
+                @if (profileData.description) {
+                  <div class="info-row">
+                    <div class="info-icon-wrap purple"><mat-icon>info_outline</mat-icon></div>
+                    <div class="info-content">
+                      <span class="info-label">About</span>
+                      <span class="info-value">{{ profileData.description }}</span>
+                    </div>
+                  </div>
+                }
+                @if (profileData.city) {
+                  <div class="info-row">
+                    <div class="info-icon-wrap green"><mat-icon>place</mat-icon></div>
+                    <div class="info-content">
+                      <span class="info-label">City</span>
+                      <span class="info-value">{{ profileData.city }}</span>
+                    </div>
+                  </div>
+                }
+                @if (profileData.phone) {
+                  <div class="info-row">
+                    <div class="info-icon-wrap red"><mat-icon>phone</mat-icon></div>
+                    <div class="info-content">
+                      <span class="info-label">Phone</span>
+                      <span class="info-value">{{ profileData.phone }}</span>
+                    </div>
+                  </div>
+                }
+                @if (profileData.email) {
+                  <div class="info-row">
+                    <div class="info-icon-wrap orange"><mat-icon>mail_outline</mat-icon></div>
+                    <div class="info-content">
+                      <span class="info-label">Organisation Email</span>
+                      <span class="info-value">{{ profileData.email }}</span>
+                    </div>
+                  </div>
+                }
+                @if (profileData.address) {
+                  <div class="info-row">
+                    <div class="info-icon-wrap purple"><mat-icon>home</mat-icon></div>
+                    <div class="info-content">
+                      <span class="info-label">Address</span>
+                      <span class="info-value">{{ profileData.address }}</span>
+                    </div>
+                  </div>
+                }
+                <div class="info-row">
+                  <div class="info-icon-wrap green"><mat-icon>check_circle_outline</mat-icon></div>
+                  <div class="info-content">
+                    <span class="info-label">Status</span>
+                    <span class="info-value">
+                      <span [class]="profileData.active ? 'status-active' : 'status-inactive'">
+                        {{ profileData.active ? 'Active' : 'Inactive' }}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <!-- NGO edit form -->
+              <div class="edit-grid">
+                <div class="edit-field edit-field-full">
+                  <label class="edit-label">Organisation Name</label>
+                  <mat-form-field appearance="outline">
+                    <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">business</mat-icon>
+                    <input matInput [(ngModel)]="editForm.name" placeholder="Organisation name">
+                  </mat-form-field>
+                </div>
+                <div class="edit-field">
+                  <label class="edit-label">Phone</label>
+                  <mat-form-field appearance="outline">
+                    <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">phone</mat-icon>
+                    <input matInput [(ngModel)]="editForm.phone" placeholder="+91 00000 00000" type="tel">
+                  </mat-form-field>
+                </div>
+                <div class="edit-field">
+                  <label class="edit-label">Organisation Email</label>
+                  <mat-form-field appearance="outline">
+                    <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">mail_outline</mat-icon>
+                    <input matInput [(ngModel)]="editForm.email" placeholder="contact@yourorg.com" type="email">
+                  </mat-form-field>
+                </div>
+                <div class="edit-field">
+                  <label class="edit-label">City</label>
+                  <mat-form-field appearance="outline">
+                    <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">place</mat-icon>
+                    <input matInput [(ngModel)]="editForm.city" placeholder="e.g. Chennai">
+                  </mat-form-field>
+                </div>
+                <div class="edit-field">
+                  <label class="edit-label">Address</label>
+                  <mat-form-field appearance="outline">
+                    <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">home</mat-icon>
+                    <input matInput [(ngModel)]="editForm.address" placeholder="Full address">
+                  </mat-form-field>
+                </div>
+                <div class="edit-field edit-field-full">
+                  <label class="edit-label">About / Description</label>
+                  <mat-form-field appearance="outline">
+                    <textarea matInput rows="3" [(ngModel)]="editForm.description"
+                              placeholder="Tell us about your organisation…"></textarea>
+                  </mat-form-field>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- ── HOSPITAL profile card ──────────────────────── -->
+        @if (role === 'HOSPITAL' && profileData) {
+          <div class="card info-card">
+            <div class="section-title">Hospital Details</div>
+
+            @if (!editMode) {
+              <div class="info-grid">
+                <div class="info-row">
+                  <div class="info-icon-wrap red"><mat-icon>local_hospital</mat-icon></div>
+                  <div class="info-content">
+                    <span class="info-label">Hospital Name</span>
+                    <span class="info-value">{{ profileData.name }}</span>
+                  </div>
+                </div>
+                @if (profileData.address) {
+                  <div class="info-row">
+                    <div class="info-icon-wrap green"><mat-icon>place</mat-icon></div>
+                    <div class="info-content">
+                      <span class="info-label">Address</span>
+                      <span class="info-value">{{ profileData.address }}</span>
+                    </div>
+                  </div>
+                }
+                @if (profileData.city) {
+                  <div class="info-row">
+                    <div class="info-icon-wrap green"><mat-icon>location_city</mat-icon></div>
+                    <div class="info-content">
+                      <span class="info-label">City</span>
+                      <span class="info-value">{{ profileData.city }}</span>
+                    </div>
+                  </div>
+                }
+                @if (profileData.phone) {
+                  <div class="info-row">
+                    <div class="info-icon-wrap orange"><mat-icon>phone</mat-icon></div>
+                    <div class="info-content">
+                      <span class="info-label">Phone</span>
+                      <span class="info-value">{{ profileData.phone }}</span>
+                    </div>
+                  </div>
+                }
+                @if (profileData.email) {
+                  <div class="info-row">
+                    <div class="info-icon-wrap purple"><mat-icon>mail_outline</mat-icon></div>
+                    <div class="info-content">
+                      <span class="info-label">Hospital Email</span>
+                      <span class="info-value">{{ profileData.email }}</span>
+                    </div>
+                  </div>
+                }
+                <div class="info-row">
+                  <div class="info-icon-wrap green"><mat-icon>check_circle_outline</mat-icon></div>
+                  <div class="info-content">
+                    <span class="info-label">Status</span>
+                    <span class="info-value">
+                      <span [class]="profileData.active ? 'status-active' : 'status-inactive'">
+                        {{ profileData.active ? 'Active' : 'Inactive' }}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <!-- Hospital edit form -->
+              <div class="edit-grid">
+                <div class="edit-field edit-field-full">
+                  <label class="edit-label">Hospital Name</label>
+                  <mat-form-field appearance="outline">
+                    <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">local_hospital</mat-icon>
+                    <input matInput [(ngModel)]="editForm.name" placeholder="Hospital name">
+                  </mat-form-field>
+                </div>
+                <div class="edit-field">
+                  <label class="edit-label">Phone</label>
+                  <mat-form-field appearance="outline">
+                    <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">phone</mat-icon>
+                    <input matInput [(ngModel)]="editForm.phone" placeholder="+91 00000 00000" type="tel">
+                  </mat-form-field>
+                </div>
+                <div class="edit-field">
+                  <label class="edit-label">Hospital Email</label>
+                  <mat-form-field appearance="outline">
+                    <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">mail_outline</mat-icon>
+                    <input matInput [(ngModel)]="editForm.email" placeholder="contact@hospital.com" type="email">
+                  </mat-form-field>
+                </div>
+                <div class="edit-field">
+                  <label class="edit-label">City</label>
+                  <mat-form-field appearance="outline">
+                    <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">location_city</mat-icon>
+                    <input matInput [(ngModel)]="editForm.city" placeholder="e.g. Chennai">
+                  </mat-form-field>
+                </div>
+                <div class="edit-field">
+                  <label class="edit-label">Address</label>
+                  <mat-form-field appearance="outline">
+                    <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">home</mat-icon>
+                    <input matInput [(ngModel)]="editForm.address" placeholder="Full address">
+                  </mat-form-field>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- ── ADMIN profile card ─────────────────────────── -->
+        @if (role === 'ADMIN') {
+          <div class="card info-card admin-notice">
+            <mat-icon style="font-size:40px;width:40px;height:40px;color:#FF8C42;margin-bottom:12px">
+              admin_panel_settings
+            </mat-icon>
+            <p style="font-weight:700;color:#1A3547;margin:0 0 4px">Platform Administrator</p>
+            <p style="color:#8BA3B5;font-size:0.85rem;margin:0">
+              You have full access to manage users, NGOs, hospitals, and rescue operations.
+            </p>
+          </div>
+        }
+
+        <!-- ── Quick links ─────────────────────────────────── -->
+        <div class="card info-card">
+          <div class="section-title">Quick Navigation</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            @for (link of quickLinks; track link.route) {
+              <button mat-stroked-button [routerLink]="link.route"
+                      style="border-radius:12px;color:#4A6478;border-color:#C8DCE8;height:40px">
+                <mat-icon>{{ link.icon }}</mat-icon>
+                {{ link.label }}
+              </button>
+            }
+          </div>
+        </div>
+
+      }
+
+    </div>

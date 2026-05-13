@@ -20,5 +20,7 @@ public class RegisterRequest {
     private String password;
 
     private String phone;
-    private String role; // USER (default), NGO, HOSPITAL
+    private String role;    // USER (default), NGO, HOSPITAL
+    private String address; // NGO / HOSPITAL only — org address
+    private String city;    // NGO / HOSPITAL only — org city
 }

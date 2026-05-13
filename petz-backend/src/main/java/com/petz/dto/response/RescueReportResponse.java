@@ -12,6 +12,7 @@ public class RescueReportResponse {
 
     private Long id;
     private Long reporterId;
+    private String reporterPhone;
     private Long assignedNgo;
     private String animalType;
     private String description;
@@ -36,6 +37,7 @@ public class RescueReportResponse {
         RescueReportResponse res = new RescueReportResponse();
         res.setId(r.getId());
         res.setReporterId(r.getReporterId());
+        res.setReporterPhone(r.getReporterPhone());
         res.setAssignedNgo(r.getAssignedNgo());
         res.setAnimalType(r.getAnimalType());
         res.setDescription(r.getDescription());

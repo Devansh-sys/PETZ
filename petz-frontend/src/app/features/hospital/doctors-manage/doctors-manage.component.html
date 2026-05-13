@@ -1,0 +1,448 @@
+<!-- ── Detail Popup ── -->
+@if (selected) {
+  <div class="overlay" (click)="selected = null; editMode = false">
+    <div class="popup" (click)="$event.stopPropagation()">
+
+      <!-- Header -->
+      <div class="popup-hdr">
+        <div class="popup-hdr-inner">
+          <div class="popup-avatar">{{ (editMode ? editDoc.name : selected.name)?.charAt(0) || 'D' }}</div>
+          <div>
+            <div class="popup-name">Dr. {{ editMode ? editDoc.name : selected.name }}</div>
+            <div class="popup-spec">{{ (editMode ? editDoc.specialization : selected.specialization) || 'General Practice' }}</div>
+          </div>
+        </div>
+        <button class="popup-close" (click)="selected = null; editMode = false">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="popup-body">
+
+        <!-- ── VIEW MODE ── -->
+        @if (!editMode) {
+
+          <!-- Schedule section -->
+          <div class="popup-section">
+            <div class="section-label">
+              <mat-icon class="sec-icon" style="color:#F97316">schedule</mat-icon> Working Schedule
+            </div>
+            <div class="detail-grid-3">
+              <div class="detail-item">
+                <span class="dk">Start Time</span>
+                <span class="dv">{{ formatTime(selected.scheduleStart) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="dk">End Time</span>
+                <span class="dv">{{ formatTime(selected.scheduleEnd) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="dk">Slot Duration</span>
+                <span class="dv">{{ selected.slotDuration || '—' }} min</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Computed stats section -->
+          <div class="popup-section">
+            <div class="section-label">
+              <mat-icon class="sec-icon" style="color:#2EB894">bar_chart</mat-icon> Daily Capacity
+            </div>
+            <div class="detail-grid-3">
+              <div class="detail-item">
+                <span class="dk">Slots / Day</span>
+                <span class="dv" style="color:#F97316">{{ slotsPerDay(selected) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="dk">Hours / Day</span>
+                <span class="dv" style="color:#2EB894">{{ hoursPerDay(selected) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="dk">Specialization</span>
+                <span class="dv" style="color:#7C62CC;font-size:0.75rem">{{ selected.specialization || 'General' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Schedule visual bar -->
+          @if (selected.scheduleStart && selected.scheduleEnd) {
+            <div class="popup-section">
+              <div class="section-label">
+                <mat-icon class="sec-icon" style="color:#E89340">timeline</mat-icon> Day Timeline
+              </div>
+              <div class="timeline-wrap">
+                <span class="tl-label">{{ formatTime(selected.scheduleStart) }}</span>
+                <div class="tl-track">
+                  <div class="tl-fill" [style.left]="timelineLeft(selected) + '%'"
+                       [style.width]="timelineWidth(selected) + '%'">
+                    <span class="tl-inner">{{ slotsPerDay(selected) }} slots</span>
+                  </div>
+                </div>
+                <span class="tl-label">{{ formatTime(selected.scheduleEnd) }}</span>
+              </div>
+            </div>
+          }
+
+        }
+
+        <!-- ── EDIT MODE ── -->
+        @if (editMode) {
+          <div class="edit-section">
+            <div class="edit-section-title">Edit Doctor Details</div>
+
+            <div class="edit-form-row">
+              <div class="edit-field">
+                <label class="edit-label">Full Name *</label>
+                <mat-form-field appearance="outline" class="edit-ff">
+                  <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">person</mat-icon>
+                  <input matInput [(ngModel)]="editDoc.name" placeholder="Doctor name">
+                </mat-form-field>
+              </div>
+              <div class="edit-field">
+                <label class="edit-label">Specialization</label>
+                <mat-form-field appearance="outline" class="edit-ff">
+                  <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">medical_services</mat-icon>
+                  <input matInput [(ngModel)]="editDoc.specialization" placeholder="e.g. Surgery">
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="edit-form-row">
+              <div class="edit-field">
+                <label class="edit-label">Schedule Start</label>
+                <div class="time-picker">
+                  <mat-icon class="time-ico">schedule</mat-icon>
+                  <select class="tp-sel tp-hour" [(ngModel)]="editStartHour" (ngModelChange)="updateEditTimes()">
+                    @for (h of hours; track h) { <option [value]="h">{{ h }}</option> }
+                  </select>
+                  <span class="tp-sep">:</span>
+                  <select class="tp-sel tp-min" [(ngModel)]="editStartMin" (ngModelChange)="updateEditTimes()">
+                    @for (m of minutes; track m) { <option [value]="m">{{ m }}</option> }
+                  </select>
+                  <select class="tp-sel tp-ampm" [(ngModel)]="editStartAmPm" (ngModelChange)="updateEditTimes()">
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
+                </div>
+              </div>
+              <div class="edit-field">
+                <label class="edit-label">Schedule End</label>
+                <div class="time-picker">
+                  <mat-icon class="time-ico">schedule</mat-icon>
+                  <select class="tp-sel tp-hour" [(ngModel)]="editEndHour" (ngModelChange)="updateEditTimes()">
+                    @for (h of hours; track h) { <option [value]="h">{{ h }}</option> }
+                  </select>
+                  <span class="tp-sep">:</span>
+                  <select class="tp-sel tp-min" [(ngModel)]="editEndMin" (ngModelChange)="updateEditTimes()">
+                    @for (m of minutes; track m) { <option [value]="m">{{ m }}</option> }
+                  </select>
+                  <select class="tp-sel tp-ampm" [(ngModel)]="editEndAmPm" (ngModelChange)="updateEditTimes()">
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="edit-field" style="max-width:200px">
+              <label class="edit-label">Slot Duration (minutes)</label>
+              <mat-form-field appearance="outline" class="edit-ff">
+                <input matInput type="number" [(ngModel)]="editDoc.slotDuration" placeholder="30" min="5" max="120">
+              </mat-form-field>
+            </div>
+          </div>
+        }
+
+      </div>
+
+      <!-- Actions -->
+      <div class="popup-actions">
+        @if (!editMode) {
+          <button mat-raised-button class="action-edit" (click)="startEdit()">
+            <mat-icon>edit</mat-icon> Edit Doctor
+          </button>
+          <button mat-raised-button class="action-delete"
+                  (click)="deleteDoctor(selected.id); selected = null">
+            <mat-icon>delete_outline</mat-icon> Remove
+          </button>
+          <button mat-stroked-button class="action-close" (click)="selected = null">Close</button>
+        }
+        @if (editMode) {
+          <button mat-raised-button class="action-save"
+                  [disabled]="!editDoc.name || savingEdit"
+                  (click)="saveEdit()">
+            <mat-icon>save</mat-icon> {{ savingEdit ? 'Saving…' : 'Save Changes' }}
+          </button>
+          <button mat-stroked-button class="action-close" (click)="cancelEdit()">Cancel</button>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-header-left" style="display:flex;align-items:center;gap:12px">
+      <button mat-icon-button routerLink="/hospital" class="back-btn" title="Back to Hospital Dashboard">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1>Manage Doctors</h1>
+        <p>Add and manage your hospital's medical staff</p>
+      </div>
+    </div>
+    <div class="page-header-actions">
+      <button mat-raised-button color="primary" (click)="showForm = !showForm">
+        <mat-icon>{{ showForm ? 'close' : 'add' }}</mat-icon>
+        {{ showForm ? 'Cancel' : 'Add Doctor' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Stat strip -->
+  <div class="stat-strip">
+    <div class="stat-item">
+      <div class="stat-val">{{ doctors.length }}</div>
+      <div class="stat-label">Total Doctors</div>
+      <div class="stat-bar" style="background:#F97316"></div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" style="color:#7C62CC">{{ uniqueSpecs() }}</div>
+      <div class="stat-label">Specializations</div>
+      <div class="stat-bar" style="background:#7C62CC"></div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" style="color:#2EB894">{{ scheduledCount() }}</div>
+      <div class="stat-label">With Schedule</div>
+      <div class="stat-bar" style="background:#2EB894"></div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" style="color:#E89340">{{ totalDailySlots() }}</div>
+      <div class="stat-label">Slots / Day</div>
+      <div class="stat-bar" style="background:#E89340"></div>
+    </div>
+  </div>
+
+  <!-- Add Doctor form -->
+  @if (showForm) {
+    <div class="card" style="padding:28px;margin-bottom:24px">
+      <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#8BA3B5;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #E0EBF2">
+        New Doctor Details
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label class="field-label">Full Name *</label>
+          <mat-form-field appearance="outline">
+            <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">person</mat-icon>
+            <input matInput [(ngModel)]="newDoc.name" placeholder="Dr. Jane Smith">
+          </mat-form-field>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Specialization</label>
+          <mat-form-field appearance="outline">
+            <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">medical_services</mat-icon>
+            <input matInput [(ngModel)]="newDoc.specialization" placeholder="e.g. Surgery, Dermatology">
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label class="field-label">Schedule Start</label>
+          <div class="time-picker">
+            <mat-icon class="time-ico">schedule</mat-icon>
+            <select class="tp-sel tp-hour" [(ngModel)]="startHour" (ngModelChange)="updateTimes()">
+              @for (h of hours; track h) { <option [value]="h">{{ h }}</option> }
+            </select>
+            <span class="tp-sep">:</span>
+            <select class="tp-sel tp-min" [(ngModel)]="startMin" (ngModelChange)="updateTimes()">
+              @for (m of minutes; track m) { <option [value]="m">{{ m }}</option> }
+            </select>
+            <select class="tp-sel tp-ampm" [(ngModel)]="startAmPm" (ngModelChange)="updateTimes()">
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Schedule End</label>
+          <div class="time-picker">
+            <mat-icon class="time-ico">schedule</mat-icon>
+            <select class="tp-sel tp-hour" [(ngModel)]="endHour" (ngModelChange)="updateTimes()">
+              @for (h of hours; track h) { <option [value]="h">{{ h }}</option> }
+            </select>
+            <span class="tp-sep">:</span>
+            <select class="tp-sel tp-min" [(ngModel)]="endMin" (ngModelChange)="updateTimes()">
+              @for (m of minutes; track m) { <option [value]="m">{{ m }}</option> }
+            </select>
+            <select class="tp-sel tp-ampm" [(ngModel)]="endAmPm" (ngModelChange)="updateTimes()">
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Slot Duration (minutes)</label>
+        <mat-form-field appearance="outline" style="max-width:200px">
+          <input matInput type="number" [(ngModel)]="newDoc.slotDuration" placeholder="30">
+        </mat-form-field>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button mat-raised-button color="primary" (click)="addDoctor()"
+                [disabled]="!newDoc.name" style="border-radius:12px;height:42px">
+          <mat-icon>save</mat-icon> Save Doctor
+        </button>
+        <button mat-stroked-button (click)="showForm = false"
+                style="border-radius:12px;height:42px;color:#4A6478;border-color:#C8DCE8">
+          Cancel
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Filter bar -->
+  @if (doctors.length > 0) {
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input class="search-input" placeholder="Search by name or specialization…"
+               [(ngModel)]="searchQ" (ngModelChange)="applyFilters()">
+        @if (searchQ) {
+          <button class="clear-btn" (click)="searchQ=''; applyFilters()">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+      <div class="filter-selects">
+        <label class="select-wrap">
+          <span class="sel-label">Specialization</span>
+          <select [(ngModel)]="filterSpec" (ngModelChange)="applyFilters()">
+            <option value="">All</option>
+            @for (s of specOptions; track s) {
+              <option [value]="s">{{ s }}</option>
+            }
+          </select>
+        </label>
+        <label class="select-wrap">
+          <span class="sel-label">Sort</span>
+          <select [(ngModel)]="sortBy" (ngModelChange)="applyFilters()">
+            <option value="name-asc">Name A–Z</option>
+            <option value="name-desc">Name Z–A</option>
+            <option value="slots-desc">Most Slots</option>
+            <option value="slots-asc">Fewest Slots</option>
+            <option value="spec">By Specialization</option>
+          </select>
+        </label>
+      </div>
+      @if (searchQ || filterSpec) {
+        <button mat-stroked-button class="clear-all-btn" (click)="clearFilters()">
+          <mat-icon>filter_alt_off</mat-icon> Clear
+        </button>
+      }
+    </div>
+  }
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-state">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Loading doctors...</span>
+    </div>
+  }
+
+  <!-- Empty state -->
+  @if (!loading && doctors.length === 0) {
+    <div class="card">
+      <div class="empty-state">
+        <div class="empty-icon"><mat-icon>medical_services</mat-icon></div>
+        <h3>No doctors added</h3>
+        <p>Add medical staff so patients can book appointments.</p>
+        <button mat-raised-button color="primary" (click)="showForm = true" style="margin-top:8px">
+          <mat-icon>add</mat-icon> Add First Doctor
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- No match -->
+  @if (!loading && doctors.length > 0 && filtered.length === 0) {
+    <div class="card">
+      <div class="empty-state">
+        <div class="empty-icon"><mat-icon>search_off</mat-icon></div>
+        <h3>No matches</h3>
+        <p>No doctors match the current filters.</p>
+        <button mat-stroked-button (click)="clearFilters()" style="margin-top:8px">Clear Filters</button>
+      </div>
+    </div>
+  }
+
+  <!-- Doctor cards grid -->
+  @if (!loading && filtered.length > 0) {
+    <div class="doc-grid">
+      @for (d of filtered; track d.id) {
+        <div class="doc-card" (click)="selected = d">
+          <!-- Top stripe -->
+          <div class="doc-stripe"></div>
+
+          <!-- Avatar + name -->
+          <div class="doc-card-header">
+            <div class="doc-avatar-lg">{{ d.name?.charAt(0) || 'D' }}</div>
+            <div class="doc-title">
+              <div class="doc-name">Dr. {{ d.name }}</div>
+              <div class="doc-spec-tag">{{ d.specialization || 'General Practice' }}</div>
+            </div>
+          </div>
+
+          <!-- Schedule info -->
+          <div class="doc-schedule">
+            @if (d.scheduleStart && d.scheduleEnd) {
+              <div class="sched-row">
+                <mat-icon class="sched-icon">schedule</mat-icon>
+                <span>{{ formatTime(d.scheduleStart) }} – {{ formatTime(d.scheduleEnd) }}</span>
+              </div>
+              <div class="sched-row">
+                <mat-icon class="sched-icon">grid_view</mat-icon>
+                <span>{{ slotsPerDay(d) }} slots · {{ d.slotDuration || '—' }} min each</span>
+              </div>
+            } @else {
+              <div class="sched-row no-schedule">
+                <mat-icon class="sched-icon">event_busy</mat-icon>
+                <span>No schedule set</span>
+              </div>
+            }
+          </div>
+
+          <!-- Slot bar -->
+          @if (d.scheduleStart && d.scheduleEnd) {
+            <div class="slot-bar-wrap">
+              <div class="slot-bar-track">
+                <div class="slot-bar-fill"
+                     [style.width]="slotBarPercent(d) + '%'"></div>
+              </div>
+              <span class="slot-bar-label">{{ slotsPerDay(d) }}/day</span>
+            </div>
+          }
+
+          <!-- Card footer -->
+          <div class="doc-card-footer">
+            <button mat-stroked-button class="detail-btn" (click)="selected = d; $event.stopPropagation()">
+              <mat-icon>info_outline</mat-icon> Details
+            </button>
+            <button mat-icon-button class="edit-icon-btn"
+                    (click)="selected = d; startEdit(); $event.stopPropagation()" title="Edit doctor">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button class="del-btn"
+                    (click)="deleteDoctor(d.id); $event.stopPropagation()" title="Remove">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

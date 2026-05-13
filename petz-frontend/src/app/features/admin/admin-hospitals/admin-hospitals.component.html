@@ -1,0 +1,256 @@
+
+    <div class="page-container">
+
+      <!-- Header -->
+      <div class="page-header">
+        <div class="page-header-left" style="display:flex;align-items:center;gap:12px">
+          <button mat-icon-button routerLink="/admin" class="back-btn" title="Back to Admin Panel">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+          <div>
+            <h1>Hospital Management</h1>
+            <p>Manage and verify registered veterinary hospitals</p>
+          </div>
+        </div>
+        <div class="hosp-stats">
+          <div class="h-stat total-stat">
+            <span>{{ all.length }}</span> Total
+          </div>
+          <div class="h-stat active-stat">
+            <span>{{ activeCount }}</span> Active
+          </div>
+          <div class="h-stat inactive-stat">
+            <span>{{ inactiveCount }}</span> Inactive
+          </div>
+        </div>
+      </div>
+
+      <!-- Info notice -->
+      <div class="info-notice">
+        <mat-icon>info_outline</mat-icon>
+        <span>Hospitals register themselves via the <strong>Sign Up</strong> page selecting the "Veterinary Hospital" account type. Use the Verify and Activate buttons below to manage them.</span>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+
+        <div class="search-box">
+          <mat-icon class="search-icon">search</mat-icon>
+          <input [(ngModel)]="filters.search" (ngModelChange)="applyFilters()"
+                 placeholder="Search by name, city, email…" class="search-input" />
+          @if (filters.search) {
+            <button class="clear-search" (click)="filters.search=''; applyFilters()">
+              <mat-icon style="font-size:15px;width:15px;height:15px">close</mat-icon>
+            </button>
+          }
+        </div>
+
+        <div class="select-group">
+          <span class="select-label">Status</span>
+          <select class="filter-select" [(ngModel)]="filters.status" (ngModelChange)="applyFilters()">
+            <option value="">All</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+
+        <div class="select-group">
+          <span class="select-label">City</span>
+          <select class="filter-select" [(ngModel)]="filters.city" (ngModelChange)="applyFilters()">
+            <option value="">All Cities</option>
+            @for (c of availableCities; track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="select-group">
+          <span class="select-label">Sort by</span>
+          <select class="filter-select" [(ngModel)]="filters.sort" (ngModelChange)="applyFilters()">
+            <option value="az">A → Z</option>
+            <option value="za">Z → A</option>
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
+        </div>
+
+        @if (activeFilterCount > 0) {
+          <button class="clear-all-btn" (click)="clearAll()">
+            Clear <span class="filter-badge">{{ activeFilterCount }}</span>
+          </button>
+        }
+
+      </div>
+
+      @if (loading) {
+        <div class="loading-state">
+          <mat-spinner diameter="32"></mat-spinner>
+          <span>Loading hospitals...</span>
+        </div>
+      }
+
+      @if (!loading) {
+        <div class="table-card">
+
+          <div class="results-count">
+            Showing <strong>{{ filteredData.length }}</strong> of <strong>{{ all.length }}</strong> hospitals
+          </div>
+
+          @if (filteredData.length === 0) {
+            <div class="empty-state">
+              <div class="empty-icon"><mat-icon>local_hospital</mat-icon></div>
+              <h3>No hospitals found</h3>
+              <p>No hospitals match your current filters.</p>
+            </div>
+          }
+
+          @if (filteredData.length > 0) {
+            <table mat-table [dataSource]="filteredData" style="width:100%">
+
+              <ng-container matColumnDef="hospital">
+                <th mat-header-cell *matHeaderCellDef>Hospital</th>
+                <td mat-cell *matCellDef="let h" style="padding:14px 18px">
+                  <div class="hosp-row">
+                    <div class="hosp-avatar-sm">
+                      @if (h.logoUrl) {
+                        <img [src]="h.logoUrl" alt="logo" class="logo-thumb" />
+                      } @else {
+                        <mat-icon>local_hospital</mat-icon>
+                      }
+                    </div>
+                    <div>
+                      <div style="font-weight:700;font-size:0.88rem;color:#1A3547">{{ h.name }}</div>
+                      <div style="font-size:0.74rem;color:#8BA3B5">{{ h.city || '—' }}</div>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="contact">
+                <th mat-header-cell *matHeaderCellDef>Contact</th>
+                <td mat-cell *matCellDef="let h" style="font-size:0.83rem;color:#4A6478">
+                  <div>{{ h.phone || '—' }}</div>
+                  @if (h.email) {
+                    <div style="font-size:0.75rem;color:#8BA3B5">{{ h.email }}</div>
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="city">
+                <th mat-header-cell *matHeaderCellDef>City</th>
+                <td mat-cell *matCellDef="let h" style="font-size:0.83rem;color:#4A6478">
+                  {{ h.city || '—' }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let h">
+                  <span class="chip" [ngClass]="h.isActive !== false ? 'active-chip' : 'inactive-chip'">
+                    {{ h.isActive !== false ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let h" style="text-align:right;padding-right:18px">
+                  <button mat-stroked-button (click)="toggle(h); $event.stopPropagation()"
+                          [class]="h.isActive !== false ? 'deactivate-btn' : 'activate-btn'">
+                    {{ h.isActive !== false ? 'Deactivate' : 'Activate' }}
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="cols"></tr>
+              <tr mat-row *matRowDef="let row; columns: cols;"
+                  class="table-row" (click)="selected = row"></tr>
+            </table>
+          }
+
+        </div>
+      }
+
+    </div>
+
+    <!-- Detail Popup -->
+    @if (selected) {
+      <div class="popup-overlay" (click)="selected = null">
+        <div class="popup-card" (click)="$event.stopPropagation()">
+
+          <button class="popup-close" (click)="selected = null">
+            <mat-icon>close</mat-icon>
+          </button>
+
+          <!-- Header -->
+          <div class="popup-header">
+            <div class="popup-avatar">
+              @if (selected.logoUrl) {
+                <img [src]="selected.logoUrl" alt="logo" class="popup-logo" />
+              } @else {
+                <mat-icon>local_hospital</mat-icon>
+              }
+            </div>
+            <div class="popup-title-block">
+              <div class="popup-name">{{ selected.name }}</div>
+              <div class="popup-id-row">
+                <span class="popup-id-badge">#{{ selected.id }}</span>
+                <span class="chip small-chip" [ngClass]="selected.isActive !== false ? 'active-chip' : 'inactive-chip'">
+                  {{ selected.isActive !== false ? 'Active' : 'Inactive' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div class="popup-body">
+
+            <div class="detail-row-2">
+              <div class="detail-group">
+                <div class="detail-label">Phone</div>
+                <div class="detail-value">{{ selected.phone || '—' }}</div>
+              </div>
+              <div class="detail-group">
+                <div class="detail-label">Email</div>
+                <div class="detail-value">{{ selected.email || '—' }}</div>
+              </div>
+            </div>
+
+            <div class="detail-group">
+              <div class="detail-label">Address</div>
+              <div class="detail-value">
+                {{ locationOf(selected) }}
+              </div>
+            </div>
+
+            <div class="detail-group">
+              <div class="detail-label">Owner User ID</div>
+              <div class="detail-value">
+                <span class="id-mono">#{{ selected.ownerUserId || '—' }}</span>
+              </div>
+            </div>
+
+            <div class="detail-row-2">
+              <div class="detail-group">
+                <div class="detail-label">Registered On</div>
+                <div class="detail-value">{{ formatDate(selected.createdAt) }}</div>
+              </div>
+              <div class="detail-group">
+                <div class="detail-label">Last Updated</div>
+                <div class="detail-value">{{ formatDate(selected.updatedAt) }}</div>
+              </div>
+            </div>
+
+            <!-- Action -->
+            <div class="popup-actions">
+              <button mat-stroked-button (click)="toggle(selected)"
+                      [class]="selected.isActive !== false ? 'modal-deactivate' : 'modal-activate'">
+                <mat-icon>{{ selected.isActive !== false ? 'block' : 'check_circle' }}</mat-icon>
+                {{ selected.isActive !== false ? 'Deactivate Hospital' : 'Activate Hospital' }}
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    }

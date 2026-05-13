@@ -1,0 +1,359 @@
+
+    <div class="page-container">
+
+      <!-- Header -->
+      <div class="page-header">
+        <div class="page-header-left" style="display:flex;align-items:center;gap:12px">
+          <button mat-icon-button routerLink="/admin" class="back-btn" title="Back to Admin Panel">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+          <div>
+            <h1>NGO Management</h1>
+            <p>Create and manage rescue organisations</p>
+          </div>
+        </div>
+        <div class="ngo-count-badge">
+          <mat-icon>business</mat-icon>
+          <span>{{ ngos.length }} organisations</span>
+        </div>
+      </div>
+
+      <!-- Info notice -->
+      <div class="info-notice">
+        <mat-icon>info_outline</mat-icon>
+        <span>NGOs register themselves via the <strong>Sign Up</strong> page selecting the "NGO / Rescue Organisation" account type. Use the Verify and Activate buttons below to manage them.</span>
+      </div>
+
+      <!-- ── Filter Panel ── -->
+      <div class="filter-panel">
+
+        <!-- Row 1: Search + Sort + Clear -->
+        <div class="filter-row">
+          <div class="search-box">
+            <mat-icon class="search-icon">search</mat-icon>
+            <input class="search-input" placeholder="Search by name, city or email…"
+                   [(ngModel)]="filters.search" />
+            @if (filters.search) {
+              <button class="search-clear" (click)="filters.search = ''">
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+          </div>
+
+          <div class="sort-wrap">
+            <mat-icon class="sort-icon">sort</mat-icon>
+            <select class="sort-select" [(ngModel)]="filters.sort">
+              <option value="name_asc">Name A → Z</option>
+              <option value="name_desc">Name Z → A</option>
+              <option value="date_desc">Newest First</option>
+              <option value="date_asc">Oldest First</option>
+            </select>
+          </div>
+
+          @if (activeFilterCount > 0) {
+            <button class="clear-all-btn" (click)="clearAll()">
+              <mat-icon>filter_alt_off</mat-icon>
+              Clear ({{ activeFilterCount }})
+            </button>
+          }
+        </div>
+
+        <!-- Row 2: Verification chips -->
+        <div class="filter-row">
+          <span class="filter-label">Verification</span>
+          <div class="chip-group">
+            @for (v of verifyOptions; track v.value) {
+              <button class="filter-chip"
+                      [class.active]="filters.verified === v.value"
+                      [ngClass]="filters.verified === v.value ? 'fc-' + v.value.toLowerCase() : ''"
+                      (click)="filters.verified = v.value">
+                {{ v.label }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Row 3: Status + City + RegNo -->
+        <div class="filter-row wrap">
+          <div class="filter-group">
+            <span class="filter-label">Status</span>
+            <div class="chip-group">
+              @for (s of statusOptions; track s.value) {
+                <button class="filter-chip"
+                        [class.active]="filters.status === s.value"
+                        (click)="filters.status = s.value">
+                  {{ s.label }}
+                </button>
+              }
+            </div>
+          </div>
+
+          @if (availableCities.length > 0) {
+            <div class="filter-group">
+              <span class="filter-label">City</span>
+              <div class="sort-wrap">
+                <mat-icon class="sort-icon">location_city</mat-icon>
+                <select class="sort-select" [(ngModel)]="filters.city">
+                  <option value="ALL">All Cities</option>
+                  @for (c of availableCities; track c) {
+                    <option [value]="c">{{ c }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+          }
+
+          <div class="filter-group">
+            <span class="filter-label">Registration</span>
+            <div class="chip-group">
+              @for (r of regOptions; track r.value) {
+                <button class="filter-chip"
+                        [class.active]="filters.regNo === r.value"
+                        (click)="filters.regNo = r.value">
+                  {{ r.label }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Result count row -->
+        <div class="result-row">
+          <span class="result-count" [class.zero]="filteredNgos.length === 0">
+            @if (filteredNgos.length === ngos.length) {
+              Showing all {{ ngos.length }} organisations
+            } @else {
+              Showing <strong>{{ filteredNgos.length }}</strong> of {{ ngos.length }} organisations
+            }
+          </span>
+          @if (activeFilterCount > 0) {
+            <span class="active-filters-badge">
+              {{ activeFilterCount }} filter{{ activeFilterCount > 1 ? 's' : '' }} active
+            </span>
+          }
+        </div>
+      </div>
+
+      <!-- Loading -->
+      @if (loading) {
+        <div class="loading-state">
+          <mat-spinner diameter="32"></mat-spinner>
+          <span>Loading NGOs...</span>
+        </div>
+      }
+
+      @if (!loading) {
+        <div class="table-card">
+
+          <!-- No results -->
+          @if (filteredNgos.length === 0) {
+            <div class="empty-state">
+              <div class="empty-icon"><mat-icon>manage_search</mat-icon></div>
+              <h3>No NGOs match your filters</h3>
+              <p style="color:#8BA3B5;font-size:0.82rem;margin:4px 0 12px">
+                Try adjusting or clearing the active filters
+              </p>
+              <button class="clear-all-btn" (click)="clearAll()">
+                <mat-icon>filter_alt_off</mat-icon> Clear All Filters
+              </button>
+            </div>
+          }
+
+          @if (filteredNgos.length > 0) {
+            <table mat-table [dataSource]="filteredNgos" style="width:100%">
+
+              <ng-container matColumnDef="ngo">
+                <th mat-header-cell *matHeaderCellDef>Organisation</th>
+                <td mat-cell *matCellDef="let n" style="padding:14px 18px">
+                  <div class="ngo-row">
+                    <div class="ngo-avatar-sm">{{ n.name?.charAt(0) || 'N' }}</div>
+                    <div>
+                      <div style="font-weight:700;font-size:0.88rem;color:#1A3547">{{ n.name }}</div>
+                      <div style="font-size:0.74rem;color:#8BA3B5">{{ n.city || '—' }}</div>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="contact">
+                <th mat-header-cell *matHeaderCellDef>Contact</th>
+                <td mat-cell *matCellDef="let n">
+                  <div style="font-size:0.82rem;color:#4A6478">{{ n.phone || '—' }}</div>
+                  <div style="font-size:0.74rem;color:#8BA3B5">{{ n.email || '' }}</div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="regno">
+                <th mat-header-cell *matHeaderCellDef>Reg. No</th>
+                <td mat-cell *matCellDef="let n">
+                  @if (n.registrationNo) {
+                    <span class="regno-badge">{{ n.registrationNo }}</span>
+                  } @else {
+                    <span style="font-size:0.78rem;color:#B0C4D4">—</span>
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let n">
+                  <span class="chip" [ngClass]="n.isActive ? 'confirmed' : 'cancelled'">
+                    {{ n.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="verified">
+                <th mat-header-cell *matHeaderCellDef>Verification</th>
+                <td mat-cell *matCellDef="let n">
+                  <span class="chip" [ngClass]="n.isVerified ? 'confirmed' : 'pending'">
+                    {{ n.isVerified ? '✓ Verified' : 'Pending' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let n" style="text-align:right;padding-right:18px">
+                  <div style="display:flex;gap:8px;justify-content:flex-end">
+                    @if (!n.isVerified) {
+                      <button mat-stroked-button
+                              (click)="$event.stopPropagation(); verify(n)"
+                              class="verify-btn">
+                        <mat-icon>verified</mat-icon> Verify
+                      </button>
+                    }
+                    <button mat-stroked-button
+                            (click)="$event.stopPropagation(); toggle(n)"
+                            [class]="n.isActive ? 'deactivate-btn' : 'activate-btn'">
+                      {{ n.isActive ? 'Deactivate' : 'Activate' }}
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="cols"></tr>
+              <tr mat-row *matRowDef="let row; columns: cols;"
+                  class="clickable-row"
+                  (click)="selected = row"></tr>
+            </table>
+          }
+        </div>
+      }
+
+    </div>
+
+    <!-- ── NGO Detail Modal ── -->
+    @if (selected) {
+      <div class="modal-backdrop" (click)="selected = null">
+        <div class="modal-card" (click)="$event.stopPropagation()">
+
+          <!-- Purple header -->
+          <div class="modal-header">
+            <div class="modal-avatar">{{ selected.name?.charAt(0) || 'N' }}</div>
+            <div class="modal-id-badge">#{{ selected.id }}</div>
+            <button mat-icon-button class="modal-close" (click)="selected = null">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <!-- Name + badges -->
+          <div class="modal-identity">
+            <div class="modal-name">{{ selected.name }}</div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center">
+              <span class="chip" [ngClass]="selected.isVerified ? 'confirmed' : 'pending'">
+                {{ selected.isVerified ? '✓ Verified' : 'Pending Verification' }}
+              </span>
+              <span class="chip" [ngClass]="selected.isActive ? 'confirmed' : 'cancelled'">
+                {{ selected.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="modal-body">
+
+            <div class="detail-section">
+
+              @if (selected.email) {
+                <div class="detail-row">
+                  <mat-icon class="detail-icon">email</mat-icon>
+                  <div>
+                    <div class="detail-label">Email</div>
+                    <a class="detail-link" [href]="'mailto:' + selected.email">{{ selected.email }}</a>
+                  </div>
+                </div>
+              }
+
+              @if (selected.phone) {
+                <div class="detail-row">
+                  <mat-icon class="detail-icon">call</mat-icon>
+                  <div>
+                    <div class="detail-label">Phone</div>
+                    <a class="detail-link" [href]="'tel:' + selected.phone">{{ selected.phone }}</a>
+                  </div>
+                </div>
+              }
+
+              @if (selected.city || selected.address) {
+                <div class="detail-row">
+                  <mat-icon class="detail-icon">location_on</mat-icon>
+                  <div>
+                    <div class="detail-label">Location</div>
+                    <div class="detail-value">{{ locationOf(selected) }}</div>
+                  </div>
+                </div>
+              }
+
+              @if (selected.registrationNo) {
+                <div class="detail-row">
+                  <mat-icon class="detail-icon">badge</mat-icon>
+                  <div>
+                    <div class="detail-label">Registration No</div>
+                    <div class="detail-value">{{ selected.registrationNo }}</div>
+                  </div>
+                </div>
+              }
+
+              @if (selected.description) {
+                <div class="detail-row">
+                  <mat-icon class="detail-icon">description</mat-icon>
+                  <div>
+                    <div class="detail-label">About</div>
+                    <div class="detail-value" style="font-size:0.82rem;line-height:1.5;font-weight:500">
+                      {{ selected.description }}
+                    </div>
+                  </div>
+                </div>
+              }
+
+              @if (selected.createdAt) {
+                <div class="detail-row">
+                  <mat-icon class="detail-icon">calendar_today</mat-icon>
+                  <div>
+                    <div class="detail-label">Registered On</div>
+                    <div class="detail-value">{{ selected.createdAt | date:'mediumDate' }}</div>
+                  </div>
+                </div>
+              }
+
+            </div>
+
+            <!-- Action buttons -->
+            <div class="modal-actions">
+              @if (!selected.isVerified) {
+                <button class="modal-action-btn modal-verify" (click)="verify(selected)">
+                  <mat-icon>verified</mat-icon> Verify Organisation
+                </button>
+              }
+              <button class="modal-action-btn"
+                      [ngClass]="selected.isActive ? 'modal-deactivate' : 'modal-activate'"
+                      (click)="toggle(selected)">
+                <mat-icon>{{ selected.isActive ? 'person_off' : 'person' }}</mat-icon>
+                {{ selected.isActive ? 'Deactivate' : 'Activate' }}
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    }

@@ -1,0 +1,289 @@
+
+    <div class="page-container">
+
+      <!-- Header -->
+      <div class="page-header">
+        <div class="page-header-left" style="display:flex;align-items:center;gap:12px">
+          <button mat-icon-button routerLink="/admin" class="back-btn" title="Back to Admin Panel">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+          <div>
+            <h1>Rescue Oversight</h1>
+            <p>Monitor all animal rescue reports platform-wide</p>
+          </div>
+        </div>
+        <div class="rescue-stats">
+          <div class="r-stat pending-stat">
+            <span>{{ pendingCount }}</span> Pending
+          </div>
+          <div class="r-stat progress-stat">
+            <span>{{ progressCount }}</span> Active
+          </div>
+          <div class="r-stat unassigned-stat">
+            <span>{{ unassignedCount }}</span> Unassigned
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+
+        <div class="search-box">
+          <mat-icon class="search-icon">search</mat-icon>
+          <input [(ngModel)]="filters.search" (ngModelChange)="applyFilters()"
+                 placeholder="Search location, description, animal…" class="search-input" />
+          @if (filters.search) {
+            <button class="clear-search" (click)="filters.search=''; applyFilters()">
+              <mat-icon style="font-size:15px;width:15px;height:15px">close</mat-icon>
+            </button>
+          }
+        </div>
+
+        <div class="select-group">
+          <span class="select-label">Status</span>
+          <select class="filter-select" [(ngModel)]="filters.status" (ngModelChange)="applyFilters()">
+            @for (s of statuses; track s.value) {
+              <option [value]="s.value">{{ s.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="select-group">
+          <span class="select-label">Urgency</span>
+          <select class="filter-select" [(ngModel)]="filters.urgency" (ngModelChange)="applyFilters()">
+            @for (u of urgencies; track u.value) {
+              <option [value]="u.value">{{ u.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="select-group">
+          <span class="select-label">Animal</span>
+          <select class="filter-select" [(ngModel)]="filters.animalType" (ngModelChange)="applyFilters()">
+            <option value="">All</option>
+            @for (t of availableAnimalTypes; track t) {
+              <option [value]="t">{{ t }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="select-group">
+          <span class="select-label">Assigned</span>
+          <select class="filter-select" [(ngModel)]="filters.assignment" (ngModelChange)="applyFilters()">
+            @for (a of assignmentOptions; track a.value) {
+              <option [value]="a.value">{{ a.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="select-group">
+          <span class="select-label">Sort by</span>
+          <select class="filter-select" [(ngModel)]="filters.sort" (ngModelChange)="applyFilters()">
+            @for (s of sortOptions; track s.value) {
+              <option [value]="s.value">{{ s.label }}</option>
+            }
+          </select>
+        </div>
+
+        @if (activeFilterCount > 0) {
+          <button class="clear-all-btn" (click)="clearAll()">
+            Clear <span class="filter-badge">{{ activeFilterCount }}</span>
+          </button>
+        }
+
+      </div>
+
+      @if (loading) {
+        <div class="loading-state">
+          <mat-spinner diameter="32"></mat-spinner>
+          <span>Loading rescue reports...</span>
+        </div>
+      }
+
+      @if (!loading) {
+        <div class="table-card">
+          <div class="results-count">
+            Showing <strong>{{ filteredData.length }}</strong> of <strong>{{ all.length }}</strong> reports
+          </div>
+
+          @if (filteredData.length === 0) {
+            <div class="empty-state">
+              <div class="empty-icon"><mat-icon>emergency</mat-icon></div>
+              <h3>No rescue reports</h3>
+              <p>No reports match your current filters.</p>
+            </div>
+          }
+
+          @if (filteredData.length > 0) {
+            <table mat-table [dataSource]="filteredData" style="width:100%">
+
+              <ng-container matColumnDef="animal">
+                <th mat-header-cell *matHeaderCellDef>Animal</th>
+                <td mat-cell *matCellDef="let r" style="padding:14px 18px">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div class="rescue-icon-sm">
+                      <mat-icon>pets</mat-icon>
+                    </div>
+                    <div>
+                      <div style="font-weight:700;font-size:0.88rem;color:#1A3547">{{ r.animalType || 'Unknown' }}</div>
+                      <div style="font-size:0.74rem;color:#8BA3B5">ID #{{ r.id }}</div>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="crit">
+                <th mat-header-cell *matHeaderCellDef>Urgency</th>
+                <td mat-cell *matCellDef="let r">
+                  <span class="crit-badge crit-{{ r.criticality?.toLowerCase() }}">{{ r.criticality }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="address">
+                <th mat-header-cell *matHeaderCellDef>Location</th>
+                <td mat-cell *matCellDef="let r" style="font-size:0.82rem;color:#4A6478;max-width:200px">
+                  {{ r.address || '—' }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="ngo">
+                <th mat-header-cell *matHeaderCellDef>Assigned NGO</th>
+                <td mat-cell *matCellDef="let r">
+                  @if (r.ngoName) {
+                    <span class="ngo-chip">{{ r.ngoName }}</span>
+                  } @else {
+                    <span class="unassigned-chip">Unassigned</span>
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let r">
+                  <span class="chip" [ngClass]="statusClass(r.status)">{{ statusLabel(r.status) }}</span>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="cols"></tr>
+              <tr mat-row *matRowDef="let row; columns: cols;"
+                  class="table-row"
+                  [class]="'table-row urgency-row-' + row.criticality?.toLowerCase()"
+                  (click)="selected = row"></tr>
+            </table>
+          }
+        </div>
+      }
+
+    </div>
+
+    <!-- Detail Popup -->
+    @if (selected) {
+      <div class="popup-overlay" (click)="selected = null">
+        <div class="popup-card" (click)="$event.stopPropagation()">
+
+          <!-- Close -->
+          <button class="popup-close" (click)="selected = null">
+            <mat-icon>close</mat-icon>
+          </button>
+
+          <!-- Header -->
+          <div class="popup-header" [class]="'popup-header crit-header-' + selected.criticality?.toLowerCase()">
+            <div class="popup-avatar">
+              <mat-icon>pets</mat-icon>
+            </div>
+            <div class="popup-title-block">
+              <div class="popup-animal">{{ selected.animalType || 'Unknown Animal' }}</div>
+              <div class="popup-id-row">
+                <span class="popup-id-badge">#{{ selected.id }}</span>
+                <span class="crit-badge crit-{{ selected.criticality?.toLowerCase() }}">{{ selected.criticality }}</span>
+                <span class="chip small-chip" [ngClass]="statusClass(selected.status)">{{ statusLabel(selected.status) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div class="popup-body">
+
+            <!-- Photo -->
+            @if (selected.photoUrl) {
+              <div class="photo-section">
+                <img [src]="selected.photoUrl" alt="Animal photo" class="rescue-photo" />
+                <div class="photo-label">Reported photo</div>
+              </div>
+            }
+
+            <!-- Description -->
+            @if (selected.description) {
+              <div class="detail-group">
+                <div class="detail-label">Description</div>
+                <div class="detail-value desc-value">{{ selected.description }}</div>
+              </div>
+            }
+
+            <!-- Location -->
+            <div class="detail-group">
+              <div class="detail-label">Location</div>
+              <div class="detail-value">{{ selected.address || '—' }}</div>
+            </div>
+
+            <!-- Timestamps row -->
+            <div class="detail-row-2">
+              <div class="detail-group">
+                <div class="detail-label">Reported At</div>
+                <div class="detail-value">{{ formatDate(selected.reportedAt) }}</div>
+              </div>
+              <div class="detail-group">
+                <div class="detail-label">Last Updated</div>
+                <div class="detail-value">{{ formatDate(selected.updatedAt) }}</div>
+              </div>
+            </div>
+
+            <!-- Response time -->
+            @if (selected.reportedAt && selected.updatedAt) {
+              <div class="response-time-block">
+                <mat-icon class="rt-icon">timer</mat-icon>
+                <span>{{ responseTime(selected.reportedAt, selected.updatedAt) }}</span>
+              </div>
+            }
+
+            <!-- Reporter -->
+            <div class="detail-group">
+              <div class="detail-label">Reporter ID</div>
+              <div class="detail-value">
+                <span class="id-mono">#{{ selected.reporterId || '—' }}</span>
+              </div>
+            </div>
+
+            <!-- Assigned NGO -->
+            <div class="detail-group">
+              <div class="detail-label">Assigned NGO</div>
+              @if (selected.ngoName) {
+                <div class="ngo-block">
+                  <div class="ngo-name">{{ selected.ngoName }}</div>
+                  @if (selected.ngoPhone) {
+                    <div class="ngo-meta"><mat-icon class="ngo-icon">phone</mat-icon>{{ selected.ngoPhone }}</div>
+                  }
+                  @if (selected.ngoEmail) {
+                    <div class="ngo-meta"><mat-icon class="ngo-icon">email</mat-icon>{{ selected.ngoEmail }}</div>
+                  }
+                  @if (selected.ngoCity || selected.ngoAddress) {
+                    <div class="ngo-meta"><mat-icon class="ngo-icon">location_on</mat-icon>{{ selected.ngoCity }}{{ selected.ngoCity && selected.ngoAddress ? ', ' : '' }}{{ selected.ngoAddress }}</div>
+                  }
+                </div>
+              } @else {
+                <span class="unassigned-chip" style="margin-top:4px;display:inline-block">Unassigned</span>
+              }
+            </div>
+
+            <!-- Resolution Notes -->
+            @if (selected.resolutionNotes) {
+              <div class="detail-group">
+                <div class="detail-label">Resolution Notes</div>
+                <div class="detail-value desc-value resolution-note">{{ selected.resolutionNotes }}</div>
+              </div>
+            }
+
+          </div>
+        </div>
+      </div>
+    }

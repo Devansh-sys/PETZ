@@ -1,0 +1,179 @@
+<div class="page-container" style="max-width:700px">
+
+  <!-- Header -->
+  <div class="page-header" style="margin-bottom:20px">
+    <div class="page-header-left">
+      <h1>Report Animal in Need</h1>
+      <p>Help an animal in distress — our NGO partners will respond</p>
+    </div>
+    <button mat-stroked-button routerLink="/rescue"
+            style="border-radius:10px;color:#4A6478;border-color:#C8DCE8">
+      <mat-icon>arrow_back</mat-icon> Back
+    </button>
+  </div>
+
+  <!-- Emergency banner -->
+  <div class="urgency-banner">
+    <div class="urgency-icon"><mat-icon>emergency</mat-icon></div>
+    <div>
+      <strong>Life-threatening emergency?</strong>
+      <p>Call your local animal rescue hotline immediately. Use this form for non-emergency & emergency reports — an NGO will be auto-assigned.</p>
+    </div>
+  </div>
+
+  <div class="card" style="padding:32px;margin-top:18px">
+    <form [formGroup]="form" (ngSubmit)="submit()">
+
+      <!-- Animal Details -->
+      <div class="form-section-title">Animal Details</div>
+
+      <div class="form-row">
+        <div class="field-group">
+          <label class="field-label">Type of animal *</label>
+          <mat-form-field appearance="outline">
+            <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">pets</mat-icon>
+            <mat-select formControlName="animalType" placeholder="Select animal type">
+              <mat-option value="DOG">🐕 Dog</mat-option>
+              <mat-option value="CAT">🐈 Cat</mat-option>
+              <mat-option value="BIRD">🦜 Bird</mat-option>
+              <mat-option value="COW">🐄 Cow</mat-option>
+              <mat-option value="MONKEY">🐒 Monkey</mat-option>
+              <mat-option value="SNAKE">🐍 Snake</mat-option>
+              <mat-option value="OTHER">🐾 Other</mat-option>
+            </mat-select>
+            <mat-error>Required</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Urgency level</label>
+          <mat-form-field appearance="outline">
+            <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">warning_amber</mat-icon>
+            <mat-select formControlName="criticality">
+              <mat-option value="LOW">🟢 Low — Stray, not injured</mat-option>
+              <mat-option value="MEDIUM">🟡 Medium — Mild distress</mat-option>
+              <mat-option value="HIGH">🟠 High — Injured or ill</mat-option>
+              <mat-option value="CRITICAL">🔴 Critical — Life-threatening</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Location -->
+      <div class="form-section-title" style="margin-top:8px">Location</div>
+
+      <!-- GPS detect row -->
+      <div class="location-detect-row">
+        <button mat-stroked-button type="button" class="gps-btn"
+                (click)="detectGPS()" [disabled]="locating">
+          @if (locating) {
+            <mat-spinner diameter="16" style="display:inline-block;margin-right:6px"></mat-spinner>
+          } @else {
+            <mat-icon>my_location</mat-icon>
+          }
+          {{ locating ? 'Detecting...' : 'Use My GPS Location' }}
+        </button>
+        @if (gpsDetected) {
+          <div class="gps-confirmed">
+            <mat-icon>check_circle</mat-icon>
+            GPS detected ({{ lat.toFixed(4) }}°N, {{ lng.toFixed(4) }}°E)
+          </div>
+        }
+      </div>
+
+      <!-- Area dropdown -->
+      <div class="field-group" style="margin-top:12px">
+        <label class="field-label">Select Chennai area *</label>
+        <mat-form-field appearance="outline">
+          <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">location_city</mat-icon>
+          <mat-select formControlName="area" placeholder="Choose your area in Chennai"
+                      (selectionChange)="onAreaSelect($event.value)">
+            @for (area of areas; track area.name) {
+              <mat-option [value]="area">{{ area.name }}</mat-option>
+            }
+          </mat-select>
+          <mat-error>Please select an area</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Landmark / street -->
+      <div class="field-group">
+        <label class="field-label">Landmark / Street description *</label>
+        <mat-form-field appearance="outline">
+          <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">place</mat-icon>
+          <input matInput formControlName="landmark"
+                 placeholder="e.g. Near petrol bunk, behind bus stop, 3rd cross street...">
+          <mat-error>Please describe the exact spot</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Full address (auto-filled, read-only hint) -->
+      @if (fullAddress) {
+        <div class="address-preview">
+          <mat-icon>location_on</mat-icon>
+          <span>{{ fullAddress }}</span>
+        </div>
+      }
+
+      <!-- Reporter Contact -->
+      <div class="form-section-title" style="margin-top:16px">Your Contact</div>
+
+      <div class="field-group">
+        <label class="field-label">
+          Your mobile number *
+          <span class="phone-why">(so the NGO can reach you at the location)</span>
+        </label>
+        <mat-form-field appearance="outline">
+          <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">phone</mat-icon>
+          <input matInput formControlName="reporterPhone" type="tel"
+                 placeholder="10-digit mobile number e.g. 9876543210"
+                 maxlength="10">
+          <mat-error *ngIf="form.get('reporterPhone')?.hasError('required')">
+            Mobile number is required
+          </mat-error>
+          <mat-error *ngIf="form.get('reporterPhone')?.hasError('pattern')">
+            Enter a valid 10-digit Indian mobile number (starts with 6–9)
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Situation Details -->
+      <div class="form-section-title" style="margin-top:8px">Situation Details</div>
+
+      <div class="field-group">
+        <label class="field-label">Describe the animal's condition *</label>
+        <mat-form-field appearance="outline">
+          <textarea matInput rows="4" formControlName="description"
+                    placeholder="Describe what you see — injuries, behaviour, surroundings, how many animals..."></textarea>
+          <mat-error>Please describe the situation</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Submit -->
+      <div style="display:flex;gap:12px;margin-top:8px">
+        <button mat-raised-button type="submit"
+                [disabled]="form.invalid || loading || !isLocationSet()"
+                class="submit-btn">
+          @if (loading) {
+            <mat-spinner diameter="18" style="display:inline-block;margin-right:6px"></mat-spinner>
+          } @else {
+            <mat-icon>add_alert</mat-icon>
+          }
+          {{ loading ? 'Submitting...' : 'Submit Report' }}
+        </button>
+        <button mat-stroked-button type="button" routerLink="/rescue"
+                style="height:48px;border-radius:12px;color:#4A6478;border-color:#C8DCE8">
+          Cancel
+        </button>
+      </div>
+
+      @if (!isLocationSet() && form.touched) {
+        <p class="location-warn">
+          <mat-icon>info_outline</mat-icon>
+          Please select an area or use GPS to set location.
+        </p>
+      }
+
+    </form>
+  </div>
+
+</div>

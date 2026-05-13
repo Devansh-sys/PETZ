@@ -1,0 +1,307 @@
+<div class="page-wrap">
+
+  <!-- ── Header ─────────────────────────────────────────── -->
+  <div class="page-hdr">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button mat-icon-button routerLink="/ngo" class="back-btn">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1 class="page-title">Rescue Queue</h1>
+        <p class="page-sub">Rescue assignments waiting for your response</p>
+      </div>
+    </div>
+    @if (criticalCount > 0) {
+      <div class="crit-badge">
+        <div class="blink-dot"></div>
+        <mat-icon>warning_amber</mat-icon>
+        <span>{{ criticalCount }} critical</span>
+      </div>
+    }
+  </div>
+
+  @if (loading) {
+    <div class="loading-state">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Loading rescue queue…</span>
+    </div>
+  }
+
+  @if (!loading) {
+
+    <!-- ── Stat Strip ──────────────────────────────────── -->
+    @if (rescues.length > 0) {
+      <div class="stat-strip">
+        <div class="stat-item">
+          <div class="stat-num">{{ rescues.length }}</div>
+          <div class="stat-lbl">Total</div>
+        </div>
+        <div class="stat-div"></div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:#7C62CC">{{ pendingCount }}</div>
+          <div class="stat-lbl">Pending</div>
+        </div>
+        <div class="stat-div"></div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:#E89340">{{ assignedCount }}</div>
+          <div class="stat-lbl">Reported</div>
+        </div>
+        <div class="stat-div"></div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:#F97316">{{ inProgressCount }}</div>
+          <div class="stat-lbl">In Progress</div>
+        </div>
+        <div class="stat-div"></div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:#2EB894">{{ completedCount }}</div>
+          <div class="stat-lbl">Completed</div>
+        </div>
+        <div class="stat-div"></div>
+        <div class="stat-item">
+          <div class="stat-num" style="color:#E05858">{{ criticalCount }}</div>
+          <div class="stat-lbl">Critical</div>
+        </div>
+      </div>
+    }
+
+    <!-- ── Filter Bar ──────────────────────────────────── -->
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input class="search-input" placeholder="Search by animal type or address…"
+               [(ngModel)]="filter.search" (ngModelChange)="applyFilters()">
+      </div>
+      <div class="select-group">
+        <label class="select-label">Status</label>
+        <select class="fsel" [(ngModel)]="filter.status" (ngModelChange)="applyFilters()">
+          <option value="">All</option>
+          <option value="PENDING">Pending</option>
+          <option value="ASSIGNED">Reported</option>
+          <option value="IN_PROGRESS">In Progress</option>
+          <option value="COMPLETED">Completed</option>
+        </select>
+      </div>
+      <div class="select-group">
+        <label class="select-label">Urgency</label>
+        <select class="fsel" [(ngModel)]="filter.criticality" (ngModelChange)="applyFilters()">
+          <option value="">All</option>
+          <option value="CRITICAL">Critical</option>
+          <option value="HIGH">High</option>
+          <option value="MEDIUM">Medium</option>
+          <option value="LOW">Low</option>
+        </select>
+      </div>
+      <div class="select-group">
+        <label class="select-label">Sort</label>
+        <select class="fsel" [(ngModel)]="filter.sort" (ngModelChange)="applyFilters()">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="urgency">Urgency (High→Low)</option>
+        </select>
+      </div>
+      @if (hasActiveFilters) {
+        <button class="clear-btn" (click)="clearFilters()">
+          <mat-icon>close</mat-icon> Clear
+        </button>
+      }
+    </div>
+
+    <!-- ── Empty: no rescues ───────────────────────────── -->
+    @if (rescues.length === 0) {
+      <div class="empty-card">
+        <mat-icon class="empty-icon">emergency</mat-icon>
+        <h3 class="empty-h3">Queue is clear</h3>
+        <p class="empty-p">No rescue assignments right now. New ones will appear here.</p>
+      </div>
+    }
+
+    <!-- ── Empty: filter no-results ───────────────────── -->
+    @if (rescues.length > 0 && filtered.length === 0) {
+      <div class="empty-card">
+        <mat-icon class="empty-icon" style="color:#CBD5E1">search_off</mat-icon>
+        <h3 class="empty-h3">No rescues match your filters</h3>
+        <p class="empty-p">Try adjusting or clearing the active filters.</p>
+        <button class="clear-btn" style="margin-top:10px" (click)="clearFilters()">
+          <mat-icon>close</mat-icon> Clear Filters
+        </button>
+      </div>
+    }
+
+    <!-- ── Rescue Cards ────────────────────────────────── -->
+    <div class="cards-list">
+      @for (r of filtered; track r.id) {
+        <div class="rescue-card" [class]="'border-' + critClass(r.criticality)"
+             (click)="selected = r; completionNote = ''">
+          <div class="rc-left">
+            <div class="rc-icon" [class]="'icon-' + critClass(r.criticality)">
+              <mat-icon>pets</mat-icon>
+            </div>
+            <div class="rc-info">
+              <div class="rc-title">{{ r.animalType || 'Unknown Animal' }}</div>
+              @if (r.address) {
+                <div class="rc-address">
+                  <mat-icon>place</mat-icon> {{ r.address }}
+                </div>
+              }
+              @if (r.description) {
+                <div class="rc-desc">{{ r.description }}</div>
+              }
+              <div class="rc-meta-row">
+                @if (r.reportedAt) {
+                  <span class="time-ago">{{ timeAgo(r.reportedAt) }}</span>
+                }
+              </div>
+            </div>
+          </div>
+          <div class="rc-right" (click)="$event.stopPropagation()">
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+              <span class="status-chip" [ngClass]="statusClass(r.status)">{{ statusLabel(r.status) }}</span>
+              <span class="crit-pill" [ngClass]="'crit-' + critClass(r.criticality)">{{ r.criticality }}</span>
+            </div>
+            <div class="rc-actions">
+              @if (r.status === 'ASSIGNED') {
+                <button class="btn-accept" (click)="respond(r.id, 'ACCEPT')">
+                  <mat-icon>check</mat-icon> Accept
+                </button>
+                <button class="btn-decline" (click)="respond(r.id, 'DECLINE')">Decline</button>
+              }
+              @if (r.status === 'IN_PROGRESS') {
+                <span class="open-hint"><mat-icon>open_in_new</mat-icon> Open to complete</span>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+  }
+
+  <!-- ── Detail Popup ────────────────────────────────────── -->
+  @if (selected) {
+    <div class="overlay" (click)="selected = null">
+      <div class="popup" (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="popup-hdr" [class]="'hdr-' + critClass(selected.criticality)">
+          <div class="popup-hdr-icon">
+            <mat-icon>pets</mat-icon>
+          </div>
+          <div class="popup-hdr-info">
+            <div class="popup-crit-pill" [ngClass]="'pill-' + critClass(selected.criticality)">
+              {{ selected.criticality }}
+            </div>
+            <div class="popup-name">{{ selected.animalType || 'Unknown Animal' }}</div>
+            @if (selected.address) {
+              <div class="popup-addr">
+                <mat-icon>place</mat-icon> {{ selected.address }}
+              </div>
+            }
+          </div>
+          <button class="popup-close" (click)="selected = null">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="popup-body">
+
+          <!-- Status + time -->
+          <div class="popup-status-row">
+            <span class="status-chip" [ngClass]="statusClass(selected.status)">{{ statusLabel(selected.status) }}</span>
+            @if (selected.reportedAt) {
+              <span class="time-ago">{{ timeAgo(selected.reportedAt) }}</span>
+              <span class="popup-date">{{ fmtDate(selected.reportedAt) }}</span>
+            }
+          </div>
+
+          <!-- Detail grid -->
+          <div class="detail-grid">
+            <div class="detail-item">
+              <div class="detail-label">Animal Type</div>
+              <div class="detail-val">{{ selected.animalType || '—' }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Report #</div>
+              <div class="detail-val">#{{ selected.id }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Reported</div>
+              <div class="detail-val">{{ fmtDate(selected.reportedAt) }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Last Updated</div>
+              <div class="detail-val">{{ selected.updatedAt ? fmtDate(selected.updatedAt) : '—' }}</div>
+            </div>
+          </div>
+
+          <!-- Reporter Contact -->
+          @if (selected.reporterPhone) {
+            <div class="reporter-contact-box">
+              <div class="reporter-contact-label">
+                <mat-icon>contact_phone</mat-icon> Reporter Contact
+              </div>
+              <a class="reporter-call-btn" [href]="'tel:' + selected.reporterPhone">
+                <mat-icon>call</mat-icon>
+                <span>{{ selected.reporterPhone }}</span>
+                <span class="call-hint">Tap to call</span>
+              </a>
+            </div>
+          }
+
+          <!-- Photo -->
+          @if (selected.photoUrl) {
+            <div style="margin-bottom:14px">
+              <div class="detail-label" style="margin-bottom:6px">Photo</div>
+              <img [src]="selected.photoUrl" alt="Rescue photo" class="rescue-photo">
+            </div>
+          }
+
+          <!-- Description -->
+          @if (selected.description) {
+            <div class="detail-notes">
+              <div class="detail-label" style="margin-bottom:6px">Description</div>
+              <div class="notes-box">{{ selected.description }}</div>
+            </div>
+          }
+
+          <!-- Resolution notes -->
+          @if (selected.resolutionNotes) {
+            <div class="detail-notes">
+              <div class="detail-label" style="margin-bottom:6px">Resolution Notes</div>
+              <div class="notes-box">{{ selected.resolutionNotes }}</div>
+            </div>
+          }
+
+          <!-- Complete with notes -->
+          @if (selected.status === 'IN_PROGRESS') {
+            <div class="detail-notes">
+              <div class="detail-label" style="margin-bottom:6px">Completion Notes</div>
+              <textarea class="notes-input" rows="2"
+                        [(ngModel)]="completionNote"
+                        placeholder="Describe how the rescue was completed…"></textarea>
+            </div>
+          }
+
+          <!-- Actions -->
+          <div class="popup-actions">
+            @if (selected.status === 'ASSIGNED') {
+              <button class="btn-accept" (click)="respond(selected.id, 'ACCEPT'); selected = null">
+                <mat-icon>check</mat-icon> Accept
+              </button>
+              <button class="btn-decline" (click)="respond(selected.id, 'DECLINE'); selected = null">
+                Decline
+              </button>
+            }
+            @if (selected.status === 'IN_PROGRESS') {
+              <button class="btn-complete-wide" (click)="completeWithNote(selected.id)">
+                <mat-icon>done_all</mat-icon> Mark as Complete
+              </button>
+            }
+          </div>
+
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

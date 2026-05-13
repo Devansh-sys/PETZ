@@ -3,6 +3,7 @@ package com.petz.service;
 import com.petz.entity.Hospital;
 import com.petz.exception.ResourceNotFoundException;
 import com.petz.repository.HospitalRepository;
+import com.petz.repository.UserRepository;
 import com.petz.util.FileStorageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.Map;
 public class HospitalService {
 
     private final HospitalRepository hospitalRepo;
+    private final UserRepository userRepo;
     private final FileStorageUtil fileStorage;
 
     public Hospital createOrUpdate(Long ownerUserId, Map<String, Object> body) {
@@ -51,10 +53,9 @@ public class HospitalService {
         return hospitalRepo.findByIsActive(true);
     }
 
-    // Admin-specific: returns only APPROVED (active) hospitals for the management page.
-    // Pending hospitals are handled separately via the pending-approvals endpoint.
+    // Admin-specific: returns ALL hospitals (active and inactive) so admin can manage them.
     public List<Hospital> getAllForAdmin() {
-        return hospitalRepo.findByIsActive(true);
+        return hospitalRepo.findAll();
     }
 
     public List<Hospital> getByCity(String city) {
@@ -71,6 +72,14 @@ public class HospitalService {
     public Hospital toggleActive(Long id, boolean active) {
         Hospital h = getById(id);
         h.setIsActive(active);
-        return hospitalRepo.save(h);
+        hospitalRepo.save(h);
+
+        // Sync the owner's User account isActive so login is blocked/unblocked immediately.
+        userRepo.findById(h.getOwnerUserId()).ifPresent(user -> {
+            user.setIsActive(active);
+            userRepo.save(user);
+        });
+
+        return h;
     }
 }

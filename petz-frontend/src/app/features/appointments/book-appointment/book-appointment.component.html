@@ -1,0 +1,147 @@
+<div class="page-container" style="max-width:700px">
+
+  <!-- Header -->
+  <div class="page-header" style="margin-bottom:24px">
+    <div class="page-header-left">
+      <button mat-icon-button routerLink="/dashboard"
+              style="background:#fff;border:1px solid #E0EBF2;border-radius:10px;margin-right:12px">
+        <mat-icon style="color:#4A6478">arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1>Book Appointment</h1>
+        <p>Schedule a vet visit for your pet</p>
+      </div>
+    </div>
+    <button mat-stroked-button routerLink="/appointments"
+            style="border-radius:10px;color:#4A6478;border-color:#C8DCE8">
+      My Appointments
+    </button>
+  </div>
+
+  <div class="card" style="padding:32px">
+    <form [formGroup]="form" (ngSubmit)="submit()">
+
+      <!-- Step 1: Choose hospital & doctor -->
+      <div class="form-section-title">Step 1 — Choose Hospital &amp; Doctor</div>
+
+      <div class="field-group">
+        <label class="field-label">Hospital</label>
+        <mat-form-field appearance="outline">
+          <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">local_hospital</mat-icon>
+          <mat-select formControlName="hospitalId"
+                      placeholder="Select a hospital"
+                      (selectionChange)="onHospitalChange($event.value)">
+            @for (h of hospitals; track h.id) {
+              <mat-option [value]="h.id">
+                {{ h.name }}{{ h.city ? ' — ' + h.city : '' }}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Selected hospital address hint -->
+      @if (form.get('hospitalId')?.value) {
+        @for (h of hospitals; track h.id) {
+          @if (h.id === form.get('hospitalId')?.value && (h.address || h.phone)) {
+            <div class="hospital-hint">
+              <mat-icon>info_outline</mat-icon>
+              <span>
+                @if (h.address) { <strong>{{ h.address }}</strong> }
+                @if (h.address && h.phone) { &nbsp;·&nbsp; }
+                @if (h.phone) { 📞 {{ h.phone }} }
+                @if ((h.address || h.phone) && h.email) { &nbsp;·&nbsp; }
+                @if (h.email) { ✉️ {{ h.email }} }
+              </span>
+            </div>
+          }
+        }
+      }
+
+      <div class="field-group">
+        <label class="field-label">Doctor</label>
+        <mat-form-field appearance="outline">
+          <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">person</mat-icon>
+          <mat-select formControlName="doctorId"
+                      placeholder="Select a doctor"
+                      [disabled]="!form.get('hospitalId')?.value">
+            @for (d of doctors; track d.id) {
+              <mat-option [value]="d.id">
+                Dr. {{ d.name }}
+                @if (d.specialization) { — {{ d.specialization }} }
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Step 2: Date & time -->
+      <div class="form-section-title" style="margin-top:8px">Step 2 — Date &amp; Time</div>
+
+      <div class="form-row">
+        <!-- Calendar date picker -->
+        <div class="field-group">
+          <label class="field-label">Appointment Date</label>
+          <mat-form-field appearance="outline">
+            <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">calendar_today</mat-icon>
+            <input matInput [matDatepicker]="picker"
+                   formControlName="apptDate"
+                   placeholder="Pick a date"
+                   [min]="minDate"
+                   readonly>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <!-- Time slot dropdown -->
+        <div class="field-group">
+          <label class="field-label">Preferred Time</label>
+          <mat-form-field appearance="outline">
+            <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">schedule</mat-icon>
+            <mat-select formControlName="apptTime" placeholder="Select time">
+              @for (slot of timeSlots; track slot.value) {
+                <mat-option [value]="slot.value">{{ slot.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Step 3: Reason -->
+      <div class="form-section-title" style="margin-top:8px">Step 3 — Reason for Visit</div>
+
+      <div class="field-group">
+        <label class="field-label">Describe the issue or reason</label>
+        <mat-form-field appearance="outline">
+          <textarea matInput rows="3" formControlName="reason"
+                    placeholder="e.g. Annual vaccination, limping, skin rash..."></textarea>
+        </mat-form-field>
+      </div>
+
+      <!-- Notice -->
+      <div class="booking-notice">
+        <mat-icon>info_outline</mat-icon>
+        <span>You'll receive a confirmation once the hospital reviews your request.</span>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex;gap:12px;margin-top:20px">
+        <button mat-raised-button color="primary" type="submit"
+                [disabled]="form.invalid || loading"
+                style="height:48px;min-width:160px;font-size:0.9rem">
+          @if (loading) {
+            <mat-spinner diameter="18" style="display:inline-block;margin-right:6px"></mat-spinner>
+          }
+          {{ loading ? 'Booking...' : 'Confirm Booking' }}
+        </button>
+        <button mat-stroked-button type="button" routerLink="/appointments"
+                style="height:48px;border-radius:12px;color:#4A6478;border-color:#C8DCE8">
+          Cancel
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</div>

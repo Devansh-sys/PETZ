@@ -46,300 +46,8 @@ const CHENNAI_AREAS: ChennaiArea[] = [
 @Component({
   standalone: false,
   selector: 'app-report-rescue',
-  template: `
-    <div class="page-container" style="max-width:700px">
-
-      <!-- Header -->
-      <div class="page-header" style="margin-bottom:20px">
-        <div class="page-header-left">
-          <h1>Report Animal in Need</h1>
-          <p>Help an animal in distress — our NGO partners will respond</p>
-        </div>
-        <button mat-stroked-button routerLink="/rescue"
-                style="border-radius:10px;color:#4A6478;border-color:#C8DCE8">
-          <mat-icon>arrow_back</mat-icon> Back
-        </button>
-      </div>
-
-      <!-- Emergency banner -->
-      <div class="urgency-banner">
-        <div class="urgency-icon"><mat-icon>emergency</mat-icon></div>
-        <div>
-          <strong>Life-threatening emergency?</strong>
-          <p>Call your local animal rescue hotline immediately. Use this form for non-emergency & emergency reports — an NGO will be auto-assigned.</p>
-        </div>
-      </div>
-
-      <div class="card" style="padding:32px;margin-top:18px">
-        <form [formGroup]="form" (ngSubmit)="submit()">
-
-          <!-- Animal Details -->
-          <div class="form-section-title">Animal Details</div>
-
-          <div class="form-row">
-            <div class="field-group">
-              <label class="field-label">Type of animal *</label>
-              <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">pets</mat-icon>
-                <mat-select formControlName="animalType" placeholder="Select animal type">
-                  <mat-option value="DOG">🐕 Dog</mat-option>
-                  <mat-option value="CAT">🐈 Cat</mat-option>
-                  <mat-option value="BIRD">🦜 Bird</mat-option>
-                  <mat-option value="COW">🐄 Cow</mat-option>
-                  <mat-option value="MONKEY">🐒 Monkey</mat-option>
-                  <mat-option value="SNAKE">🐍 Snake</mat-option>
-                  <mat-option value="OTHER">🐾 Other</mat-option>
-                </mat-select>
-                <mat-error>Required</mat-error>
-              </mat-form-field>
-            </div>
-            <div class="field-group">
-              <label class="field-label">Urgency level</label>
-              <mat-form-field appearance="outline">
-                <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">warning_amber</mat-icon>
-                <mat-select formControlName="criticality">
-                  <mat-option value="LOW">🟢 Low — Stray, not injured</mat-option>
-                  <mat-option value="MEDIUM">🟡 Medium — Mild distress</mat-option>
-                  <mat-option value="HIGH">🟠 High — Injured or ill</mat-option>
-                  <mat-option value="CRITICAL">🔴 Critical — Life-threatening</mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-          </div>
-
-          <!-- Location -->
-          <div class="form-section-title" style="margin-top:8px">Location</div>
-
-          <!-- GPS detect row -->
-          <div class="location-detect-row">
-            <button mat-stroked-button type="button" class="gps-btn"
-                    (click)="detectGPS()" [disabled]="locating">
-              @if (locating) {
-                <mat-spinner diameter="16" style="display:inline-block;margin-right:6px"></mat-spinner>
-              } @else {
-                <mat-icon>my_location</mat-icon>
-              }
-              {{ locating ? 'Detecting...' : 'Use My GPS Location' }}
-            </button>
-            @if (gpsDetected) {
-              <div class="gps-confirmed">
-                <mat-icon>check_circle</mat-icon>
-                GPS detected ({{ lat.toFixed(4) }}°N, {{ lng.toFixed(4) }}°E)
-              </div>
-            }
-          </div>
-
-          <!-- Area dropdown -->
-          <div class="field-group" style="margin-top:12px">
-            <label class="field-label">Select Chennai area *</label>
-            <mat-form-field appearance="outline">
-              <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">location_city</mat-icon>
-              <mat-select formControlName="area" placeholder="Choose your area in Chennai"
-                          (selectionChange)="onAreaSelect($event.value)">
-                @for (area of areas; track area.name) {
-                  <mat-option [value]="area">{{ area.name }}</mat-option>
-                }
-              </mat-select>
-              <mat-error>Please select an area</mat-error>
-            </mat-form-field>
-          </div>
-
-          <!-- Landmark / street -->
-          <div class="field-group">
-            <label class="field-label">Landmark / Street description *</label>
-            <mat-form-field appearance="outline">
-              <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">place</mat-icon>
-              <input matInput formControlName="landmark"
-                     placeholder="e.g. Near petrol bunk, behind bus stop, 3rd cross street...">
-              <mat-error>Please describe the exact spot</mat-error>
-            </mat-form-field>
-          </div>
-
-          <!-- Full address (auto-filled, read-only hint) -->
-          @if (fullAddress) {
-            <div class="address-preview">
-              <mat-icon>location_on</mat-icon>
-              <span>{{ fullAddress }}</span>
-            </div>
-          }
-
-          <!-- Situation Details -->
-          <div class="form-section-title" style="margin-top:16px">Situation Details</div>
-
-          <div class="field-group">
-            <label class="field-label">Describe the animal's condition *</label>
-            <mat-form-field appearance="outline">
-              <textarea matInput rows="4" formControlName="description"
-                        placeholder="Describe what you see — injuries, behaviour, surroundings, how many animals..."></textarea>
-              <mat-error>Please describe the situation</mat-error>
-            </mat-form-field>
-          </div>
-
-          <!-- Photo upload (optional) -->
-          <div class="field-group">
-            <label class="field-label">Photo <span class="optional-badge">Optional</span></label>
-            <div class="upload-area" (click)="photoInput.click()"
-                 [class.has-image]="imagePreview"
-                 [style.backgroundImage]="imagePreview ? 'url(' + imagePreview + ')' : 'none'">
-              @if (!imagePreview) {
-                <div class="upload-placeholder">
-                  <mat-icon>add_a_photo</mat-icon>
-                  <span>Click to upload a photo of the animal</span>
-                  <small>JPG, PNG or WEBP · max 5 MB</small>
-                </div>
-              }
-              @if (imagePreview) {
-                <button mat-mini-fab type="button" class="remove-photo-btn"
-                        (click)="removePhoto($event)">
-                  <mat-icon>close</mat-icon>
-                </button>
-              }
-            </div>
-            <input #photoInput type="file" accept="image/jpeg,image/png,image/webp"
-                   style="display:none" (change)="onFileSelected($event)">
-            @if (fileError) {
-              <p class="file-error"><mat-icon>error_outline</mat-icon> {{ fileError }}</p>
-            }
-          </div>
-
-          <!-- Submit -->
-          <div style="display:flex;gap:12px;margin-top:8px">
-            <button mat-raised-button type="submit"
-                    [disabled]="form.invalid || loading || !isLocationSet()"
-                    class="submit-btn">
-              @if (loading) {
-                <mat-spinner diameter="18" style="display:inline-block;margin-right:6px"></mat-spinner>
-              } @else {
-                <mat-icon>add_alert</mat-icon>
-              }
-              {{ loading ? 'Submitting...' : 'Submit Report' }}
-            </button>
-            <button mat-stroked-button type="button" routerLink="/rescue"
-                    style="height:48px;border-radius:12px;color:#4A6478;border-color:#C8DCE8">
-              Cancel
-            </button>
-          </div>
-
-          @if (!isLocationSet() && form.touched) {
-            <p class="location-warn">
-              <mat-icon>info_outline</mat-icon>
-              Please select an area or use GPS to set location.
-            </p>
-          }
-
-        </form>
-      </div>
-
-    </div>
-  `,
-  styles: [`
-    .urgency-banner {
-      display: flex; gap: 14px; align-items: flex-start;
-      background: #FEF2F2; border: 1px solid #FECACA;
-      border-radius: 16px; padding: 16px 20px;
-    }
-    .urgency-icon {
-      width: 40px; height: 40px; border-radius: 12px;
-      background: #FEE2E2; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-      mat-icon { color: #DC2626; font-size: 20px; }
-    }
-    .urgency-banner div strong { font-size: 0.88rem; color: #991B1B; font-weight: 800; display: block; margin-bottom: 4px; }
-    .urgency-banner div p { margin: 0; font-size: 0.8rem; color: #B91C1C; line-height: 1.5; }
-
-    .form-section-title {
-      font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
-      letter-spacing: 0.1em; color: #8BA3B5;
-      margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #E0EBF2;
-    }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
-    .field-group { margin-bottom: 4px; }
-    .field-label { display: block; font-size: 0.78rem; font-weight: 700; color: #1A3547; margin-bottom: 6px; }
-
-    .location-detect-row {
-      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-      margin-bottom: 8px;
-    }
-    .gps-btn {
-      border-radius: 12px !important;
-      border-color: #C8DCE8 !important;
-      color: #FF8C42 !important;
-      font-weight: 600 !important;
-      font-size: 0.85rem !important;
-      height: 40px !important;
-      display: flex !important;
-      align-items: center !important;
-      gap: 6px !important;
-      mat-icon { font-size: 18px; width: 18px; height: 18px; }
-      &:hover { background: #FFF7ED !important; border-color: #FF8C42 !important; }
-    }
-    .gps-confirmed {
-      display: flex; align-items: center; gap: 5px;
-      font-size: 0.78rem; font-weight: 600; color: #059669;
-      background: #D1FAE5; padding: 5px 12px; border-radius: 999px;
-      mat-icon { font-size: 14px; width: 14px; height: 14px; }
-    }
-    .address-preview {
-      display: flex; align-items: center; gap: 8px;
-      background: #FFF7ED; border: 1px solid #FFEDD5;
-      border-radius: 10px; padding: 10px 14px;
-      font-size: 0.82rem; color: #9A3412; font-weight: 600;
-      margin-bottom: 4px;
-      mat-icon { font-size: 16px; width: 16px; height: 16px; color: #FF8C42; flex-shrink: 0; }
-      span { white-space: normal; }
-    }
-    .submit-btn {
-      height: 48px !important;
-      min-width: 160px !important;
-      font-size: 0.9rem !important;
-      border-radius: 14px !important;
-      background: linear-gradient(135deg, #F87171, #DC2626) !important;
-      color: #fff !important;
-      box-shadow: 0 4px 14px rgba(220,38,38,0.35) !important;
-      display: flex !important; align-items: center !important; gap: 6px !important;
-      &:not(:disabled):hover { box-shadow: 0 6px 20px rgba(220,38,38,0.5) !important; }
-      &:disabled { background: #C8DCE8 !important; box-shadow: none !important; }
-    }
-    .location-warn {
-      display: flex; align-items: center; gap: 6px;
-      margin: 8px 0 0; font-size: 0.78rem; color: #DC2626;
-      mat-icon { font-size: 15px; width: 15px; height: 15px; }
-    }
-    .optional-badge {
-      font-size: 0.68rem; font-weight: 600; color: #8BA3B5;
-      background: #EAF2F8; border-radius: 6px;
-      padding: 1px 7px; margin-left: 6px; vertical-align: middle;
-    }
-    .upload-area {
-      border: 2px dashed #C8DCE8; border-radius: 14px;
-      min-height: 130px; cursor: pointer; position: relative;
-      display: flex; align-items: center; justify-content: center;
-      background-size: cover; background-position: center;
-      overflow: hidden; transition: border-color 0.2s;
-      &:hover { border-color: #FF8C42; }
-      &.has-image { border-style: solid; border-color: #FF8C42; }
-    }
-    .upload-placeholder {
-      display: flex; flex-direction: column; align-items: center; gap: 6px;
-      color: #8BA3B5; pointer-events: none;
-      mat-icon { font-size: 36px; width: 36px; height: 36px; color: #C8DCE8; }
-      span { font-size: 0.82rem; font-weight: 600; }
-      small { font-size: 0.72rem; }
-    }
-    .remove-photo-btn {
-      position: absolute !important; top: 8px; right: 8px;
-      width: 28px !important; height: 28px !important;
-      background: rgba(0,0,0,0.55) !important;
-      mat-icon { font-size: 16px; width: 16px; height: 16px; color: #fff; }
-    }
-    .file-error {
-      display: flex; align-items: center; gap: 4px;
-      margin: 4px 0 0; font-size: 0.76rem; color: #DC2626;
-      mat-icon { font-size: 14px; width: 14px; height: 14px; }
-    }
-    @media (max-width: 560px) {
-      .form-row { grid-template-columns: 1fr; }
-    }
-  `]
+  templateUrl: './report-rescue.component.html',
+  styleUrls: ['./report-rescue.component.scss']
 })
 export class ReportRescueComponent {
   form: FormGroup;
@@ -351,10 +59,6 @@ export class ReportRescueComponent {
   lng: number = 0;
   fullAddress = '';
 
-  selectedFile: File | null = null;
-  imagePreview: string | null = null;
-  fileError = '';
-
   areas: ChennaiArea[] = CHENNAI_AREAS;
 
   constructor(
@@ -364,11 +68,12 @@ export class ReportRescueComponent {
     private snack: MatSnackBar
   ) {
     this.form = this.fb.group({
-      animalType:  ['', Validators.required],
-      criticality: ['MEDIUM'],
-      area:        [null, Validators.required],
-      landmark:    ['', Validators.required],
-      description: ['', Validators.required]
+      animalType:    ['', Validators.required],
+      criticality:   ['MEDIUM'],
+      area:          [null, Validators.required],
+      landmark:      ['', Validators.required],
+      reporterPhone: ['', [Validators.required, Validators.pattern(/^[6-9]\d{9}$/)]],
+      description:   ['', Validators.required]
     });
   }
 
@@ -428,28 +133,6 @@ export class ReportRescueComponent {
     this.form.get('landmark')?.valueChanges.subscribe(() => this.buildFullAddress());
   }
 
-  // ── Photo upload ──────────────────────────────────────────────
-  onFileSelected(event: Event): void {
-    this.fileError = '';
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      this.fileError = 'File is too large. Maximum size is 5 MB.';
-      return;
-    }
-    this.selectedFile = file;
-    const reader = new FileReader();
-    reader.onload = () => { this.imagePreview = reader.result as string; };
-    reader.readAsDataURL(file);
-  }
-
-  removePhoto(event: MouseEvent): void {
-    event.stopPropagation();
-    this.selectedFile = null;
-    this.imagePreview = null;
-    this.fileError = '';
-  }
-
   // ── Submit ────────────────────────────────────────────────────
   submit(): void {
     if (this.form.invalid || !this.isLocationSet()) return;
@@ -461,19 +144,17 @@ export class ReportRescueComponent {
     const address  = landmark ? `${landmark}, ${area?.address}` : area?.address;
 
     const payload = {
-      animalType:  this.form.get('animalType')?.value,
-      criticality: this.form.get('criticality')?.value,
-      description: this.form.get('description')?.value,
-      address:     address,
-      latitude:    this.lat || area?.lat,
-      longitude:   this.lng || area?.lng
+      animalType:    this.form.get('animalType')?.value,
+      criticality:   this.form.get('criticality')?.value,
+      description:   this.form.get('description')?.value,
+      address:       address,
+      latitude:      this.lat || area?.lat,
+      longitude:     this.lng || area?.lng,
+      reporterPhone: this.form.get('reporterPhone')?.value
     };
 
     const formData = new FormData();
     formData.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
-    if (this.selectedFile) {
-      formData.append('photo', this.selectedFile);
-    }
 
     this.api.postFormData<any>('/rescue', formData).subscribe({
       next: (res: any) => {

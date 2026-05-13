@@ -1,0 +1,392 @@
+<div class="page-wrap">
+
+  <!-- ── Header ─────────────────────────────────────────── -->
+  <div class="page-hdr">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button mat-icon-button routerLink="/ngo" class="back-btn" title="Back">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1 class="page-title">My Animals</h1>
+        <p class="page-sub">Manage all animals listed for adoption</p>
+      </div>
+    </div>
+    <button mat-raised-button color="primary" (click)="showForm ? cancelForm() : (showForm = true)">
+      <mat-icon>{{ showForm ? 'close' : 'add' }}</mat-icon>
+      {{ showForm ? (editMode ? 'Close Edit' : 'Cancel') : 'Add Animal' }}
+    </button>
+  </div>
+
+  <!-- ── Add / Edit Animal Form ─────────────────────────── -->
+  @if (showForm) {
+    <div class="form-card">
+      <div class="form-section-label">
+        {{ editMode ? 'Edit Animal Details' : 'New Animal Details' }}
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label class="field-label">Animal Name *</label>
+          <mat-form-field appearance="outline">
+            <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">badge</mat-icon>
+            <input matInput [(ngModel)]="newAnimal.name" placeholder="e.g. Milo">
+          </mat-form-field>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Species</label>
+          <mat-form-field appearance="outline">
+            <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">pets</mat-icon>
+            <input matInput [(ngModel)]="newAnimal.species" placeholder="Dog, Cat, Bird…">
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label class="field-label">Breed</label>
+          <mat-form-field appearance="outline">
+            <input matInput [(ngModel)]="newAnimal.breed" placeholder="Mixed">
+          </mat-form-field>
+        </div>
+        <div class="field-group">
+          <label class="field-label">City</label>
+          <mat-form-field appearance="outline">
+            <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">place</mat-icon>
+            <input matInput [(ngModel)]="newAnimal.city">
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label class="field-label">Age (months)</label>
+          <mat-form-field appearance="outline">
+            <input matInput type="number" [(ngModel)]="newAnimal.ageMonths" placeholder="e.g. 6">
+          </mat-form-field>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Gender</label>
+          <mat-form-field appearance="outline">
+            <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">transgender</mat-icon>
+            <mat-select [(ngModel)]="newAnimal.gender" placeholder="Select gender">
+              <mat-option value="Male">Male</mat-option>
+              <mat-option value="Female">Female</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group radio-field-group">
+          <label class="field-label">Vaccinated?</label>
+          <div class="radio-row">
+            <mat-icon class="radio-icon">vaccines</mat-icon>
+            <mat-radio-group [(ngModel)]="newAnimal.isVaccinated" class="radio-group">
+              <mat-radio-button [value]="true">Yes</mat-radio-button>
+              <mat-radio-button [value]="false">No</mat-radio-button>
+            </mat-radio-group>
+          </div>
+        </div>
+        <div class="field-group radio-field-group">
+          <label class="field-label">Neutered?</label>
+          <div class="radio-row">
+            <mat-icon class="radio-icon">health_and_safety</mat-icon>
+            <mat-radio-group [(ngModel)]="newAnimal.isNeutered" class="radio-group">
+              <mat-radio-button [value]="true">Yes</mat-radio-button>
+              <mat-radio-button [value]="false">No</mat-radio-button>
+            </mat-radio-group>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status — shown only in edit mode -->
+      @if (editMode) {
+        <div class="field-group">
+          <label class="field-label">Status</label>
+          <mat-form-field appearance="outline">
+            <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">info_outline</mat-icon>
+            <mat-select [(ngModel)]="newAnimal.status">
+              <mat-option value="AVAILABLE">Available</mat-option>
+              <mat-option value="RESERVED">Reserved</mat-option>
+              <mat-option value="ADOPTED">Adopted</mat-option>
+              <mat-option value="ARCHIVED">Archived</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      }
+
+      <!-- Description (full width) -->
+      <div class="form-row-full">
+        <label class="field-label">Description <span class="field-opt">Optional</span></label>
+        <mat-form-field appearance="outline" style="width:100%">
+          <textarea matInput rows="3" [(ngModel)]="newAnimal.description"
+                    placeholder="e.g. Friendly and playful, great with kids…"></textarea>
+        </mat-form-field>
+      </div>
+
+      <!-- Photo upload (full width) -->
+      <div class="form-row-full">
+        <label class="field-label">Animal Photo <span class="field-opt">Optional</span></label>
+        <input type="file" #photoInput accept="image/*" style="display:none"
+               (change)="onPhotoSelected($event)">
+        <div class="photo-upload-zone" (click)="photoInput.click()">
+          @if (photoPreview) {
+            <img [src]="photoPreview" class="photo-preview-img" alt="Preview">
+            <div class="photo-change-overlay">
+              <mat-icon>edit</mat-icon>
+              <span>Change Photo</span>
+            </div>
+          } @else {
+            <div class="photo-placeholder">
+              <mat-icon>add_photo_alternate</mat-icon>
+              <span class="photo-cta">Click to upload a photo</span>
+              <span class="photo-hint">JPG or PNG · max 5 MB</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button mat-raised-button color="primary"
+                (click)="editMode ? updateAnimal() : addAnimal()"
+                [disabled]="!newAnimal.name || saving">
+          @if (saving) { <mat-spinner diameter="16" style="margin-right:6px"></mat-spinner> }
+          @else { <mat-icon>{{ editMode ? 'save' : 'add' }}</mat-icon> }
+          {{ saving ? 'Saving…' : (editMode ? 'Update Animal' : 'Save Animal') }}
+        </button>
+        <button mat-stroked-button (click)="cancelForm()" class="cancel-btn">Cancel</button>
+      </div>
+    </div>
+  }
+
+  <!-- ── Stat Strip ──────────────────────────────────────── -->
+  @if (animals.length > 0) {
+    <div class="stat-strip">
+      <div class="stat-item">
+        <div class="stat-num">{{ animals.length }}</div>
+        <div class="stat-lbl">Total Listed</div>
+      </div>
+      <div class="stat-div"></div>
+      <div class="stat-item">
+        <div class="stat-num">{{ availableCount }}</div>
+        <div class="stat-lbl">Available</div>
+      </div>
+      <div class="stat-div"></div>
+      <div class="stat-item">
+        <div class="stat-num">{{ adoptedCount }}</div>
+        <div class="stat-lbl">Adopted</div>
+      </div>
+      <div class="stat-div"></div>
+      <div class="stat-item">
+        <div class="stat-num">{{ vaccinatedCount }}</div>
+        <div class="stat-lbl">Vaccinated</div>
+      </div>
+      <div class="stat-div"></div>
+      <div class="stat-item">
+        <div class="stat-num">{{ uniqueCities }}</div>
+        <div class="stat-lbl">Cities</div>
+      </div>
+    </div>
+  }
+
+  <!-- ── Filter Bar ──────────────────────────────────────── -->
+  <div class="filter-bar">
+    <div class="search-wrap">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input class="search-input" placeholder="Search by name or breed…"
+             [(ngModel)]="filter.search" (ngModelChange)="applyFilters()">
+    </div>
+    <div class="select-group">
+      <label class="select-label">Species</label>
+      <select class="fsel" [(ngModel)]="filter.species" (ngModelChange)="applyFilters()">
+        <option value="">All</option>
+        @for (sp of speciesList; track sp) {
+          <option [value]="sp">{{ sp }}</option>
+        }
+      </select>
+    </div>
+    <div class="select-group">
+      <label class="select-label">Status</label>
+      <select class="fsel" [(ngModel)]="filter.status" (ngModelChange)="applyFilters()">
+        <option value="">All</option>
+        <option value="AVAILABLE">Available</option>
+        <option value="ADOPTED">Adopted</option>
+        <option value="PENDING">Pending</option>
+      </select>
+    </div>
+    <div class="select-group">
+      <label class="select-label">Sort</label>
+      <select class="fsel" [(ngModel)]="filter.sort" (ngModelChange)="applyFilters()">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="az">Name A–Z</option>
+        <option value="za">Name Z–A</option>
+      </select>
+    </div>
+    @if (hasActiveFilters) {
+      <button class="clear-btn" (click)="clearFilters()">
+        <mat-icon>close</mat-icon> Clear
+      </button>
+    }
+  </div>
+
+  <!-- ── Empty: no animals ───────────────────────────────── -->
+  @if (animals.length === 0) {
+    <div class="empty-card">
+      <mat-icon class="empty-icon-big">pets</mat-icon>
+      <h3 class="empty-h3">No animals listed yet</h3>
+      <p class="empty-p">Add animals to your organisation's adoption catalogue.</p>
+      <button mat-raised-button color="primary" (click)="showForm = true" style="margin-top:10px">
+        <mat-icon>add</mat-icon> Add your first animal
+      </button>
+    </div>
+  }
+
+  <!-- ── Empty: filter no-results ───────────────────────── -->
+  @if (animals.length > 0 && filtered.length === 0) {
+    <div class="empty-card">
+      <mat-icon class="empty-icon-big" style="color:#CBD5E1">search_off</mat-icon>
+      <h3 class="empty-h3">No animals match your filters</h3>
+      <p class="empty-p">Try adjusting or clearing the active filters.</p>
+      <button class="clear-btn" style="margin-top:10px" (click)="clearFilters()">
+        <mat-icon>close</mat-icon> Clear Filters
+      </button>
+    </div>
+  }
+
+  <!-- ── Table ───────────────────────────────────────────── -->
+  @if (filtered.length > 0) {
+    <div class="table-wrap">
+      <table class="ani-table">
+        <thead>
+          <tr>
+            <th>ANIMAL</th>
+            <th>BREED / AGE</th>
+            <th>LOCATION</th>
+            <th>HEALTH</th>
+            <th>STATUS</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (a of filtered; track a.id) {
+            <tr class="ani-row" (click)="selected = a">
+              <td>
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div class="ani-avatar">
+                    @if (a.photoUrl) {
+                      <img [src]="imgSrc(a.photoUrl)" [alt]="a.name" class="ani-avatar-img"
+                           (error)="$any($event.target).style.display='none'">
+                    } @else {
+                      <mat-icon class="ani-avatar-icon">pets</mat-icon>
+                    }
+                  </div>
+                  <div>
+                    <div class="cell-name">{{ a.name }}</div>
+                    <div class="cell-species">{{ a.species || '—' }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="cell-main">{{ a.breed || 'Mixed breed' }}</div>
+                <div class="cell-sub">{{ fmtAge(a.ageMonths) }}</div>
+              </td>
+              <td>
+                <div class="cell-main">{{ a.city || '—' }}</div>
+              </td>
+              <td>
+                <div style="display:flex;gap:5px;flex-wrap:wrap">
+                  @if (a.isVaccinated) { <span class="badge-vax">Vacc.</span> }
+                  @if (a.isNeutered)   { <span class="badge-neut">Neut.</span> }
+                  @if (!a.isVaccinated && !a.isNeutered) { <span class="cell-sub">—</span> }
+                </div>
+              </td>
+              <td>
+                <span class="status-chip" [ngClass]="statusClass(a.status)">{{ a.status }}</span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- ── Detail Popup ────────────────────────────────────── -->
+  @if (selected) {
+    <div class="overlay" (click)="selected = null">
+      <div class="popup" (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="popup-hdr">
+          @if (selected.photoUrl) {
+            <img [src]="imgSrc(selected.photoUrl)" [alt]="selected.name" class="popup-photo"
+                 (error)="$any($event.target).style.display='none'">
+          } @else {
+            <div class="popup-photo-ph">
+              <mat-icon>pets</mat-icon>
+            </div>
+          }
+          <div class="popup-hdr-info">
+            <span class="popup-species-pill">{{ selected.species || 'Animal' }}</span>
+            <div class="popup-name">{{ selected.name }}</div>
+            <div class="popup-breed">{{ selected.breed || 'Mixed breed' }}</div>
+          </div>
+          <button class="popup-close" (click)="selected = null">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="popup-body">
+
+          <!-- Status + date -->
+          <div class="popup-status-row">
+            <span class="status-chip" [ngClass]="statusClass(selected.status)">{{ selected.status }}</span>
+            <div style="display:flex;gap:6px">
+              @if (selected.isVaccinated) { <span class="badge-vax">Vaccinated</span> }
+              @if (selected.isNeutered)   { <span class="badge-neut">Neutered</span> }
+            </div>
+            @if (selected.createdAt) {
+              <span class="popup-date">Listed {{ fmtDate(selected.createdAt) }}</span>
+            }
+          </div>
+
+          <!-- Detail grid -->
+          <div class="detail-grid">
+            <div class="detail-item">
+              <div class="detail-label">Age</div>
+              <div class="detail-val">{{ fmtAge(selected.ageMonths) }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Gender</div>
+              <div class="detail-val">{{ selected.gender || '—' }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">City</div>
+              <div class="detail-val">{{ selected.city || '—' }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Species</div>
+              <div class="detail-val">{{ selected.species || '—' }}</div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          @if (selected.description) {
+            <div class="detail-notes">
+              <div class="detail-label" style="margin-bottom:6px">Description</div>
+              <div class="notes-box">{{ selected.description }}</div>
+            </div>
+          }
+
+          <!-- Actions -->
+          <div class="popup-actions">
+            <button class="popup-edit-btn" (click)="openEdit(selected)">
+              <mat-icon>edit</mat-icon> Edit Animal
+            </button>
+            <button class="popup-del-btn" (click)="deleteAnimal(selected.id)">
+              <mat-icon>delete_outline</mat-icon> Remove Animal
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

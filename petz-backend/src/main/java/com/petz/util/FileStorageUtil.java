@@ -13,7 +13,7 @@ import java.util.UUID;
 @Component
 public class FileStorageUtil {
 
-    @Value("${petz.upload.dir}")
+    @Value("${petz.upload.dir:./uploads}")
     private String uploadDir;
 
     public String store(MultipartFile file, String subfolder) throws IOException {

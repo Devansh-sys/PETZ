@@ -1,0 +1,307 @@
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-header-left" style="display:flex;align-items:center">
+      <button mat-icon-button routerLink="/dashboard"
+              style="background:#fff;border:1px solid #E0EBF2;border-radius:10px;margin-right:12px">
+        <mat-icon style="color:#4A6478">arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1>My Applications</h1>
+        <p>Track your adoption application statuses</p>
+      </div>
+    </div>
+    <button mat-stroked-button routerLink="/adoption/animals"
+            style="border-radius:10px;color:#4A6478;border-color:#C8DCE8;height:40px">
+      <mat-icon>pets</mat-icon> Browse Animals
+    </button>
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-state">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Loading your applications...</span>
+    </div>
+  }
+
+  @if (!loading) {
+
+    <!-- Empty state -->
+    @if (applications.length === 0) {
+      <div class="card">
+        <div class="empty-state">
+          <div class="empty-icon"><mat-icon>assignment</mat-icon></div>
+          <h3>No applications yet</h3>
+          <p>Find your perfect companion and submit an adoption application.</p>
+          <button mat-raised-button routerLink="/adoption/animals"
+                  style="margin-top:12px;border-radius:12px;background:#FF8C42;color:#fff;height:42px">
+            <mat-icon>pets</mat-icon> Browse Animals
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (applications.length > 0) {
+
+      <!-- Filter Bar -->
+      <div class="filter-bar-card">
+        <div class="search-wrap">
+          <mat-icon class="search-icon">search</mat-icon>
+          <input class="search-input" [(ngModel)]="filter.search" (ngModelChange)="applyFilters()"
+                 placeholder="Search by animal name or species…">
+        </div>
+        <div class="select-group">
+          <label class="select-label">Status</label>
+          <select class="fsel" [(ngModel)]="filter.status" (ngModelChange)="applyFilters()">
+            <option value="">All</option>
+            <option value="PENDING">Pending</option>
+            <option value="UNDER_REVIEW">Under Review</option>
+            <option value="APPROVED">Approved</option>
+            <option value="REJECTED">Rejected</option>
+            <option value="WITHDRAWN">Withdrawn</option>
+          </select>
+        </div>
+        <div class="select-group">
+          <label class="select-label">Sort</label>
+          <select class="fsel" [(ngModel)]="filter.sort" (ngModelChange)="applyFilters()">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+          </select>
+        </div>
+        @if (hasActiveFilters) {
+          <button class="clear-btn" (click)="clearFilters()">
+            <mat-icon>close</mat-icon> Clear
+          </button>
+        }
+      </div>
+
+      <!-- Results count -->
+      <div class="results-count">Showing {{ filtered.length }} of {{ applications.length }} applications</div>
+
+      <!-- Application cards -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+        @for (app of filtered; track app.id) {
+          <div class="app-card" (click)="selected = app" style="cursor:pointer">
+
+            <!-- Left: number + info -->
+            <div class="app-left">
+              <div class="app-num-badge">
+                @if (app.animalPhotoUrl) {
+                  <img [src]="imgSrc(app.animalPhotoUrl)" style="width:100%;height:100%;object-fit:cover;border-radius:14px"
+                       (error)="$any($event.target).style.display='none'" />
+                } @else {
+                  <mat-icon style="color:#fff;font-size:20px">pets</mat-icon>
+                }
+              </div>
+              <div class="app-detail">
+                <div class="app-title">{{ app.animalName || 'Adoption Application' }}</div>
+                <div class="app-meta">
+                  @if (app.animalSpecies) {
+                    <span><mat-icon>cruelty_free</mat-icon>{{ app.animalSpecies }}{{ app.animalBreed ? ' · ' + app.animalBreed : '' }}</span>
+                  }
+                  @if (app.appliedAt) {
+                    <span><mat-icon>schedule</mat-icon>{{ app.appliedAt | date:'mediumDate' }}</span>
+                  }
+                </div>
+                @if (app.adminNotes) {
+                  <div class="app-note">
+                    <mat-icon>comment</mat-icon>
+                    <span>{{ app.adminNotes }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Right: status -->
+            <div class="app-right">
+              <span class="chip" [ngClass]="statusClass(app.status)">
+                {{ statusLabel(app.status) }}
+              </span>
+              <div class="status-hint" [ngClass]="'hint-' + statusClass(app.status)">
+                {{ statusHint(app.status) }}
+              </div>
+            </div>
+
+          </div>
+        }
+        @if (filtered.length === 0) {
+          <div class="card" style="text-align:center;padding:32px;color:#8BA3B5;font-size:0.88rem">
+            No applications match your filters.
+          </div>
+        }
+      </div>
+
+      <!-- Summary chips -->
+      <div class="summary-row">
+        <div class="sum-pill">
+          <span class="sum-num">{{ applications.length }}</span> Total
+        </div>
+        @if (pendingCount > 0) {
+          <div class="sum-pill pending-pill">
+            <span class="sum-num">{{ pendingCount }}</span> Pending
+          </div>
+        }
+        @if (approvedCount > 0) {
+          <div class="sum-pill approved-pill">
+            <span class="sum-num">{{ approvedCount }}</span> Approved
+          </div>
+        }
+      </div>
+    }
+  }
+
+</div>
+
+<!-- ── Detail Modal ── -->
+@if (selected) {
+  <div class="modal-backdrop" (click)="selected = null">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+
+      <!-- Header -->
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="modal-animal-icon">
+            @if (selected.animalPhotoUrl) {
+              <img [src]="imgSrc(selected.animalPhotoUrl)" style="width:100%;height:100%;object-fit:cover;border-radius:14px"
+                   (error)="$any($event.target).style.display='none'" />
+            } @else {
+              <mat-icon>pets</mat-icon>
+            }
+          </div>
+          <div>
+            <div class="modal-title">{{ selected.animalName || 'Adoption Application' }}</div>
+            <div class="modal-sub">
+              @if (selected.animalSpecies) {
+                <span>{{ selected.animalSpecies }}{{ selected.animalBreed ? ' · ' + selected.animalBreed : '' }}</span>
+              }
+            </div>
+          </div>
+        </div>
+        <button mat-icon-button (click)="selected = null">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Status -->
+        <div class="detail-row">
+          <mat-icon class="detail-icon">info</mat-icon>
+          <div>
+            <div class="detail-label">Application Status</div>
+            <span class="chip" [ngClass]="statusClass(selected.status)">{{ statusLabel(selected.status) }}</span>
+            <div class="detail-meta" style="margin-top:4px">{{ statusHint(selected.status) }}</div>
+          </div>
+        </div>
+
+        <!-- Animal details -->
+        <div class="section-divider">Animal Details</div>
+
+        <div class="detail-grid">
+          @if (selected.animalAgeMonths) {
+            <div class="detail-item">
+              <div class="detail-label">Age</div>
+              <div class="detail-value">{{ ageDisplay(selected.animalAgeMonths) }}</div>
+            </div>
+          }
+          @if (selected.animalGender) {
+            <div class="detail-item">
+              <div class="detail-label">Gender</div>
+              <div class="detail-value">{{ selected.animalGender }}</div>
+            </div>
+          }
+          @if (selected.animalCity) {
+            <div class="detail-item">
+              <div class="detail-label">Location</div>
+              <div class="detail-value">{{ selected.animalCity }}</div>
+            </div>
+          }
+          <div class="detail-item">
+            <div class="detail-label">Vaccinated</div>
+            <div class="detail-value">{{ selected.animalIsVaccinated ? '✅ Yes' : '❌ No' }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Neutered</div>
+            <div class="detail-value">{{ selected.animalIsNeutered ? '✅ Yes' : '❌ No' }}</div>
+          </div>
+        </div>
+
+        <!-- Your application -->
+        <div class="section-divider">Your Application</div>
+
+        @if (selected.reason) {
+          <div class="detail-row">
+            <mat-icon class="detail-icon">favorite</mat-icon>
+            <div>
+              <div class="detail-label">Why do you want to adopt?</div>
+              <div class="detail-value" style="font-weight:500;line-height:1.5">{{ selected.reason }}</div>
+            </div>
+          </div>
+        }
+
+        @if (selected.experience) {
+          <div class="detail-row">
+            <mat-icon class="detail-icon">workspace_premium</mat-icon>
+            <div>
+              <div class="detail-label">Pet Experience</div>
+              <div class="detail-value" style="font-weight:500;line-height:1.5">{{ selected.experience }}</div>
+            </div>
+          </div>
+        }
+
+        <div class="detail-grid">
+          @if (selected.housingType) {
+            <div class="detail-item">
+              <div class="detail-label">Housing Type</div>
+              <div class="detail-value">{{ selected.housingType }}</div>
+            </div>
+          }
+          <div class="detail-item">
+            <div class="detail-label">Other Pets</div>
+            <div class="detail-value">{{ selected.hasOtherPets ? 'Yes' : 'No' }}</div>
+          </div>
+          @if (selected.appliedAt) {
+            <div class="detail-item">
+              <div class="detail-label">Applied On</div>
+              <div class="detail-value">{{ selected.appliedAt | date:'mediumDate' }}</div>
+            </div>
+          }
+        </div>
+
+        <!-- Admin notes -->
+        @if (selected.adminNotes) {
+          <div class="admin-notes-box">
+            <div class="detail-label" style="margin-bottom:6px">NGO Feedback</div>
+            <div style="font-size:0.88rem;color:#1A3547;line-height:1.5">{{ selected.adminNotes }}</div>
+          </div>
+        }
+
+        <!-- NGO info -->
+        @if (selected.ngoName) {
+          <div class="ngo-section">
+            <div class="ngo-section-title"><mat-icon>groups</mat-icon> Managing NGO</div>
+            <div class="ngo-name">{{ selected.ngoName }}</div>
+            @if (selected.ngoCity) {
+              <div class="ngo-meta">{{ selected.ngoCity }}</div>
+            }
+            <div class="ngo-contacts">
+              @if (selected.ngoPhone) {
+                <a class="ngo-contact-chip" [href]="'tel:' + selected.ngoPhone">
+                  <mat-icon>call</mat-icon> {{ selected.ngoPhone }}
+                </a>
+              }
+              @if (selected.ngoEmail) {
+                <a class="ngo-contact-chip" [href]="'mailto:' + selected.ngoEmail">
+                  <mat-icon>email</mat-icon> {{ selected.ngoEmail }}
+                </a>
+              }
+            </div>
+          </div>
+        }
+
+      </div>
+    </div>
+  </div>
+}

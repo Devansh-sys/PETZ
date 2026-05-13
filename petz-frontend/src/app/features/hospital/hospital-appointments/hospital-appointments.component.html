@@ -1,0 +1,356 @@
+<!-- Popup overlay -->
+@if (selected) {
+  <div class="overlay" (click)="selected = null">
+    <div class="popup" (click)="$event.stopPropagation()">
+
+      <!-- Popup Header -->
+      <div class="popup-hdr" [ngClass]="'hdr-' + selected.status.toLowerCase()">
+        <div class="popup-hdr-inner">
+          <div class="popup-avatar">
+            <svg viewBox="0 0 40 40" fill="none" width="40" height="40">
+              <circle cx="20" cy="20" r="20" fill="rgba(255,255,255,0.15)"/>
+              <path d="M20 10 C15 10 11 14 11 19 C11 24 15 27 20 27 C25 27 29 24 29 19 C29 14 25 10 20 10Z" fill="rgba(255,255,255,0.8)"/>
+              <path d="M10 38 C10 31 14 28 20 28 C26 28 30 31 30 38" fill="rgba(255,255,255,0.5)"/>
+            </svg>
+          </div>
+          <div>
+            <div class="popup-name">{{ selected.userName || 'Unknown Owner' }}</div>
+            <div class="popup-sub">{{ selected.apptDate | date:'EEEE, MMMM d, y' }} · {{ formatTime(selected.apptTime) }}</div>
+          </div>
+        </div>
+        <button class="popup-close" (click)="selected = null">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <!-- Status pill -->
+      <div style="padding:16px 22px 0">
+        <span class="status-chip chip-{{ selected.status.toLowerCase() }}">{{ selected.status }}</span>
+      </div>
+
+      <!-- Popup body -->
+      <div class="popup-body">
+
+        <!-- Pet section -->
+        <div class="popup-section">
+          <div class="section-label">
+            <mat-icon class="sec-icon pet-ic">pets</mat-icon> Pet Details
+          </div>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="dk">Name</span>
+              <span class="dv">{{ selected.petName || '—' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="dk">Species</span>
+              <span class="dv">{{ selected.petSpecies || '—' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="dk">Breed</span>
+              <span class="dv">{{ selected.petBreed || '—' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Doctor section -->
+        <div class="popup-section">
+          <div class="section-label">
+            <mat-icon class="sec-icon doc-ic">medical_services</mat-icon> Assigned Doctor
+          </div>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="dk">Doctor</span>
+              <span class="dv">{{ selected.doctorName || '—' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="dk">Specialization</span>
+              <span class="dv">{{ selected.doctorSpecialization || '—' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Owner Contact section -->
+        <div class="popup-section">
+          <div class="section-label">
+            <mat-icon class="sec-icon own-ic">person</mat-icon> Owner Contact
+          </div>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="dk">Name</span>
+              <span class="dv">{{ selected.userName || '—' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="dk">Email</span>
+              <span class="dv email-val">{{ selected.userEmail || '—' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="dk">Phone</span>
+              <span class="dv">{{ selected.userPhone || '—' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reason block -->
+        <div class="popup-section">
+          <div class="section-label">
+            <mat-icon class="sec-icon rsn-ic">notes</mat-icon> Reason for Visit
+          </div>
+          <div class="reason-box">{{ selected.reason || 'General Checkup' }}</div>
+        </div>
+
+        <!-- Notes block -->
+        @if (selected.notes) {
+          <div class="popup-section">
+            <div class="section-label">
+              <mat-icon class="sec-icon nts-ic">edit_note</mat-icon> Notes
+            </div>
+            <div class="reason-box notes-box">{{ selected.notes }}</div>
+          </div>
+        }
+
+      </div>
+
+      <!-- Popup actions -->
+      <div class="popup-actions">
+        @if (selected.status === 'PENDING') {
+          <button mat-raised-button class="action-confirm" (click)="updateStatus(selected, 'CONFIRMED')">
+            <mat-icon>check_circle</mat-icon> Confirm Appointment
+          </button>
+        }
+        @if (selected.status === 'CONFIRMED' && isPast(selected.apptDate)) {
+          <button mat-raised-button class="action-complete" (click)="updateStatus(selected, 'COMPLETED')">
+            <mat-icon>done_all</mat-icon> Mark Completed
+          </button>
+        }
+        @if (selected.status === 'CONFIRMED' && !isPast(selected.apptDate)) {
+          <div class="future-note">
+            <mat-icon>schedule</mat-icon>
+            Can only be marked complete on or after the appointment date
+          </div>
+        }
+        @if (selected.status === 'PENDING' || selected.status === 'CONFIRMED') {
+          <button mat-stroked-button class="action-cancel" (click)="updateStatus(selected, 'CANCELLED')">
+            <mat-icon>cancel</mat-icon> Cancel
+          </button>
+        }
+        <button mat-stroked-button class="action-close" (click)="selected = null">Close</button>
+      </div>
+    </div>
+  </div>
+}
+
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-header-left" style="display:flex;align-items:center;gap:12px">
+      <button mat-icon-button routerLink="/hospital" class="back-btn" title="Back">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1>Appointments</h1>
+        <p>Manage incoming and scheduled vet appointments</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="view-toggle">
+        <button class="vt-btn" [class.active]="viewMode==='week'" (click)="switchView('week')">
+          <mat-icon>date_range</mat-icon> Week
+        </button>
+        <button class="vt-btn" [class.active]="viewMode==='all'" (click)="switchView('all')">
+          <mat-icon>list_alt</mat-icon> All Time
+        </button>
+      </div>
+      <div class="total-badge">
+        <mat-icon>event</mat-icon>
+        <span>{{ viewMode === 'week' ? weekTotal() + ' this week' : allAppts.length + ' total' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stat strip -->
+  <div class="stat-strip">
+    <div class="stat-item" (click)="filterStatus=''; applyFilters()" [class.active]="filterStatus===''">
+      <div class="stat-val">{{ viewMode === 'week' ? weekTotal() : allAppts.length }}</div>
+      <div class="stat-label">All</div>
+      <div class="stat-bar" style="background:#F97316"></div>
+    </div>
+    <div class="stat-item" (click)="filterStatus='PENDING'; applyFilters()" [class.active]="filterStatus==='PENDING'">
+      <div class="stat-val" style="color:#E89340">{{ countBy('PENDING') }}</div>
+      <div class="stat-label">Pending</div>
+      <div class="stat-bar" style="background:#E89340"></div>
+    </div>
+    <div class="stat-item" (click)="filterStatus='CONFIRMED'; applyFilters()" [class.active]="filterStatus==='CONFIRMED'">
+      <div class="stat-val" style="color:#F97316">{{ countBy('CONFIRMED') }}</div>
+      <div class="stat-label">Confirmed</div>
+      <div class="stat-bar" style="background:#F97316"></div>
+    </div>
+    <div class="stat-item" (click)="filterStatus='COMPLETED'; applyFilters()" [class.active]="filterStatus==='COMPLETED'">
+      <div class="stat-val" style="color:#2EB894">{{ countBy('COMPLETED') }}</div>
+      <div class="stat-label">Completed</div>
+      <div class="stat-bar" style="background:#2EB894"></div>
+    </div>
+    <div class="stat-item" (click)="filterStatus='CANCELLED'; applyFilters()" [class.active]="filterStatus==='CANCELLED'">
+      <div class="stat-val" style="color:#E05858">{{ countBy('CANCELLED') }}</div>
+      <div class="stat-label">Cancelled</div>
+      <div class="stat-bar" style="background:#E05858"></div>
+    </div>
+  </div>
+
+  <!-- Week Strip (visible in week mode only) -->
+  @if (viewMode === 'week') {
+  <div class="week-strip-card">
+    <div class="week-nav">
+      <button mat-icon-button class="nav-btn" (click)="prevWeek()" title="Previous week">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <span class="week-label">{{ weekRangeLabel() }}</span>
+      <button mat-icon-button class="nav-btn" (click)="nextWeek()" title="Next week">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+    <div class="week-days">
+      <div class="week-all-btn" [class.active]="!selectedDate" (click)="clearDateFilter()">
+        <mat-icon class="week-all-icon">calendar_view_week</mat-icon>
+        <div class="wd-name">This Week</div>
+        <div class="wd-count">{{ weekTotal() }}</div>
+      </div>
+      @for (day of weekDays; track day.label) {
+        <div class="week-day-cell"
+             [class.selected]="isSelectedDay(day.date)"
+             [class.today]="isToday(day.date)"
+             [class.has-appts]="day.count > 0"
+             (click)="selectDay(day.date)">
+          <div class="wd-name">{{ day.dayName }}</div>
+          <div class="wd-num">{{ day.dayNum }}</div>
+          @if (day.count > 0) {
+            <div class="wd-count">{{ day.count }}</div>
+          } @else {
+            <div class="wd-empty">·</div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <div class="search-wrap">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input class="search-input" placeholder="Search by pet, owner, doctor, reason…"
+             [(ngModel)]="searchQ" (ngModelChange)="applyFilters()">
+      @if (searchQ) {
+        <button class="clear-btn" (click)="searchQ=''; applyFilters()">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </div>
+    <div class="filter-selects">
+      <label class="select-wrap">
+        <span class="sel-label">Status</span>
+        <select [(ngModel)]="filterStatus" (ngModelChange)="applyFilters()">
+          <option value="">All</option>
+          <option value="PENDING">Pending</option>
+          <option value="CONFIRMED">Confirmed</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+      </label>
+      <label class="select-wrap">
+        <span class="sel-label">Sort</span>
+        <select [(ngModel)]="sortBy" (ngModelChange)="applyFilters()">
+          <option value="date-asc">Date ↑</option>
+          <option value="date-desc">Date ↓</option>
+          <option value="pending-first">Pending first</option>
+          <option value="status">By status</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-state">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Loading appointments...</span>
+    </div>
+  }
+
+  <!-- Empty -->
+  @if (!loading && filtered.length === 0) {
+    <div class="card">
+      <div class="empty-state">
+        <div class="empty-icon"><mat-icon>event_busy</mat-icon></div>
+        <h3>No appointments</h3>
+        <p>{{ allAppts.length === 0 ? 'No appointments have been booked yet.' : 'No appointments match the current filters.' }}</p>
+        @if (allAppts.length > 0) {
+          <button mat-stroked-button (click)="clearFilters()" style="margin-top:8px">Clear Filters</button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Appointments list -->
+  @if (!loading && filtered.length > 0) {
+    <div class="appt-list">
+      @for (a of filtered; track a.id) {
+        <div class="appt-row" [class.row-pending]="a.status==='PENDING'"
+             (click)="selected = a">
+          <!-- Date block -->
+          <div class="appt-date-blk">
+            <div class="date-num">{{ getDay(a.apptDate) }}</div>
+            <div class="date-mon">{{ getMonth(a.apptDate) }}</div>
+            <div class="date-time">{{ formatTime(a.apptTime) }}</div>
+          </div>
+
+          <!-- Main info -->
+          <div class="appt-main">
+            <div class="appt-top">
+              <div class="appt-reason">{{ a.reason || 'General Checkup' }}</div>
+              <span class="status-chip chip-{{ a.status.toLowerCase() }}">{{ a.status }}</span>
+            </div>
+            <div class="appt-meta-row">
+              <span class="meta-pill pet-pill">
+                <mat-icon>pets</mat-icon>
+                {{ a.petName || 'Unknown Pet' }}
+                @if (a.petSpecies) { · {{ a.petSpecies }} }
+              </span>
+              <span class="meta-pill owner-pill">
+                <mat-icon>person</mat-icon>
+                {{ a.userName || 'Unknown Owner' }}
+              </span>
+              <span class="meta-pill doc-pill">
+                <mat-icon>medical_services</mat-icon>
+                Dr. {{ a.doctorName || 'TBD' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Quick actions -->
+          <div class="appt-quick" (click)="$event.stopPropagation()">
+            @if (a.status === 'PENDING') {
+              <button mat-icon-button class="q-confirm" title="Confirm" (click)="updateStatus(a,'CONFIRMED')">
+                <mat-icon>check_circle</mat-icon>
+              </button>
+            }
+            @if (a.status === 'CONFIRMED' && isPast(a.apptDate)) {
+              <button mat-icon-button class="q-complete" title="Mark complete" (click)="updateStatus(a,'COMPLETED')">
+                <mat-icon>done_all</mat-icon>
+              </button>
+            }
+            @if (a.status === 'CONFIRMED' && !isPast(a.apptDate)) {
+              <button mat-icon-button class="q-future" title="Appointment not yet due" disabled>
+                <mat-icon>schedule</mat-icon>
+              </button>
+            }
+            <button mat-icon-button class="q-detail" title="View details" (click)="selected = a">
+              <mat-icon>open_in_new</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

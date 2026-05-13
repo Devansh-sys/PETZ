@@ -1,0 +1,196 @@
+<div class="page-container" style="max-width:800px">
+
+  <!-- Back button -->
+  <button mat-button routerLink="/adoption/animals" class="back-btn">
+    <mat-icon>arrow_back</mat-icon> All Animals
+  </button>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-state" style="margin-top:40px">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Loading animal profile...</span>
+    </div>
+  }
+
+  @if (!loading && animal) {
+    <!-- Hero card -->
+    <div class="hero-card">
+      <div class="hero-img-wrap">
+        <img [src]="animal.photoUrl || 'assets/animal-placeholder.png'" [alt]="animal.name">
+        <div class="species-overlay">{{ animal.species || 'Animal' }}</div>
+        @if (animal.isAdoptionReady) {
+          <div class="ready-overlay">
+            <mat-icon>check_circle</mat-icon> Ready to Adopt
+          </div>
+        }
+      </div>
+
+      <div class="hero-info">
+        <div class="animal-name">{{ animal.name }}</div>
+        <div class="animal-subtitle">
+          {{ animal.breed || 'Mixed' }}
+          @if (animal.ageMonths) {
+            · {{ animal.ageMonths < 12 ? animal.ageMonths + ' month' + (animal.ageMonths > 1 ? 's' : '') : (animal.ageMonths / 12 | number:'1.0-1') + ' yr' }}
+          }
+          @if (animal.gender) { · {{ animal.gender }} }
+        </div>
+
+        <!-- Tags row -->
+        <div class="tags-row">
+          @if (animal.isVaccinated) {
+            <span class="ptag ptag-green">💉 Vaccinated</span>
+          }
+          @if (animal.isNeutered) {
+            <span class="ptag ptag-blue">✂️ Neutered</span>
+          }
+          <span class="ptag" [ngClass]="animal.status === 'AVAILABLE' ? 'ptag-orange' : 'ptag-grey'">
+            {{ animal.status || 'AVAILABLE' }}
+          </span>
+        </div>
+
+        <!-- Location -->
+        @if (animal.city) {
+          <div class="location-row">
+            <mat-icon>place</mat-icon>
+            <span>{{ animal.city }}</span>
+          </div>
+        }
+
+        <!-- Description -->
+        @if (animal.description) {
+          <p class="animal-desc">{{ animal.description }}</p>
+        }
+
+        <!-- Vitals grid -->
+        <div class="vitals-grid">
+          @if (animal.ageMonths) {
+            <div class="vital-item">
+              <mat-icon>cake</mat-icon>
+              <div>
+                <div class="vital-value">
+                  {{ animal.ageMonths < 12 ? animal.ageMonths + ' mo' : (animal.ageMonths / 12 | number:'1.0-1') + ' yr' }}
+                </div>
+                <div class="vital-label">Age</div>
+              </div>
+            </div>
+          }
+          @if (animal.gender) {
+            <div class="vital-item">
+              <mat-icon>{{ animal.gender === 'MALE' ? 'male' : 'female' }}</mat-icon>
+              <div>
+                <div class="vital-value">{{ animal.gender }}</div>
+                <div class="vital-label">Gender</div>
+              </div>
+            </div>
+          }
+          @if (animal.species) {
+            <div class="vital-item">
+              <mat-icon>pets</mat-icon>
+              <div>
+                <div class="vital-value">{{ animal.species }}</div>
+                <div class="vital-label">Species</div>
+              </div>
+            </div>
+          }
+          @if (animal.breed) {
+            <div class="vital-item">
+              <mat-icon>info_outline</mat-icon>
+              <div>
+                <div class="vital-value">{{ animal.breed }}</div>
+                <div class="vital-label">Breed</div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Apply form -->
+    @if (animal.status === 'AVAILABLE' && isLoggedIn) {
+      <div class="apply-card">
+        <div class="apply-header">
+          <div class="apply-icon"><mat-icon>favorite</mat-icon></div>
+          <div>
+            <div class="apply-title">Apply to Adopt {{ animal.name }}</div>
+            <div class="apply-sub">Tell us about yourself and your home environment</div>
+          </div>
+        </div>
+
+        <form [formGroup]="applyForm" (ngSubmit)="apply()">
+          <div class="form-section-title">Your Story</div>
+          <div class="field-group">
+            <label class="field-label">Why do you want to adopt {{ animal.name }}? *</label>
+            <mat-form-field appearance="outline">
+              <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">edit_note</mat-icon>
+              <textarea matInput rows="3" formControlName="reason"
+                        placeholder="Share your motivation and what a day with {{ animal.name }} would look like..."></textarea>
+            </mat-form-field>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Previous pet ownership experience</label>
+            <mat-form-field appearance="outline">
+              <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">history</mat-icon>
+              <textarea matInput rows="2" formControlName="experience"
+                        placeholder="Do you currently have or have previously cared for pets?"></textarea>
+            </mat-form-field>
+          </div>
+          <div class="form-section-title" style="margin-top:8px">Living Situation</div>
+          <div class="field-group">
+            <label class="field-label">Housing type</label>
+            <mat-form-field appearance="outline">
+              <mat-icon matPrefix style="color:#8BA3B5;margin-right:6px">home</mat-icon>
+              <mat-select formControlName="housingType">
+                <mat-option value="HOUSE">🏠 Independent House</mat-option>
+                <mat-option value="APARTMENT">🏢 Apartment</mat-option>
+                <mat-option value="FLAT">🏗️ Flat / Studio</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:12px">
+            <button mat-raised-button type="submit" [disabled]="applying" class="apply-submit-btn">
+              @if (applying) {
+                <mat-spinner diameter="18" style="display:inline-block;margin-right:6px"></mat-spinner>
+              } @else {
+                <mat-icon>send</mat-icon>
+              }
+              {{ applying ? 'Submitting...' : 'Submit Application' }}
+            </button>
+            <button mat-stroked-button type="button" routerLink="/adoption/animals"
+                    style="height:48px;border-radius:12px;color:#4A6478;border-color:#C8DCE8">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    }
+
+    @if (!isLoggedIn) {
+      <div class="login-nudge">
+        <mat-icon>lock_outline</mat-icon>
+        <div>
+          <strong>Login to apply for adoption</strong>
+          <p>Create an account or log in to submit your adoption application.</p>
+        </div>
+        <button mat-raised-button routerLink="/auth/login"
+                style="background:#FF8C42;color:#fff;border-radius:12px;height:42px;flex-shrink:0">
+          Login / Register
+        </button>
+      </div>
+    }
+  }
+
+  @if (!loading && !animal) {
+    <div class="card" style="margin-top:24px">
+      <div class="empty-state">
+        <div class="empty-icon"><mat-icon>search_off</mat-icon></div>
+        <h3>Animal not found</h3>
+        <p>This animal may have already been adopted or is no longer listed.</p>
+        <button mat-raised-button routerLink="/adoption/animals" style="margin-top:8px;border-radius:10px">
+          Browse All Animals
+        </button>
+      </div>
+    </div>
+  }
+
+</div>

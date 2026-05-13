@@ -198,7 +198,8 @@ public class DataInitializer implements CommandLineRunner {
                         h.setName(u.getName());
                         h.setPhone(u.getPhone());
                         h.setEmail(u.getEmail());
-                        h.setCity("Chennai");
+                        h.setCity("");      // unknown at backfill — owner can update via profile
+                        h.setAddress("");   // unknown at backfill — owner can update via profile
                         // Activate if user is already approved; keep inactive if still pending
                         h.setIsActive(Boolean.TRUE.equals(u.getIsApproved()));
                         hospitalRepository.save(h);
@@ -217,7 +218,8 @@ public class DataInitializer implements CommandLineRunner {
                         ngo.setName(u.getName());
                         ngo.setPhone(u.getPhone());
                         ngo.setEmail(u.getEmail());
-                        ngo.setCity("Chennai");
+                        ngo.setCity("");    // unknown at backfill — owner can update via profile
+                        ngo.setAddress(""); // unknown at backfill — owner can update via profile
                         // Activate + verify if user is already approved; keep inactive if pending
                         boolean approved = Boolean.TRUE.equals(u.getIsApproved());
                         ngo.setIsActive(approved);
@@ -421,6 +423,7 @@ public class DataInitializer implements CommandLineRunner {
                                       String address, BigDecimal lat, BigDecimal lng) {
         RescueReport r = new RescueReport();
         r.setReporterId(reporter.getId());
+        r.setReporterPhone(reporter.getPhone()); // pulled from the User entity — already seeded
         r.setAssignedNgo(ngoId);
         r.setAnimalType(animalType);
         r.setCriticality(crit);
@@ -459,6 +462,18 @@ public class DataInitializer implements CommandLineRunner {
     //  8. ADOPTABLE ANIMALS  (idempotent: skip if NGO already has animals)
     // ════════════════════════════════════════════════════════════════
 
+    /** Curated Unsplash photos for each seeded animal — stable public CDN URLs */
+    private static final java.util.Map<String, String> ANIMAL_PHOTOS = java.util.Map.of(
+        "max",    "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&auto=format&fit=crop&q=80",
+        "luna",   "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=600&auto=format&fit=crop&q=80",
+        "simba",  "https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?w=600&auto=format&fit=crop&q=80",
+        "bella",  "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=600&auto=format&fit=crop&q=80",
+        "mia",    "https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?w=600&auto=format&fit=crop&q=80",
+        "tiger",  "https://images.unsplash.com/photo-1558929996-da64ba858215?w=600&auto=format&fit=crop&q=80",
+        "goldie", "https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&auto=format&fit=crop&q=80",
+        "leo",    "https://images.unsplash.com/photo-1505628346881-b72b27e84530?w=600&auto=format&fit=crop&q=80"
+    );
+
     private void seedAdoptableAnimals(Ngo ngo1, Ngo ngo2) {
 
         if (adoptableAnimalRepository.findByNgoId(ngo1.getId()).isEmpty()) {
@@ -478,20 +493,40 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         if (adoptableAnimalRepository.findByNgoId(ngo2.getId()).isEmpty()) {
-            createAnimal(ngo2, "Mia",    "Cat", "Siamese Mix",             12, "FEMALE",
+            createAnimal(ngo2, "Mia",    "Cat", "Siamese Mix",         12, "FEMALE",
                     "Elegant Siamese mix. Very vocal and affectionate. Vaccinated.",
                     true,  false, AnimalStatus.AVAILABLE);
-            createAnimal(ngo2, "Tiger",  "Dog", "Indie Mix",               36, "MALE",
+            createAnimal(ngo2, "Tiger",  "Dog", "Indie Mix",           36, "MALE",
                     "Street-smart Indie mix. Healthy adult dog. Gets along with dogs and cats.",
                     false, false, AnimalStatus.AVAILABLE);
-            createAnimal(ngo2, "Goldie", "Dog", "Golden Retriever Mix",     14, "FEMALE",
+            createAnimal(ngo2, "Goldie", "Dog", "Golden Retriever Mix", 14, "FEMALE",
                     "Affectionate Golden mix. Excellent with kids and families. Vaccinated and neutered.",
                     true,  true,  AnimalStatus.AVAILABLE);
-            createAnimal(ngo2, "Leo",    "Dog", "Beagle Mix",               10, "MALE",
+            createAnimal(ngo2, "Leo",    "Dog", "Beagle Mix",           10, "MALE",
                     "Curious and friendly Beagle mix pup. Very trainable. Loves outdoor activities.",
                     false, false, AnimalStatus.AVAILABLE);
             log.info("🐱 Created 4 adoptable animals for {}", ngo2.getName());
         }
+
+        // Backfill photos for any existing seeded animal that has no photo yet
+        backfillAnimalPhotos();
+    }
+
+    /**
+     * Patches null photoUrl on seeded animals using the curated ANIMAL_PHOTOS map.
+     * Safe to run on an existing database — only touches rows where photoUrl IS NULL.
+     */
+    private void backfillAnimalPhotos() {
+        adoptableAnimalRepository.findAll().stream()
+                .filter(a -> a.getPhotoUrl() == null || a.getPhotoUrl().isBlank())
+                .forEach(a -> {
+                    String photo = ANIMAL_PHOTOS.get(a.getName().toLowerCase());
+                    if (photo != null) {
+                        a.setPhotoUrl(photo);
+                        adoptableAnimalRepository.save(a);
+                        log.info("📸 Backfilled photo for animal: {}", a.getName());
+                    }
+                });
     }
 
     private AdoptableAnimal createAnimal(Ngo ngo, String name, String species, String breed,
@@ -509,6 +544,7 @@ public class DataInitializer implements CommandLineRunner {
         a.setIsVaccinated(vaccinated);
         a.setIsNeutered(neutered);
         a.setStatus(status);
+        a.setPhotoUrl(ANIMAL_PHOTOS.get(name.toLowerCase())); // set photo at creation
         return adoptableAnimalRepository.save(a);
     }
 

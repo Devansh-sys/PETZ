@@ -1,0 +1,322 @@
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <button mat-icon-button routerLink="/dashboard"
+              style="background:#fff;border:1px solid #E0EBF2;border-radius:10px;margin-right:12px">
+        <mat-icon style="color:#4A6478">arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1>Rescue Reports</h1>
+        <p>Animals you've reported that need help</p>
+      </div>
+    </div>
+    <div class="page-header-actions">
+      <button class="report-btn" routerLink="/rescue/report">
+        <mat-icon>crisis_alert</mat-icon>
+        <span>Report Animal</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-state">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Loading reports...</span>
+    </div>
+  }
+
+  @if (!loading) {
+
+    <!-- Empty state -->
+    @if (rescues.length === 0) {
+      <div class="card">
+        <div class="empty-state">
+          <div class="empty-icon"><mat-icon>emergency</mat-icon></div>
+          <h3>No rescue reports</h3>
+          <p>Spotted an animal in need? Report it and we'll dispatch help immediately.</p>
+          <button mat-raised-button color="primary" routerLink="/rescue/report" style="margin-top:8px">
+            <mat-icon>add_alert</mat-icon> Report Now
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (rescues.length > 0) {
+
+      <!-- Search + secondary filter bar -->
+      <div class="search-filter-bar">
+        <div class="search-wrap">
+          <mat-icon class="search-icon">search</mat-icon>
+          <input class="search-input" [(ngModel)]="searchFilter.search"
+                 placeholder="Search by animal type, description, address…">
+        </div>
+        <div class="select-group">
+          <label class="select-label">Urgency</label>
+          <select class="fsel" [(ngModel)]="searchFilter.criticality">
+            <option value="">All</option>
+            <option value="CRITICAL">Critical</option>
+            <option value="HIGH">High</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="LOW">Low</option>
+          </select>
+        </div>
+        <div class="select-group">
+          <label class="select-label">Sort</label>
+          <select class="fsel" [(ngModel)]="searchFilter.sort">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+          </select>
+        </div>
+        @if (hasSearchFilters) {
+          <button class="clear-btn" (click)="clearSearchFilters()">
+            <mat-icon>close</mat-icon> Clear
+          </button>
+        }
+      </div>
+
+      <!-- Status chips filter -->
+      <div class="filter-bar">
+        <button class="filter-btn" [class.active]="activeFilter === 'ALL'"
+                (click)="activeFilter = 'ALL'">
+          All <span class="f-count">{{ rescues.length }}</span>
+        </button>
+        @for (s of statusFilters; track s.key) {
+          @if (countOf(s.key) > 0) {
+            <button class="filter-btn" [class.active]="activeFilter === s.key"
+                    (click)="activeFilter = s.key">
+              {{ s.label }} <span class="f-count">{{ countOf(s.key) }}</span>
+            </button>
+          }
+        }
+      </div>
+
+      <!-- Cards grid -->
+      <div class="rescue-grid">
+        @for (r of filtered(); track r.id) {
+          <div class="rescue-card-item" [class.completed-card]="r.status === 'COMPLETED'"
+                                        [class.cancelled-card]="r.status === 'CANCELLED'"
+                                        (click)="selected = r" style="cursor:pointer">
+
+            <!-- Top row: icon + status chips -->
+            <div class="rescue-card-top">
+              <div class="rescue-animal-icon" [class.green-icon]="r.status === 'COMPLETED'"
+                                              [class.grey-icon]="r.status === 'CANCELLED'">
+                <mat-icon>{{ animalIcon(r.animalType) }}</mat-icon>
+              </div>
+              <div class="rescue-card-chips">
+                <span class="chip" [ngClass]="r.status.toLowerCase()">{{ statusLabel(r.status) }}</span>
+                <span class="crit-badge" [ngClass]="critClass(r.criticality)">{{ r.criticality }}</span>
+              </div>
+            </div>
+
+            <!-- Animal name + date -->
+            <div class="rescue-card-content">
+              <div class="rescue-animal-name">{{ r.animalType || 'Unknown Animal' }}</div>
+              @if (r.reportedAt) {
+                <div class="report-date">
+                  <mat-icon>schedule</mat-icon>
+                  Reported {{ r.reportedAt | date:'MMM d, y' }}
+                </div>
+              }
+              <p class="rescue-desc">{{ r.description || 'No description provided.' }}</p>
+            </div>
+
+            <!-- ── Status timeline ── -->
+            @if (r.status !== 'CANCELLED') {
+              <div class="timeline">
+                @for (step of steps; track step.key; let i = $index) {
+                  <div class="tl-step" [class.tl-done]="stepIndex(r.status) >= i"
+                                       [class.tl-active]="stepIndex(r.status) === i">
+                    <div class="tl-dot">
+                      @if (stepIndex(r.status) > i) {
+                        <mat-icon>check</mat-icon>
+                      }
+                    </div>
+                    <span class="tl-label">{{ step.label }}</span>
+                  </div>
+                  @if (i < steps.length - 1) {
+                    <div class="tl-line" [class.tl-line-done]="stepIndex(r.status) > i"></div>
+                  }
+                }
+              </div>
+            }
+
+            <!-- Status hint message -->
+            <div class="status-hint" [ngClass]="'hint-' + r.status.toLowerCase()">
+              <mat-icon>{{ statusIcon(r.status) }}</mat-icon>
+              <span>{{ statusHint(r.status) }}</span>
+            </div>
+
+            <!-- Resolution notes (shown when COMPLETED) -->
+            @if (r.resolutionNotes) {
+              <div class="resolution-notes">
+                <mat-icon>check_circle</mat-icon>
+                <span><strong>Resolution:</strong> {{ r.resolutionNotes }}</span>
+              </div>
+            }
+
+            <!-- Location -->
+            @if (r.address) {
+              <div class="rescue-location">
+                <mat-icon>place</mat-icon>
+                <span>{{ r.address }}</span>
+              </div>
+            }
+
+            <!-- Reporter phone (visible to reporter) -->
+            @if (r.reporterPhone) {
+              <div class="rescue-location" style="color:#4A6478">
+                <mat-icon>phone</mat-icon>
+                <span>{{ r.reporterPhone }}</span>
+              </div>
+            }
+
+          </div>
+        }
+        @if (filtered().length === 0) {
+          <div style="grid-column:1/-1;text-align:center;padding:32px;color:#8BA3B5;font-size:0.88rem">
+            No rescue reports match your filters.
+          </div>
+        }
+      </div>
+    }
+
+  }
+
+</div>
+
+<!-- ── Detail Modal ── -->
+@if (selected) {
+  <div class="modal-backdrop" (click)="selected = null">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+
+      <div class="modal-header" [class.header-completed]="selected.status === 'COMPLETED'"
+                                [class.header-cancelled]="selected.status === 'CANCELLED'">
+        <div>
+          <div class="modal-title">{{ selected.animalType || 'Unknown Animal' }} — Report Details</div>
+          <div class="modal-sub">
+            <span class="chip" [ngClass]="selected.status.toLowerCase()">{{ statusLabel(selected.status) }}</span>
+            <span class="crit-badge" [ngClass]="critClass(selected.criticality)" style="margin-left:6px">{{ selected.criticality }}</span>
+          </div>
+        </div>
+        <button mat-icon-button (click)="selected = null">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Status timeline -->
+        @if (selected.status !== 'CANCELLED') {
+          <div class="modal-timeline">
+            @for (step of steps; track step.key; let i = $index) {
+              <div class="tl-step" [class.tl-done]="stepIndex(selected.status) >= i"
+                                   [class.tl-active]="stepIndex(selected.status) === i">
+                <div class="tl-dot">
+                  @if (stepIndex(selected.status) > i) {
+                    <mat-icon>check</mat-icon>
+                  }
+                </div>
+                <span class="tl-label">{{ step.label }}</span>
+              </div>
+              @if (i < steps.length - 1) {
+                <div class="tl-line" [class.tl-line-done]="stepIndex(selected.status) > i"></div>
+              }
+            }
+          </div>
+        }
+
+        <!-- Reported on -->
+        <div class="detail-row">
+          <mat-icon class="detail-icon">schedule</mat-icon>
+          <div>
+            <div class="detail-label">Reported On</div>
+            <div class="detail-value">{{ selected.reportedAt | date:'EEEE, d MMMM y, h:mm a' }}</div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="detail-row">
+          <mat-icon class="detail-icon">description</mat-icon>
+          <div>
+            <div class="detail-label">Description</div>
+            <div class="detail-value" style="font-weight:500;line-height:1.5">{{ selected.description || 'No description provided.' }}</div>
+          </div>
+        </div>
+
+        <!-- Location -->
+        @if (selected.address) {
+          <div class="detail-row">
+            <mat-icon class="detail-icon">place</mat-icon>
+            <div>
+              <div class="detail-label">Location</div>
+              <div class="detail-value" style="font-weight:500">{{ selected.address }}</div>
+            </div>
+          </div>
+        }
+
+        <!-- Reporter Phone -->
+        @if (selected.reporterPhone) {
+          <div class="detail-row">
+            <mat-icon class="detail-icon">phone</mat-icon>
+            <div>
+              <div class="detail-label">Your Contact Number</div>
+              <div class="detail-value">{{ selected.reporterPhone }}</div>
+            </div>
+          </div>
+        }
+
+        <!-- NGO Section -->
+        @if (selected.ngoName) {
+          <div class="ngo-section">
+            <div class="ngo-section-title">
+              <mat-icon>groups</mat-icon> Assigned NGO
+            </div>
+            <div class="ngo-name">{{ selected.ngoName }}</div>
+            @if (selected.ngoCity) {
+              <div class="ngo-meta">{{ selected.ngoAddress ? selected.ngoAddress + ', ' : '' }}{{ selected.ngoCity }}</div>
+            }
+            <div class="ngo-contacts">
+              @if (selected.ngoPhone) {
+                <a class="ngo-contact-chip" [href]="'tel:' + selected.ngoPhone">
+                  <mat-icon>call</mat-icon> {{ selected.ngoPhone }}
+                </a>
+              }
+              @if (selected.ngoEmail) {
+                <a class="ngo-contact-chip" [href]="'mailto:' + selected.ngoEmail">
+                  <mat-icon>email</mat-icon> {{ selected.ngoEmail }}
+                </a>
+              }
+            </div>
+          </div>
+        } @else if (selected.status === 'PENDING') {
+          <div class="ngo-pending-box">
+            <mat-icon>hourglass_empty</mat-icon>
+            <span>Awaiting NGO assignment. You'll be notified once one is assigned.</span>
+          </div>
+        } @else if (selected.status === 'ASSIGNED' || selected.status === 'IN_PROGRESS') {
+          <div class="ngo-pending-box" style="background:#EFF6FF;border-color:#BFDBFE;color:#1E40AF">
+            <mat-icon style="color:#3B82F6">groups</mat-icon>
+            <span>An NGO is assigned. Contact details will appear after refreshing.</span>
+          </div>
+        }
+
+        <!-- Resolution notes -->
+        @if (selected.resolutionNotes) {
+          <div class="resolution-notes">
+            <mat-icon>check_circle</mat-icon>
+            <div>
+              <div class="detail-label">Resolution</div>
+              <span>{{ selected.resolutionNotes }}</span>
+            </div>
+          </div>
+        }
+
+      </div>
+
+    </div>
+  </div>
+}

@@ -16,6 +16,7 @@ import com.petz.repository.NgoRepository;
 import com.petz.util.FileStorageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -63,6 +64,7 @@ public class AdoptionService {
         if (req.getCity() != null)         a.setCity(req.getCity());
         if (req.getIsVaccinated() != null) a.setIsVaccinated(req.getIsVaccinated());
         if (req.getIsNeutered() != null)   a.setIsNeutered(req.getIsNeutered());
+        if (req.getStatus() != null)       a.setStatus(req.getStatus());
         return animalRepo.save(a);
     }
 
@@ -93,6 +95,17 @@ public class AdoptionService {
     public List<AdoptableAnimal> getByNgo(Long ngoUserId) {
         Ngo ngo = getNgo(ngoUserId);
         return animalRepo.findByNgoId(ngo.getId());
+    }
+
+    @Transactional
+    public void deleteAnimal(Long id, Long ngoUserId) {
+        Ngo ngo = getNgo(ngoUserId);
+        AdoptableAnimal a = getAnimalById(id);
+        if (!a.getNgoId().equals(ngo.getId())) throw new BadRequestException("Not your animal listing.");
+        // Remove all adoption applications for this animal first, then delete the listing
+        List<AdoptionApplication> apps = applicationRepo.findByAnimalId(id);
+        applicationRepo.deleteAll(apps);
+        animalRepo.delete(a);
     }
 
     // ── Application (User) ────────────────────────────────────────────

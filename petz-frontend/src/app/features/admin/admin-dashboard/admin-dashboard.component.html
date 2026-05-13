@@ -1,0 +1,357 @@
+
+    <div class="dash-root">
+
+      <!-- ── Header ───────────────────────────────────────── -->
+      <div class="dash-header">
+        <div>
+          <h1 class="dash-title">Admin Panel</h1>
+          <p class="dash-sub">Platform management and oversight</p>
+        </div>
+        <div class="admin-badge">
+          <mat-icon>verified_user</mat-icon>
+          <span>Administrator</span>
+        </div>
+      </div>
+
+      @if (loading) {
+        <div class="loading-state">
+          <mat-spinner diameter="36"></mat-spinner>
+          <span>Loading platform data…</span>
+        </div>
+      }
+
+      @if (!loading) {
+
+        <!-- ── Critical Alert ──────────────────────────────── -->
+        @if (criticalPending > 0) {
+          <div class="alert-bar" routerLink="/admin/rescues">
+            <div class="alert-dot"></div>
+            <mat-icon class="alert-icon">warning_amber</mat-icon>
+            <span><strong>{{ criticalPending }} critical rescue{{ criticalPending > 1 ? 's' : '' }}</strong> need{{ criticalPending === 1 ? 's' : '' }} immediate attention</span>
+            <span class="alert-cta">View now <mat-icon style="font-size:13px;width:13px;height:13px;vertical-align:middle">arrow_forward</mat-icon></span>
+          </div>
+        }
+
+        <!-- ── KPI Strip ───────────────────────────────────── -->
+        <div class="kpi-strip">
+
+          <!-- Users -->
+          <div class="kpi-item">
+            <div class="kpi-icon-box" style="background:linear-gradient(135deg,#6BAEE8,#4F8FD4)">
+              <mat-icon>people</mat-icon>
+            </div>
+            <div class="kpi-text">
+              <div class="kpi-num">{{ users.length }}</div>
+              <div class="kpi-lbl">Total Users</div>
+              <div class="kpi-sub"><span class="dot dg"></span>{{ activeUsers }} active<span class="sep">·</span><span class="dot dr"></span>{{ inactiveUsers }} inactive</div>
+              <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#4F8FD4" [style.width.%]="pct(activeUsers, users.length)"></div></div>
+            </div>
+          </div>
+
+          <div class="kpi-div"></div>
+
+          <!-- NGOs -->
+          <div class="kpi-item">
+            <div class="kpi-icon-box" style="background:linear-gradient(135deg,#9B82E0,#7C62CC)">
+              <mat-icon>business</mat-icon>
+            </div>
+            <div class="kpi-text">
+              <div class="kpi-num">{{ ngos.length }}</div>
+              <div class="kpi-lbl">Registered NGOs</div>
+              <div class="kpi-sub"><span class="dot dg"></span>{{ verifiedNgos }} verified<span class="sep">·</span><span class="dot da"></span>{{ unverifiedNgos }} pending</div>
+              <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#7C62CC" [style.width.%]="pct(verifiedNgos, ngos.length)"></div></div>
+            </div>
+          </div>
+
+          <div class="kpi-div"></div>
+
+          <!-- Rescues -->
+          <div class="kpi-item">
+            <div class="kpi-icon-box" style="background:linear-gradient(135deg,#E87070,#E05858)">
+              <mat-icon>emergency</mat-icon>
+            </div>
+            <div class="kpi-text">
+              <div class="kpi-num">{{ rescues.length }}</div>
+              <div class="kpi-lbl">Total Rescues</div>
+              <div class="kpi-sub"><span class="dot da"></span>{{ pendingRescues }} pending<span class="sep">·</span><span class="dot dg"></span>{{ completedRescues }} resolved</div>
+              <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#E05858" [style.width.%]="pct(completedRescues, rescues.length)"></div></div>
+            </div>
+          </div>
+
+          <div class="kpi-div"></div>
+
+          <!-- Hospitals -->
+          <div class="kpi-item">
+            <div class="kpi-icon-box" style="background:linear-gradient(135deg,#50CCA8,#2EB894)">
+              <mat-icon>local_hospital</mat-icon>
+            </div>
+            <div class="kpi-text">
+              <div class="kpi-num">{{ hospitals.length }}</div>
+              <div class="kpi-lbl">Hospitals</div>
+              <div class="kpi-sub"><span class="dot dg"></span>{{ activeHospitals }} active<span class="sep">·</span><span class="dot dr"></span>{{ inactiveHospitals }} inactive</div>
+              <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#2EB894" [style.width.%]="pct(activeHospitals, hospitals.length)"></div></div>
+            </div>
+          </div>
+
+          <div class="kpi-div"></div>
+
+          <!-- Adoptions -->
+          <div class="kpi-item">
+            <div class="kpi-icon-box" style="background:linear-gradient(135deg,#F0A85A,#E89340)">
+              <mat-icon>pets</mat-icon>
+            </div>
+            <div class="kpi-text">
+              <div class="kpi-num">{{ adoptions.length }}</div>
+              <div class="kpi-lbl">Adoptions</div>
+              <div class="kpi-sub"><span class="dot da"></span>{{ pendingAdoptions }} pending<span class="sep">·</span><span class="dot dg"></span>{{ approvedAdoptions }} approved</div>
+              <div class="kpi-bar-track"><div class="kpi-bar-fill" style="background:#E89340" [style.width.%]="pct(approvedAdoptions, adoptions.length)"></div></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ── Row 2: Pipeline + Urgency ──────────────────── -->
+        <div class="grid-2">
+
+          <div class="panel">
+            <div class="panel-head">
+              <span class="panel-title"><span class="accent-bar rose-bar"></span>Rescue Pipeline</span>
+              <a routerLink="/admin/rescues" class="view-link">See All →</a>
+            </div>
+            <div class="donut-layout">
+              <div class="donut-wrap">
+                <svg width="150" height="150" viewBox="0 0 92 92">
+                  <circle cx="46" cy="46" r="34" fill="none" stroke="#EEF1F5" stroke-width="7"/>
+                  @for (s of buildSegs(rescuePipeline, rescues.length); track $index) {
+                    <circle cx="46" cy="46" r="34" fill="none" [attr.stroke]="s.color" stroke-width="7"
+                            stroke-linecap="butt" transform="rotate(-90 46 46)"
+                            [attr.stroke-dasharray]="s.dash" [attr.stroke-dashoffset]="s.offset"/>
+                  }
+                </svg>
+                <div class="donut-center">
+                  <div class="donut-total">{{ rescues.length }}</div>
+                  <div class="donut-total-lbl">total</div>
+                </div>
+              </div>
+              <div class="donut-legend">
+                @for (item of rescuePipeline; track item.label) {
+                  <div class="leg-row">
+                    <span class="leg-dot" [style.background]="item.color"></span>
+                    <span class="leg-name">{{ item.label }}</span>
+                    <span class="leg-count">{{ item.count }}</span>
+                    <span class="leg-pct">{{ pct(item.count, rescues.length) }}%</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <span class="panel-title"><span class="accent-bar rose-bar"></span>Urgency Breakdown</span>
+            </div>
+            <div class="donut-layout">
+              <div class="donut-wrap">
+                <svg width="150" height="150" viewBox="0 0 92 92">
+                  <circle cx="46" cy="46" r="34" fill="none" stroke="#EEF1F5" stroke-width="7"/>
+                  @for (s of buildSegs(urgencyBreakdown, rescues.length); track $index) {
+                    <circle cx="46" cy="46" r="34" fill="none" [attr.stroke]="s.color" stroke-width="7"
+                            stroke-linecap="butt" transform="rotate(-90 46 46)"
+                            [attr.stroke-dasharray]="s.dash" [attr.stroke-dashoffset]="s.offset"/>
+                  }
+                </svg>
+                <div class="donut-center">
+                  <div class="donut-total">{{ rescues.length }}</div>
+                  <div class="donut-total-lbl">rescues</div>
+                </div>
+              </div>
+              <div class="donut-legend">
+                @for (item of urgencyBreakdown; track item.label) {
+                  <div class="leg-row">
+                    <span class="leg-dot" [style.background]="item.color"></span>
+                    <span class="leg-name">{{ item.label }}</span>
+                    <span class="leg-count">{{ item.count }}</span>
+                    <span class="leg-pct">{{ pct(item.count, rescues.length) }}%</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ── Row 3: Roles + NGO ──────────────────────────── -->
+        <div class="grid-2">
+
+          <div class="panel">
+            <div class="panel-head">
+              <span class="panel-title"><span class="accent-bar slate-bar"></span>User Roles</span>
+              <a routerLink="/admin/users" class="view-link">Manage →</a>
+            </div>
+            <div class="donut-layout">
+              <div class="donut-wrap">
+                <svg width="150" height="150" viewBox="0 0 92 92">
+                  <circle cx="46" cy="46" r="34" fill="none" stroke="#EEF1F5" stroke-width="7"/>
+                  @for (s of buildSegs(roleDistribution, users.length); track $index) {
+                    <circle cx="46" cy="46" r="34" fill="none" [attr.stroke]="s.color" stroke-width="7"
+                            stroke-linecap="butt" transform="rotate(-90 46 46)"
+                            [attr.stroke-dasharray]="s.dash" [attr.stroke-dashoffset]="s.offset"/>
+                  }
+                </svg>
+                <div class="donut-center">
+                  <div class="donut-total">{{ users.length }}</div>
+                  <div class="donut-total-lbl">users</div>
+                </div>
+              </div>
+              <div class="donut-legend">
+                @for (item of roleDistribution; track item.label) {
+                  <div class="leg-row">
+                    <span class="leg-dot" [style.background]="item.color"></span>
+                    <span class="leg-name">{{ item.label }}</span>
+                    <span class="leg-count">{{ item.count }}</span>
+                    <span class="leg-pct">{{ pct(item.count, users.length) }}%</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <span class="panel-title"><span class="accent-bar lavender-bar"></span>NGO Health</span>
+              <a routerLink="/admin/ngos" class="view-link">Manage →</a>
+            </div>
+            <div class="donut-layout">
+              <div class="donut-wrap">
+                <svg width="150" height="150" viewBox="0 0 92 92">
+                  <circle cx="46" cy="46" r="34" fill="none" stroke="#EEF1F5" stroke-width="7"/>
+                  @for (s of buildSegs(ngoBreakdown, ngos.length); track $index) {
+                    <circle cx="46" cy="46" r="34" fill="none" [attr.stroke]="s.color" stroke-width="7"
+                            stroke-linecap="butt" transform="rotate(-90 46 46)"
+                            [attr.stroke-dasharray]="s.dash" [attr.stroke-dashoffset]="s.offset"/>
+                  }
+                </svg>
+                <div class="donut-center">
+                  <div class="donut-total">{{ ngos.length }}</div>
+                  <div class="donut-total-lbl">NGOs</div>
+                </div>
+              </div>
+              <div class="donut-legend">
+                @for (item of ngoBreakdown; track item.label) {
+                  <div class="leg-row">
+                    <span class="leg-dot" [style.background]="item.color"></span>
+                    <span class="leg-name">{{ item.label }}</span>
+                    <span class="leg-count">{{ item.count }}</span>
+                    <span class="leg-pct">{{ pct(item.count, ngos.length) }}%</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ── Row 4: Adoptions ────────────────────────────── -->
+        <div class="panel" style="margin-bottom:28px">
+          <div class="panel-head">
+            <span class="panel-title"><span class="accent-bar steel-bar"></span>Adoption Pipeline</span>
+          </div>
+          <div class="donut-layout">
+            <div class="donut-wrap">
+              <svg width="150" height="150" viewBox="0 0 92 92">
+                <circle cx="46" cy="46" r="34" fill="none" stroke="#EEF1F5" stroke-width="7"/>
+                @for (s of buildSegs(adoptionSegments, adoptions.length); track $index) {
+                  <circle cx="46" cy="46" r="34" fill="none" [attr.stroke]="s.color" stroke-width="7"
+                          stroke-linecap="butt" transform="rotate(-90 46 46)"
+                          [attr.stroke-dasharray]="s.dash" [attr.stroke-dashoffset]="s.offset"/>
+                }
+              </svg>
+              <div class="donut-center">
+                <div class="donut-total">{{ adoptions.length }}</div>
+                <div class="donut-total-lbl">total</div>
+              </div>
+            </div>
+            <div class="donut-legend donut-legend-horiz">
+              @for (item of adoptionSegments; track item.label) {
+                <div class="leg-row leg-row-wide">
+                  <span class="leg-dot" [style.background]="item.color"></span>
+                  <span class="leg-name">{{ item.label }}</span>
+                  <span class="leg-count">{{ item.count }}</span>
+                  <span class="leg-pct">{{ pct(item.count, adoptions.length) }}%</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Navigation Cards ────────────────────────────── -->
+        <div class="section-head-row">
+          <h2 class="section-h2">Platform Management</h2>
+        </div>
+
+        <div class="nav-grid">
+
+          <div class="nav-card" routerLink="/admin/users">
+            <div class="nav-stripe" style="background:#4F8FD4"></div>
+            <div class="nav-icon" style="background:#4F8FD4"><mat-icon>people</mat-icon></div>
+            <div class="nav-body">
+              <div class="nav-title">User Management</div>
+              <div class="nav-desc">View, activate or deactivate user accounts</div>
+              <div class="nav-chips">
+                <span class="nchip sage-chip">{{ activeUsers }} active</span>
+                <span class="nchip rose-chip">{{ inactiveUsers }} inactive</span>
+              </div>
+            </div>
+            <mat-icon class="nav-arrow">chevron_right</mat-icon>
+          </div>
+
+          <div class="nav-card" routerLink="/admin/ngos">
+            <div class="nav-stripe" style="background:#7C62CC"></div>
+            <div class="nav-icon" style="background:#7C62CC"><mat-icon>business</mat-icon></div>
+            <div class="nav-body">
+              <div class="nav-title">NGO Management</div>
+              <div class="nav-desc">Create and manage rescue organisations</div>
+              <div class="nav-chips">
+                <span class="nchip sage-chip">{{ verifiedNgos }} verified</span>
+                <span class="nchip sand-chip">{{ unverifiedNgos }} pending</span>
+              </div>
+            </div>
+            <mat-icon class="nav-arrow">chevron_right</mat-icon>
+          </div>
+
+          <div class="nav-card" routerLink="/admin/rescues">
+            <div class="nav-stripe" style="background:#E05858"></div>
+            <div class="nav-icon" style="background:#E05858"><mat-icon>emergency</mat-icon></div>
+            <div class="nav-body">
+              <div class="nav-title">Rescue Oversight</div>
+              <div class="nav-desc">Monitor all platform rescue reports</div>
+              <div class="nav-chips">
+                <span class="nchip sand-chip">{{ pendingRescues }} pending</span>
+                @if (criticalPending > 0) {
+                  <span class="nchip rose-chip">{{ criticalPending }} critical</span>
+                }
+              </div>
+            </div>
+            <mat-icon class="nav-arrow">chevron_right</mat-icon>
+          </div>
+
+          <div class="nav-card" routerLink="/admin/hospitals">
+            <div class="nav-stripe" style="background:#2EB894"></div>
+            <div class="nav-icon" style="background:#2EB894"><mat-icon>local_hospital</mat-icon></div>
+            <div class="nav-body">
+              <div class="nav-title">Hospital Management</div>
+              <div class="nav-desc">View and manage registered hospitals</div>
+              <div class="nav-chips">
+                <span class="nchip sage-chip">{{ activeHospitals }} active</span>
+                @if (inactiveHospitals > 0) {
+                  <span class="nchip rose-chip">{{ inactiveHospitals }} inactive</span>
+                }
+              </div>
+            </div>
+            <mat-icon class="nav-arrow">chevron_right</mat-icon>
+          </div>
+
+        </div>
+
+      }
+    </div>
